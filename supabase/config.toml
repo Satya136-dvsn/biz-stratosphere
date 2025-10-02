@@ -1,0 +1,55 @@
+project_id = "kfkllxfwyvocmnkowbyw"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[functions.ai-chat]
+verify_jwt = true
+
+[functions.trend-analysis]
+verify_jwt = true
+
+[functions.forecasting]
+verify_jwt = true
+
+[functions.customer-prediction]
+verify_jwt = true
+
+[functions.churn-prediction]
+verify_jwt = true
+
+[functions.sales-forecasting]
+verify_jwt = true
+
+[functions.anomaly-detection]
+verify_jwt = true
+
+[functions.data-upload]
+verify_jwt = true
+
+[functions.etl-processor]
+verify_jwt = true
+
+[functions.auto-etl-trigger]
+verify_jwt = true
+
+[functions.powerbi-data-endpoint]
+verify_jwt = false
+
+[functions.powerbi-report-generator]
+verify_jwt = true
+
+[functions.powerbi-scheduled-refresh]
+verify_jwt = true
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+enable_confirmations = false

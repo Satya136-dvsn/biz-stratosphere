@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/biz-stratosphere-main/mlruns/988215091531766538/1f6ea575ff4949f4972dd7dcaf56edbf/artifacts
+end_time: 1758548649536
+entry_point_name: ''
+experiment_id: '988215091531766538'
+lifecycle_stage: active
+run_id: 1f6ea575ff4949f4972dd7dcaf56edbf
+run_name: adorable-pig-44
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758548649481
+status: 3
+tags: []
+user_id: ACER
