@@ -12,12 +12,15 @@ import { DateFilter } from "@/components/dashboard/DateFilter";
 import { ExportButtons } from "@/components/dashboard/ExportButtons";
 import { ChartTypeSelector, ChartType } from "@/components/dashboard/ChartTypeSelector";
 import { MLInsights } from "@/components/dashboard/MLInsights";
+import { EnhancedDataUpload } from "@/components/dashboard/EnhancedDataUpload";
 import { useKPIData } from "@/hooks/useKPIData";
 import { useChartData } from "@/hooks/useChartData";
+import { useRealtimeKPIs } from "@/hooks/useRealtimeKPIs";
 import { subMonths } from 'date-fns';
 
 export default function Dashboard() {
   const { kpiData, isLoading } = useKPIData();
+  const { realtimeData } = useRealtimeKPIs();
   
   // Chart filters state
   const [startDate, setStartDate] = useState(() => subMonths(new Date(), 6));
@@ -153,6 +156,11 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <DataUpload />
           <ChurnDataUpload />
+        </div>
+
+        {/* Enhanced Upload Section */}
+        <div>
+          <EnhancedDataUpload />
         </div>
 
         {/* Predictions Section */}

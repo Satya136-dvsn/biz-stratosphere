@@ -165,6 +165,81 @@ export type Database = {
           },
         ]
       }
+      app_5e2825bd69_churn_predictions: {
+        Row: {
+          churn_probability: number
+          created_at: string
+          customer_id: string
+          customer_name: string
+          factors: Json | null
+          id: string
+          predicted_date: string | null
+          revenue_impact: number | null
+          risk_level: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          churn_probability: number
+          created_at?: string
+          customer_id: string
+          customer_name: string
+          factors?: Json | null
+          id?: string
+          predicted_date?: string | null
+          revenue_impact?: number | null
+          risk_level: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          churn_probability?: number
+          created_at?: string
+          customer_id?: string
+          customer_name?: string
+          factors?: Json | null
+          id?: string
+          predicted_date?: string | null
+          revenue_impact?: number | null
+          risk_level?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      app_5e2825bd69_user_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message: string
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          severity: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       churn_data: {
         Row: {
           company_id: string | null
@@ -337,7 +412,7 @@ export type Database = {
           },
         ]
       }
-        datasets: {
+      datasets: {
         Row: {
           company_id: string | null
           created_at: string
@@ -644,6 +719,41 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       churn_predictions_view: {
@@ -672,11 +782,61 @@ export type Database = {
         }
         Relationships: []
       }
+      user_alerts_view: {
+        Row: {
+          alert_color: string | null
+          alert_id: string | null
+          alert_type: string | null
+          created_at: string | null
+          is_global: boolean | null
+          is_new: boolean | null
+          message: string | null
+          seen: boolean | null
+          title: string | null
+          user_id: string | null
+        }
+        Insert: {
+          alert_color?: never
+          alert_id?: string | null
+          alert_type?: string | null
+          created_at?: string | null
+          is_global?: boolean | null
+          is_new?: never
+          message?: string | null
+          seen?: boolean | null
+          title?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          alert_color?: never
+          alert_id?: string | null
+          alert_type?: string | null
+          created_at?: string | null
+          is_global?: boolean | null
+          is_new?: never
+          message?: string | null
+          seen?: boolean | null
+          title?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      check_user_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       get_user_company_id: {
         Args: { user_uuid: string }
         Returns: string
+      }
+      get_user_highest_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
       }
       has_permission: {
         Args: {
@@ -697,6 +857,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "super_admin" | "company_admin" | "analyst" | "viewer"
       dataset_status: "uploading" | "processing" | "completed" | "error"
       permission_type: "read" | "write" | "delete" | "admin"
       user_role:
@@ -833,6 +994,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["super_admin", "company_admin", "analyst", "viewer"],
       dataset_status: ["uploading", "processing", "completed", "error"],
       permission_type: ["read", "write", "delete", "admin"],
       user_role: [

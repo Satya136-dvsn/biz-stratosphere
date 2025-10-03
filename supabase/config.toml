@@ -46,6 +46,9 @@ verify_jwt = true
 [functions.powerbi-scheduled-refresh]
 verify_jwt = true
 
+[functions.model-explainability]
+verify_jwt = true
+
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
