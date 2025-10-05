@@ -318,6 +318,120 @@ export type Database = {
           },
         ]
       }
+      cleaned_data_points: {
+        Row: {
+          active_member: number | null
+          age: number | null
+          age_tenure_interaction: number | null
+          balance: number | null
+          balance_salary_ratio: number | null
+          churn: number | null
+          cleaned_at: string | null
+          company_id: string | null
+          country: string | null
+          country_france: number | null
+          country_germany: number | null
+          country_spain: number | null
+          created_at: string | null
+          credit_card: number | null
+          credit_score: number | null
+          customer_id: number | null
+          data_quality_score: number | null
+          date_recorded: string
+          estimated_salary: number | null
+          gender: string | null
+          gender_male: number | null
+          id: string
+          metadata: Json | null
+          metric_name: string
+          metric_type: string
+          metric_value: number
+          original_dataset_id: string | null
+          products_number: number | null
+          tenure: number | null
+          user_id: string
+        }
+        Insert: {
+          active_member?: number | null
+          age?: number | null
+          age_tenure_interaction?: number | null
+          balance?: number | null
+          balance_salary_ratio?: number | null
+          churn?: number | null
+          cleaned_at?: string | null
+          company_id?: string | null
+          country?: string | null
+          country_france?: number | null
+          country_germany?: number | null
+          country_spain?: number | null
+          created_at?: string | null
+          credit_card?: number | null
+          credit_score?: number | null
+          customer_id?: number | null
+          data_quality_score?: number | null
+          date_recorded: string
+          estimated_salary?: number | null
+          gender?: string | null
+          gender_male?: number | null
+          id?: string
+          metadata?: Json | null
+          metric_name: string
+          metric_type?: string
+          metric_value: number
+          original_dataset_id?: string | null
+          products_number?: number | null
+          tenure?: number | null
+          user_id: string
+        }
+        Update: {
+          active_member?: number | null
+          age?: number | null
+          age_tenure_interaction?: number | null
+          balance?: number | null
+          balance_salary_ratio?: number | null
+          churn?: number | null
+          cleaned_at?: string | null
+          company_id?: string | null
+          country?: string | null
+          country_france?: number | null
+          country_germany?: number | null
+          country_spain?: number | null
+          created_at?: string | null
+          credit_card?: number | null
+          credit_score?: number | null
+          customer_id?: number | null
+          data_quality_score?: number | null
+          date_recorded?: string
+          estimated_salary?: number | null
+          gender?: string | null
+          gender_male?: number | null
+          id?: string
+          metadata?: Json | null
+          metric_name?: string
+          metric_type?: string
+          metric_value?: number
+          original_dataset_id?: string | null
+          products_number?: number | null
+          tenure?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cleaned_data_points_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cleaned_data_points_original_dataset_id_fkey"
+            columns: ["original_dataset_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           created_at: string
@@ -845,6 +959,10 @@ export type Database = {
           resource_uuid?: string
           user_uuid: string
         }
+        Returns: boolean
+      }
+      is_admin_user: {
+        Args: { _user_id: string }
         Returns: boolean
       }
       mark_alert_seen: {
