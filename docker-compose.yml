@@ -9,9 +9,12 @@ services:
       - "8000:8000"
     volumes:
       - ./services/predict:/app/services/predict
+      - ./models:/app/models
       - ./requirements.txt:/app/requirements.txt
     environment:
       - PYTHONUNBUFFERED=1
+      - MODEL_DIR=/app/models
+      
   frontend:
     build:
       context: .
@@ -22,3 +25,64 @@ services:
       - backend
     environment:
       - NODE_ENV=production
+      
+  postgres-airflow:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - airflow-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+      
+  airflow-webserver:
+    image: apache/airflow:2.8.0-python3.11
+    depends_on:
+      - postgres-airflow
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./etl:/opt/airflow/dags/etl
+      - ./ml:/opt/airflow/dags/ml
+    command: >
+      bash -c "airflow db init &&
+               airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin &&
+               airflow webserver"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
+  airflow-scheduler:
+    image: apache/airflow:2.8.0-python3.11
+    depends_on:
+      - postgres-airflow
+      - airflow-webserver
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    volumes:
+      - ./etl:/opt/airflow/dags/etl
+      - ./ml:/opt/airflow/dags/ml
+    command: airflow scheduler
+    
+volumes:
+  airflow-db:
