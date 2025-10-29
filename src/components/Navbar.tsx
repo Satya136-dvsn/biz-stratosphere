@@ -59,29 +59,32 @@ export function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 border-b border-border/50 glass-effect shadow-card">
       <div className="container mx-auto px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Branding */}
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-primary-foreground" />
+          <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate('/dashboard')}>
+            <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow group-hover:shadow-glow-secondary transition-all duration-300 group-hover:scale-110">
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold bg-gradient-accent bg-clip-text text-transparent">
                 Biz Stratosphere
               </h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">Business Intelligence Platform</p>
+              <p className="text-xs text-muted-foreground hidden sm:block">AI Business Intelligence</p>
             </div>
           </div>
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
-            {/* Only show Dashboard, remove Home since / redirects to /dashboard */}
             <Button 
               variant={isActivePath('/dashboard') ? "secondary" : "ghost"} 
               size="sm" 
-              className="text-muted-foreground hover:text-foreground"
+              className={`transition-all duration-300 ${
+                isActivePath('/dashboard') 
+                  ? 'bg-gradient-primary text-white shadow-glow' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`}
               onClick={() => navigate('/dashboard')}
             >
               <BarChart3 className="h-4 w-4 mr-2" />
@@ -90,7 +93,11 @@ export function Navbar() {
             <Button 
               variant={isActivePath('/reports') ? "secondary" : "ghost"} 
               size="sm" 
-              className="text-muted-foreground hover:text-foreground"
+              className={`transition-all duration-300 ${
+                isActivePath('/reports') 
+                  ? 'bg-gradient-primary text-white shadow-glow' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`}
               onClick={() => navigate('/reports')}
             >
               <FileText className="h-4 w-4 mr-2" />
@@ -99,7 +106,11 @@ export function Navbar() {
             <Button 
               variant={isActivePath('/settings') ? "secondary" : "ghost"} 
               size="sm" 
-              className="text-muted-foreground hover:text-foreground"
+              className={`transition-all duration-300 ${
+                isActivePath('/settings') 
+                  ? 'bg-gradient-primary text-white shadow-glow' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`}
               onClick={() => navigate('/settings')}
             >
               <Settings className="h-4 w-4 mr-2" />
@@ -115,16 +126,16 @@ export function Navbar() {
             {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:ring-2 hover:ring-primary/50 transition-all duration-300">
+                  <Avatar className="h-10 w-10 ring-2 ring-border">
                     <AvatarImage src={user?.user_metadata?.avatar_url} alt="User avatar" />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
+                    <AvatarFallback className="bg-gradient-primary text-white font-semibold">
                       {getUserInitials()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuContent className="w-56 glass-effect border-border/50" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">

@@ -117,23 +117,34 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen bg-gradient-bg flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <div className="w-full max-w-md space-y-6 relative z-10 animate-fade-in-up">
         {/* Logo/Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Business Intelligence
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-primary shadow-glow mb-2 animate-scale-in">
+            <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-white">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-accent bg-clip-text text-transparent animate-gradient-shift" style={{ backgroundSize: '200% 200%' }}>
+            Biz Stratosphere
           </h1>
-          <p className="text-muted-foreground">
-            AI-powered analytics and insights
+          <p className="text-muted-foreground text-lg">
+            AI-Powered Business Intelligence Platform
           </p>
         </div>
 
-        <Card className="border-muted/20 shadow-card">
+        <Card className="border-border/50 shadow-card-hover glass-effect hover-lift">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Welcome</CardTitle>
+            <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
             <CardDescription className="text-center">
-              Sign in to your account or create a new one
+              Sign in to access your analytics dashboard
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -171,7 +182,7 @@ export default function Auth() {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity" 
+                    className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300 hover:scale-[1.02]" 
                     disabled={loading}
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -221,7 +232,7 @@ export default function Auth() {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity" 
+                    className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300 hover:scale-[1.02]" 
                     disabled={loading}
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

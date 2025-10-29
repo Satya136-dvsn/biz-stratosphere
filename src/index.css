@@ -8,58 +8,65 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Enterprise BI Color Palette */
-    --background: 240 10% 3.9%;
+    /* Biz Stratosphere 2.0 - Deep Blue + Violet Theme */
+    --background: 235 25% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 235 20% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 235 25% 10%;
     --popover-foreground: 0 0% 98%;
 
-    /* Primary - Professional Blue */
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 221 83% 65%;
+    /* Primary - Deep Blue */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 217 91% 70%;
+    --primary-dark: 217 91% 45%;
 
-    /* Secondary - Enterprise Purple */
-    --secondary: 267 79% 42%;
-    --secondary-foreground: 0 0% 98%;
+    /* Secondary - Vibrant Violet */
+    --secondary: 270 80% 58%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 270 80% 68%;
 
-    /* Muted - Professional Grays */
-    --muted: 240 4.9% 15%;
-    --muted-foreground: 240 5% 64.9%;
+    /* Muted - Subtle Grays */
+    --muted: 235 15% 20%;
+    --muted-foreground: 235 10% 70%;
 
-    /* Accent - Success Green */
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 98%;
+    /* Accent - Bright Cyan */
+    --accent: 190 95% 55%;
+    --accent-foreground: 235 25% 8%;
 
-    /* Destructive - Warning Red */
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
+    /* Destructive - Coral Red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Borders and Inputs */
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 221 83% 53%;
+    --border: 235 20% 22%;
+    --input: 235 20% 18%;
+    --ring: 217 91% 60%;
 
     /* BI Specific Colors */
-    --revenue: 142 71% 45%;
-    --growth: 35 91% 62%;
-    --warning: 38 92% 50%;
-    --info: 199 89% 48%;
+    --revenue: 142 76% 48%;
+    --growth: 35 95% 62%;
+    --warning: 38 92% 55%;
+    --info: 199 89% 52%;
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
-    --gradient-revenue: linear-gradient(135deg, hsl(var(--revenue)) 0%, hsl(142 71% 65%) 100%);
-    --gradient-bg: linear-gradient(180deg, hsl(240 10% 3.9%) 0%, hsl(240 8% 6%) 100%);
+    /* Sophisticated Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(270 80% 58%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(270 80% 58%) 0%, hsl(217 91% 60%) 100%);
+    --gradient-revenue: linear-gradient(135deg, hsl(142 76% 48%) 0%, hsl(190 95% 55%) 100%);
+    --gradient-bg: linear-gradient(180deg, hsl(235 25% 8%) 0%, hsl(235 30% 5%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(235 20% 12%) 0%, hsl(235 25% 10%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(270 80% 58%) 50%, hsl(190 95% 55%) 100%);
     
-    /* Shadows */
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.3);
-    --shadow-card: 0 4px 20px hsl(240 10% 3.9% / 0.4);
+    /* Modern Shadows */
+    --shadow-glow: 0 8px 32px hsl(217 91% 60% / 0.4);
+    --shadow-glow-secondary: 0 8px 32px hsl(270 80% 58% / 0.4);
+    --shadow-card: 0 8px 24px hsl(235 25% 8% / 0.5);
+    --shadow-card-hover: 0 12px 40px hsl(217 91% 60% / 0.3);
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -123,6 +130,82 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-bg text-foreground;
+    background-attachment: fixed;
+  }
+
+  /* Modern Animations */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(217 91% 60% / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(217 91% 60% / 0.6), 0 0 60px hsl(270 80% 58% / 0.4);
+    }
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.4s ease-out;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  .animate-gradient-shift {
+    animation: gradient-shift 8s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  /* Glassmorphism Effect */
+  .glass-effect {
+    background: hsl(235 20% 12% / 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(235 20% 22% / 0.5);
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
   }
 }
