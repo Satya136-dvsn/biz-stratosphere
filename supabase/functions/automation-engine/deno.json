@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "resend": "npm:resend@3.4.0",
+    "@slack/web-api": "npm:@slack/web-api@7.0.2"
+  }
+}
