@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { 
+import {
   TrendingUp,
   User,
   Settings,
@@ -59,7 +59,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border/50 glass-effect shadow-card">
+    <nav className="sticky top-0 z-50 border-b border-white/10 shadow-lg" style={{ backgroundColor: '#0f1729' }}>
       <div className="container mx-auto px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Branding */}
@@ -68,7 +68,7 @@ export function Navbar() {
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-accent bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-white">
                 Biz Stratosphere
               </h1>
               <p className="text-xs text-muted-foreground hidden sm:block">AI Business Intelligence</p>
@@ -77,40 +77,37 @@ export function Navbar() {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
-            <Button 
-              variant={isActivePath('/dashboard') ? "secondary" : "ghost"} 
-              size="sm" 
-              className={`transition-all duration-300 ${
-                isActivePath('/dashboard') 
-                  ? 'bg-gradient-primary text-white shadow-glow' 
+            <Button
+              variant={isActivePath('/dashboard') ? "secondary" : "ghost"}
+              size="sm"
+              className={`transition-all duration-300 ${isActivePath('/dashboard')
+                  ? 'bg-gradient-primary text-white shadow-glow'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              }`}
+                }`}
               onClick={() => navigate('/dashboard')}
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Dashboard
             </Button>
-            <Button 
-              variant={isActivePath('/reports') ? "secondary" : "ghost"} 
-              size="sm" 
-              className={`transition-all duration-300 ${
-                isActivePath('/reports') 
-                  ? 'bg-gradient-primary text-white shadow-glow' 
+            <Button
+              variant={isActivePath('/reports') ? "secondary" : "ghost"}
+              size="sm"
+              className={`transition-all duration-300 ${isActivePath('/reports')
+                  ? 'bg-gradient-primary text-white shadow-glow'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              }`}
+                }`}
               onClick={() => navigate('/reports')}
             >
               <FileText className="h-4 w-4 mr-2" />
               Reports
             </Button>
-            <Button 
-              variant={isActivePath('/settings') ? "secondary" : "ghost"} 
-              size="sm" 
-              className={`transition-all duration-300 ${
-                isActivePath('/settings') 
-                  ? 'bg-gradient-primary text-white shadow-glow' 
+            <Button
+              variant={isActivePath('/settings') ? "secondary" : "ghost"}
+              size="sm"
+              className={`transition-all duration-300 ${isActivePath('/settings')
+                  ? 'bg-gradient-primary text-white shadow-glow'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              }`}
+                }`}
               onClick={() => navigate('/settings')}
             >
               <Settings className="h-4 w-4 mr-2" />
@@ -156,8 +153,8 @@ export function Navbar() {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  className="text-destructive cursor-pointer" 
+                <DropdownMenuItem
+                  className="text-destructive cursor-pointer"
                   onClick={handleSignOut}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
