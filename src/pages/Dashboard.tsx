@@ -143,41 +143,40 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* AI Assistant & Tools Section - Full Width */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <AIChatbot />
+          </div>
+          <div className="space-y-4">
+            <ExportButtons
+              kpiData={kpiData}
+              chartData={chartData}
+              dashboardElementId="dashboard-content"
+            />
+            <MLInsights />
+          </div>
+        </div>
+
+        {/* Data Upload Section - Combined */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <DataUpload />
+          <ChurnDataUpload />
+          <EnhancedDataUpload />
+        </div>
+
+        {/* Predictions Section - Improved Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <PredictionForm />
+          <PredictionsLog />
+        </div>
+
+        {/* Churn Predictions Analysis */}
+        <div>
+          <ChurnPredictionsView />
+        </div>
+      </main>
     </div>
-
-        {/* AI Assistant & Tools Section - Full Width */ }
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <div className="lg:col-span-2">
-      <AIChatbot />
-    </div>
-    <div className="space-y-4">
-      <ExportButtons
-        kpiData={kpiData}
-        chartData={chartData}
-        dashboardElementId="dashboard-content"
-      />
-      <MLInsights />
-    </div>
-  </div>
-
-  {/* Data Upload Section - Combined */ }
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <DataUpload />
-    <ChurnDataUpload />
-    <EnhancedDataUpload />
-  </div>
-
-  {/* Predictions Section - Improved Layout */ }
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <PredictionForm />
-    <PredictionsLog />
-  </div>
-
-  {/* Churn Predictions Analysis */ }
-  <div>
-    <ChurnPredictionsView />
-  </div>
-      </main >
-    </div >
   );
 }
