@@ -58,8 +58,8 @@ export function DashboardHeader() {
               <TrendingUp className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                BI Platform
+              <h1 className="text-xl font-bold text-foreground">
+                Biz Stratosphere
               </h1>
               <p className="text-xs text-muted-foreground">Business Intelligence & Analytics</p>
             </div>
