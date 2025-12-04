@@ -146,7 +146,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar - Removed AI Chatbot */}
           <div className="space-y-4">
             <ExportButtons
               kpiData={kpiData}
@@ -154,17 +154,10 @@ export default function Dashboard() {
               dashboardElementId="dashboard-content"
             />
             <MLInsights />
-            <AIChatbot />
           </div>
         </div>
 
-        {/* Data Management Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <DataUpload />
-          <ChurnDataUpload />
-        </div>
-
-        {/* Enhanced Upload Section */}
+        {/* Data Upload Section - Consolidated */}
         <div>
           <EnhancedDataUpload />
         </div>
