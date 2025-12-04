@@ -1,4 +1,4 @@
-
+import { UsageQuotas } from "@/components/settings/UsageQuotas";
 
 export function Settings() {
   return (
@@ -13,10 +13,15 @@ export function Settings() {
               Configure your application preferences
             </p>
           </div>
+
+          {/* Usage & Quotas Section */}
+          <UsageQuotas />
+
+          {/* Placeholder for future settings */}
           <div className="bg-card/50 rounded-lg p-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">Settings Panel Coming Soon</h2>
+            <h2 className="text-xl font-semibold mb-4">Additional Settings Coming Soon</h2>
             <p className="text-muted-foreground">
-              User preferences, account settings, and system configuration options will be available here.
+              More user preferences, account settings, and system configuration options will be available here.
             </p>
           </div>
         </div>
