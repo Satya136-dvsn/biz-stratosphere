@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { 
-  BarChart3, 
-  Upload, 
-  Settings, 
+import {
+  BarChart3,
+  Upload,
+  Settings,
   User,
   TrendingUp,
   Database,
@@ -50,7 +50,7 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b border-border/50 bg-card backdrop-blur-lg sticky top-0 z-50 shadow-lg">
       <div className="flex h-16 items-center justify-between px-6">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
@@ -67,9 +67,9 @@ export function DashboardHeader() {
         </div>
 
         <nav className="hidden md:flex items-center space-x-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             className="text-muted-foreground hover:text-foreground"
             onClick={() => navigate('/')}
           >
@@ -84,9 +84,9 @@ export function DashboardHeader() {
             <Upload className="h-4 w-4 mr-2" />
             Data Upload
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             className="text-muted-foreground hover:text-foreground"
             onClick={() => navigate('/enterprise')}
           >
@@ -130,8 +130,8 @@ export function DashboardHeader() {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="text-destructive cursor-pointer" 
+              <DropdownMenuItem
+                className="text-destructive cursor-pointer"
                 onClick={handleSignOut}
               >
                 <LogOut className="mr-2 h-4 w-4" />

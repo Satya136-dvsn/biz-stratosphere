@@ -166,17 +166,22 @@ export default function Dashboard() {
           <EnhancedDataUpload />
         </div>
 
-        {/* Predictions Section - Improved Layout */}
+        {/* Predictions Section - Hidden per user request */}
+        {/* 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <PredictionForm />
           <PredictionsLog />
         </div>
+        */}
 
-        {/* Churn Predictions Analysis */}
+        {/* Churn Predictions Analysis - Hidden per user request */}
+        {/*
         <div>
           <ChurnPredictionsView />
         </div>
+        */}
       </main>
     </div>
   );
 }
+```
