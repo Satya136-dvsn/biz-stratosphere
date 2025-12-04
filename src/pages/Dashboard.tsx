@@ -13,6 +13,7 @@ import { ExportButtons } from "@/components/dashboard/ExportButtons";
 import { ChartTypeSelector, ChartType } from "@/components/dashboard/ChartTypeSelector";
 import { MLInsights } from "@/components/dashboard/MLInsights";
 import { EnhancedDataUpload } from "@/components/dashboard/EnhancedDataUpload";
+import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
 import { useKPIData } from "@/hooks/useKPIData";
 import { useChartData } from "@/hooks/useChartData";
 import { useRealtimeKPIs } from "@/hooks/useRealtimeKPIs";
@@ -21,7 +22,7 @@ import { subMonths } from 'date-fns';
 export default function Dashboard() {
   const { kpiData, isLoading } = useKPIData();
   const { realtimeData } = useRealtimeKPIs();
-  
+
   // Chart filters state
   const [startDate, setStartDate] = useState(() => subMonths(new Date(), 6));
   const [endDate, setEndDate] = useState(() => new Date());
@@ -29,9 +30,9 @@ export default function Dashboard() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [revenueChartType, setRevenueChartType] = useState<ChartType>('line');
   const [customerChartType, setCustomerChartType] = useState<ChartType>('bar');
-  
+
   const availableCategories = ['Revenue', 'Customers', 'Sales', 'Marketing', 'Operations'];
-  
+
   const { chartData, isLoading: isChartLoading } = useChartData({
     startDate,
     endDate,
@@ -92,6 +93,11 @@ export default function Dashboard() {
           )}
         </div>
 
+        {/* Welcome Card for New Users */}
+        {!isLoading && kpiData && kpiData.totalRevenue === 0 && kpiData.activeCustomers === 0 && (
+          <WelcomeCard />
+        )}
+
         {/* Enhanced Filters */}
         <DateFilter
           startDate={startDate}
@@ -116,22 +122,22 @@ export default function Dashboard() {
                   onTypeChange={setRevenueChartType}
                   availableTypes={['line', 'area', 'bar']}
                 />
-                <RevenueChart 
-                  title="Revenue vs Target" 
+                <RevenueChart
+                  title="Revenue vs Target"
                   variant={revenueChartType}
                   data={chartData}
                   isLoading={isChartLoading}
                 />
               </div>
-              
+
               <div className="space-y-4">
                 <ChartTypeSelector
                   selectedType={customerChartType}
                   onTypeChange={setCustomerChartType}
                   availableTypes={['bar', 'line', 'pie']}
                 />
-                <RevenueChart 
-                  title="Customer Analytics" 
+                <RevenueChart
+                  title="Customer Analytics"
                   variant={customerChartType}
                   data={chartData}
                   isLoading={isChartLoading}
@@ -142,7 +148,7 @@ export default function Dashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <ExportButtons 
+            <ExportButtons
               kpiData={kpiData}
               chartData={chartData}
               dashboardElementId="dashboard-content"
@@ -166,10 +172,10 @@ export default function Dashboard() {
         {/* Predictions Section */}
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PredictionForm />
-          <div className="lg:col-span-1">
-            <PredictionsLog />
-          </div>
+            <PredictionForm />
+            <div className="lg:col-span-1">
+              <PredictionsLog />
+            </div>
           </div>
         </div>
 

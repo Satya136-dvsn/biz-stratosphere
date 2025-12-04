@@ -1,21 +1,21 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  LineChart, 
-  Line, 
-  BarChart, 
-  Bar, 
-  AreaChart, 
-  Area, 
-  PieChart, 
-  Pie, 
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  PieChart,
+  Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  Tooltip, 
+  XAxis,
+  YAxis,
+  Tooltip,
   ResponsiveContainer,
-  Legend 
+  Legend
 } from 'recharts';
 import { ChartType } from './ChartTypeSelector';
 
@@ -59,8 +59,29 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-64 text-muted-foreground">
-            No data available
+          <div className="flex flex-col items-center justify-center h-64 text-center space-y-3">
+            <div className="rounded-full bg-primary/10 p-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-12 w-12 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+            </div>
+            <div className="space-y-1">
+              <p className="text-lg font-medium text-foreground">No data yet</p>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                Upload your first dataset to see beautiful visualizations and insights here
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -80,17 +101,17 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
       case 'line':
         return (
           <LineChart data={data}>
-            <XAxis 
-              dataKey="month" 
+            <XAxis
+              dataKey="month"
               className="text-muted-foreground"
               fontSize={12}
             />
-            <YAxis 
+            <YAxis
               className="text-muted-foreground"
               fontSize={12}
               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
@@ -102,17 +123,17 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
               ]}
             />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="revenue" 
+            <Line
+              type="monotone"
+              dataKey="revenue"
               stroke="hsl(var(--revenue))"
               strokeWidth={3}
               dot={{ fill: 'hsl(var(--revenue))', strokeWidth: 2, r: 4 }}
               name="Revenue"
             />
-            <Line 
-              type="monotone" 
-              dataKey="target" 
+            <Line
+              type="monotone"
+              dataKey="target"
               stroke="hsl(var(--warning))"
               strokeWidth={2}
               strokeDasharray="5 5"
@@ -125,17 +146,17 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
       case 'bar':
         return (
           <BarChart data={data}>
-            <XAxis 
-              dataKey="month" 
+            <XAxis
+              dataKey="month"
               className="text-muted-foreground"
               fontSize={12}
             />
-            <YAxis 
+            <YAxis
               className="text-muted-foreground"
               fontSize={12}
               tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
@@ -144,8 +165,8 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
               formatter={(value: number) => [`${value.toLocaleString()}`, 'Customers']}
             />
             <Legend />
-            <Bar 
-              dataKey="customers" 
+            <Bar
+              dataKey="customers"
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               name="Customers"
@@ -156,17 +177,17 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
       case 'area':
         return (
           <AreaChart data={data}>
-            <XAxis 
-              dataKey="month" 
+            <XAxis
+              dataKey="month"
               className="text-muted-foreground"
               fontSize={12}
             />
-            <YAxis 
+            <YAxis
               className="text-muted-foreground"
               fontSize={12}
               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
@@ -178,20 +199,20 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
               ]}
             />
             <Legend />
-            <Area 
-              type="monotone" 
-              dataKey="revenue" 
+            <Area
+              type="monotone"
+              dataKey="revenue"
               stackId="1"
-              stroke="hsl(var(--revenue))" 
+              stroke="hsl(var(--revenue))"
               fill="hsl(var(--revenue))"
               fillOpacity={0.6}
               name="Revenue"
             />
-            <Area 
-              type="monotone" 
-              dataKey="target" 
+            <Area
+              type="monotone"
+              dataKey="target"
               stackId="1"
-              stroke="hsl(var(--warning))" 
+              stroke="hsl(var(--warning))"
               fill="hsl(var(--warning))"
               fillOpacity={0.4}
               name="Target"
@@ -205,7 +226,7 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
           value: item.revenue,
           fill: colors[index % colors.length]
         }));
-        
+
         return (
           <PieChart>
             <Pie
@@ -222,7 +243,7 @@ export function RevenueChart({ variant, title, className, data, isLoading }: Cha
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
-            <Tooltip 
+            <Tooltip
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
