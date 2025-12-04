@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useCompany } from '@/hooks/useCompany';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 type DataPoint = {
   metric_name: string;
