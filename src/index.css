@@ -2,125 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Enterprise-Level Design System - Futuristic Corporate Theme */
 
 @layer base {
   :root {
-    /* Biz Stratosphere 2.0 - Deep Blue + Violet Theme */
-    --background: 235 25% 8%;
-    --foreground: 0 0% 98%;
-
-    --card: 235 20% 12%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 235 25% 10%;
-    --popover-foreground: 0 0% 98%;
-
-    /* Primary - Deep Blue */
-    --primary: 217 91% 60%;
+    /* === BASE COLORS === */
+    /* Deep Space Background */
+    --background: 235 30% 6%;          /* #0A0E1A - Deep space blue */
+    --foreground: 210 20% 98%;         /* #F8FAFC - Almost white */
+    
+    /* Card & Surface */
+    --card: 235 25% 10%;               /* #141B2E - Elevated surface */
+    --card-foreground: 210 20% 98%;
+    
+    /* Popover */
+    --popover: 235 28% 8%;
+    --popover-foreground: 210 20% 98%;
+    
+    /* === PRIMARY - Indigo (Modern Professional) === */
+    --primary: 239 84% 67%;            /* #6366F1 - Indigo */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 70%;
-    --primary-dark: 217 91% 45%;
-
-    /* Secondary - Vibrant Violet */
-    --secondary: 270 80% 58%;
+    --primary-glow: 239 84% 77%;       /* Lighter for glow */
+    --primary-dark: 239 84% 57%;       /* Darker variant */
+    
+    /* === SECONDARY - Purple (Futuristic Accent) === */
+    --secondary: 271 81% 65%;          /* #8B5CF6 - Purple */
     --secondary-foreground: 0 0% 100%;
-    --secondary-glow: 270 80% 68%;
-
-    /* Muted - Subtle Grays */
-    --muted: 235 15% 20%;
-    --muted-foreground: 235 10% 70%;
-
-    /* Accent - Bright Cyan */
-    --accent: 190 95% 55%;
-    --accent-foreground: 235 25% 8%;
-
-    /* Destructive - Coral Red */
-    --destructive: 0 84% 60%;
+    --secondary-glow: 271 81% 75%;
+    
+    /* === ACCENT - Cyan (Neon Highlight) === */
+    --accent: 189 100% 50%;            /* #00D9FF - Neon blue */
+    --accent-foreground: 235 30% 6%;
+    --accent-neon: 287 100% 50%;       /* #B800FF - Neon purple */
+    
+    /* === STATUS COLORS === */
+    --success: 142 76% 48%;            /* #10B981 - Green */
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 55%;             /* #F59E0B - Amber */
+    --warning-foreground: 235 30% 6%;
+    
+    --destructive: 0 84% 60%;          /* #EF4444 - Red */
     --destructive-foreground: 0 0% 100%;
-
-    /* Borders and Inputs */
-    --border: 235 20% 22%;
-    --input: 235 20% 18%;
-    --ring: 217 91% 60%;
-
-    /* BI Specific Colors */
-    --revenue: 142 76% 48%;
-    --growth: 35 95% 62%;
-    --warning: 38 92% 55%;
-    --info: 199 89% 52%;
     
-    /* Sophisticated Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(270 80% 58%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(270 80% 58%) 0%, hsl(217 91% 60%) 100%);
-    --gradient-revenue: linear-gradient(135deg, hsl(142 76% 48%) 0%, hsl(190 95% 55%) 100%);
-    --gradient-bg: linear-gradient(180deg, hsl(235 25% 8%) 0%, hsl(235 30% 5%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(235 20% 12%) 0%, hsl(235 25% 10%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(270 80% 58%) 50%, hsl(190 95% 55%) 100%);
+    --info: 199 89% 52%;               /* #3B82F6 - Blue */
+    --info-foreground: 0 0% 100%;
     
-    /* Modern Shadows */
-    --shadow-glow: 0 8px 32px hsl(217 91% 60% / 0.4);
-    --shadow-glow-secondary: 0 8px 32px hsl(270 80% 58% / 0.4);
-    --shadow-card: 0 8px 24px hsl(235 25% 8% / 0.5);
-    --shadow-card-hover: 0 12px 40px hsl(217 91% 60% / 0.3);
-
-    --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    /* === MUTED & SUBTLE === */
+    --muted: 235 20% 18%;              /* Muted surface */
+    --muted-foreground: 215 20% 65%;   /* #94A3B8 - Muted text */
+    
+    /* === BORDERS & INPUTS === */
+    --border: 235 20% 20%;             /* Subtle borders */
+    --input: 235 22% 14%;              /* Input backgrounds */
+    --ring: 239 84% 67%;               /* Focus ring */
+    
+    /* === BI-SPECIFIC COLORS === */
+    --revenue: 142 76% 48%;            /* Green for revenue */
+    --growth: 35 95% 62%;              /* Orange for growth */
+    --metric-blue: 217 91% 60%;        /* Blue for metrics */
+    --metric-purple: 270 80% 58%;      /* Purple for metrics */
+    
+    /* === GRADIENTS (Corporate & Futuristic) === */
+    --gradient-primary: linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(271 81% 65%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(271 81% 65%) 0%, hsl(189 100% 50%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 48%) 0%, hsl(142 76% 38%) 100%);
+    --gradient-bg: linear-gradient(180deg, hsl(235 30% 6%) 0%, hsl(235 35% 4%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(235 25% 10% / 0.8) 0%, hsl(235 30% 8% / 0.8) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(239 84% 67% / 0.05) 0%, hsl(271 81% 65% / 0.05) 100%);
+    --gradient-neon: linear-gradient(135deg, hsl(189 100% 50%) 0%, hsl(287 100% 50%) 100%);
+    
+    /* === SHADOWS (Depth & Glow) === */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 2px 4px 0 rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.15);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.2);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.25);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.35);
+    
+    --shadow-glow-primary: 0 8px 32px hsl(239 84% 67% / 0.35);
+    --shadow-glow-secondary: 0 8px 32px hsl(271 81% 65% / 0.35);
+    --shadow-glow-neon: 0 0 30px hsl(189 100% 50% / 0.5);
+    --shadow-card: 0 8px 24px rgb(0 0 0 / 0.4);
+    --shadow-card-hover: 0 12px 40px hsl(239 84% 67% / 0.25);
+    
+    /* === BORDER RADIUS === */
+    --radius: 0.75rem;       /* 12px - Standard */
+    --radius-sm: 0.5rem;     /* 8px - Small */
+    --radius-lg: 1rem;       /* 16px - Large */
+    --radius-xl: 1.5rem;     /* 24px - Extra large */
+    --radius-full: 9999px;   /* Full rounded */
+    
+    /* === SIDEBAR === */
+    --sidebar-background: 235 28% 8%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 235 25% 12%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 235 20% 20%;
+    --sidebar-ring: 239 84% 67%;
   }
 }
 
@@ -130,26 +111,57 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-gradient-bg text-foreground;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: normal;
+    background: linear-gradient(180deg, hsl(235 30% 6%) 0%, hsl(235 35% 4%) 100%);
     background-attachment: fixed;
   }
-
-  /* Modern Animations */
+  
+  /* === TYPOGRAPHY === */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  
+  h1 { font-size: 2.25rem; line-height: 2.5rem; }  /* 36px */
+  h2 { font-size: 1.875rem; line-height: 2.25rem; } /* 30px */
+  h3 { font-size: 1.5rem; line-height: 2rem; }     /* 24px */
+  h4 { font-size: 1.25rem; line-height: 1.75rem; } /* 20px */
+  
+  /* === ANIMATIONS === */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
   @keyframes fade-in-up {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
+  
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 
   @keyframes scale-in {
     from {
       opacity: 0;
-      transform: scale(0.95);
+      transform: scale(0.96);
     }
     to {
       opacity: 1;
@@ -159,10 +171,19 @@ All colors MUST be HSL.
 
   @keyframes glow-pulse {
     0%, 100% {
-      box-shadow: 0 0 20px hsl(217 91% 60% / 0.3);
+      box-shadow: 0 0 20px hsl(239 84% 67% / 0.3);
     }
     50% {
-      box-shadow: 0 0 40px hsl(217 91% 60% / 0.6), 0 0 60px hsl(270 80% 58% / 0.4);
+      box-shadow: 0 0 40px hsl(239 84% 67% / 0.6), 0 0 60px hsl(271 81% 65% / 0.4);
+    }
+  }
+  
+  @keyframes glow-pulse-neon {
+    0%, 100% {
+      box-shadow: 0 0 15px hsl(189 100% 50% / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 30px hsl(189 100% 50% / 0.8), 0 0 45px hsl(287 100% 50% / 0.6);
     }
   }
 
@@ -174,38 +195,166 @@ All colors MUST be HSL.
       background-position: 100% 50%;
     }
   }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
 
+  /* === UTILITY CLASSES === */
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+  
   .animate-fade-in-up {
-    animation: fade-in-up 0.6s ease-out;
+    animation: fade-in-up 0.5s ease-out;
+  }
+  
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out;
   }
 
   .animate-scale-in {
-    animation: scale-in 0.4s ease-out;
+    animation: scale-in 0.3s ease-out;
   }
 
   .animate-glow-pulse {
     animation: glow-pulse 3s ease-in-out infinite;
+  }
+  
+  .animate-glow-pulse-neon {
+    animation: glow-pulse-neon 2s ease-in-out infinite;
   }
 
   .animate-gradient-shift {
     animation: gradient-shift 8s ease infinite;
     background-size: 200% 200%;
   }
-
-  /* Glassmorphism Effect */
-  .glass-effect {
-    background: hsl(235 20% 12% / 0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid hsl(235 20% 22% / 0.5);
+  
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.03),
+      transparent
+    );
+    background-size: 1000px 100%;
   }
 
-  /* Hover Effects */
+  /* === GLASSMORPHISM === */
+  .glass {
+    background: hsl(235 25% 10% / 0.5);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(235 20% 20% / 0.3);
+  }
+  
+  .glass-strong {
+    background: hsl(235 25% 10% / 0.7);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid hsl(235 20% 20% / 0.5);
+  }
+
+  /* === HOVER EFFECTS === */
   .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .hover-lift:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-card-hover);
+  }
+  
+  .hover-scale {
+    transition: transform 0.2s ease;
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+  
+  .hover-glow {
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .hover-glow:hover {
+    box-shadow: var(--shadow-glow-primary);
+  }
+
+  /* === GRADIENT TEXT === */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .gradient-text-neon {
+    background: var(--gradient-neon);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(235 25% 10%);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(239 84% 67% / 0.5);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(239 84% 67% / 0.7);
+  }
+}
+
+/* === COMPONENT LAYER === */
+@layer components {
+  /* Card Variants */
+  .card-glass {
+    @apply glass rounded-xl p-6;
+  }
+  
+  .card-glow {
+    @apply bg-card/50 rounded-xl p-6 border border-primary/20;
+    box-shadow: 0 0 30px hsl(239 84% 67% / 0.15);
+  }
+  
+  /* Button Gradients */
+  .btn-gradient {
+    @apply relative overflow-hidden;
+    background: var(--gradient-primary);
+    box-shadow: 0 4px 12px hsl(239 84% 67% / 0.3);
+  }
+  
+  .btn-gradient:hover {
+    box-shadow: 0 6px 20px hsl(239 84% 67% / 0.5);
+  }
+  
+  /* Metric Card */
+  .metric-card {
+    @apply glass rounded-xl p-6 hover-lift;
+  }
+  
+  /* Neon Border */
+  .neon-border {
+    position: relative;
+    border: 1px solid transparent;
+    background: linear-gradient(hsl(235 25% 10%), hsl(235 25% 10%)) padding-box,
+                var(--gradient-neon) border-box;
   }
 }
