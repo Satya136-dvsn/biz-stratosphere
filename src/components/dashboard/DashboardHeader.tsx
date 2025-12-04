@@ -50,7 +50,10 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="border-b border-border/30 bg-[#1a1f37] sticky top-0 z-50 shadow-md">
+    <header
+      className="border-b border-white/10 sticky top-0 z-50 shadow-lg"
+      style={{ backgroundColor: '#0f1729' }}
+    >
       <div className="flex h-16 items-center justify-between px-6">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
