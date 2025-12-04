@@ -164,6 +164,25 @@ export function useDataUpload() {
       return;
     }
 
+    // Check rate limit before uploading
+    try {
+      const rateLimitResult = await checkRateLimit(user.id, 'upload');
+
+      if (!rateLimitResult.allowed) {
+        const resetTime = rateLimitResult.resetAt.toLocaleTimeString();
+        const resetDate = rateLimitResult.resetAt.toLocaleDateString();
+        toast({
+          title: "Upload Limit Reached",
+          description: `You've reached your daily limit of ${rateLimitResult.limit} uploads. Limit resets at ${resetTime} on ${resetDate}. (${rateLimitResult.current}/${rateLimitResult.limit} used)`,
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Rate limit check error:', error);
+      // Continue with upload if rate limit check fails (fail open)
+    }
+
     setIsUploading(true);
 
     try {
