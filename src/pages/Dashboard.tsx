@@ -14,6 +14,10 @@ import { ChartTypeSelector, ChartType } from "@/components/dashboard/ChartTypeSe
 import { MLInsights } from "@/components/dashboard/MLInsights";
 import { EnhancedDataUpload } from "@/components/dashboard/EnhancedDataUpload";
 import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
+import { TopPerformers } from "@/components/dashboard/TopPerformers";
+import { RevenueBreakdown } from "@/components/dashboard/RevenueBreakdown";
+import { QuickActions } from "@/components/dashboard/QuickActions";
 import { useKPIData } from "@/hooks/useKPIData";
 import { useChartData } from "@/hooks/useChartData";
 import { useRealtimeKPIs } from "@/hooks/useRealtimeKPIs";
@@ -164,6 +168,18 @@ export default function Dashboard() {
           <DataUpload />
           <ChurnDataUpload />
           <EnhancedDataUpload />
+        </div>
+
+        {/* Business Insights Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <RecentActivity />
+          <QuickActions />
+        </div>
+
+        {/* Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TopPerformers />
+          <RevenueBreakdown />
         </div>
 
         {/* Predictions Section - Hidden per user request */}
