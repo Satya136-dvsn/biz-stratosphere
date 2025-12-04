@@ -50,7 +50,7 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="border-b border-border/50 bg-card backdrop-blur-lg sticky top-0 z-50 shadow-lg">
+    <header className="border-b border-border/30 bg-[#1a1f37] sticky top-0 z-50 shadow-md">
       <div className="flex h-16 items-center justify-between px-6">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
