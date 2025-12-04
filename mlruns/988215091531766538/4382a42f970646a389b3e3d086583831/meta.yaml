@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/biz-stratosphere-main/mlruns/988215091531766538/4382a42f970646a389b3e3d086583831/artifacts
+end_time: 1758549540958
+entry_point_name: ''
+experiment_id: '988215091531766538'
+lifecycle_stage: active
+run_id: 4382a42f970646a389b3e3d086583831
+run_name: righteous-bird-199
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758549540871
+status: 3
+tags: []
+user_id: ACER

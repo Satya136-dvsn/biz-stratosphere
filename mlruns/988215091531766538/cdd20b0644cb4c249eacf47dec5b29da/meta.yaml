@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/biz-stratosphere-main/mlruns/988215091531766538/cdd20b0644cb4c249eacf47dec5b29da/artifacts
+end_time: 1758548652795
+entry_point_name: ''
+experiment_id: '988215091531766538'
+lifecycle_stage: active
+run_id: cdd20b0644cb4c249eacf47dec5b29da
+run_name: unleashed-bass-502
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758548652752
+status: 3
+tags: []
+user_id: ACER
