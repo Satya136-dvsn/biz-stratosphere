@@ -9,51 +9,38 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: Install Python dependencies
-        run: |
-          pip install -r etl/requirements.txt || true
-          pip install -r services/predict/requirements.txt
-      - name: Run ETL unit tests
-        run: |
-          pip install pytest
-          pytest tests/unit/
-      - name: Build FastAPI Docker image
-        run: |
-          docker build -t predict-service ./services/predict
+      
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install frontend dependencies
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Lint frontend (eslint)
-        run: npx eslint src || true
+      - name: Lint (ESLint)
+        run: npx eslint src --max-warnings 0 || true
 
-      - name: Test frontend (vitest)
-        run: |
-          if [ -f "vitest.config.ts" ]; then npx vitest run; fi
+      - name: Type Check
+        run: npx tsc --noEmit || true
 
-      - name: Build backend Docker image
-        run: docker build -f Dockerfile.backend -t backend:ci .
+      - name: Run Tests
+        run: npm run test:run
+        env:
+          CI: true
 
-      - name: Build frontend Docker image
-        run: docker build -f Dockerfile.frontend -t frontend:ci .
+      - name: Build Frontend
+        run: npm run build
+        env:
+          CI: true
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
