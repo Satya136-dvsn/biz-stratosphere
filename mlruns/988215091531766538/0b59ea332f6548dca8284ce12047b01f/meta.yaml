@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/biz-stratosphere-main/mlruns/988215091531766538/0b59ea332f6548dca8284ce12047b01f/artifacts
+end_time: 1758548662221
+entry_point_name: ''
+experiment_id: '988215091531766538'
+lifecycle_stage: active
+run_id: 0b59ea332f6548dca8284ce12047b01f
+run_name: rare-newt-796
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758548662174
+status: 3
+tags: []
+user_id: ACER
