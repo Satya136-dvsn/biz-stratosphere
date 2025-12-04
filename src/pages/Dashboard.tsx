@@ -41,9 +41,9 @@ export default function Dashboard() {
 
   return (
     <div id="dashboard-content">
-      <main className="p-6 space-y-6 animate-fade-in">
+      <main className="p-4 space-y-5 animate-fade-in">
         {/* Welcome Section */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Business Intelligence Dashboard
           </h2>
@@ -53,7 +53,7 @@ export default function Dashboard() {
         </div>
 
         {/* KPI Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {isLoading ? (
             // Loading skeleton
             Array.from({ length: 4 }).map((_, i) => (
@@ -112,11 +112,11 @@ export default function Dashboard() {
         />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Charts Section */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <div className="space-y-4">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              <div className="space-y-3">
                 <ChartTypeSelector
                   selectedType={revenueChartType}
                   onTypeChange={setRevenueChartType}
@@ -130,7 +130,7 @@ export default function Dashboard() {
                 />
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <ChartTypeSelector
                   selectedType={customerChartType}
                   onTypeChange={setCustomerChartType}
@@ -147,7 +147,7 @@ export default function Dashboard() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <ExportButtons
               kpiData={kpiData}
               chartData={chartData}
@@ -159,7 +159,7 @@ export default function Dashboard() {
         </div>
 
         {/* Data Management Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <DataUpload />
           <ChurnDataUpload />
         </div>
@@ -170,8 +170,8 @@ export default function Dashboard() {
         </div>
 
         {/* Predictions Section */}
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <PredictionForm />
             <div className="lg:col-span-1">
               <PredictionsLog />
