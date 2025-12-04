@@ -1,9 +1,7 @@
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 
 export function Profile() {
   return (
     <div className="min-h-screen bg-gradient-bg">
-      <DashboardHeader />
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           <div>

@@ -19,14 +19,7 @@ interface Message {
 
 export function AIChatbot() {
   const { toast } = useToast();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! I'm your AI Business Intelligence assistant. Ask me anything about your data, metrics, or request trend analysis or forecasts.",
-      isBot: true,
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +40,7 @@ export function AIChatbot() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         throw new Error('Not authenticated');
       }
@@ -78,7 +71,7 @@ export function AIChatbot() {
         description: "Failed to get AI response. Please try again.",
         variant: "destructive",
       });
-      
+
       const errorResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: "I'm sorry, I'm having trouble responding right now. Please try again later.",
@@ -95,7 +88,7 @@ export function AIChatbot() {
     setIsLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         throw new Error('Not authenticated');
       }
@@ -142,7 +135,7 @@ export function AIChatbot() {
     setIsLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         throw new Error('Not authenticated');
       }
@@ -203,15 +196,15 @@ export function AIChatbot() {
                 key={message.id}
                 className={cn(
                   "flex gap-3 p-3 rounded-lg animate-fade-in",
-                  message.isBot 
-                    ? "bg-muted/50" 
+                  message.isBot
+                    ? "bg-muted/50"
                     : "bg-primary/10 ml-8"
                 )}
               >
                 <div className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                  message.isBot 
-                    ? "bg-secondary text-secondary-foreground" 
+                  message.isBot
+                    ? "bg-secondary text-secondary-foreground"
                     : "bg-primary text-primary-foreground"
                 )}>
                   {message.isBot ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
@@ -242,7 +235,7 @@ export function AIChatbot() {
             )}
           </div>
         </ScrollArea>
-        
+
         {/* Quick Action Buttons */}
         <div className="flex flex-wrap gap-2 mb-4">
           <Button
@@ -266,7 +259,7 @@ export function AIChatbot() {
             Revenue Forecast
           </Button>
         </div>
-        
+
         <div className="flex gap-2">
           <Input
             value={input}
