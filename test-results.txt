@@ -1,0 +1,4561 @@
+﻿node.exe : npm warn Unknown cli 
+config "--reporter". This will 
+stop working in the next major 
+version of npm.
+At C:\Program 
+Files\nodejs\npm.ps1:29 char:3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : Not 
+   Specified: (npm warn Unknow..  
+  .version of npm.:String) [],    
+ RemoteException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+
+> vite_react_shadcn_ts@0.0.0 test:run
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/biz-stratosphere-main[39m
+
+ [32mΓ£ô[39m src/lib/rateLimit.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+[90mstderr[2m | src/components/d
+ashboard/EnhancedDataUpload.test.t
+sx[2m > 
+[22m[2mEnhancedDataUpload 
+Component[2m > 
+[22m[2mRendering[2m > 
+[22m[2mrenders the enhanced 
+upload component
+[22m[39mΓÜá∩╕Å React Router 
+Future Flag Warning: React Router 
+will begin wrapping state updates 
+in `React.startTransition` in v7. 
+You can use the 
+`v7_startTransition` future flag 
+to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_star
+ttransition.
+ΓÜá∩╕Å React Router Future Flag 
+Warning: Relative route 
+resolution within Splat routes is 
+changing in v7. You can use the 
+`v7_relativeSplatPath` future 
+flag to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_rela
+tivesplatpath.
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > 
+[22m[2mRendering[2m > 
+[22m[2mrenders upload component
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+ΓÜá∩╕Å React Router Future Flag 
+Warning: React Router will begin 
+wrapping state updates in 
+`React.startTransition` in v7. 
+You can use the 
+`v7_startTransition` future flag 
+to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_star
+ttransition.
+ΓÜá∩╕Å React Router Future Flag 
+Warning: Relative route 
+resolution within Splat routes is 
+changing in v7. You can use the 
+`v7_relativeSplatPath` future 
+flag to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_rela
+tivesplatpath.
+
+[90mstderr[2m | src/components/d
+ashboard/KPICard.test.tsx[2m > 
+[22m[2mKPICard Component[2m > 
+[22m[2mRendering[2m > 
+[22m[2mrenders KPI card with 
+title and value
+[22m[39mΓÜá∩╕Å React Router 
+Future Flag Warning: React Router 
+will begin wrapping state updates 
+in `React.startTransition` in v7. 
+You can use the 
+`v7_startTransition` future flag 
+to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_star
+ttransition.
+ΓÜá∩╕Å React Router Future Flag 
+Warning: Relative route 
+resolution within Splat routes is 
+changing in v7. You can use the 
+`v7_relativeSplatPath` future 
+flag to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_rela
+tivesplatpath.
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > 
+[22m[2mRendering[2m > 
+[22m[2mshows upload instructions
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/ChartTypeSelector.test.ts
+x[2m > 
+[22m[2mChartTypeSelector 
+Component[2m > 
+[22m[2mRendering[2m > 
+[22m[2mrenders chart type 
+selector
+[22m[39mΓÜá∩╕Å React Router 
+Future Flag Warning: React Router 
+will begin wrapping state updates 
+in `React.startTransition` in v7. 
+You can use the 
+`v7_startTransition` future flag 
+to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_star
+ttransition.
+ΓÜá∩╕Å React Router Future Flag 
+Warning: Relative route 
+resolution within Splat routes is 
+changing in v7. You can use the 
+`v7_relativeSplatPath` future 
+flag to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_rela
+tivesplatpath.
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > 
+[22m[2mRendering[2m > 
+[22m[2mhas choose files button
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > 
+[22m[2mRendering[2m > 
+[22m[2mdisplays file upload icon
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mFile 
+Input[2m > [22m[2mhas file 
+input with correct attributes
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mFile 
+Input[2m > [22m[2mfile input 
+accepts CSV files
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mFile 
+Input[2m > [22m[2mfile input 
+accepts Excel files
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mLoading 
+State[2m > [22m[2mshows 
+loading state initially
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+ [31mΓ¥»[39m src/components/dashboard/KPICard.test.tsx [2m([22m[2m20 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 1141[2mms[22m[39m
+[31m       [31m├ù[31m renders KPI card with title and value[39m[33m 674[2mms[22m[39m
+[31m       [31m├ù[31m renders with number format[39m[32m 28[2mms[22m[39m
+       [32mΓ£ô[39m renders with percentage format[32m 31[2mms[22m[39m
+       [32mΓ£ô[39m shows positive change with trending up icon[32m 32[2mms[22m[39m
+       [32mΓ£ô[39m shows negative change with trending down icon[32m 34[2mms[22m[39m
+       [32mΓ£ô[39m shows zero change with minus icon[32m 38[2mms[22m[39m
+       [32mΓ£ô[39m applies correct styling for positive change[32m 27[2mms[22m[39m
+       [32mΓ£ô[39m applies correct styling for negative change[32m 21[2mms[22m[39m
+       [32mΓ£ô[39m shows default period text[32m 41[2mms[22m[39m
+       [32mΓ£ô[39m shows custom period text[32m 34[2mms[22m[39m
+       [32mΓ£ô[39m applies revenue variant styling[32m 31[2mms[22m[39m
+       [32mΓ£ô[39m applies growth variant styling[32m 15[2mms[22m[39m
+       [32mΓ£ô[39m applies warning variant styling[32m 19[2mms[22m[39m
+       [32mΓ£ô[39m applies default info variant[32m 20[2mms[22m[39m
+       [32mΓ£ô[39m formats currency correctly[32m 16[2mms[22m[39m
+[31m       [31m├ù[31m formats large numbers with commas[39m[32m 19[2mms[22m[39m
+       [32mΓ£ô[39m handles string values[32m 12[2mms[22m[39m
+       [32mΓ£ô[39m has hover animation class[32m 11[2mms[22m[39m
+       [32mΓ£ô[39m has fade-in animation[32m 12[2mms[22m[39m
+       [32mΓ£ô[39m displays decorative gradient overlay[32m 14[2mms[22m[39m
+[90mstderr[2m | 
+src/pages/Auth.test.tsx[2m > 
+[22m[2mAuth Page[2m > 
+[22m[2mRendering[2m > 
+[22m[2mrenders the auth page 
+with signin form by default
+[22m[39mΓÜá∩╕Å React Router 
+Future Flag Warning: React Router 
+will begin wrapping state updates 
+in `React.startTransition` in v7. 
+You can use the 
+`v7_startTransition` future flag 
+to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_star
+ttransition.
+ΓÜá∩╕Å React Router Future Flag 
+Warning: Relative route 
+resolution within Splat routes is 
+changing in v7. You can use the 
+`v7_relativeSplatPath` future 
+flag to opt-in early. For more 
+information, see https://reactrout
+er.com/v6/upgrading/future#v7_rela
+tivesplatpath.
+Warning: An update to Auth inside 
+a test was not wrapped in 
+act(...).
+
+When testing, code that causes 
+React state updates should be 
+wrapped into act(...):
+
+act(() => {
+  /* fire events that update 
+state */
+});
+/* assert on the output */
+
+This ensures that you're testing 
+the behavior the user would see 
+in the browser. Learn more at http
+s://reactjs.org/link/wrap-tests-wi
+th-act
+    at Auth (C:/biz-stratosphere-m
+ain/src/pages/Auth.tsx:25:65)
+    at Router (C:\biz-stratosphere
+-main\node_modules\react-router\di
+st\umd\react-router.development.js
+:1207:17)
+    at BrowserRouter (C:\biz-strat
+osphere-main\node_modules\react-ro
+uter-dom\dist\umd\react-router-dom
+.development.js:695:7)
+    at QueryClientProvider (file:/
+//C:/biz-stratosphere-main/node_mo
+dules/@tanstack/react-query/build/
+modern/QueryClientProvider.js:20:3
+)
+    at AllTheProviders (C:/biz-str
+atosphere-main/src/test/utils.tsx:
+32:28)
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mLoading 
+State[2m > [22m[2mdisplays 
+recent uploads heading
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mUpload 
+Button[2m > [22m[2mchoose 
+files button is not disabled when 
+not uploading
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mUpload 
+Button[2m > [22m[2mdisplays 
+Choose Files text when not 
+uploading
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mUpload 
+Area[2m > [22m[2mdisplays drag 
+and drop area
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+[90mstderr[2m | src/components/d
+ashboard/DataUpload.test.tsx[2m 
+> [22m[2mDataUpload 
+Component[2m > [22m[2mUpload 
+Area[2m > [22m[2mshows border 
+styling on upload area
+[22m[39mError fetching 
+datasets: TypeError: __vite_ssr_im
+port_7__.supabase.from(...).select
+(...).eq(...).order is not a 
+function
+    at fetchDatasetsAsync (C:/biz-
+stratosphere-main/src/components/d
+ashboard/DataUpload.tsx:159:12)
+    at C:/biz-stratosphere-main/sr
+c/components/dashboard/DataUpload.
+tsx:186:5
+    at commitHookEffectListMount 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:23189:
+26[90m)[39m
+    at commitPassiveMountOnFiber 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24970:
+11[90m)[39m
+    at commitPassiveMountEffects_c
+omplete [90m(C:\biz-stratosphere-
+main\[39mnode_modules\[4mreact-d
+om[24m\cjs\react-dom.development.
+js:24930:9[90m)[39m
+    at 
+commitPassiveMountEffects_begin [
+90m(C:\biz-stratosphere-main\[39m
+node_modules\[4mreact-dom[24m\cj
+s\react-dom.development.js:24917:7
+[90m)[39m
+    at commitPassiveMountEffects 
+[90m(C:\biz-stratosphere-main\[39
+mnode_modules\[4mreact-dom[24m\c
+js\react-dom.development.js:24905:
+3[90m)[39m
+    at flushPassiveEffectsImpl [9
+0m(C:\biz-stratosphere-main\[39mn
+ode_modules\[4mreact-dom[24m\cjs
+\react-dom.development.js:27078:3
+[90m)[39m
+    at flushPassiveEffects [90m(C
+:\biz-stratosphere-main\[39mnode_
+modules\[4mreact-dom[24m\cjs\rea
+ct-dom.development.js:27023:14[90
+m)[39m
+    at [90mC:\biz-stratosphere-ma
+in\[39mnode_modules\[4mreact-dom
+[24m\cjs\react-dom.development.js
+:26808:9
+
+ [31mΓ¥»[39m src/components/dashboard/DataUpload.test.tsx [2m([22m[2m13 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1295[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m renders upload component [33m 542[2mms[22m[39m
+       [32mΓ£ô[39m shows upload instructions[32m 48[2mms[22m[39m
+       [32mΓ£ô[39m has choose files button[32m 218[2mms[22m[39m
+       [32mΓ£ô[39m displays file upload icon[32m 49[2mms[22m[39m
+       [32mΓ£ô[39m has file input with correct attributes[32m 58[2mms[22m[39m
+       [32mΓ£ô[39m file input accepts CSV files[32m 44[2mms[22m[39m
+       [32mΓ£ô[39m file input accepts Excel files[32m 33[2mms[22m[39m
+[31m       [31m├ù[31m shows loading state initially[39m[32m 39[2mms[22m[39m
+       [32mΓ£ô[39m displays recent uploads heading[32m 38[2mms[22m[39m
+       [32mΓ£ô[39m choose files button is not disabled when not uploading[32m 116[2mms[22m[39m
+       [32mΓ£ô[39m displays Choose Files text when not uploading[32m 24[2mms[22m[39m
+       [32mΓ£ô[39m displays drag and drop area[32m 26[2mms[22m[39m
+       [32mΓ£ô[39m shows border styling on upload area[32m 52[2mms[22m[39m
+[90mstderr[2m | 
+src/pages/Auth.test.tsx[2m > 
+[22m[2mAuth Page[2m > 
+[22m[2mRendering[2m > 
+[22m[2mshows sign in form 
+elements
+[22m[39mWarning: An update to 
+Auth inside a test was not 
+wrapped in act(...).
+
+When testing, code that causes 
+React state updates should be 
+wrapped into act(...):
+
+act(() => {
+  /* fire events that update 
+state */
+});
+/* assert on the output */
+
+This ensures that you're testing 
+the behavior the user would see 
+in the browser. Learn more at http
+s://reactjs.org/link/wrap-tests-wi
+th-act
+    at Auth (C:/biz-stratosphere-m
+ain/src/pages/Auth.tsx:25:65)
+    at Router (C:\biz-stratosphere
+-main\node_modules\react-router\di
+st\umd\react-router.development.js
+:1207:17)
+    at BrowserRouter (C:\biz-strat
+osphere-main\node_modules\react-ro
+uter-dom\dist\umd\react-router-dom
+.development.js:695:7)
+    at QueryClientProvider (file:/
+//C:/biz-stratosphere-main/node_mo
+dules/@tanstack/react-query/build/
+modern/QueryClientProvider.js:20:3
+)
+    at AllTheProviders (C:/biz-str
+atosphere-main/src/test/utils.tsx:
+32:28)
+
+ [32mΓ£ô[39m src/components/dashboard/EnhancedDataUpload.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 1484[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m renders the enhanced upload component [33m 545[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m displays analyze button [33m 317[2mms[22m[39m
+ [31mΓ¥»[39m src/components/dashboard/ChartTypeSelector.test.tsx [2m([22m[2m20 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 1415[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m renders chart type selector [33m 371[2mms[22m[39m
+       [32mΓ£ô[39m renders all chart type buttons by default[32m 53[2mms[22m[39m
+       [32mΓ£ô[39m renders only available chart types when specified[32m 37[2mms[22m[39m
+[31m       [31m├ù[31m displays icons for each chart type[39m[32m 63[2mms[22m[39m
+[31m       [31m├ù[31m highlights selected chart type with default variant[39m[32m 45[2mms[22m[39m
+[31m       [31m├ù[31m shows non-selected types with outline variant[39m[32m 33[2mms[22m[39m
+[31m       [31m├ù[31m updates selection when different type is selected[39m[32m 24[2mms[22m[39m
+       [32mΓ£ô[39m calls onTypeChange when line chart is clicked[32m 203[2mms[22m[39m
+       [32mΓ£ô[39m calls onTypeChange when bar chart is clicked[32m 119[2mms[22m[39m
+       [32mΓ£ô[39m calls onTypeChange when area chart is clicked[32m 108[2mms[22m[39m
+       [32mΓ£ô[39m calls onTypeChange when pie chart is clicked[32m 92[2mms[22m[39m
+       [32mΓ£ô[39m allows clicking the currently selected type[32m 81[2mms[22m[39m
+       [32mΓ£ô[39m uses grid layout for buttons[32m 15[2mms[22m[39m
+       [32mΓ£ô[39m has proper spacing between elements[32m 11[2mms[22m[39m
+       [32mΓ£ô[39m renders within a Card component[32m 15[2mms[22m[39m
+       [32mΓ£ô[39m buttons are keyboard accessible[32m 91[2mms[22m[39m
+       [32mΓ£ô[39m has descriptive button labels[32m 20[2mms[22m[39m
+       [32mΓ£ô[39m handles empty availableTypes array[32m 8[2mms[22m[39m
+       [32mΓ£ô[39m handles single chart type[32m 8[2mms[22m[39m
+       [32mΓ£ô[39m handles three chart types[32m 10[2mms[22m[39m
+ [31mΓ¥»[39m src/pages/Auth.test.tsx [2m([22m[2m13 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[33m 9940[2mms[22m[39m
+[31m       [31m├ù[31m renders the auth page with signin form by default[39m[33m 603[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m shows sign in form elements [33m 365[2mms[22m[39m
+       [33m[2mΓ£ô[22m[39m switches to signup form when clicking signup tab [33m 305[2mms[22m[39m
+       [32mΓ£ô[39m validates required fields on sign in[32m 163[2mms[22m[39m
+[31m       [31m├ù[31m calls supabase signIn on form submit with valid credentials[39m[33m 1740[2mms[22m[39m
+[31m       [31m├ù[31m shows loading state during sign in[39m[33m 1645[2mms[22m[39m
+[31m       [31m├ù[31m redirects to home on successful sign in[39m[33m 1710[2mms[22m[39m
+       [32mΓ£ô[39m shows all signup form fields[32m 131[2mms[22m[39m
+[31m       [31m├ù[31m validates all required fields on sign up[39m[32m 105[2mms[22m[39m
+[31m       [31m├ù[31m calls supabase signUp on form submit[39m[33m 1970[2mms[22m[39m
+[31m       [31m├ù[31m enforces minimum password length of 6 characters[39m[32m 111[2mms[22m[39m
+[31m       [31m├ù[31m redirects to home if user is already authenticated[39m[33m 1045[2mms[22m[39m
+       [32mΓ£ô[39m does not redirect if no session exists[32m 43[2mms[22m[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[
+41m Failed Tests 16 [49m[22m[31
+mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > 
+[22mRendering[2m > [22mrenders 
+the auth page with signin form by 
+default
+[31m[1mTestingLibraryElementErro
+r[22m[39m: Found multiple 
+elements with the text: Biz 
+Stratosphere
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, 
+style
+[36m<h1[39m
+  [33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+[36m>[39m
+  [0mBiz Stratosphere[0m
+[36m</h1>[39m
+
+Ignored nodes: comments, script, 
+style
+[36m<h3[39m
+  [33mclass[39m=[32m"font-semib
+old tracking-tight text-2xl"[39m
+[36m>[39m
+  [0mBiz Stratosphere[0m
+[36m</h3>[39m
+
+(If this is intentional, then use 
+the `*AllBy*` variant of the 
+query (like `queryAllByText`, 
+`getAllByText`, or 
+`findAllByText`)).
+
+Ignored nodes: comments, script, 
+style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-
+screen flex"[39m
+    [36m>[39m
+      [36m<div[39m
+        
+[33mclass[39m=[32m"hidden 
+lg:flex lg:w-1/2 
+bg-gradient-to-br from-primary 
+via-secondary to-accent p-12 
+relative overflow-hidden"[39m
+      [36m>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"absolute 
+inset-0 opacity-20"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+top-20 left-20 w-72 h-72 bg-white 
+rounded-full blur-3xl 
+animate-pulse"[39m
+          [36m/>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+bottom-20 right-20 w-96 h-96 
+bg-white rounded-full blur-3xl 
+animate-pulse delay-1000"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"relative 
+z-10 flex flex-col justify-center 
+text-white"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"flex 
+items-center gap-3 mb-8"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"w-12 h-12 
+bg-white/20 backdrop-blur-xl 
+rounded-xl flex items-center 
+justify-center shadow-2xl"[39m
+            [36m>[39m
+              [36m<svg[39m
+                
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-6 w-6 
+text-white"[39m
+                
+[33mfill[39m=[32m"none"[39m
+                
+[33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=
+[32m"currentColor"[39m
+                [33mstroke-lineca
+p[39m=[32m"round"[39m
+                [33mstroke-linejo
+in[39m=[32m"round"[39m
+                [33mstroke-width
+[39m=[32m"2"[39m
+                
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                
+[33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[
+32m"http://www.w3.org/2000/svg"[3
+9m
+              [36m>[39m
+                
+[36m<polyline[39m
+                  
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                [36m/>[39m
+                
+[36m<polyline[39m
+                  
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h1[39m
+                
+[33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+              [36m>[39m
+                [0mBiz 
+Stratosphere[0m
+              [36m</h1>[39m
+              [36m<p[39m
+                [33mclass[39m=[
+32m"text-white/80 text-sm"[39m
+              [36m>[39m
+                [0mBusiness 
+Intelligence Platform[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"space-y-6 
+max-w-md"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32
+m"space-y-2"[39m
+            [36m>[39m
+              [36m<h2[39m
+                
+[33mclass[39m=[32m"text-4xl 
+font-bold leading-tight"[39m
+              [36m>[39m
+                [0mTransform 
+Your Data Into Insights[0m
+              [36m</h2>[39m
+              [36m<p[39m
+                [33mclass[39m=[
+32m"text-white/80 text-lg"[39m
+              [36m>[39m
+                
+[0mEnterprise-grade analytics 
+and AI-powered predictions for 
+modern businesses.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32
+m"space-y-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-sparkles h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M9.937 15.5A2 2 
+0 0 0 8.5 
+14.063l-6.135-1.582a.5.5 0 0 1 
+0-.962L8.5 9.936A2 2 0 0 0 9.937 
+8.5l1.582-6.135a.5.5 0 0 1 .963 
+0L14.063 8.5A2 2 0 0 0 15.5 
+9.937l6.135 1.581a.5.5 0 0 1 0 
+.964L15.5 14.063a2 2 0 0 0-1.437 
+1.437l-1.582 6.135a.5.5 0 0 
+1-.963 0z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M20 3v4"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M22 5h-4"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M4 17v2"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M5 18H3"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<div>[39m
+                  [36m<h3[39m
+                    [33mclass[39
+m=[32m"font-semibold mb-1"[39m
+                  [36m>[39m
+                    
+[0mAI-Powered Analytics[0m
+                  [36m</h3>[39m
+                  [36m<p[39m
+                    
+[33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+                  [36m>[39m
+                    [0mGet 
+instant insights with machine 
+learning predictions[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                  [36m/>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<div>[39m
+                  [36m<h3[39m
+             ...
+[90m [2mΓ¥»[22m 
+Object.getElementError node_module
+s/@testing-library/dom/dist/config
+.js:[2m37:19[22m[39m
+[90m [2mΓ¥»[22m 
+getElementError node_modules/@test
+ing-library/dom/dist/query-helpers
+.js:[2m20:35[22m[39m
+[90m [2mΓ¥»[22m 
+getMultipleElementsFoundError node
+_modules/@testing-library/dom/dist
+/query-helpers.js:[2m23:10[22m[
+39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m55:13[22m[39m
+[90m [2mΓ¥»[22m getByText node_
+modules/@testing-library/dom/dist/
+query-helpers.js:[2m95:19[22m[3
+9m
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m21:27[22m[39m
+    [90m 19| [39m            [3
+4mrender[39m([33m<[39m[33mAuth
+[39m [33m/[39m[33m>[39m)
+    [90m 20| [39m
+    [90m 21| [39m            
+expect(screen.getByText('Biz 
+Stratosphere')).toBeInTheDocuΓÇª
+    [90m   | [39m               
+           [31m^[39m
+    [90m 22| [39m            exp
+ect(screen.getByText('AI-Powered 
+Business Intelligence ΓÇª
+    [90m 23| [39m            
+expect(screen.getByText('Welcome 
+Back')).toBeInTheDocumentΓÇª
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[1/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > [22mSign In 
+Functionality[2m > [22mcalls 
+supabase signIn on form submit 
+with valid credentials
+[31m[1mAssertionError[22m[39m:
+ expected "vi.fn()" to be called 
+with arguments: [ { email: 
+'test@example.com', ΓÇª(1) } 
+][90m
+
+Number of calls: [1m0[22m
+[39m
+
+Ignored nodes: comments, script, 
+style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"min-
+h-screen flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"hidden 
+lg:flex lg:w-1/2 
+bg-gradient-to-br from-primary 
+via-secondary to-accent p-12 
+relative overflow-hidden"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+inset-0 opacity-20"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+top-20 left-20 w-72 h-72 bg-white 
+rounded-full blur-3xl 
+animate-pulse"[39m
+            [36m/>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+bottom-20 right-20 w-96 h-96 
+bg-white rounded-full blur-3xl 
+animate-pulse delay-1000"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"relative 
+z-10 flex flex-col justify-center 
+text-white"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"flex 
+items-center gap-3 mb-8"[39m
+            [36m>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"w-12 h-12 
+bg-white/20 backdrop-blur-xl 
+rounded-xl flex items-center 
+justify-center shadow-2xl"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-6 w-6 
+text-white"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                  [36m/>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</div>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  
+[33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+                [36m>[39m
+                  [0mBiz 
+Stratosphere[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-sm"[39m
+                [36m>[39m
+                  [0mBusiness 
+Intelligence Platform[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"space-y-6 
+max-w-md"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-2"[39m
+              [36m>[39m
+                [36m<h2[39m
+                  
+[33mclass[39m=[32m"text-4xl 
+font-bold leading-tight"[39m
+                [36m>[39m
+                  [0mTransform 
+Your Data Into Insights[0m
+                [36m</h2>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-lg"[39m
+                [36m>[39m
+                  
+[0mEnterprise-grade analytics 
+and AI-powered predictions for 
+modern businesses.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-sparkles h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M9.937 15.5A2 2 
+0 0 0 8.5 
+14.063l-6.135-1.582a.5.5 0 0 1 
+0-.962L8.5 9.936A2 2 0 0 0 9.937 
+8.5l1.582-6.135a.5.5 0 0 1 .963 
+0L14.063 8.5A2 2 0 0 0 15.5 
+9.937l6.135 1.581a.5.5 0 0 1 0 
+.964L15.5 14.063a2 2 0 0 0-1.437 
+1.437l-1.582 6.135a.5.5 0 0 
+1-.963 0z"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M20 3v4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M22 5h-4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M4 17v2"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M5 18H3"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [36m<div>[39m
+                    [36m<h3[39m
+                      [33mclass[
+39m=[32m"font-semibold mb-1"[39m
+                    [36m>[39m
+                      
+[0mAI-Powered Analytics[0m
+                    
+[36m</h3>[39m
+                    [36m<p[39m
+                      
+[33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+                    [36m>[39m
+                      [0mGet 
+instant insights with machine 
+learning predictions[0m
+                    [36m</p>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<polyline[39m
+                      
+[33mpoints[...
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m87:36[22m[39m
+    [90m 85| [39m
+    [90m 86| [39m            
+[35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m 
+{
+    [90m 87| [39m               
+ [34mexpect[39m(mockSignIn)[33m
+.[39m[34mtoHaveBeenCalledWith[3
+9m({
+    [90m   | [39m               
+                    [31m^[39m
+    [90m 88| [39m               
+     email[33m:[39m [32m'test@e
+xample.com'[39m[33m,[39m
+    [90m 89| [39m               
+     password[33m:[39m 
+[32m'password123'[39m[33m,[39m
+[90m [2mΓ¥»[22m runWithExpensiv
+eErrorDiagnosticsDisabled node_mod
+ules/@testing-library/dom/dist/con
+fig.js:[2m47:12[22m[39m
+[90m [2mΓ¥»[22m checkCallback n
+ode_modules/@testing-library/dom/d
+ist/wait-for.js:[2m124:77[22m[3
+9m
+[90m [2mΓ¥»[22m 
+Timeout.checkRealTimersCallback no
+de_modules/@testing-library/dom/di
+st/wait-for.js:[2m118:16[22m[39
+m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[2/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > [22mSign In 
+Functionality[2m > [22mshows 
+loading state during sign in
+[31m[1mTestingLibraryElementErro
+r[22m[39m: Unable to find an 
+accessible element with the role 
+"button" and name `/sign in/i`
+
+Here are the accessible roles:
+
+  heading:
+
+  Name "Biz Stratosphere":
+  [36m<h1[39m
+    
+[33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+  [36m/>[39m
+
+  Name "Transform Your Data Into 
+Insights":
+  [36m<h2[39m
+    
+[33mclass[39m=[32m"text-4xl 
+font-bold leading-tight"[39m
+  [36m/>[39m
+
+  Name "AI-Powered Analytics":
+  [36m<h3[39m
+    [33mclass[39m=[32m"font-sem
+ibold mb-1"[39m
+  [36m/>[39m
+
+  Name "Real-Time Dashboards":
+  [36m<h3[39m
+    [33mclass[39m=[32m"font-sem
+ibold mb-1"[39m
+  [36m/>[39m
+
+  Name "Biz Stratosphere":
+  [36m<h3[39m
+    [33mclass[39m=[32m"font-sem
+ibold tracking-tight 
+text-2xl"[39m
+  [36m/>[39m
+
+  Name "Welcome":
+  [36m<h3[39m
+    [33mclass[39m=[32m"font-sem
+ibold tracking-tight 
+text-2xl"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-whi
+te/80 text-sm"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-whi
+te/80 text-lg"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+  tablist:
+
+  Name "":
+  [36m<div[39m
+    [33maria-orientation[39m=[3
+2m"horizontal"[39m
+    [33mclass[39m=[32m"h-10 
+items-center justify-center 
+rounded-md bg-muted p-1 
+text-muted-foreground grid w-full 
+grid-cols-2 mb-6"[39m
+    [33mdata-orientation[39m=[3
+2m"horizontal"[39m
+    
+[33mrole[39m=[32m"tablist"[39m
+    
+[33mstyle[39m=[32m"outline: 
+none;"[39m
+    
+[33mtabindex[39m=[32m"0"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+  tab:
+
+  Name "Sign In":
+  [36m<button[39m
+    [33maria-controls[39m=[32m"
+radix-:rf:-content-signin"[39m
+    [33maria-selected[39m=[32m"
+true"[39m
+    
+[33mclass[39m=[32m"inline-flex 
+items-center justify-center 
+whitespace-nowrap rounded-sm px-3 
+py-1.5 text-sm font-medium 
+ring-offset-background 
+transition-all 
+focus-visible:outline-none 
+focus-visible:ring-2 
+focus-visible:ring-ring 
+focus-visible:ring-offset-2 
+disabled:pointer-events-none 
+disabled:opacity-50 
+data-[state=active]:bg-background 
+data-[state=active]:text-foregroun
+d data-[state=active]:shadow-sm"[
+39m
+    [33mdata-orientation[39m=[3
+2m"horizontal"[39m
+    [33mdata-radix-collection-ite
+m[39m=[32m""[39m
+    [33mdata-state[39m=[32m"act
+ive"[39m
+    [33mid[39m=[32m"radix-:rf:-
+trigger-signin"[39m
+    [33mrole[39m=[32m"tab"[39m
+    
+[33mtabindex[39m=[32m"-1"[39m
+    
+[33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Sign Up":
+  [36m<button[39m
+    [33maria-controls[39m=[32m"
+radix-:rf:-content-signup"[39m
+    [33maria-selected[39m=[32m"
+false"[39m
+    
+[33mclass[39m=[32m"inline-flex 
+items-center justify-center 
+whitespace-nowrap rounded-sm px-3 
+py-1.5 text-sm font-medium 
+ring-offset-background 
+transition-all 
+focus-visible:outline-none 
+focus-visible:ring-2 
+focus-visible:ring-ring 
+focus-visible:ring-offset-2 
+disabled:pointer-events-none 
+disabled:opacity-50 
+data-[state=active]:bg-background 
+data-[state=active]:text-foregroun
+d data-[state=active]:shadow-sm"[
+39m
+    [33mdata-orientation[39m=[3
+2m"horizontal"[39m
+    [33mdata-radix-collection-ite
+m[39m=[32m""[39m
+    [33mdata-state[39m=[32m"ina
+ctive"[39m
+    [33mid[39m=[32m"radix-:rf:-
+trigger-signup"[39m
+    [33mrole[39m=[32m"tab"[39m
+    
+[33mtabindex[39m=[32m"-1"[39m
+    
+[33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+  tabpanel:
+
+  Name "Sign In":
+  [36m<div[39m
+    [33maria-labelledby[39m=[32
+m"radix-:rf:-trigger-signin"[39m
+    [33mclass[39m=[32m"mt-2 
+ring-offset-background 
+focus-visible:outline-none 
+focus-visible:ring-2 
+focus-visible:ring-ring 
+focus-visible:ring-offset-2"[39m
+    [33mdata-orientation[39m=[3
+2m"horizontal"[39m
+    [33mdata-state[39m=[32m"act
+ive"[39m
+    [33mid[39m=[32m"radix-:rf:-
+content-signin"[39m
+    [33mrole[39m=[32m"tabpanel"
+[39m
+    [33mstyle[39m=[32m""[39m
+    
+[33mtabindex[39m=[32m"0"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+  textbox:
+
+  Name "Email":
+  [36m<input[39m
+    [33mclass[39m=[32m"flex 
+h-10 w-full rounded-md border 
+border-input bg-background px-3 
+py-2 text-base 
+ring-offset-background 
+file:border-0 file:bg-transparent 
+file:text-sm file:font-medium 
+file:text-foreground 
+placeholder:text-muted-foreground 
+focus-visible:outline-none 
+focus-visible:ring-2 
+focus-visible:ring-ring 
+focus-visible:ring-offset-2 
+disabled:cursor-not-allowed 
+disabled:opacity-50 md:text-sm 
+pl-9"[39m
+    [33mid[39m=[32m"email"[39m
+    [33mplaceholder[39m=[32m"yo
+u@example.com"[39m
+    
+[33mrequired[39m=[32m""[39m
+    
+[33mtype[39m=[32m"email"[39m
+    [33mvalue[39m=[32m"test@exa
+mple.com"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+  button:
+
+  Name "Signing in...":
+  [36m<button[39m
+    
+[33mclass[39m=[32m"inline-flex 
+items-center justify-center gap-2 
+whitespace-nowrap rounded-md 
+text-sm font-medium 
+ring-offset-background 
+transition-colors 
+focus-visible:outline-none 
+focus-visible:ring-2 
+focus-visible:ring-ring 
+focus-visible:ring-offset-2 
+disabled:pointer-events-none 
+disabled:opacity-50 
+[&_svg]:pointer-events-none 
+[&_svg]:size-4 [&_svg]:shrink-0 
+text-primary-foreground 
+hover:bg-primary/90 h-10 px-4 
+py-2 w-full bg-gradient-primary 
+hover:opacity-90"[39m
+    
+[33mdisabled[39m=[32m""[39m
+    
+[33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+  region:
+
+  Name "Notifications alt+T":
+  [36m<section[39m
+    [33maria-atomic[39m=[32m"fa
+lse"[39m
+    [33maria-label[39m=[32m"Not
+ifications alt+T"[39m
+    [33maria-live[39m=[32m"poli
+te"[39m
+    [33maria-relevant[39m=[32m"
+additions text"[39m
+    
+[33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------
+------------------
+
+Ignored nodes: comments, script, 
+style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-
+screen flex"[39m
+    [36m>[39m
+      [36m<div[39m
+        
+[33mclass[39m=[32m"hidden 
+lg:flex lg:w-1/2 
+bg-gradient-to-br from-primary 
+via-secondary to-accent p-12 
+relative overflow-hidden"[39m
+      [36m>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"absolute 
+inset-0 opacity-20"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+top-20 left-20 w-72 h-72 bg-white 
+rounded-full blur-3xl 
+animate-pulse"[39m
+          [36m/>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+bottom-20 right-20 w-96 h-96 
+bg-white rounded-full blur-3xl 
+animate-pulse delay-1000"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"relative 
+z-10 flex flex-col justify-center 
+text-white"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"flex 
+items-center gap-3 mb-8"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"w-12 h-12 
+bg-white/20 backdrop-blur-xl 
+rounded-xl flex items-center 
+justify-center shadow-2xl"[39m
+            [36m>[39m
+              [36m<svg[39m
+                
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-6 w-6 
+text-white"[39m
+                
+[33mfill[39m=[32m"none"[39m
+                
+[33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=
+[32m"currentColor"[39m
+                [33mstroke-lineca
+p[39m=[32m"round"[39m
+                [33mstroke-linejo
+in[39m=[32m"round"[39m
+                [33mstroke-width
+[39m=[32m"2"[39m
+                
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                
+[33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[
+32m"http://www.w3.org/2000/svg"[3
+9m
+              [36m>[39m
+                
+[36m<polyline[39m
+                  
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                [36m/>[39m
+                
+[36m<polyline[39m
+                  
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<h1[39m
+                
+[33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+              [36m>[39m
+                [0mBiz 
+Stratosphere[0m
+              [36m</h1>[39m
+              [36m<p[39m
+                [33mclass[39m=[
+32m"text-white/80 text-sm"[39m
+              [36m>[39m
+                [0mBusiness 
+Intelligence Platform[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"space-y-6 
+max-w-md"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32
+m"space-y-2"[39m
+            [36m>[39m
+              [36m<h2[39m
+                
+[33mclass[39m=[32m"text-4xl 
+font-bold leading-tight"[39m
+              [36m>[39m
+                [0mTransform 
+Your Data Into Insights[0m
+              [36m</h2>[39m
+              [36m<p[39m
+                [33mclass[39m=[
+32m"text-white/80 text-lg"[39m
+              [36m>[39m
+                
+[0mEnterprise-grade analytics 
+and AI-powered predictions for 
+modern businesses.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32
+m"space-y-4"[39m
+            [36m>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-sparkles h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M9.937 15.5A2 2 
+0 0 0 8.5 
+14.063l-6.135-1.582a.5.5 0 0 1 
+0-.962L8.5 9.936A2 2 0 0 0 9.937 
+8.5l1.582-6.135a.5.5 0 0 1 .963 
+0L14.063 8.5A2 2 0 0 0 15.5 
+9.937l6.135 1.581a.5.5 0 0 1 0 
+.964L15.5 14.063a2 2 0 0 0-1.437 
+1.437l-1.582 6.135a.5.5 0 0 
+1-.963 0z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M20 3v4"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M22 5h-4"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M4 17v2"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    
+[33md[39m=[32m"M5 18H3"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<div>[39m
+                  [36m<h3[39m
+                    [33mclass[39
+m=[32m"font-semibold mb-1"[39m
+                  [36m>[39m
+                    
+[0mAI-Powered Analytics[0m
+                  [36m</h3>[39m
+                  [36m<p[39m
+                    
+[33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+                  [36m>[39m
+                    [0mGet 
+instant insights with machine 
+learning predictions[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                  [36m/>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<div>[39m
+                  [36m<h3[39m
+             ...
+[90m [2mΓ¥»[22m 
+Object.getElementError node_module
+s/@testing-library/dom/dist/config
+.js:[2m37:19[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m76:38[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m52:17[22m[39m
+[90m [2mΓ¥»[22m getByRole node_
+modules/@testing-library/dom/dist/
+query-helpers.js:[2m95:19[22m[3
+9m
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m111:27[22m[39m
+    [90m109| [39m
+    [90m110| [39m            
+[90m// Should show loading 
+state[39m
+    [90m111| [39m            
+expect(screen.getByRole('button', 
+{ name: /sign in/i })).tΓÇª
+    [90m   | [39m               
+           [31m^[39m
+    [90m112| [39m
+    [90m113| [39m            
+[90m// Resolve the promise[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[3/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > [22mSign In 
+Functionality[2m > 
+[22mredirects to home on 
+successful sign in
+[31m[1mAssertionError[22m[39m:
+ expected '' to be '/' // 
+Object.is equality
+
+Ignored nodes: comments, script, 
+style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"min-
+h-screen flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"hidden 
+lg:flex lg:w-1/2 
+bg-gradient-to-br from-primary 
+via-secondary to-accent p-12 
+relative overflow-hidden"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+inset-0 opacity-20"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+top-20 left-20 w-72 h-72 bg-white 
+rounded-full blur-3xl 
+animate-pulse"[39m
+            [36m/>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+bottom-20 right-20 w-96 h-96 
+bg-white rounded-full blur-3xl 
+animate-pulse delay-1000"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"relative 
+z-10 flex flex-col justify-center 
+text-white"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"flex 
+items-center gap-3 mb-8"[39m
+            [36m>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"w-12 h-12 
+bg-white/20 backdrop-blur-xl 
+rounded-xl flex items-center 
+justify-center shadow-2xl"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-6 w-6 
+text-white"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                  [36m/>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</div>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  
+[33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+                [36m>[39m
+                  [0mBiz 
+Stratosphere[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-sm"[39m
+                [36m>[39m
+                  [0mBusiness 
+Intelligence Platform[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"space-y-6 
+max-w-md"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-2"[39m
+              [36m>[39m
+                [36m<h2[39m
+                  
+[33mclass[39m=[32m"text-4xl 
+font-bold leading-tight"[39m
+                [36m>[39m
+                  [0mTransform 
+Your Data Into Insights[0m
+                [36m</h2>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-lg"[39m
+                [36m>[39m
+                  
+[0mEnterprise-grade analytics 
+and AI-powered predictions for 
+modern businesses.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-sparkles h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M9.937 15.5A2 2 
+0 0 0 8.5 
+14.063l-6.135-1.582a.5.5 0 0 1 
+0-.962L8.5 9.936A2 2 0 0 0 9.937 
+8.5l1.582-6.135a.5.5 0 0 1 .963 
+0L14.063 8.5A2 2 0 0 0 15.5 
+9.937l6.135 1.581a.5.5 0 0 1 0 
+.964L15.5 14.063a2 2 0 0 0-1.437 
+1.437l-1.582 6.135a.5.5 0 0 
+1-.963 0z"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M20 3v4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M22 5h-4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M4 17v2"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M5 18H3"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [36m<div>[39m
+                    [36m<h3[39m
+                      [33mclass[
+39m=[32m"font-semibold mb-1"[39m
+                    [36m>[39m
+                      
+[0mAI-Powered Analytics[0m
+                    
+[36m</h3>[39m
+                    [36m<p[39m
+                      
+[33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+                    [36m>[39m
+                      [0mGet 
+instant insights with machine 
+learning predictions[0m
+                    [36m</p>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<polyline[39m
+                      
+[33mpoints[...
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- /[39m
+
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m138:46[22m[39m
+    [90m136| [39m
+    [90m137| [39m            
+[35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m 
+{
+    [90m138| [39m               
+ [34mexpect[39m(window[33m.[39
+mlocation[33m.[39mhref)[33m.[3
+9m[34mtoBe[39m([32m'/'[39m)
+    [90m   | [39m               
+                              
+[31m^[39m
+    [90m139| [39m            })
+    [90m140| [39m        })
+[90m [2mΓ¥»[22m runWithExpensiv
+eErrorDiagnosticsDisabled node_mod
+ules/@testing-library/dom/dist/con
+fig.js:[2m47:12[22m[39m
+[90m [2mΓ¥»[22m checkCallback n
+ode_modules/@testing-library/dom/d
+ist/wait-for.js:[2m124:77[22m[3
+9m
+[90m [2mΓ¥»[22m 
+Timeout.checkRealTimersCallback no
+de_modules/@testing-library/dom/di
+st/wait-for.js:[2m118:16[22m[39
+m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[4/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > [22mSign Up 
+Functionality[2m > 
+[22mvalidates all required 
+fields on sign up
+[31m[1mError[22m: [2mexpect([
+22m[31melement[31m[2m).toBeRequ
+ired()[22m
+
+Received element is not required:
+  [31m<input
+  class="flex h-10 w-full 
+rounded-md border border-input 
+bg-background px-3 py-2 text-base 
+ring-offset-background 
+file:border-0 file:bg-transparent 
+file:text-sm file:font-medium 
+file:text-foreground 
+placeholder:text-muted-foreground 
+focus-visible:outline-none 
+focus-visible:ring-2 
+focus-visible:ring-ring 
+focus-visible:ring-offset-2 
+disabled:cursor-not-allowed 
+disabled:opacity-50 md:text-sm 
+pl-9"
+  id="signup-name"
+  placeholder="John Doe"
+  type="text"
+  value=""
+/>[31m[39m
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m166:38[22m[39m
+    [90m164| [39m            
+[35mconst[39m passwordInput 
+[33m=[39m screen[33m.[39m[34m
+getByLabelText[39m([36m/password
+/i[39m)
+    [90m165| [39m
+    [90m166| [39m            [3
+4mexpect[39m(displayNameInput)[3
+3m.[39m[34mtoBeRequired[39m()
+    [90m   | [39m               
+                      [31m^[39m
+    [90m167| [39m            [3
+4mexpect[39m(emailInput)[33m.[3
+9m[34mtoBeRequired[39m()
+    [90m168| [39m            [3
+4mexpect[39m(passwordInput)[33m.
+[39m[34mtoBeRequired[39m()
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[5/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > [22mSign Up 
+Functionality[2m > [22mcalls 
+supabase signUp on form submit
+[31m[1mAssertionError[22m[39m:
+ expected "vi.fn()" to be called 
+with arguments: [ { email: 
+'test@example.com', ΓÇª(2) } 
+][90m
+
+Number of calls: [1m0[22m
+[39m
+
+Ignored nodes: comments, script, 
+style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"min-
+h-screen flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"hidden 
+lg:flex lg:w-1/2 
+bg-gradient-to-br from-primary 
+via-secondary to-accent p-12 
+relative overflow-hidden"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+inset-0 opacity-20"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+top-20 left-20 w-72 h-72 bg-white 
+rounded-full blur-3xl 
+animate-pulse"[39m
+            [36m/>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+bottom-20 right-20 w-96 h-96 
+bg-white rounded-full blur-3xl 
+animate-pulse delay-1000"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"relative 
+z-10 flex flex-col justify-center 
+text-white"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"flex 
+items-center gap-3 mb-8"[39m
+            [36m>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"w-12 h-12 
+bg-white/20 backdrop-blur-xl 
+rounded-xl flex items-center 
+justify-center shadow-2xl"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-6 w-6 
+text-white"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                  [36m/>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</div>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  
+[33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+                [36m>[39m
+                  [0mBiz 
+Stratosphere[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-sm"[39m
+                [36m>[39m
+                  [0mBusiness 
+Intelligence Platform[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"space-y-6 
+max-w-md"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-2"[39m
+              [36m>[39m
+                [36m<h2[39m
+                  
+[33mclass[39m=[32m"text-4xl 
+font-bold leading-tight"[39m
+                [36m>[39m
+                  [0mTransform 
+Your Data Into Insights[0m
+                [36m</h2>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-lg"[39m
+                [36m>[39m
+                  
+[0mEnterprise-grade analytics 
+and AI-powered predictions for 
+modern businesses.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-sparkles h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M9.937 15.5A2 2 
+0 0 0 8.5 
+14.063l-6.135-1.582a.5.5 0 0 1 
+0-.962L8.5 9.936A2 2 0 0 0 9.937 
+8.5l1.582-6.135a.5.5 0 0 1 .963 
+0L14.063 8.5A2 2 0 0 0 15.5 
+9.937l6.135 1.581a.5.5 0 0 1 0 
+.964L15.5 14.063a2 2 0 0 0-1.437 
+1.437l-1.582 6.135a.5.5 0 0 
+1-.963 0z"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M20 3v4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M22 5h-4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M4 17v2"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M5 18H3"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [36m<div>[39m
+                    [36m<h3[39m
+                      [33mclass[
+39m=[32m"font-semibold mb-1"[39m
+                    [36m>[39m
+                      
+[0mAI-Powered Analytics[0m
+                    
+[36m</h3>[39m
+                    [36m<p[39m
+                      
+[33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+                    [36m>[39m
+                      [0mGet 
+instant insights with machine 
+learning predictions[0m
+                    [36m</p>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<polyline[39m
+                      
+[33mpoints[...
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m192:36[22m[39m
+    [90m190| [39m
+    [90m191| [39m            
+[35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m 
+{
+    [90m192| [39m               
+ [34mexpect[39m(mockSignUp)[33m
+.[39m[34mtoHaveBeenCalledWith[3
+9m({
+    [90m   | [39m               
+                    [31m^[39m
+    [90m193| [39m               
+     email[33m:[39m [32m'test@e
+xample.com'[39m[33m,[39m
+    [90m194| [39m               
+     password[33m:[39m 
+[32m'password123'[39m[33m,[39m
+[90m [2mΓ¥»[22m runWithExpensiv
+eErrorDiagnosticsDisabled node_mod
+ules/@testing-library/dom/dist/con
+fig.js:[2m47:12[22m[39m
+[90m [2mΓ¥»[22m checkCallback n
+ode_modules/@testing-library/dom/d
+ist/wait-for.js:[2m124:77[22m[3
+9m
+[90m [2mΓ¥»[22m 
+Timeout.checkRealTimersCallback no
+de_modules/@testing-library/dom/di
+st/wait-for.js:[2m118:16[22m[39
+m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[6/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > [22mSign Up 
+Functionality[2m > [22menforces 
+minimum password length of 6 
+characters
+[31m[1mAssertionError[22m: 
+expected -1 to be 6 // Object.is 
+equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 6[39m
+[31m+ -1[39m
+
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m211:45[22m[39m
+    [90m209| [39m
+    [90m210| [39m            
+const passwordInput = screen.getBy
+LabelText(/password/i) aΓÇª
+    [90m211| [39m            [3
+4mexpect[39m(passwordInput[33m.
+[39mminLength)[33m.[39m[34mtoBe
+[39m([34m6[39m)
+    [90m   | [39m               
+                             
+[31m^[39m
+    [90m212| [39m        })
+    [90m213| [39m    })
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[7/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+src/pages/Auth.test.tsx[2m > 
+[22mAuth Page[2m > 
+[22mAuthentication Check on 
+Mount[2m > [22mredirects to 
+home if user is already 
+authenticated
+[31m[1mAssertionError[22m[39m:
+ expected '' to be '/' // 
+Object.is equality
+
+Ignored nodes: comments, script, 
+style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"min-
+h-screen flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          
+[33mclass[39m=[32m"hidden 
+lg:flex lg:w-1/2 
+bg-gradient-to-br from-primary 
+via-secondary to-accent p-12 
+relative overflow-hidden"[39m
+        [36m>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"absolute 
+inset-0 opacity-20"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+top-20 left-20 w-72 h-72 bg-white 
+rounded-full blur-3xl 
+animate-pulse"[39m
+            [36m/>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"absolute 
+bottom-20 right-20 w-96 h-96 
+bg-white rounded-full blur-3xl 
+animate-pulse delay-1000"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            
+[33mclass[39m=[32m"relative 
+z-10 flex flex-col justify-center 
+text-white"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"flex 
+items-center gap-3 mb-8"[39m
+            [36m>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"w-12 h-12 
+bg-white/20 backdrop-blur-xl 
+rounded-xl flex items-center 
+justify-center shadow-2xl"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-6 w-6 
+text-white"[39m
+                  
+[33mfill[39m=[32m"none"[39m
+                  
+[33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m
+=[32m"currentColor"[39m
+                  [33mstroke-line
+cap[39m=[32m"round"[39m
+                  [33mstroke-line
+join[39m=[32m"round"[39m
+                  [33mstroke-widt
+h[39m=[32m"2"[39m
+                  
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  
+[33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=
+[32m"http://www.w3.org/2000/svg"
+[39m
+                [36m>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[39m
+                  [36m/>[39m
+                  
+[36m<polyline[39m
+                    
+[33mpoints[39m=[32m"16 7 22 7 
+22 13"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</div>[39m
+              [36m<div>[39m
+                [36m<h1[39m
+                  
+[33mclass[39m=[32m"text-3xl 
+font-bold"[39m
+                [36m>[39m
+                  [0mBiz 
+Stratosphere[0m
+                [36m</h1>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-sm"[39m
+                [36m>[39m
+                  [0mBusiness 
+Intelligence Platform[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"space-y-6 
+max-w-md"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-2"[39m
+              [36m>[39m
+                [36m<h2[39m
+                  
+[33mclass[39m=[32m"text-4xl 
+font-bold leading-tight"[39m
+                [36m>[39m
+                  [0mTransform 
+Your Data Into Insights[0m
+                [36m</h2>[39m
+                [36m<p[39m
+                  [33mclass[39m=
+[32m"text-white/80 text-lg"[39m
+                [36m>[39m
+                  
+[0mEnterprise-grade analytics 
+and AI-powered predictions for 
+modern businesses.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[
+32m"space-y-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-sparkles h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M9.937 15.5A2 2 
+0 0 0 8.5 
+14.063l-6.135-1.582a.5.5 0 0 1 
+0-.962L8.5 9.936A2 2 0 0 0 9.937 
+8.5l1.582-6.135a.5.5 0 0 1 .963 
+0L14.063 8.5A2 2 0 0 0 15.5 
+9.937l6.135 1.581a.5.5 0 0 1 0 
+.964L15.5 14.063a2 2 0 0 0-1.437 
+1.437l-1.582 6.135a.5.5 0 0 
+1-.963 0z"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M20 3v4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M22 5h-4"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M4 17v2"[39m
+                    [36m/>[39m
+                    
+[36m<path[39m
+                      
+[33md[39m=[32m"M5 18H3"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [36m<div>[39m
+                    [36m<h3[39m
+                      [33mclass[
+39m=[32m"font-semibold mb-1"[39m
+                    [36m>[39m
+                      
+[0mAI-Powered Analytics[0m
+                    
+[36m</h3>[39m
+                    [36m<p[39m
+                      
+[33mclass[39m=[32m"text-sm 
+text-white/80"[39m
+                    [36m>[39m
+                      [0mGet 
+instant insights with machine 
+learning predictions[0m
+                    [36m</p>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+items-start gap-3 p-4 bg-white/10 
+backdrop-blur-sm rounded-lg"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    
+[33mclass[39m=[32m"lucide 
+lucide-trending-up h-5 w-5 
+text-white mt-0.5 
+flex-shrink-0"[39m
+                    
+[33mfill[39m=[32m"none"[39m
+                    
+[33mheight[39m=[32m"24"[39m
+                    [33mstroke[3
+9m=[32m"currentColor"[39m
+                    [33mstroke-li
+necap[39m=[32m"round"[39m
+                    [33mstroke-li
+nejoin[39m=[32m"round"[39m
+                    [33mstroke-wi
+dth[39m=[32m"2"[39m
+                    
+[33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                    
+[33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39
+m=[32m"http://www.w3.org/2000/svg
+"[39m
+                  [36m>[39m
+                    
+[36m<polyline[39m
+                      
+[33mpoints[...
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- /[39m
+
+[36m [2mΓ¥»[22m src/pages/Auth.
+test.tsx:[2m231:46[22m[39m
+    [90m229| [39m
+    [90m230| [39m            
+[35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m 
+{
+    [90m231| [39m               
+ [34mexpect[39m(window[33m.[39
+mlocation[33m.[39mhref)[33m.[3
+9m[34mtoBe[39m([32m'/'[39m)
+    [90m   | [39m               
+                              
+[31m^[39m
+    [90m232| [39m            })
+    [90m233| [39m        })
+[90m [2mΓ¥»[22m runWithExpensiv
+eErrorDiagnosticsDisabled node_mod
+ules/@testing-library/dom/dist/con
+fig.js:[2m47:12[22m[39m
+[90m [2mΓ¥»[22m checkCallback n
+ode_modules/@testing-library/dom/d
+ist/wait-for.js:[2m124:77[22m[3
+9m
+[90m [2mΓ¥»[22m 
+Timeout.checkRealTimersCallback no
+de_modules/@testing-library/dom/di
+st/wait-for.js:[2m118:16[22m[39
+m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[8/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/ChartTypeSelector
+.test.tsx[2m > 
+[22mChartTypeSelector 
+Component[2m > 
+[22mRendering[2m > 
+[22mdisplays icons for each 
+chart type
+[31m[1mError[22m: [2mexpect([
+22m[31mreceived[31m[2m).toBeInT
+heDocument()[22m
+
+[31mreceived[31m value must be 
+an HTMLElement or an SVGElement.
+Received has type:  Null
+Received has value: 
+[31mnull[31m[39m
+[36m [2mΓ¥»[22m src/components/
+dashboard/ChartTypeSelector.test.t
+sx:[2m67:30[22m[39m
+    [90m 65| [39m            
+[35mconst[39m pieIcon 
+[33m=[39m document[33m.[39m[3
+4mquerySelector[39m([32m'.lucide
+-pie-chart'[39m)
+    [90m 66| [39m
+    [90m 67| [39m            [3
+4mexpect[39m(lineIcon)[33m.[39m
+[34mtoBeInTheDocument[39m()
+    [90m   | [39m               
+              [31m^[39m
+    [90m 68| [39m            [3
+4mexpect[39m(barIcon)[33m.[39m
+[34mtoBeInTheDocument[39m()
+    [90m 69| [39m            [3
+4mexpect[39m(areaIcon)[33m.[39m
+[34mtoBeInTheDocument[39m()
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»[9/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/ChartTypeSelector
+.test.tsx[2m > 
+[22mChartTypeSelector 
+Component[2m > [22mSelection 
+State[2m > [22mhighlights 
+selected chart type with default 
+variant
+[31m[1mError[22m: [2mexpect([
+22m[31melement[31m[2m).toHaveAt
+tribute([22m[32m[32m"data-varia
+nt"[32m[31m[2m, [22m[32m[32m
+"default"[32m[31m[2m) // elemen
+t.getAttribute("data-variant") 
+=== "default"[22m
+
+Expected the element to have 
+attribute:
+[32m  data-variant="default"[31m
+Received:
+[31m  null[31m[39m
+[36m [2mΓ¥»[22m src/components/
+dashboard/ChartTypeSelector.test.t
+sx:[2m84:31[22m[39m
+    [90m 82| [39m
+    [90m 83| [39m            
+const barButton = 
+screen.getByText('Bar 
+Chart').closest('bΓÇª
+    [90m 84| [39m            exp
+ect(barButton).toHaveAttribute('da
+ta-variant', 'defaultΓÇª
+    [90m   | [39m               
+               [31m^[39m
+    [90m 85| [39m        })
+    [90m 86| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[10/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/ChartTypeSelector
+.test.tsx[2m > 
+[22mChartTypeSelector 
+Component[2m > [22mSelection 
+State[2m > [22mshows 
+non-selected types with outline 
+variant
+[31m[1mError[22m: [2mexpect([
+22m[31melement[31m[2m).toHaveAt
+tribute([22m[32m[32m"data-varia
+nt"[32m[31m[2m, [22m[32m[32m
+"outline"[32m[31m[2m) // elemen
+t.getAttribute("data-variant") 
+=== "outline"[22m
+
+Expected the element to have 
+attribute:
+[32m  data-variant="outline"[31m
+Received:
+[31m  null[31m[39m
+[36m [2mΓ¥»[22m src/components/
+dashboard/ChartTypeSelector.test.t
+sx:[2m96:31[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m            
+const barButton = 
+screen.getByText('Bar 
+Chart').closest('bΓÇª
+    [90m 96| [39m            exp
+ect(barButton).toHaveAttribute('da
+ta-variant', 'outlineΓÇª
+    [90m   | [39m               
+               [31m^[39m
+    [90m 97| [39m        })
+    [90m 98| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[11/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/ChartTypeSelector
+.test.tsx[2m > 
+[22mChartTypeSelector 
+Component[2m > [22mSelection 
+State[2m > [22mupdates 
+selection when different type is 
+selected
+[31m[1mError[22m: [2mexpect([
+22m[31melement[31m[2m).toHaveAt
+tribute([22m[32m[32m"data-varia
+nt"[32m[31m[2m, [22m[32m[32m
+"default"[32m[31m[2m) // elemen
+t.getAttribute("data-variant") 
+=== "default"[22m
+
+Expected the element to have 
+attribute:
+[32m  data-variant="default"[31m
+Received:
+[31m  null[31m[39m
+[36m [2mΓ¥»[22m src/components/
+dashboard/ChartTypeSelector.test.t
+sx:[2m108:32[22m[39m
+    [90m106| [39m
+    [90m107| [39m            
+let lineButton = 
+screen.getByText('Line 
+Chart').closest('bΓÇª
+    [90m108| [39m            exp
+ect(lineButton).toHaveAttribute('d
+ata-variant', 'defaulΓÇª
+    [90m   | [39m               
+                [31m^[39m
+    [90m109| [39m
+    [90m110| [39m            
+[34mrerender[39m(
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[12/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/DataUpload.test.t
+sx[2m > [22mDataUpload 
+Component[2m > [22mLoading 
+State[2m > [22mshows loading 
+state initially
+[31m[1mAssertionError[22m: 
+expected 0 to be greater than 
+0[39m
+[36m [2mΓ¥»[22m src/components/
+dashboard/DataUpload.test.tsx:[2m
+100:38[22m[39m
+    [90m 98| [39m
+    [90m 99| [39m            
+const skeletons = document.querySe
+lectorAll('.animate-pulsΓÇª
+    [90m100| [39m            [3
+4mexpect[39m(skeletons[33m.[39m
+length)[33m.[39m[34mtoBeGreater
+Than[39m([34m0[39m)
+    [90m   | [39m               
+                      [31m^[39m
+    [90m101| [39m        })
+    [90m102| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[13/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/KPICard.test.tsx
+[2m > [22mKPICard Component[2m 
+> [22mRendering[2m > 
+[22mrenders KPI card with title 
+and value
+[31m[1mTestingLibraryElementErro
+r[22m: Unable to find an element 
+with the text: TOTAL REVENUE. 
+This could be because the text is 
+broken up by multiple elements. 
+In this case, you can provide a 
+function for your text matcher to 
+make your matcher more flexible.
+
+Ignored nodes: comments, script, 
+style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      
+[33mclass[31m=[32m"rounded-lg 
+text-card-foreground shadow-sm 
+relative overflow-hidden border-2 
+transition-all duration-300 
+hover:scale-105 animate-fade-in 
+bg-gradient-primary 
+border-primary/20 
+shadow-glow"[31m
+    [36m>[31m
+      [36m<div[31m
+        
+[33mclass[31m=[32m"p-6"[31m
+      [36m>[31m
+        [36m<div[31m
+          
+[33mclass[31m=[32m"flex 
+items-center justify-between"[31m
+        [36m>[31m
+          [36m<div[31m
+            [33mclass[31m=[32m"
+space-y-2"[31m
+          [36m>[31m
+            [36m<p[31m
+              
+[33mclass[31m=[32m"text-sm 
+font-medium text-muted-foreground 
+uppercase tracking-wider"[31m
+            [36m>[31m
+              [0mTotal 
+Revenue[0m
+            [36m</p>[31m
+            [36m<p[31m
+              
+[33mclass[31m=[32m"text-3xl 
+font-bold text-foreground"[31m
+            [36m>[31m
+              [0m$125,430[0m
+            [36m</p>[31m
+            [36m<div[31m
+              
+[33mclass[31m=[32m"flex 
+items-center space-x-2 
+text-sm"[31m
+            [36m>[31m
+              [36m<svg[31m
+                
+[33mclass[31m=[32m"lucide 
+lucide-trending-up h-4 w-4 
+text-accent"[31m
+                
+[33mfill[31m=[32m"none"[31m
+                
+[33mheight[31m=[32m"24"[31m
+                [33mstroke[31m=
+[32m"currentColor"[31m
+                [33mstroke-lineca
+p[31m=[32m"round"[31m
+                [33mstroke-linejo
+in[31m=[32m"round"[31m
+                [33mstroke-width
+[31m=[32m"2"[31m
+                
+[33mviewBox[31m=[32m"0 0 24 
+24"[31m
+                
+[33mwidth[31m=[32m"24"[31m
+                [33mxmlns[31m=[
+32m"http://www.w3.org/2000/svg"[3
+1m
+              [36m>[31m
+                
+[36m<polyline[31m
+                  
+[33mpoints[31m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[31m
+                [36m/>[31m
+                
+[36m<polyline[31m
+                  
+[33mpoints[31m=[32m"16 7 22 7 
+22 13"[31m
+                [36m/>[31m
+              [36m</svg>[31m
+              [36m<span[31m
+                
+[33mclass[31m=[32m"font-medium 
+text-accent"[31m
+              [36m>[31m
+                [0m+[0m
+                [0m12.5[0m
+                [0m%[0m
+              [36m</span>[31m
+              [36m<span[31m
+                [33mclass[31m=[
+32m"text-muted-foreground"[31m
+              [36m>[31m
+                [0mvs last 
+month[0m
+              [36m</span>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          
+[33mclass[31m=[32m"absolute 
+top-0 right-0 w-20 h-20 
+bg-gradient-to-br from-white/10 
+to-transparent 
+rounded-bl-full"[31m
+        [36m/>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+    [36m<section[31m
+      [33maria-atomic[31m=[32m"
+false"[31m
+      [33maria-label[31m=[32m"N
+otifications alt+T"[31m
+      [33maria-live[31m=[32m"po
+lite"[31m
+      [33maria-relevant[31m=[32
+m"additions text"[31m
+      
+[33mtabindex[31m=[32m"-1"[31m
+    [36m/>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2mΓ¥»[22m 
+Object.getElementError node_module
+s/@testing-library/dom/dist/config
+.js:[2m37:19[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m76:38[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m52:17[22m[39m
+[90m [2mΓ¥»[22m getByText node_
+modules/@testing-library/dom/dist/
+query-helpers.js:[2m95:19[22m[3
+9m
+[36m [2mΓ¥»[22m src/components/
+dashboard/KPICard.test.tsx:[2m17:
+27[22m[39m
+    [90m 15| [39m            )
+    [90m 16| [39m
+    [90m 17| [39m            
+expect(screen.getByText('TOTAL 
+REVENUE')).toBeInTheDocumenΓÇª
+    [90m   | [39m               
+           [31m^[39m
+    [90m 18| [39m            [3
+4mexpect[39m(screen[33m.[39m[3
+4mgetByText[39m([32m'$125,430'[
+39m))[33m.[39m[34mtoBeInTheDocu
+ment[39m()
+    [90m 19| [39m        })
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[14/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/KPICard.test.tsx
+[2m > [22mKPICard Component[2m 
+> [22mRendering[2m > 
+[22mrenders with number format
+[31m[1mTestingLibraryElementErro
+r[22m: Unable to find an element 
+with the text: TOTAL USERS. This 
+could be because the text is 
+broken up by multiple elements. 
+In this case, you can provide a 
+function for your text matcher to 
+make your matcher more flexible.
+
+Ignored nodes: comments, script, 
+style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      
+[33mclass[31m=[32m"rounded-lg 
+text-card-foreground shadow-sm 
+relative overflow-hidden border-2 
+transition-all duration-300 
+hover:scale-105 animate-fade-in 
+bg-gradient-primary 
+border-primary/20 
+shadow-glow"[31m
+    [36m>[31m
+      [36m<div[31m
+        
+[33mclass[31m=[32m"p-6"[31m
+      [36m>[31m
+        [36m<div[31m
+          
+[33mclass[31m=[32m"flex 
+items-center justify-between"[31m
+        [36m>[31m
+          [36m<div[31m
+            [33mclass[31m=[32m"
+space-y-2"[31m
+          [36m>[31m
+            [36m<p[31m
+              
+[33mclass[31m=[32m"text-sm 
+font-medium text-muted-foreground 
+uppercase tracking-wider"[31m
+            [36m>[31m
+              [0mTotal Users[0m
+            [36m</p>[31m
+            [36m<p[31m
+              
+[33mclass[31m=[32m"text-3xl 
+font-bold text-foreground"[31m
+            [36m>[31m
+              [0m1,234[0m
+            [36m</p>[31m
+            [36m<div[31m
+              
+[33mclass[31m=[32m"flex 
+items-center space-x-2 
+text-sm"[31m
+            [36m>[31m
+              [36m<svg[31m
+                
+[33mclass[31m=[32m"lucide 
+lucide-trending-up h-4 w-4 
+text-accent"[31m
+                
+[33mfill[31m=[32m"none"[31m
+                
+[33mheight[31m=[32m"24"[31m
+                [33mstroke[31m=
+[32m"currentColor"[31m
+                [33mstroke-lineca
+p[31m=[32m"round"[31m
+                [33mstroke-linejo
+in[31m=[32m"round"[31m
+                [33mstroke-width
+[31m=[32m"2"[31m
+                
+[33mviewBox[31m=[32m"0 0 24 
+24"[31m
+                
+[33mwidth[31m=[32m"24"[31m
+                [33mxmlns[31m=[
+32m"http://www.w3.org/2000/svg"[3
+1m
+              [36m>[31m
+                
+[36m<polyline[31m
+                  
+[33mpoints[31m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[31m
+                [36m/>[31m
+                
+[36m<polyline[31m
+                  
+[33mpoints[31m=[32m"16 7 22 7 
+22 13"[31m
+                [36m/>[31m
+              [36m</svg>[31m
+              [36m<span[31m
+                
+[33mclass[31m=[32m"font-medium 
+text-accent"[31m
+              [36m>[31m
+                [0m+[0m
+                [0m5[0m
+                [0m%[0m
+              [36m</span>[31m
+              [36m<span[31m
+                [33mclass[31m=[
+32m"text-muted-foreground"[31m
+              [36m>[31m
+                [0mvs last 
+month[0m
+              [36m</span>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          
+[33mclass[31m=[32m"absolute 
+top-0 right-0 w-20 h-20 
+bg-gradient-to-br from-white/10 
+to-transparent 
+rounded-bl-full"[31m
+        [36m/>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+    [36m<section[31m
+      [33maria-atomic[31m=[32m"
+false"[31m
+      [33maria-label[31m=[32m"N
+otifications alt+T"[31m
+      [33maria-live[31m=[32m"po
+lite"[31m
+      [33maria-relevant[31m=[32
+m"additions text"[31m
+      
+[33mtabindex[31m=[32m"-1"[31m
+    [36m/>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2mΓ¥»[22m 
+Object.getElementError node_module
+s/@testing-library/dom/dist/config
+.js:[2m37:19[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m76:38[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m52:17[22m[39m
+[90m [2mΓ¥»[22m getByText node_
+modules/@testing-library/dom/dist/
+query-helpers.js:[2m95:19[22m[3
+9m
+[36m [2mΓ¥»[22m src/components/
+dashboard/KPICard.test.tsx:[2m31:
+27[22m[39m
+    [90m 29| [39m            )
+    [90m 30| [39m
+    [90m 31| [39m            [3
+4mexpect[39m(screen[33m.[39m[3
+4mgetByText[39m([32m'TOTAL USERS
+'[39m))[33m.[39m[34mtoBeInTheD
+ocument[39m()
+    [90m   | [39m               
+           [31m^[39m
+    [90m 32| [39m            [3
+4mexpect[39m(screen[33m.[39m[3
+4mgetByText[39m([32m'1,234'[39m
+))[33m.[39m[34mtoBeInTheDocumen
+t[39m()
+    [90m 33| [39m        })
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[15/16]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/comp
+onents/dashboard/KPICard.test.tsx
+[2m > [22mKPICard Component[2m 
+> [22mValue Formatting[2m > 
+[22mformats large numbers with 
+commas
+[31m[1mTestingLibraryElementErro
+r[22m: Unable to find an element 
+with the text: /9[,.]876[,.]543/. 
+This could be because the text is 
+broken up by multiple elements. 
+In this case, you can provide a 
+function for your text matcher to 
+make your matcher more flexible.
+
+Ignored nodes: comments, script, 
+style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      
+[33mclass[31m=[32m"rounded-lg 
+text-card-foreground shadow-sm 
+relative overflow-hidden border-2 
+transition-all duration-300 
+hover:scale-105 animate-fade-in 
+bg-gradient-primary 
+border-primary/20 
+shadow-glow"[31m
+    [36m>[31m
+      [36m<div[31m
+        
+[33mclass[31m=[32m"p-6"[31m
+      [36m>[31m
+        [36m<div[31m
+          
+[33mclass[31m=[32m"flex 
+items-center justify-between"[31m
+        [36m>[31m
+          [36m<div[31m
+            [33mclass[31m=[32m"
+space-y-2"[31m
+          [36m>[31m
+            [36m<p[31m
+              
+[33mclass[31m=[32m"text-sm 
+font-medium text-muted-foreground 
+uppercase tracking-wider"[31m
+            [36m>[31m
+              [0mUsers[0m
+            [36m</p>[31m
+            [36m<p[31m
+              
+[33mclass[31m=[32m"text-3xl 
+font-bold text-foreground"[31m
+            [36m>[31m
+              [0m98,76,543[0m
+            [36m</p>[31m
+            [36m<div[31m
+              
+[33mclass[31m=[32m"flex 
+items-center space-x-2 
+text-sm"[31m
+            [36m>[31m
+              [36m<svg[31m
+                
+[33mclass[31m=[32m"lucide 
+lucide-trending-up h-4 w-4 
+text-accent"[31m
+                
+[33mfill[31m=[32m"none"[31m
+                
+[33mheight[31m=[32m"24"[31m
+                [33mstroke[31m=
+[32m"currentColor"[31m
+                [33mstroke-lineca
+p[31m=[32m"round"[31m
+                [33mstroke-linejo
+in[31m=[32m"round"[31m
+                [33mstroke-width
+[31m=[32m"2"[31m
+                
+[33mviewBox[31m=[32m"0 0 24 
+24"[31m
+                
+[33mwidth[31m=[32m"24"[31m
+                [33mxmlns[31m=[
+32m"http://www.w3.org/2000/svg"[3
+1m
+              [36m>[31m
+                
+[36m<polyline[31m
+                  
+[33mpoints[31m=[32m"22 7 13.5 
+15.5 8.5 10.5 2 17"[31m
+                [36m/>[31m
+                
+[36m<polyline[31m
+                  
+[33mpoints[31m=[32m"16 7 22 7 
+22 13"[31m
+                [36m/>[31m
+              [36m</svg>[31m
+              [36m<span[31m
+                
+[33mclass[31m=[32m"font-medium 
+text-accent"[31m
+              [36m>[31m
+                [0m+[0m
+                [0m2[0m
+                [0m%[0m
+              [36m</span>[31m
+              [36m<span[31m
+                [33mclass[31m=[
+32m"text-muted-foreground"[31m
+              [36m>[31m
+                [0mvs last 
+month[0m
+              [36m</span>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          
+[33mclass[31m=[32m"absolute 
+top-0 right-0 w-20 h-20 
+bg-gradient-to-br from-white/10 
+to-transparent 
+rounded-bl-full"[31m
+        [36m/>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+    [36m<section[31m
+      [33maria-atomic[31m=[32m"
+false"[31m
+      [33maria-label[31m=[32m"N
+otifications alt+T"[31m
+      [33maria-live[31m=[32m"po
+lite"[31m
+      [33maria-relevant[31m=[32
+m"additions text"[31m
+      
+[33mtabindex[31m=[32m"-1"[31m
+    [36m/>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2mΓ¥»[22m 
+Object.getElementError node_module
+s/@testing-library/dom/dist/config
+.js:[2m37:19[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m76:38[22m[39m
+[90m [2mΓ¥»[22m node_modules/@t
+esting-library/dom/dist/query-help
+ers.js:[2m52:17[22m[39m
+[90m [2mΓ¥»[22m getByText node_
+modules/@testing-library/dom/dist/
+query-helpers.js:[2m95:19[22m[3
+9m
+[36m [2mΓ¥»[22m src/components/
+dashboard/KPICard.test.tsx:[2m228
+:27[22m[39m
+    [90m226| [39m
+    [90m227| [39m            // 
+Use regex to match formatted 
+number (handles different ΓÇª
+    [90m228| [39m            exp
+ect(screen.getByText(/9[,.]876[,.]
+543/)).toBeInTheDocumΓÇª
+    [90m   | [39m               
+           [31m^[39m
+    [90m229| [39m        })
+    [90m230| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[16/16]ΓÄ»[22m[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[
+41m Unhandled Errors [49m[22m[3
+1mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[31m[1m
+Vitest caught 5 unhandled errors 
+during the test run.
+This might cause false positive 
+tests. Resolve unhandled errors 
+to make sure your tests are not 
+affected.[22m[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m 
+Unhandled Rejection [49m[22m[31
+mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[31m[1mTypeError[22m: signIn 
+is not a function[39m
+[36m [2mΓ¥»[22m handleSignIn sr
+c/pages/Auth.tsx:[2m25:29[22m[3
+9m
+    [90m 23| [39m    [34msetLoa
+ding[39m([35mtrue[39m)[33m;[3
+9m
+    [90m 24| [39m
+    [90m 25| [39m    
+[35mconst[39m { error } 
+[33m=[39m [35mawait[39m 
+[34msignIn[39m(email[33m,[39m 
+password)[33m;[39m
+    [90m   | [39m               
+             [31m^[39m
+    [90m 26| [39m
+    [90m 27| [39m    
+[35mif[39m (error) {
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.callCallback no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4164:14[22m[
+39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+ent.callTheUserObjectsOperation no
+de_modules/jsdom/lib/jsdom/living/
+generated/EventListener.js:[2m26:
+30[22m[39m
+[90m [2mΓ¥»[22m 
+innerInvokeEventListeners node_mod
+ules/jsdom/lib/jsdom/living/events
+/EventTarget-impl.js:[2m360:16[2
+2m[39m
+[90m [2mΓ¥»[22m 
+invokeEventListeners node_modules/
+jsdom/lib/jsdom/living/events/Even
+tTarget-impl.js:[2m296:3[22m[39
+m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElementImpl._dispatch n
+ode_modules/jsdom/lib/jsdom/living
+/events/EventTarget-impl.js:[2m24
+3:9[22m[39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+entImpl.dispatchEvent node_modules
+/jsdom/lib/jsdom/living/events/Eve
+ntTarget-impl.js:[2m114:17[22m[
+39m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.dispatchEvent n
+ode_modules/jsdom/lib/jsdom/living
+/generated/EventTarget.js:[2m241:
+34[22m[39m
+[90m [2mΓ¥»[22m 
+Object.invokeGuardedCallbackDev no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4213:16[22m[
+39m
+[90m [2mΓ¥»[22m 
+invokeGuardedCallback node_modules
+/react-dom/cjs/react-dom.developme
+nt.js:[2m4277:31[22m[39m
+
+[31mThis error originated in "[1
+msrc/pages/Auth.test.tsx[22m" 
+test file. It doesn't mean the 
+error was thrown inside the file 
+itself, but while it was 
+running.[39m
+[31mThe latest test that 
+might've caused the error is 
+"[1mcalls supabase signIn on 
+form submit with valid 
+credentials[22m". It might mean 
+one of the following:
+- The error was thrown, while 
+Vitest was running this test.
+- If the error occurred after the 
+test had been completed, this was 
+the last documented test before 
+it was thrown.[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m 
+Unhandled Rejection [49m[22m[31
+mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[31m[1mTypeError[22m: signIn 
+is not a function[39m
+[36m [2mΓ¥»[22m handleSignIn sr
+c/pages/Auth.tsx:[2m25:29[22m[3
+9m
+    [90m 23| [39m    [34msetLoa
+ding[39m([35mtrue[39m)[33m;[3
+9m
+    [90m 24| [39m
+    [90m 25| [39m    
+[35mconst[39m { error } 
+[33m=[39m [35mawait[39m 
+[34msignIn[39m(email[33m,[39m 
+password)[33m;[39m
+    [90m   | [39m               
+             [31m^[39m
+    [90m 26| [39m
+    [90m 27| [39m    
+[35mif[39m (error) {
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.callCallback no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4164:14[22m[
+39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+ent.callTheUserObjectsOperation no
+de_modules/jsdom/lib/jsdom/living/
+generated/EventListener.js:[2m26:
+30[22m[39m
+[90m [2mΓ¥»[22m 
+innerInvokeEventListeners node_mod
+ules/jsdom/lib/jsdom/living/events
+/EventTarget-impl.js:[2m360:16[2
+2m[39m
+[90m [2mΓ¥»[22m 
+invokeEventListeners node_modules/
+jsdom/lib/jsdom/living/events/Even
+tTarget-impl.js:[2m296:3[22m[39
+m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElementImpl._dispatch n
+ode_modules/jsdom/lib/jsdom/living
+/events/EventTarget-impl.js:[2m24
+3:9[22m[39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+entImpl.dispatchEvent node_modules
+/jsdom/lib/jsdom/living/events/Eve
+ntTarget-impl.js:[2m114:17[22m[
+39m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.dispatchEvent n
+ode_modules/jsdom/lib/jsdom/living
+/generated/EventTarget.js:[2m241:
+34[22m[39m
+[90m [2mΓ¥»[22m 
+Object.invokeGuardedCallbackDev no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4213:16[22m[
+39m
+[90m [2mΓ¥»[22m 
+invokeGuardedCallback node_modules
+/react-dom/cjs/react-dom.developme
+nt.js:[2m4277:31[22m[39m
+
+[31mThis error originated in "[1
+msrc/pages/Auth.test.tsx[22m" 
+test file. It doesn't mean the 
+error was thrown inside the file 
+itself, but while it was 
+running.[39m
+[31mThe latest test that 
+might've caused the error is 
+"[1mshows loading state during 
+sign in[22m". It might mean one 
+of the following:
+- The error was thrown, while 
+Vitest was running this test.
+- If the error occurred after the 
+test had been completed, this was 
+the last documented test before 
+it was thrown.[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m 
+Unhandled Rejection [49m[22m[31
+mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[31m[1mTypeError[22m: signIn 
+is not a function[39m
+[36m [2mΓ¥»[22m handleSignIn sr
+c/pages/Auth.tsx:[2m25:29[22m[3
+9m
+    [90m 23| [39m    [34msetLoa
+ding[39m([35mtrue[39m)[33m;[3
+9m
+    [90m 24| [39m
+    [90m 25| [39m    
+[35mconst[39m { error } 
+[33m=[39m [35mawait[39m 
+[34msignIn[39m(email[33m,[39m 
+password)[33m;[39m
+    [90m   | [39m               
+             [31m^[39m
+    [90m 26| [39m
+    [90m 27| [39m    
+[35mif[39m (error) {
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.callCallback no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4164:14[22m[
+39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+ent.callTheUserObjectsOperation no
+de_modules/jsdom/lib/jsdom/living/
+generated/EventListener.js:[2m26:
+30[22m[39m
+[90m [2mΓ¥»[22m 
+innerInvokeEventListeners node_mod
+ules/jsdom/lib/jsdom/living/events
+/EventTarget-impl.js:[2m360:16[2
+2m[39m
+[90m [2mΓ¥»[22m 
+invokeEventListeners node_modules/
+jsdom/lib/jsdom/living/events/Even
+tTarget-impl.js:[2m296:3[22m[39
+m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElementImpl._dispatch n
+ode_modules/jsdom/lib/jsdom/living
+/events/EventTarget-impl.js:[2m24
+3:9[22m[39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+entImpl.dispatchEvent node_modules
+/jsdom/lib/jsdom/living/events/Eve
+ntTarget-impl.js:[2m114:17[22m[
+39m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.dispatchEvent n
+ode_modules/jsdom/lib/jsdom/living
+/generated/EventTarget.js:[2m241:
+34[22m[39m
+[90m [2mΓ¥»[22m 
+Object.invokeGuardedCallbackDev no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4213:16[22m[
+39m
+[90m [2mΓ¥»[22m 
+invokeGuardedCallback node_modules
+/react-dom/cjs/react-dom.developme
+nt.js:[2m4277:31[22m[39m
+
+[31mThis error originated in "[1
+msrc/pages/Auth.test.tsx[22m" 
+test file. It doesn't mean the 
+error was thrown inside the file 
+itself, but while it was 
+running.[39m
+[31mThe latest test that 
+might've caused the error is 
+"[1mredirects to home on 
+successful sign in[22m". It 
+might mean one of the following:
+- The error was thrown, while 
+Vitest was running this test.
+- If the error occurred after the 
+test had been completed, this was 
+the last documented test before 
+it was thrown.[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m 
+Unhandled Rejection [49m[22m[31
+mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[31m[1mTypeError[22m: signUp 
+is not a function[39m
+[36m [2mΓ¥»[22m handleSignUp sr
+c/pages/Auth.tsx:[2m47:29[22m[3
+9m
+    [90m 45| [39m    [34msetLoa
+ding[39m([35mtrue[39m)[33m;[3
+9m
+    [90m 46| [39m
+    [90m 47| [39m    
+[35mconst[39m { error } 
+[33m=[39m [35mawait[39m 
+[34msignUp[39m(email[33m,[39m 
+password[33m,[39m 
+displayName)[33m;[39m
+    [90m   | [39m               
+             [31m^[39m
+    [90m 48| [39m
+    [90m 49| [39m    
+[35mif[39m (error) {
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.callCallback no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4164:14[22m[
+39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+ent.callTheUserObjectsOperation no
+de_modules/jsdom/lib/jsdom/living/
+generated/EventListener.js:[2m26:
+30[22m[39m
+[90m [2mΓ¥»[22m 
+innerInvokeEventListeners node_mod
+ules/jsdom/lib/jsdom/living/events
+/EventTarget-impl.js:[2m360:16[2
+2m[39m
+[90m [2mΓ¥»[22m 
+invokeEventListeners node_modules/
+jsdom/lib/jsdom/living/events/Even
+tTarget-impl.js:[2m296:3[22m[39
+m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElementImpl._dispatch n
+ode_modules/jsdom/lib/jsdom/living
+/events/EventTarget-impl.js:[2m24
+3:9[22m[39m
+[90m [2mΓ¥»[22m HTMLUnknownElem
+entImpl.dispatchEvent node_modules
+/jsdom/lib/jsdom/living/events/Eve
+ntTarget-impl.js:[2m114:17[22m[
+39m
+[90m [2mΓ¥»[22m 
+HTMLUnknownElement.dispatchEvent n
+ode_modules/jsdom/lib/jsdom/living
+/generated/EventTarget.js:[2m241:
+34[22m[39m
+[90m [2mΓ¥»[22m 
+Object.invokeGuardedCallbackDev no
+de_modules/react-dom/cjs/react-dom
+.development.js:[2m4213:16[22m[
+39m
+[90m [2mΓ¥»[22m 
+invokeGuardedCallback node_modules
+/react-dom/cjs/react-dom.developme
+nt.js:[2m4277:31[22m[39m
+
+[31mThis error originated in "[1
+msrc/pages/Auth.test.tsx[22m" 
+test file. It doesn't mean the 
+error was thrown inside the file 
+itself, but while it was 
+running.[39m
+[31mThe latest test that 
+might've caused the error is 
+"[1mcalls supabase signUp on 
+form submit[22m". It might mean 
+one of the following:
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[31m16 failed[39m[22m[2m | [22m[1m[32m68 passed[39m[22m[90m (84)[39m
+[2m     Errors [22m [1m[31m5 errors[39m[22m
+[2m   Start at [22m 09:39:01
+[2m   Duration [22m 16.77s[2m (transform 4.10s, setup 7.28s, import 8.25s, tests 15.30s, environment 18.91s)[22m
+
+- The error was thrown, while 
+Vitest was running this test.
+- If the error occurred after the 
+test had been completed, this was 
+the last documented test before 
+it was thrown.[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m 
+Unhandled Rejection [49m[22m[31
+mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+[31m[1mTypeError[22m: __vite_ss
+r_import_1__.supabase.from(...).se
+lect(...).eq(...).order is not a 
+function[39m
+[36m [2mΓ¥»[22m fetchUserRole s
+rc/hooks/useAuth.ts:[2m49:8[22m
+[39m
+    [90m 47| [39m      [33m.[3
+9m[34mselect[39m([32m'role'[39
+m)
+    [90m 48| [39m      [33m.[3
+9m[34meq[39m([32m'user_id'[39m
+[33m,[39m userId)
+    [90m 49| [39m      [33m.[3
+9m[34morder[39m([32m'created_at
+'[39m[33m,[39m { 
+ascending[33m:[39m 
+[35mfalse[39m })
+    [90m   | [39m       
+[31m^[39m
+    [90m 50| [39m      [33m.[3
+9m[34mlimit[39m([34m1[39m)
+    [90m 51| [39m      [33m.[3
+9m[34msingle[39m()[33m;[39m
+[90m [2mΓ¥»[22m src/hooks/useAu
+th.ts:[2m37:9[22m[39m
+[90m [2mΓ¥»[22m runNextTicks no
+de:internal/process/task_queues:[
+2m65:5[22m[39m
+[90m [2mΓ¥»[22m processTimers n
+ode:internal/timers:[2m540:9[22m
+[39m
+
+[31mThis error originated in "[1
+msrc/pages/Auth.test.tsx[22m" 
+test file. It doesn't mean the 
+error was thrown inside the file 
+itself, but while it was 
+running.[39m
+[31mThe latest test that 
+might've caused the error is 
+"[1mredirects to home if user is 
+already authenticated[22m". It 
+might mean one of the following:
+- The error was thrown, while 
+Vitest was running this test.
+- If the error occurred after the 
+test had been completed, this was 
+the last documented test before 
+it was thrown.[39m
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+

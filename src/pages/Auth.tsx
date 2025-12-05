@@ -1,192 +1,180 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
-import type { AuthError } from '@supabase/supabase-js';
+import { TrendingUp, Mail, Lock, User, ArrowRight, Sparkles } from "lucide-react";
 
 export default function Auth() {
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          window.location.href = "/";
-        }
-      } catch (error) {
-        console.error("Auth check error:", error);
-      }
-    };
-    checkAuth();
-  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    setLoading(true);
+
+    const { error } = await signIn(email, password);
+
+    if (error) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: error.message,
         variant: "destructive",
       });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: "Signed in successfully!",
-      });
-      window.location.href = "/";
-    } catch (error) {
-      const authError = error as AuthError;
-      toast({
-        title: "Sign In Error",
-        description: authError.message,
-        variant: "destructive",
-      });
-    } finally {
       setLoading(false);
+    } else {
+      toast({
+        title: "Welcome back!",
+        description: "Signed in successfully",
+      });
+      navigate("/dashboard");
     }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !displayName) {
+    setLoading(true);
+
+    const { error } = await signUp(email, password, displayName);
+
+    if (error) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: error.message,
         variant: "destructive",
       });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            display_name: displayName,
-          }
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: "Account created! Please check your email to verify your account.",
-      });
-    } catch (error) {
-      const authError = error as AuthError;
-      toast({
-        title: "Sign Up Error",
-        description: authError.message,
-        variant: "destructive",
-      });
-    } finally {
       setLoading(false);
+    } else {
+      toast({
+        title: "Success!",
+        description: "Account created successfully",
+      });
+      navigate("/dashboard");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-bg flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }} />
-      </div>
-
-      <div className="w-full max-w-md space-y-6 relative z-10 animate-fade-in-up">
-        {/* Logo/Header */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-primary shadow-glow mb-2 animate-scale-in">
-            <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-white">
-              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-accent bg-clip-text text-transparent animate-gradient-shift" style={{ backgroundSize: '200% 200%' }}>
-            Biz Stratosphere
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            AI-Powered Business Intelligence Platform
-          </p>
+    <div className="min-h-screen flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-secondary to-accent p-12 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
 
-        <Card className="border-border/50 shadow-card-hover glass-effect hover-lift">
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-center text-white">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center shadow-2xl">
+              <TrendingUp className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Biz Stratosphere</h1>
+              <p className="text-white/80 text-sm">Business Intelligence Platform</p>
+            </div>
+          </div>
+
+          <div className="space-y-6 max-w-md">
+            <div className="space-y-2">
+              <h2 className="text-4xl font-bold leading-tight">
+                Transform Your Data Into Insights
+              </h2>
+              <p className="text-white/80 text-lg">
+                Enterprise-grade analytics and AI-powered predictions for modern businesses.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
+                <Sparkles className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold mb-1">AI-Powered Analytics</h3>
+                  <p className="text-sm text-white/80">Get instant insights with machine learning predictions</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
+                <TrendingUp className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold mb-1">Real-Time Dashboards</h3>
+                  <p className="text-sm text-white/80">Monitor your KPIs with beautiful, live visualizations</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Auth Forms */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-background">
+        <Card className="w-full max-w-md glass border-2">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
-              Sign in to access your analytics dashboard
+            <div className="lg:hidden flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                <TrendingUp className="h-4 w-4 text-white" />
+              </div>
+              <CardTitle className="text-2xl">Biz Stratosphere</CardTitle>
+            </div>
+            <CardTitle className="text-2xl">Welcome</CardTitle>
+            <CardDescription>
+              Sign in to your account or create a new one
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2">
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password">Password</Label>
-                    <Input
-                      id="signin-password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
                   </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300 hover:scale-[1.02]" 
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-primary hover:opacity-90"
                     disabled={loading}
                   >
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Sign In
+                    {loading ? "Signing in..." : "Sign In"}
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </form>
               </TabsContent>
@@ -195,48 +183,55 @@ export default function Auth() {
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Display Name</Label>
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      placeholder="Enter your name"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signup-name"
+                        type="text"
+                        placeholder="John Doe"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        className="pl-9"
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="Create a password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      required
-                      minLength={6}
-                    />
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-9"
+                        required
+                      />
+                    </div>
                   </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300 hover:scale-[1.02]" 
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-primary hover:opacity-90"
                     disabled={loading}
                   >
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Account
+                    {loading ? "Creating account..." : "Create Account"}
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </form>
               </TabsContent>

@@ -18,6 +18,8 @@ import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { TopPerformers } from "@/components/dashboard/TopPerformers";
 import { RevenueBreakdown } from "@/components/dashboard/RevenueBreakdown";
 import { QuickActions } from "@/components/dashboard/QuickActions";
+import { DateRangeFilter } from "@/components/dashboard/DateRangeFilter";
+import { MultiSelectFilter } from "@/components/dashboard/MultiSelectFilter";
 import { useKPIData } from "@/hooks/useKPIData";
 import { useChartData } from "@/hooks/useChartData";
 import { useRealtimeKPIs } from "@/hooks/useRealtimeKPIs";
@@ -35,7 +37,13 @@ export default function Dashboard() {
   const [revenueChartType, setRevenueChartType] = useState<ChartType>('line');
   const [customerChartType, setCustomerChartType] = useState<ChartType>('bar');
 
-  const availableCategories = ['Revenue', 'Customers', 'Sales', 'Marketing', 'Operations'];
+  const availableCategories = [
+    { label: 'Revenue', value: 'revenue' },
+    { label: 'Customers', value: 'customers' },
+    { label: 'Sales', value: 'sales' },
+    { label: 'Marketing', value: 'marketing' },
+    { label: 'Operations', value: 'operations' },
+  ];
 
   const { chartData, isLoading: isChartLoading } = useChartData({
     startDate,
@@ -56,11 +64,11 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* KPI Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* KPI Cards Grid - Now 6 cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {isLoading ? (
             // Loading skeleton
-            Array.from({ length: 4 }).map((_, i) => (
+            Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-32 bg-card/50 rounded-lg animate-pulse" />
             ))
           ) : (
@@ -93,6 +101,20 @@ export default function Dashboard() {
                 format="currency"
                 variant="info"
               />
+              <KPICard
+                title="Conversion Rate"
+                value={kpiData?.conversionRate || 0}
+                change={kpiData?.conversionChange || 0}
+                format="percentage"
+                variant="growth"
+              />
+              <KPICard
+                title="Growth Rate"
+                value={kpiData?.growthRate || 0}
+                change={kpiData?.growthChange || 0}
+                format="percentage"
+                variant="revenue"
+              />
             </>
           )}
         </div>
@@ -102,18 +124,26 @@ export default function Dashboard() {
           <WelcomeCard />
         )}
 
-        {/* Enhanced Filters */}
-        <DateFilter
-          startDate={startDate}
-          endDate={endDate}
-          period={period}
-          selectedCategories={selectedCategories}
-          availableCategories={availableCategories}
-          onStartDateChange={setStartDate}
-          onEndDateChange={setEndDate}
-          onPeriodChange={setPeriod}
-          onCategoryChange={setSelectedCategories}
-        />
+        {/* Advanced Filters Section */}
+        <div className="bg-card/50 rounded-lg p-4 space-y-4">
+          <h3 className="text-sm font-semibold">Filters</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <DateRangeFilter
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+            />
+            <MultiSelectFilter
+              options={availableCategories}
+              selected={selectedCategories}
+              onSelectionChange={setSelectedCategories}
+              placeholder="Filter by category..."
+              label="Categories"
+            />
+          </div>
+        </div>
+
 
         {/* Charts Section - Full Width */}
         <div className="space-y-4">

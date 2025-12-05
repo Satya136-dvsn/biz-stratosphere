@@ -2,233 +2,182 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User, Sparkles, TrendingUp, BarChart3 } from "lucide-react";
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Send, Bot, User, Sparkles, Loader2, DollarSign, Zap } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import styles from "./AIChatbot.module.css";
-
-interface Message {
-  id: string;
-  text: string;
-  isBot: boolean;
-  timestamp: Date;
-}
-
+import { useAIConversation } from "@/hooks/useAIConversation";
+import ReactMarkdown from 'react-markdown';
 
 export function AIChatbot() {
-  const { toast } = useToast();
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [currentConversationId, setCurrentConversationId] = useState<string | undefined>();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const {
+    messages,
+    isTyping,
+    sendMessage,
+    isSending,
+    tokenUsage,
+    estimatedCost
+  } = useAIConversation(currentConversationId);
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: input,
-      isBot: false,
-      timestamp: new Date()
-    };
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
-    setMessages(prev => [...prev, userMessage]);
-    const currentInput = input;
+  const handleSend = () => {
+    if (!input.trim() || isSending) return;
+
+    sendMessage({
+      message: input,
+      newConversation: !currentConversationId
+    });
+
     setInput("");
-    setIsLoading(true);
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await supabase.functions.invoke('ai-chat', {
-        body: { message: currentInput },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message || 'Failed to get AI response');
-      }
-
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: response.data.message,
-        isBot: true,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botResponse]);
-    } catch (error) {
-      console.error('Error getting AI response:', error);
-      toast({
-        title: "Error",
-        description: "Failed to get AI response. Please try again.",
-        variant: "destructive",
-      });
-
-      const errorResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "I'm sorry, I'm having trouble responding right now. Please try again later.",
-        isBot: true,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorResponse]);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
-  const handleTrendAnalysis = async (metric: string) => {
-    setIsLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await supabase.functions.invoke('trend-analysis', {
-        body: { metric_name: metric, time_period: 30 },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message || 'Failed to get trend analysis');
-      }
-
-      const analysis = response.data;
-      const insight = `📊 Trend Analysis for ${metric}:\n\n• Trend: ${analysis.trend.toUpperCase()}\n• Change: ${analysis.change_percentage}%\n• Confidence: ${analysis.confidence}%\n\nInsights:\n${analysis.insights.map((i: string) => `• ${i}`).join('\n')}`;
-
-      const botResponse: Message = {
-        id: Date.now().toString(),
-        text: insight,
-        isBot: true,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botResponse]);
-      toast({
-        title: "Trend Analysis Complete",
-        description: `Analysis for ${metric} has been generated.`,
-      });
-    } catch (error) {
-      console.error('Error getting trend analysis:', error);
-      toast({
-        title: "Error",
-        description: "Failed to get trend analysis. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleForecast = async (metric: string) => {
-    setIsLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await supabase.functions.invoke('forecasting', {
-        body: { metric_name: metric, forecast_days: 30 },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message || 'Failed to get forecast');
-      }
-
-      const forecast = response.data;
-      const lastPrediction = forecast.predictions[forecast.predictions.length - 1];
-      const insight = `🔮 30-Day Forecast for ${metric}:\n\n• Predicted Value: ${lastPrediction.predicted_value}\n• Range: ${lastPrediction.confidence_interval.lower} - ${lastPrediction.confidence_interval.upper}\n• Model Accuracy: ${forecast.model_accuracy}%\n\nInsights:\n${forecast.insights.map((i: string) => `• ${i}`).join('\n')}`;
-
-      const botResponse: Message = {
-        id: Date.now().toString(),
-        text: insight,
-        isBot: true,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botResponse]);
-      toast({
-        title: "Forecast Complete",
-        description: `30-day forecast for ${metric} has been generated.`,
-      });
-    } catch (error) {
-      console.error('Error getting forecast:', error);
-      toast({
-        title: "Error",
-        description: "Failed to get forecast. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
   return (
-    <Card className="border-2 border-secondary/20 bg-gradient-to-br from-secondary/10 to-transparent h-[500px] flex flex-col">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-          <Bot className="h-6 w-6 text-secondary" />
-          AI Business Assistant
-          <Sparkles className="h-4 w-4 text-warning animate-pulse" />
-        </CardTitle>
+    <Card className="h-[600px] flex flex-col bg-gradient-to-br from-card/95 to-card/80 border-primary/10">
+      <CardHeader className="pb-3 border-b border-border/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-gradient-primary">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">AI Business Analyst</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Powered by GPT-4o Mini • Context-aware insights
+              </p>
+            </div>
+          </div>
+
+          {tokenUsage.total > 0 && (
+            <div className="flex items-center gap-3 text-xs">
+              <Badge variant="outline" className="gap-1">
+                <Zap className="h-3 w-3" />
+                {tokenUsage.total} tokens
+              </Badge>
+              <Badge variant="outline" className="gap-1">
+                <DollarSign className="h-3 w-3" />
+                ${estimatedCost.toFixed(4)}
+              </Badge>
+            </div>
+          )}
+        </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-4 p-6">
-        <ScrollArea className="flex-1 pr-4">
+
+      <CardContent className="flex-1 flex flex-col p-0">
+        {/* Messages Area */}
+        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
           <div className="space-y-4">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-3 py-12">
+                <div className="p-4 rounded-full bg-primary/10">
+                  <Bot className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Ask me anything about your business data</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    I'll analyze your datasets and provide insights
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 gap-2 mt-4 w-full max-w-md">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setInput("What are my top revenue trends?")}
+                    className="justify-start text-left"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    What are my top revenue trends?
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setInput("Analyze my customer growth")}
+                    className="justify-start text-left"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Analyze my customer growth
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setInput("Show me data quality insights")}
+                    className="justify-start text-left"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Show me data quality insights
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
-                  "flex gap-3 p-3 rounded-lg animate-fade-in",
-                  message.isBot
-                    ? "bg-muted/50"
-                    : "bg-primary/10 ml-8"
+                  "flex gap-3 items-start",
+                  message.role === "user" && "flex-row-reverse"
                 )}
               >
-                <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                  message.isBot
-                    ? "bg-secondary text-secondary-foreground"
-                    : "bg-primary text-primary-foreground"
-                )}>
-                  {message.isBot ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
+                <div
+                  className={cn(
+                    "p-2 rounded-lg",
+                    message.role === "assistant"
+                      ? "bg-primary/10"
+                      : "bg-secondary/50"
+                  )}
+                >
+                  {message.role === "assistant" ? (
+                    <Bot className="h-4 w-4 text-primary" />
+                  ) : (
+                    <User className="h-4 w-4 text-secondary-foreground" />
+                  )}
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm text-foreground leading-relaxed">
-                    {message.text}
+
+                <div
+                  className={cn(
+                    "flex-1 rounded-lg p-3 space-y-2",
+                    message.role === "assistant"
+                      ? "bg-muted/50"
+                      : "bg-primary/5"
+                  )}
+                >
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(message.timestamp).toLocaleTimeString()}
                   </p>
-                  <span className="text-xs text-muted-foreground">
-                    {message.timestamp.toLocaleTimeString()}
-                  </span>
                 </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="flex gap-3 p-3 rounded-lg bg-muted/50 animate-fade-in">
-                <div className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center">
-                  <Bot className="h-4 w-4" />
+
+            {isTyping && (
+              <div className="flex gap-3 items-start">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Bot className="h-4 w-4 text-primary" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-secondary rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-secondary rounded-full animate-bounce bounce-delay-2" />
-                    <div className={`w-2 h-2 bg-secondary rounded-full animate-bounce ${styles.bounceDelay}`} />
+                <div className="flex-1 rounded-lg p-3 bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">
+                      Analyzing your data...
+                    </span>
                   </div>
                 </div>
               </div>
@@ -236,41 +185,33 @@ export function AIChatbot() {
           </div>
         </ScrollArea>
 
-        {/* Quick Action Buttons */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleTrendAnalysis('revenue')}
-            disabled={isLoading}
-            className="text-xs"
-          >
-            <TrendingUp className="h-3 w-3 mr-1" />
-            Revenue Trend
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleForecast('revenue')}
-            disabled={isLoading}
-            className="text-xs"
-          >
-            <BarChart3 className="h-3 w-3 mr-1" />
-            Revenue Forecast
-          </Button>
-        </div>
-
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about revenue, churn, predictions..."
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            disabled={isLoading}
-          />
-          <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
-            <Send className="h-4 w-4" />
-          </Button>
+        {/* Input Area */}
+        <div className="p-4 border-t border-border/50">
+          <div className="flex gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask about your business data..."
+              disabled={isSending}
+              className="flex-1 bg-background"
+            />
+            <Button
+              onClick={handleSend}
+              disabled={!input.trim() || isSending}
+              size="icon"
+              className="bg-gradient-primary hover:opacity-90"
+            >
+              {isSending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Press Enter to send • Shift+Enter for new line
+          </p>
         </div>
       </CardContent>
     </Card>

@@ -1,17 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { DollarSign } from "lucide-react";
-
-const revenueData = [
-    { name: 'Products', value: 450000, color: 'hsl(var(--primary))' },
-    { name: 'Services', value: 320000, color: 'hsl(var(--secondary))' },
-    { name: 'Subscriptions', value: 280000, color: 'hsl(var(--accent))' },
-    { name: 'Consulting', value: 150000, color: 'hsl(var(--success))' }
-];
-
-const total = revenueData.reduce((sum, item) => sum + item.value, 0);
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { DollarSign, TrendingUp } from "lucide-react";
+import { useRevenueBreakdown } from "@/hooks/useRevenueBreakdown";
 
 export function RevenueBreakdown() {
+    const { data: breakdown = [], isLoading } = useRevenueBreakdown();
+
     return (
         <Card className="glass">
             <CardHeader>
@@ -19,70 +13,81 @@ export function RevenueBreakdown() {
                     <DollarSign className="h-5 w-5 text-success" />
                     Revenue Breakdown
                 </CardTitle>
-                <CardDescription>Revenue distribution by category</CardDescription>
+                <CardDescription>Distribution by category</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    <ResponsiveContainer width="100%" height={250}>
-                        <PieChart>
-                            <Pie
-                                data={revenueData}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                outerRadius={80}
-                                fill="#8884d8"
-                                dataKey="value"
-                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                            >
-                                {revenueData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                formatter={(value: number) => `$${value.toLocaleString()}`}
-                                contentStyle={{
-                                    backgroundColor: 'hsl(var(--card))',
-                                    border: '1px solid hsl(var(--border))',
-                                    borderRadius: '8px'
-                                }}
-                            />
-                            <Legend />
-                        </PieChart>
-                    </ResponsiveContainer>
+                {isLoading ? (
+                    <div className="space-y-4">
+                        <div className="h-64 bg-muted rounded animate-pulse" />
+                        <div className="space-y-2">
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="h-12 bg-muted rounded animate-pulse" />
+                            ))}
+                        </div>
+                    </div>
+                ) : breakdown.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                        <DollarSign className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                        <p>No data available</p>
+                        <p className="text-xs mt-1">Upload data to see revenue breakdown</p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {/* Pie Chart */}
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={breakdown}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                    >
+                                        {breakdown.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        formatter={(value: number) => `${value.toLocaleString()} bytes`}
+                                    />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
 
-                    <div className="space-y-2">
-                        {revenueData.map((item) => {
-                            const percentage = ((item.value / total) * 100).toFixed(1);
-                            return (
-                                <div key={item.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
+                        {/* Breakdown List */}
+                        <div className="space-y-3">
+                            {breakdown.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                                >
                                     <div className="flex items-center gap-3">
                                         <div
                                             className="w-3 h-3 rounded-full"
                                             style={{ backgroundColor: item.color }}
                                         />
-                                        <span className="text-sm font-medium">{item.name}</span>
+                                        <div>
+                                            <p className="text-sm font-medium">{item.name}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {(item.value / (1024 * 1024)).toFixed(2)} MB
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-sm text-muted-foreground">{percentage}%</span>
-                                        <span className="text-sm font-semibold">
-                                            ${item.value.toLocaleString()}
-                                        </span>
+                                    <div className="text-right">
+                                        <p className="text-sm font-semibold">{item.percentage.toFixed(1)}%</p>
+                                        <div className="flex items-center gap-1 text-xs text-success">
+                                            <TrendingUp className="h-3 w-3" />
+                                        </div>
                                     </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-
-                    <div className="pt-4 border-t border-border">
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Total Revenue</span>
-                            <span className="text-lg font-bold text-success">
-                                ${total.toLocaleString()}
-                            </span>
+                            ))}
                         </div>
                     </div>
-                </div>
+                )}
             </CardContent>
         </Card>
     );
