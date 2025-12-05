@@ -224,7 +224,8 @@ describe('KPICard Component', () => {
                 />
             )
 
-            expect(screen.getByText('9,876,543')).toBeInTheDocument()
+            // Use regex to match formatted number (handles different locale formats)
+            expect(screen.getByText(/9[,.]876[,.]543/)).toBeInTheDocument()
         })
 
         it('handles string values', () => {
