@@ -19,8 +19,8 @@ interface Conversation {
     updated_at: Date;
 }
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-const OPENAI_MODEL = 'gpt-4o-mini'; // Cost-effective model
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const GEMINI_MODEL = 'gemini-1.5-flash'; // Fast and free!
 
 export function useAIConversation(conversationId?: string) {
     const { user } = useAuth();
@@ -64,62 +64,63 @@ export function useAIConversation(conversationId?: string) {
                 // Build context from user's data
                 const context = dataContext ? buildAIContext(dataContext) : '';
 
-                // Prepare messages for OpenAI
-                const messages: any[] = [
-                    {
-                        role: 'system',
-                        content: `You are an AI business analyst assistant. You help users analyze their business data and provide insights.
-            
+                // Build conversation history for Gemini
+                const conversationHistory = conversation?.messages.map(msg => ({
+                    role: msg.role === 'user' ? 'user' : 'model',
+                    parts: [{ text: msg.content }]
+                })) || [];
+
+                // Prepare Gemini API request
+                const systemInstruction = `You are an AI business analyst assistant. You help users analyze their business data and provide insights.
+
 ${context}
 
-Provide concise, actionable insights based on the user's data. When referencing data, be specific. If the user hasn't uploaded data yet, guide them to upload their business data first.`
+Provide concise, actionable insights based on the user's data. When referencing data, be specific. If the user hasn't uploaded data yet, guide them to upload their business data first.`;
+
+                // Call Gemini API
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [
+                                ...conversationHistory,
+                                {
+                                    role: 'user',
+                                    parts: [{ text: message }]
+                                }
+                            ],
+                            systemInstruction: {
+                                parts: [{ text: systemInstruction }]
+                            },
+                            generationConfig: {
+                                temperature: 0.7,
+                                maxOutputTokens: 1000,
+                            }
+                        }),
                     }
-                ];
-
-                // Add conversation history
-                if (conversation?.messages) {
-                    conversation.messages.forEach(msg => {
-                        messages.push({
-                            role: msg.role,
-                            content: msg.content
-                        });
-                    });
-                }
-
-                // Add current user message
-                messages.push({
-                    role: 'user',
-                    content: message
-                });
-
-                // Call OpenAI API
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                    },
-                    body: JSON.stringify({
-                        model: OPENAI_MODEL,
-                        messages,
-                        temperature: 0.7,
-                        max_tokens: 1000,
-                    }),
-                });
+                );
 
                 if (!response.ok) {
-                    throw new Error(`OpenAI API error: ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
                 }
 
                 const data = await response.json();
-                const assistantMessage = data.choices[0].message.content;
-                const usage = data.usage;
+                const assistantMessage = data.candidates[0].content.parts[0].text;
+
+                // Estimate token usage (Gemini doesn't provide exact counts in free tier)
+                const estimatedPromptTokens = Math.ceil((systemInstruction.length + message.length) / 4);
+                const estimatedCompletionTokens = Math.ceil(assistantMessage.length / 4);
 
                 // Update token usage
                 setTokenUsage({
-                    prompt: usage.prompt_tokens,
-                    completion: usage.completion_tokens,
-                    total: usage.total_tokens,
+                    prompt: estimatedPromptTokens,
+                    completion: estimatedCompletionTokens,
+                    total: estimatedPromptTokens + estimatedCompletionTokens,
                 });
 
                 // Create or update conversation in database
@@ -174,8 +175,8 @@ Provide concise, actionable insights based on the user's data. When referencing 
         },
     });
 
-    // Calculate cost (approximate)
-    const estimatedCost = (tokenUsage.total / 1000) * 0.00015; // gpt-4o-mini pricing
+    // Gemini is FREE, so cost is $0!
+    const estimatedCost = 0;
 
     return {
         conversation,

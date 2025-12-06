@@ -24,81 +24,72 @@ serve(async (req) => {
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
         )
 
-        // 1. Generate embedding for the query
-        const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: 'text-embedding-ada-002',
-                input: query,
-            }),
-        })
+        // For now, we'll use Gemini without embeddings (simpler, still free)
+        // Fetch recent data for context
+        const { data: recentData } = await supabaseClient
+            .from('datasets')
+            .select('name, metadata, created_at')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(5)
 
-        const embeddingData = await embeddingResponse.json()
-        const queryEmbedding = embeddingData.data[0].embedding
-
-        // 2. Search for similar content using vector search
-        const { data: similarDocs, error: searchError } = await supabaseClient.rpc(
-            'match_embeddings',
-            {
-                query_embedding: queryEmbedding,
-                match_threshold: 0.7,
-                match_count: 5,
-                filter_user_id: userId,
-            }
-        )
-
-        if (searchError) throw searchError
-
-        // 3. Build context from similar documents
-        const context = similarDocs && similarDocs.length > 0
-            ? similarDocs
-                .map((doc: any, i: number) => `[Source ${i + 1}] ${doc.content}`)
+        // Build context from recent datasets
+        const context = recentData && recentData.length > 0
+            ? recentData
+                .map((dataset: any, i: number) =>
+                    `[Source ${i + 1}] Dataset: ${dataset.name}\nUploaded: ${new Date(dataset.created_at).toLocaleDateString()}\nInfo: ${JSON.stringify(dataset.metadata || {})}`
+                )
                 .join('\n\n')
-            : 'No relevant data found in your uploads.'
+            : 'No datasets found. User should upload business data first.'
 
-        // 4. Call GPT with context (RAG!)
-        const completionResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are an AI business analyst. Use the following context from the user's data to answer their question accurately. Always cite your sources using [Source N] notation.
+        // Call Gemini API (FREE!)
+        const geminiResponse = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${Deno.env.get('GEMINI_API_KEY')}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        role: 'user',
+                        parts: [{ text: query }]
+                    }],
+                    systemInstruction: {
+                        parts: [{
+                            text: `You are an AI business analyst. Use the following context from the user's data to answer their question accurately. Always cite your sources using [Source N] notation.
 
 Context from user's data:
 ${context}
 
-If the context doesn't contain relevant information, say so and provide general guidance.`,
+If the context doesn't contain relevant information, say so and provide general guidance.`
+                        }]
                     },
-                    {
-                        role: 'user',
-                        content: query,
-                    },
-                ],
-                temperature: 0.7,
-                max_tokens: 1000,
-            }),
-        })
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 1000,
+                    }
+                }),
+            }
+        )
 
-        const completionData = await completionResponse.json()
-        const answer = completionData.choices[0].message.content
-        const usage = completionData.usage
+        if (!geminiResponse.ok) {
+            const errorData = await geminiResponse.json()
+            throw new Error(`Gemini API error: ${errorData.error?.message || geminiResponse.statusText}`)
+        }
 
-        // 5. Return response with sources
+        const geminiData = await geminiResponse.json()
+        const answer = geminiData.candidates[0].content.parts[0].text
+
+        // Return response with sources
         return new Response(
             JSON.stringify({
                 answer,
-                sources: similarDocs || [],
-                usage,
+                sources: recentData || [],
+                usage: {
+                    model: 'gemini-1.5-flash',
+                    cost: 0, // FREE!
+                },
             }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
