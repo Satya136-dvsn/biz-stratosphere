@@ -71,62 +71,62 @@ export function ScheduledReports() {
             )}
 
             {/* Report Creation Wizard - Simplified */}
-            {show Wizard && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <Card className="w-full max-w-2xl">
-                    <CardHeader>
-                        <CardTitle>Create Scheduled Report</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div>
-                            <Label>Report Name *</Label>
-                            <Input placeholder="Weekly KPI Summary" />
-                        </div>
-                        <div>
-                            <Label>Report Type *</Label>
-                            <Select>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="kpi_summary">KPI Summary</SelectItem>
-                                    <SelectItem value="trend_analysis">Trend Analysis</SelectItem>
-                                    <SelectItem value="custom">Custom Report</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label>Schedule *</Label>
-                            <Select>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select frequency" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="daily">Daily</SelectItem>
-                                    <SelectItem value="weekly">Weekly</SelectItem>
-                                    <SelectItem value="monthly">Monthly</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div>
-                            <Label>Recipients *</Label>
-                            <Input placeholder="email@example.com (comma-separated)" />
-                        </div>
-                        <div className="flex justify-end gap-2 pt-4">
-                            <Button variant="outline" onClick={() => setShowWizard(false)}>
-                                Cancel
-                            </Button>
-                            <Button onClick={() => {
-                                // Save logic here
-                                setShowWizard(false);
-                            }}>
-                                Create Report
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-      )}
+            {showWizard && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <Card className="w-full max-w-2xl">
+                        <CardHeader>
+                            <CardTitle>Create Scheduled Report</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div>
+                                <Label>Report Name *</Label>
+                                <Input placeholder="Weekly KPI Summary" />
+                            </div>
+                            <div>
+                                <Label>Report Type *</Label>
+                                <Select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="kpi_summary">KPI Summary</SelectItem>
+                                        <SelectItem value="trend_analysis">Trend Analysis</SelectItem>
+                                        <SelectItem value="custom">Custom Report</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label>Schedule *</Label>
+                                <Select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select frequency" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="daily">Daily</SelectItem>
+                                        <SelectItem value="weekly">Weekly</SelectItem>
+                                        <SelectItem value="monthly">Monthly</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label>Recipients *</Label>
+                                <Input placeholder="email@example.com (comma-separated)" />
+                            </div>
+                            <div className="flex justify-end gap-2 pt-4">
+                                <Button variant="outline" onClick={() => setShowWizard(false)}>
+                                    Cancel
+                                </Button>
+                                <Button onClick={() => {
+                                    // Save logic here
+                                    setShowWizard(false);
+                                }}>
+                                    Create Report
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
         </div>
     );
 }

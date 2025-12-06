@@ -29,7 +29,7 @@ export function PIIDetection({ data, columns }: PIIDetectionProps) {
             const columnData = data.map((row) => String(row[column] || '')).filter(Boolean);
 
             Object.entries(PII_PATTERNS).forEach(([type, pattern]) => {
-                const matches = column Data.join(' ').match(pattern);
+                const matches = columnData.join(' ').match(pattern);
                 if (matches && matches.length > 0) {
                     if (!results[column]) {
                         results[column] = { type, count: matches.length, samples: matches.slice(0, 3) };
