@@ -25,6 +25,32 @@ services:
       - backend
     environment:
       - NODE_ENV=production
+
+  # Ollama - Local LLM serving (Tier 3.3)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: biz-stratosphere-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+  # ML Service - FastAPI for ML predictions & SHAP (Tier 3.3-3.4)
+  ml-service:
+    build: ./ml-service
+    container_name: biz-stratosphere-ml
+    ports:
+      - "8001:8000"  # Changed to 8001 to avoid conflict
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    restart: unless-stopped
+    volumes:
+      - ./ml-service:/app
       
   postgres-airflow:
     image: postgres:14
@@ -86,3 +112,4 @@ services:
     
 volumes:
   airflow-db:
+  ollama_data:  # New volume for Ollama models
