@@ -17,7 +17,7 @@ export function useAuth() {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
+
         // Fetch user role when session changes
         if (session?.user) {
           setTimeout(() => fetchUserRole(session.user.id), 0);
@@ -32,7 +32,7 @@ export function useAuth() {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      
+
       if (session?.user) {
         fetchUserRole(session.user.id);
       }
@@ -49,9 +49,42 @@ export function useAuth() {
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
-    
+
     if (data) {
       setUserRole(data.role as UserRole);
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) return { error };
+      return { data, error: null };
+    } catch (error: any) {
+      return { error };
+    }
+  };
+
+  const signUp = async (email: string, password: string, displayName?: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name: displayName || email,
+          },
+        },
+      });
+
+      if (error) return { error };
+      return { data, error: null };
+    } catch (error: any) {
+      return { error };
     }
   };
 
@@ -65,13 +98,15 @@ export function useAuth() {
   };
 
   const hasRole = (role: UserRole) => userRole === role;
-  
+
   const isAdmin = () => userRole === 'super_admin' || userRole === 'company_admin';
 
   return {
     user,
     session,
     loading,
+    signIn,
+    signUp,
     signOut,
     isAuthenticated: !!session,
     userRole,

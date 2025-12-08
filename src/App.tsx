@@ -7,11 +7,15 @@ import { Sidebar } from "./components/layout/Sidebar";
 import { CommandBar } from "./components/layout/CommandBar";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
+import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import { Enterprise } from "./pages/Enterprise";
 import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
 import { Profile } from "./pages/Profile";
+import Workspaces from "./pages/Workspaces";
+import APIManagement from "./pages/APIManagement";
+import AdvancedCharts from "./pages/AdvancedCharts";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -20,8 +24,9 @@ const queryClient = new QueryClient();
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const isAuthPage = location.pathname === '/auth';
+  const isLandingPage = location.pathname === '/';
 
-  if (isAuthPage) {
+  if (isAuthPage || isLandingPage) {
     return (
       <div className="min-h-screen bg-gradient-bg">
         {children}
@@ -61,10 +66,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/"
-              element={<Navigate to="/dashboard" replace />}
-            />
+            <Route path="/" element={<Landing />} />
             <Route
               path="/enterprise"
               element={
@@ -94,6 +96,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/workspaces"
+              element={
+                <ProtectedRoute>
+                  <Workspaces />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/api-management"
+              element={
+                <ProtectedRoute>
+                  <APIManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/advanced-charts"
+              element={
+                <ProtectedRoute>
+                  <AdvancedCharts />
                 </ProtectedRoute>
               }
             />

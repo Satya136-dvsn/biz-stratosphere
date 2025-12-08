@@ -53,21 +53,14 @@ CREATE TABLE IF NOT EXISTS api_keys (
   is_active BOOLEAN DEFAULT TRUE
 );
 
--- Add workspace_id to existing tables
-ALTER TABLE datasets ADD COLUMN IF NOT EXISTS workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE;
-ALTER TABLE notifications ADD COLUMN IF NOT EXISTS workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE;
-ALTER TABLE ai_conversations ADD COLUMN IF NOT EXISTS workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE;
-ALTER TABLE automation_rules ADD COLUMN IF NOT EXISTS workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE;
-
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_workspaces_owner ON workspaces(owner_id);
-CREATE INDEX IF NOT EXISTS idx_workspaces_slug ON workspaces(slug);
-CREATE INDEX IF NOT EXISTS idx_workspace_members_workspace ON workspace_members(workspace_id);
-CREATE INDEX IF NOT EXISTS idx_workspace_members_user ON workspace_members(user_id);
-CREATE INDEX IF NOT EXISTS idx_workspace_invites_workspace ON workspace_invites(workspace_id);
-CREATE INDEX IF NOT EXISTS idx_workspace_invites_email ON workspace_invites(email);
-CREATE INDEX IF NOT EXISTS idx_api_keys_workspace ON api_keys(workspace_id);
-CREATE INDEX IF NOT EXISTS idx_datasets_workspace ON datasets(workspace_id);
+-- Add workspace_id to existing tables (ONLY if they exist)
+DO $$
+BEGIN
+  -- Add to datasets if exists
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'datasets') THEN
+    ALTER TABLE datasets ADD COLUMN IF NOT EXISTS workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE;
+  END IF;
+  
 
 -- RLS Policies
 

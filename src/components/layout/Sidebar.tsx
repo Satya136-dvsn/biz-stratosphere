@@ -10,6 +10,9 @@ import {
     ChevronRight,
     TrendingUp,
     Building2,
+    Users,
+    Key,
+    LineChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +40,24 @@ const navItems: NavItem[] = [
         title: "Enterprise",
         href: "/enterprise",
         icon: Building2,
+    },
+    {
+        title: "Workspaces",
+        href: "/workspaces",
+        icon: Users,
+        badge: "NEW",
+    },
+    {
+        title: "API Management",
+        href: "/api-management",
+        icon: Key,
+        badge: "NEW",
+    },
+    {
+        title: "Advanced Charts",
+        href: "/advanced-charts",
+        icon: LineChart,
+        badge: "NEW",
     },
     {
         title: "Profile",
