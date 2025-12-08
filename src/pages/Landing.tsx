@@ -9,10 +9,13 @@ export default function LandingPage() {
             <section className="container mx-auto px-4 pt-20 pb-32">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center space-y-8">
-                        <div className="inline-block">
-                            <div className="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-6">
-                                🚀 AI-Powered Business Intelligence Platform
-                            </div>
+                        {/* Logo */}
+                        <div className="flex justify-center mb-8">
+                            <img
+                                src="/logo-full.png"
+                                alt="Biz Stratosphere"
+                                className="h-20 md:h-24 w-auto"
+                            />
                         </div>
 
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight">

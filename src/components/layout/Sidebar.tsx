@@ -90,11 +90,21 @@ export function Sidebar() {
         >
             {/* Logo Section */}
             <div className="flex items-center justify-between p-4 border-b border-border/50">
-                {!collapsed && (
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-glow">
-                            <TrendingUp className="h-4 w-4 text-white" />
-                        </div>
+                {collapsed ? (
+                    <div className="flex items-center justify-center w-full">
+                        <img
+                            src="/logo-orbit.png"
+                            alt="Biz Stratosphere"
+                            className="h-8 w-8"
+                        />
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/logo-orbit.png"
+                            alt="Biz Stratosphere"
+                            className="h-8 w-8"
+                        />
                         <div>
                             <h2 className="text-sm font-bold text-foreground">Biz Stratosphere</h2>
                             <p className="text-xs text-muted-foreground">Analytics</p>
