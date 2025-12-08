@@ -126,7 +126,7 @@ export function FunnelChartComponent({ data, title }: {
 }
 
 // Advanced Charts Page
-export function AdvancedCharts() {
+export default function AdvancedCharts() {
     // Sample data
     const scatterData = [
         { revenue: 4000, customers: 24 },

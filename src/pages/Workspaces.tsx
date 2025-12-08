@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useWorkspaces, useWorkspaceMembers } from '@/hooks/useWorkspaces';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export function Workspaces() {
+export default function Workspaces() {
     const { workspaces, isLoading, createWorkspace, deleteWorkspace } = useWorkspaces();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
