@@ -456,3 +456,11 @@ export default function APIManagementPage() {
 
     return <APIManagement workspaceId={workspaceId} />;
 }
+
+
+// Default export wrapper
+export default function APIManagementPage() {
+    const { user } = useAuth();
+    const workspaceId = user?.id || 'default-workspace';
+    return <APIManagement workspaceId={workspaceId} />;
+}
