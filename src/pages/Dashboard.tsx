@@ -52,69 +52,85 @@ export default function Dashboard() {
   });
 
   return (
-    <div id="dashboard-content">
-      <main className="p-4 space-y-5 animate-fade-in">
+    <div id="dashboard-content" className="min-h-screen">
+      <main className="p-6 space-y-8 animate-fade-in-up">
         {/* Welcome Section */}
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <div className="mb-8">
+          <h2 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent leading-tight">
             Business Intelligence Dashboard
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg font-medium">
             AI-powered insights and analytics for data-driven decisions
           </p>
         </div>
 
-        {/* KPI Cards Grid - Now 6 cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* KPI Cards Grid - Enhanced with animations */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (
-            // Loading skeleton
+            // Enhanced loading skeleton
             Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-32 bg-card/50 rounded-lg animate-pulse" />
+              <div
+                key={i}
+                className="h-36 glass rounded-xl animate-pulse"
+                style={{ animationDelay: `${i * 100}ms` }}
+              />
             ))
           ) : (
             <>
-              <KPICard
-                title="Total Revenue"
-                value={kpiData?.totalRevenue || 0}
-                change={kpiData?.revenueChange || 0}
-                format="currency"
-                variant="revenue"
-              />
-              <KPICard
-                title="Active Customers"
-                value={kpiData?.activeCustomers || 0}
-                change={kpiData?.customersChange || 0}
-                format="number"
-                variant="growth"
-              />
-              <KPICard
-                title="Churn Rate"
-                value={kpiData?.churnRate || 0}
-                change={kpiData?.churnChange || 0}
-                format="percentage"
-                variant="warning"
-              />
-              <KPICard
-                title="Avg Deal Size"
-                value={kpiData?.averageDealSize || 0}
-                change={kpiData?.dealSizeChange || 0}
-                format="currency"
-                variant="info"
-              />
-              <KPICard
-                title="Conversion Rate"
-                value={kpiData?.conversionRate || 0}
-                change={kpiData?.conversionChange || 0}
-                format="percentage"
-                variant="growth"
-              />
-              <KPICard
-                title="Growth Rate"
-                value={kpiData?.growthRate || 0}
-                change={kpiData?.growthChange || 0}
-                format="percentage"
-                variant="revenue"
-              />
+              <div className="animate-fade-in-up" style={{ animationDelay: '0ms' }}>
+                <KPICard
+                  title="Total Revenue"
+                  value={kpiData?.totalRevenue || 0}
+                  change={kpiData?.revenueChange || 0}
+                  format="currency"
+                  variant="revenue"
+                />
+              </div>
+              <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                <KPICard
+                  title="Active Customers"
+                  value={kpiData?.activeCustomers || 0}
+                  change={kpiData?.customersChange || 0}
+                  format="number"
+                  variant="growth"
+                />
+              </div>
+              <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+                <KPICard
+                  title="Churn Rate"
+                  value={kpiData?.churnRate || 0}
+                  change={kpiData?.churnChange || 0}
+                  format="percentage"
+                  variant="warning"
+                />
+              </div>
+              <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+                <KPICard
+                  title="Avg Deal Size"
+                  value={kpiData?.averageDealSize || 0}
+                  change={kpiData?.dealSizeChange || 0}
+                  format="currency"
+                  variant="info"
+                />
+              </div>
+              <div className="animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+                <KPICard
+                  title="Conversion Rate"
+                  value={kpiData?.conversionRate || 0}
+                  change={kpiData?.conversionChange || 0}
+                  format="percentage"
+                  variant="growth"
+                />
+              </div>
+              <div className="animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+                <KPICard
+                  title="Growth Rate"
+                  value={kpiData?.growthRate || 0}
+                  change={kpiData?.growthChange || 0}
+                  format="percentage"
+                  variant="revenue"
+                />
+              </div>
             </>
           )}
         </div>
@@ -124,10 +140,15 @@ export default function Dashboard() {
           <WelcomeCard />
         )}
 
-        {/* Advanced Filters Section */}
-        <div className="bg-card/50 rounded-lg p-4 space-y-4">
-          <h3 className="text-sm font-semibold">Filters</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Advanced Filters Section - Enhanced */}
+        <div className="glass-strong rounded-xl p-6 space-y-4 hover-lift">
+          <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filters
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DateRangeFilter
               startDate={startDate}
               endDate={endDate}
@@ -145,10 +166,10 @@ export default function Dashboard() {
         </div>
 
 
-        {/* Charts Section - Full Width */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div className="space-y-3">
+        {/* Charts Section - Enhanced with better spacing */}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="space-y-4 animate-fade-in" style={{ animationDelay: '600ms' }}>
               <ChartTypeSelector
                 selectedType={revenueChartType}
                 onTypeChange={setRevenueChartType}
@@ -162,7 +183,7 @@ export default function Dashboard() {
               />
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4 animate-fade-in" style={{ animationDelay: '700ms' }}>
               <ChartTypeSelector
                 selectedType={customerChartType}
                 onTypeChange={setCustomerChartType}
@@ -178,12 +199,12 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* AI Assistant & Tools Section - Full Width */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
+        {/* AI Assistant & Tools Section - Enhanced spacing */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '800ms' }}>
             <AIChatbot />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-6 animate-fade-in" style={{ animationDelay: '900ms' }}>
             <ExportButtons
               kpiData={kpiData}
               chartData={chartData}
@@ -193,21 +214,21 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Data Upload Section - Combined */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Data Upload Section - Enhanced */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <DataUpload />
           <ChurnDataUpload />
           <EnhancedDataUpload />
         </div>
 
-        {/* Business Insights Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Business Insights Section - Better spacing */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentActivity />
           <QuickActions />
         </div>
 
-        {/* Analytics Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Analytics Section - Enhanced layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
           <TopPerformers />
           <RevenueBreakdown />
         </div>
