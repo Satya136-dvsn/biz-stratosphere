@@ -226,23 +226,21 @@ export function EnhancedDataUpload() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
-          <div className="flex-1">
-            <Input
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              disabled={loading}
-              className="cursor-pointer border-2 hover:border-primary/50 transition-colors"
-            />
-          </div>
+        <div className="flex flex-col gap-4">
+          <Input
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            disabled={loading}
+            className="cursor-pointer border-2 hover:border-primary/50 transition-colors h-14 text-base"
+          />
           <Button
             onClick={handleAnalyze}
             disabled={!file || loading}
             size="lg"
-            className="transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95 whitespace-nowrap bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 sm:px-8"
+            className="w-full transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-12"
           >
-            <FileText className="h-4 w-4 mr-2" />
+            <FileText className="h-5 w-5 mr-2" />
             Analyze
           </Button>
         </div>
