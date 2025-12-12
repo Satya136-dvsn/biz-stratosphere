@@ -32,7 +32,7 @@ export default function LandingPage() {
 
                         <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-medium">
                             Data insights that reach the stratosphere. Make data-driven decisions with
-                            AI-powered analytics, real-time dashboards, and enterprise-grade intelligence.
+                            AI-powered RAG chatbots, ML predictions, SHAP explainability, and enterprise-grade intelligence.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-6 justify-center pt-12">
@@ -93,8 +93,8 @@ export default function LandingPage() {
                         />
                         <FeatureCard
                             icon={<Zap className="h-10 w-10" />}
-                            title="AI-Powered Insights"
-                            description="Get intelligent recommendations with Gemini AI and local ML models at zero cost."
+                            title="AI & ML Features"
+                            description="RAG chatbot with Gemini, ML model serving with SHAP explainability, and dual AI comparison."
                         />
                         <FeatureCard
                             icon={<Users className="h-10 w-10" />}
