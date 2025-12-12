@@ -93,7 +93,7 @@ export function Sidebar() {
                 {collapsed ? (
                     <div className="flex items-center justify-center w-full">
                         <img
-                            src="/logo-orbit.png"
+                            src="/logo-orbit-transparent.png"
                             alt="Biz Stratosphere"
                             className="h-8 w-8"
                         />
@@ -101,7 +101,7 @@ export function Sidebar() {
                 ) : (
                     <div className="flex items-center gap-3">
                         <img
-                            src="/logo-orbit.png"
+                            src="/logo-orbit-transparent.png"
                             alt="Biz Stratosphere"
                             className="h-8 w-8"
                         />

@@ -14,7 +14,7 @@ export default function LandingPage() {
                             <img
                                 src="/logo-orbit.png"
                                 alt="Biz Stratosphere"
-                                className="h-16 w-16 md:h-20 md:w-20 drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                                className="h-16 w-16 md:h-20 md:w-20 rounded-full bg-transparent object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
                             />
                             <div className="text-left">
                                 <h2 className="text-3xl md:text-4xl font-bold text-foreground">Biz Stratosphere</h2>
