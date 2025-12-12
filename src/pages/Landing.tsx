@@ -9,13 +9,17 @@ export default function LandingPage() {
             <section className="container mx-auto px-4 pt-24 pb-40">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center space-y-10 animate-fade-in-up">
-                        {/* Logo */}
-                        <div className="flex justify-center mb-12">
+                        {/* Logo - Matching Sidebar Design */}
+                        <div className="flex justify-center items-center gap-4 mb-12">
                             <img
-                                src="/logo-full.png"
+                                src="/logo-orbit.png"
                                 alt="Biz Stratosphere"
-                                className="h-24 md:h-32 w-auto drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                                className="h-16 w-16 md:h-20 md:w-20 drop-shadow-2xl hover:scale-105 transition-transform duration-300"
                             />
+                            <div className="text-left">
+                                <h2 className="text-3xl md:text-4xl font-bold text-foreground">Biz Stratosphere</h2>
+                                <p className="text-sm md:text-base text-muted-foreground font-medium">Analytics</p>
+                            </div>
                         </div>
 
                         <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-tight">
