@@ -2,10 +2,14 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, FileText, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, AlertCircle, TrendingUp, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Papa from 'papaparse';
+import { scanDataForPII, type PIIScanResult } from '@/lib/piiDetection';
+import { PIIDetection } from './PIIDetection';
 
 interface DataQuality {
   totalRows: number;
@@ -22,6 +26,9 @@ export function EnhancedDataUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<DataQuality | null>(null);
+  const [piiScan, setPiiScan] = useState<PIIScanResult | null>(null);
+  const [parsedData, setParsedData] = useState<any[]>([]);
+  const [piiConsent, setPiiConsent] = useState(false);
   const { toast } = useToast();
 
   const analyzeCSV = (data: any[], fields: string[]) => {
@@ -33,7 +40,7 @@ export function EnhancedDataUpload() {
     // Analyze columns
     fields.forEach(field => {
       const sample = data.find(row => row[field] != null)?.[field];
-      
+
       if (!isNaN(Number(sample))) {
         numericColumns.push(field);
       } else if (!isNaN(Date.parse(sample))) {
@@ -82,7 +89,7 @@ export function EnhancedDataUpload() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      
+
       if (!selectedFile.name.endsWith('.csv')) {
         toast({
           title: "Invalid File",
@@ -91,7 +98,7 @@ export function EnhancedDataUpload() {
         });
         return;
       }
-      
+
       setFile(selectedFile);
       setAnalysis(null);
     }
@@ -101,18 +108,39 @@ export function EnhancedDataUpload() {
     if (!file) return;
 
     setLoading(true);
-    
+
     Papa.parse(file, {
       header: true,
       complete: (results) => {
-        const quality = analyzeCSV(results.data, results.meta.fields || []);
+        const data = results.data as any[];
+        const fields = results.meta.fields || [];
+
+        // Analyze quality
+        const quality = analyzeCSV(data, fields);
         setAnalysis(quality);
+
+        // Scan for PII
+        const scanResult = scanDataForPII(data, fields);
+        setPiiScan(scanResult);
+        setParsedData(data);
+
+        // Reset consent if new file
+        setPiiConsent(false);
+
         setLoading(false);
-        
-        toast({
-          title: "Analysis Complete",
-          description: `Analyzed ${quality.totalRows} rows with ${quality.totalColumns} columns`,
-        });
+
+        if (scanResult.hasPII) {
+          toast({
+            title: "⚠️ PII Detected",
+            description: `Found ${scanResult.piiColumns.length} columns with potential personally identifiable information. Please review and provide consent.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Analysis Complete",
+            description: `Analyzed ${quality.totalRows} rows with ${quality.totalColumns} columns. No PII detected.`,
+          });
+        }
       },
       error: (error) => {
         console.error('Parse error:', error);
@@ -129,8 +157,18 @@ export function EnhancedDataUpload() {
   const handleUpload = async () => {
     if (!file || !analysis) return;
 
+    // Validate PII consent
+    if (piiScan?.hasPII && !piiConsent) {
+      toast({
+        title: "Consent Required",
+        description: "You must acknowledge and provide consent to process data containing PII.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
-    
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -146,6 +184,8 @@ export function EnhancedDataUpload() {
           status: 'completed' as const,
           metadata: {
             quality: analysis,
+            pii_scan: piiScan,
+            pii_consent_given: piiConsent,
             uploaded_at: new Date().toISOString()
           }
         }] as any);
@@ -159,6 +199,9 @@ export function EnhancedDataUpload() {
 
       setFile(null);
       setAnalysis(null);
+      setPiiScan(null);
+      setPiiConsent(false);
+      setParsedData([]);
     } catch (error) {
       console.error('Upload error:', error);
       toast({
@@ -206,7 +249,7 @@ export function EnhancedDataUpload() {
               <CheckCircle2 className="h-5 w-5 text-success" />
               Data Quality Report
             </h3>
-            
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Total Rows</p>
@@ -243,9 +286,41 @@ export function EnhancedDataUpload() {
               </div>
             )}
 
-            <Button onClick={handleUpload} disabled={loading} className="w-full">
+            {/* PII Detection Results */}
+            {piiScan && piiScan.hasPII && (
+              <div className="space-y-4">
+                <PIIDetection data={parsedData} columns={Object.keys(parsedData[0] || {})} />
+
+                <div className="flex items-start gap-3 p-4 border-2 border-warning rounded-lg bg-warning/5">
+                  <Checkbox
+                    id="pii-consent"
+                    checked={piiConsent}
+                    onCheckedChange={(checked) => setPiiConsent(checked as boolean)}
+                  />
+                  <div className="flex-1">
+                    <Label
+                      htmlFor="pii-consent"
+                      className="text-sm font-medium cursor-pointer"
+                    >
+                      I acknowledge this data contains personally identifiable information (PII)
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      By checking this box, you confirm that you have the necessary rights and permissions
+                      to process this data, and that it will be handled in accordance with applicable
+                      privacy regulations (GDPR, CCPA, etc.).
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Button
+              onClick={handleUpload}
+              disabled={loading || (piiScan?.hasPII && !piiConsent)}
+              className="w-full"
+            >
               <Upload className="h-4 w-4 mr-2" />
-              Upload Dataset
+              {piiScan?.hasPII && !piiConsent ? 'Consent Required to Upload' : 'Upload Dataset'}
             </Button>
           </div>
         )}
