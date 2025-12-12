@@ -1,15 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Plus, Download } from 'lucide-react';
+import { Calendar, Plus, Download, Play, Pause, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useScheduledReports } from '@/hooks/useScheduledReports';
 
 export function ScheduledReports() {
-    const [reports, setReports] = useState<any[]>([]);
+    const { reports, isLoading, createReport, toggleReport, deleteReport, runReportNow, isRunning } = useScheduledReports();
     const [showWizard, setShowWizard] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        report_type: 'kpi_summary' as 'kpi_summary' | 'trend_analysis' | 'custom',
+        schedule: 'weekly' as 'daily' | 'weekly' | 'monthly',
+        recipients: [] as string[],
+        enabled: true,
+    });
 
     return (
         <div className="space-y-6">
@@ -26,7 +29,13 @@ export function ScheduledReports() {
                 </Button>
             </div>
 
-            {reports.length === 0 ? (
+            {isLoading ? (
+                <Card>
+                    <CardContent className="flex items-center justify-center py-12">
+                        <p className="text-muted-foreground">Loading reports...</p>
+                    </CardContent>
+                </Card>
+            ) : reports.length === 0 ? (
                 <Card>
                     <CardContent className="flex flex-col items-center justify-center py-12">
                         <Calendar className="h-12 w-12 text-muted-foreground/50 mb-4" />
@@ -49,20 +58,53 @@ export function ScheduledReports() {
                                     <div>
                                         <CardTitle>{report.name}</CardTitle>
                                         <p className="text-sm text-muted-foreground mt-1">
-                                            {report.schedule}
+                                            {report.schedule.charAt(0).toUpperCase() + report.schedule.slice(1)} · {report.report_type.replace('_', ' ')}
                                         </p>
                                     </div>
-                                    <Badge>{report.enabled ? 'Active' : 'Paused'}</Badge>
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant={report.enabled ? 'default' : 'secondary'}>
+                                            {report.enabled ? 'Active' : 'Paused'}
+                                        </Badge>
+                                        <Button
+                                            size="icon"
+                                            variant="outline"
+                                            onClick={() => toggleReport({ reportId: report.id, enabled: !report.enabled })}
+                                        >
+                                            {report.enabled ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                                        </Button>
+                                        <Button
+                                            size="icon"
+                                            variant="outline"
+                                            onClick={() => runReportNow(report.id)}
+                                            disabled={isRunning}
+                                        >
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            size="icon"
+                                            variant="outline"
+                                            onClick={() => deleteReport(report.id)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </CardHeader>
                             <CardContent>
                                 <div className="flex items-center gap-4 text-sm">
                                     <div>
-                                        <span className="font-medium">Type:</span> {report.report_type}
+                                        <span className="font-medium">Recipients:</span> {report.recipients?.length || 0}
                                     </div>
-                                    <div>
-                                        <span className="font-medium">Recipients:</span> {report.recipients.length}
-                                    </div>
+                                    {report.last_run && (
+                                        <div>
+                                            <span className="font-medium">Last run:</span> {new Date(report.last_run).toLocaleDateString()}
+                                        </div>
+                                    )}
+                                    {report.next_run && (
+                                        <div>
+                                            <span className="font-medium">Next run:</span> {new Date(report.next_run).toLocaleDateString()}
+                                        </div>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -80,11 +122,18 @@ export function ScheduledReports() {
                         <CardContent className="space-y-4">
                             <div>
                                 <Label>Report Name *</Label>
-                                <Input placeholder="Weekly KPI Summary" />
+                                <Input
+                                    placeholder="Weekly KPI Summary"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                />
                             </div>
                             <div>
                                 <Label>Report Type *</Label>
-                                <Select>
+                                <Select
+                                    value={formData.report_type}
+                                    onValueChange={(value: any) => setFormData({ ...formData, report_type: value })}
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
@@ -97,7 +146,10 @@ export function ScheduledReports() {
                             </div>
                             <div>
                                 <Label>Schedule *</Label>
-                                <Select>
+                                <Select
+                                    value={formData.schedule}
+                                    onValueChange={(value: any) => setFormData({ ...formData, schedule: value })}
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select frequency" />
                                     </SelectTrigger>
@@ -110,16 +162,36 @@ export function ScheduledReports() {
                             </div>
                             <div>
                                 <Label>Recipients *</Label>
-                                <Input placeholder="email@example.com (comma-separated)" />
+                                <Input
+                                    placeholder="email@example.com (comma-separated)"
+                                    onChange={(e) => {
+                                        const emails = e.target.value.split(',').map(email => email.trim()).filter(Boolean);
+                                        setFormData({ ...formData, recipients: emails });
+                                    }}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Separate multiple emails with commas
+                                </p>
                             </div>
                             <div className="flex justify-end gap-2 pt-4">
                                 <Button variant="outline" onClick={() => setShowWizard(false)}>
                                     Cancel
                                 </Button>
-                                <Button onClick={() => {
-                                    // Save logic here
-                                    setShowWizard(false);
-                                }}>
+                                <Button
+                                    onClick={() => {
+                                        createReport(formData);
+                                        setShowWizard(false);
+                                        setFormData({
+                                            name: '',
+                                            description: '',
+                                            report_type: 'kpi_summary',
+                                            schedule: 'weekly',
+                                            recipients: [],
+                                            enabled: true,
+                                        });
+                                    }}
+                                    disabled={!formData.name || formData.recipients.length === 0}
+                                >
                                     Create Report
                                 </Button>
                             </div>
