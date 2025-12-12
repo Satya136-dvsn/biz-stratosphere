@@ -95,39 +95,39 @@ export function scanDataForPII(data: any[], columns: string[]): PIIScanResult {
                 }
             });
 
-            if (all Matches.length > 0) {
+            if (allMatches.length > 0) {
+                piiColumns.push({
+                    column,
+                    type,
+                    count: allMatches.length,
+                    samples: [...new Set(allMatches)].slice(0, 3),
+                    confidence: 'high',
+                });
+            }
+        });
+
+        // Check column names for PII keywords
+        const columnLower = column.toLowerCase();
+        const hasKeyword = PII_COLUMN_KEYWORDS.some((keyword) =>
+            columnLower.includes(keyword)
+        );
+
+        if (hasKeyword && !piiColumns.some((p) => p.column === column)) {
             piiColumns.push({
                 column,
-                type,
-                count: allMatches.length,
-                samples: [...new Set(allMatches)].slice(0, 3),
-                confidence: 'high',
+                type: 'potential_pii',
+                count: columnData.length,
+                samples: columnData.slice(0, 3),
+                confidence: 'medium',
             });
         }
     });
 
-    // Check column names for PII keywords
-    const columnLower = column.toLowerCase();
-    const hasKeyword = PII_COLUMN_KEYWORDS.some((keyword) =>
-        columnLower.includes(keyword)
-    );
-
-    if (hasKeyword && !piiColumns.some((p) => p.column === column)) {
-        piiColumns.push({
-            column,
-            type: 'potential_pii',
-            count: columnData.length,
-            samples: columnData.slice(0, 3),
-            confidence: 'medium',
-        });
-    }
-});
-
-return {
-    hasPII: piiColumns.length > 0,
-    piiColumns,
-    totalPIICount: piiColumns.reduce((sum, col) => sum + col.count, 0),
-};
+    return {
+        hasPII: piiColumns.length > 0,
+        piiColumns,
+        totalPIICount: piiColumns.reduce((sum, col) => sum + col.count, 0),
+    };
 }
 
 /**
