@@ -3,23 +3,33 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Suspense, lazy } from "react";
 import { Sidebar } from "./components/layout/Sidebar";
 import { CommandBar } from "./components/layout/CommandBar";
-import Dashboard from "./pages/Dashboard";
-import Auth from "./pages/Auth";
-import Landing from "./pages/Landing";
-import NotFound from "./pages/NotFound";
-import { Enterprise } from "./pages/Enterprise";
-import { Reports } from "./pages/Reports";
-import { Settings } from "./pages/Settings";
-import { Profile } from "./pages/Profile";
-import Workspaces from "./pages/Workspaces";
-import APIManagement from "./pages/APIManagement";
-import AdvancedCharts from "./pages/AdvancedCharts";
-import { AIChat } from "./pages/AIChat";
-import { MLPredictions } from "./pages/MLPredictions";
-import { AIComparison } from "./pages/AIComparison";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+
+// Lazy load all page components for better performance
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Landing = lazy(() => import("./pages/Landing"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Enterprise = lazy(() => import("./pages/Enterprise").then(m => ({ default: m.Enterprise })));
+const Reports = lazy(() => import("./pages/Reports").then(m => ({ default: m.Reports })));
+const Settings = lazy(() => import("./pages/Settings").then(m => ({ default: m.Settings })));
+const Profile = lazy(() => import("./pages/Profile").then(m => ({ default: m.Profile })));
+const Workspaces = lazy(() => import("./pages/Workspaces"));
+const APIManagement = lazy(() => import("./pages/APIManagement"));
+const AdvancedCharts = lazy(() => import("./pages/AdvancedCharts"));
+const AIChat = lazy(() => import("./pages/AIChat").then(m => ({ default: m.AIChat })));
+const MLPredictions = lazy(() => import("./pages/MLPredictions").then(m => ({ default: m.MLPredictions })));
+const AIComparison = lazy(() => import("./pages/AIComparison").then(m => ({ default: m.AIComparison })));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -59,100 +69,102 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AppLayout>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/" element={<Landing />} />
-            <Route
-              path="/enterprise"
-              element={
-                <ProtectedRoute>
-                  <Enterprise />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/workspaces"
-              element={
-                <ProtectedRoute>
-                  <Workspaces />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/api-management"
-              element={
-                <ProtectedRoute>
-                  <APIManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/advanced-charts"
-              element={
-                <ProtectedRoute>
-                  <AdvancedCharts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/ai-chat"
-              element={
-                <ProtectedRoute>
-                  <AIChat />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/ml-predictions"
-              element={
-                <ProtectedRoute>
-                  <MLPredictions />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/ai-comparison"
-              element={
-                <ProtectedRoute>
-                  <AIComparison />
-                </ProtectedRoute>
-              }
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/" element={<Landing />} />
+              <Route
+                path="/enterprise"
+                element={
+                  <ProtectedRoute>
+                    <Enterprise />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <ProtectedRoute>
+                    <Reports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/workspaces"
+                element={
+                  <ProtectedRoute>
+                    <Workspaces />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/api-management"
+                element={
+                  <ProtectedRoute>
+                    <APIManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/advanced-charts"
+                element={
+                  <ProtectedRoute>
+                    <AdvancedCharts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai-chat"
+                element={
+                  <ProtectedRoute>
+                    <AIChat />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ml-predictions"
+                element={
+                  <ProtectedRoute>
+                    <MLPredictions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai-comparison"
+                element={
+                  <ProtectedRoute>
+                    <AIComparison />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </AppLayout>
       </BrowserRouter>
     </TooltipProvider>

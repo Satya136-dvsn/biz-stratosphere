@@ -1,0 +1,53 @@
+{
+    "name": "Biz Stratosphere",
+    "short_name": "Biz Strato",
+    "description": "AI-powered business intelligence platform with RAG chatbot, ML predictions, and advanced analytics",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#8b5cf6",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/logo-orbit.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/logo-orbit.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "business",
+        "analytics",
+        "productivity"
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "View your analytics dashboard",
+            "url": "/dashboard",
+            "icons": []
+        },
+        {
+            "name": "AI Chat",
+            "short_name": "AI Chat",
+            "description": "Chat with AI using RAG",
+            "url": "/ai-chat",
+            "icons": []
+        },
+        {
+            "name": "ML Predictions",
+            "short_name": "ML",
+            "description": "Make ML predictions",
+            "url": "/ml-predictions",
+            "icons": []
+        }
+    ]
+}
