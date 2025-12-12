@@ -7,10 +7,14 @@ from typing import List, Dict, Any, Optional
 import pandas as pd
 import numpy as np
 
+# Import our ML services
+from model_service import model_service
+from shap_service import shap_service
+
 app = FastAPI(
     title="Biz Stratosphere ML Service",
-    description="ML predictions and explanations API",
-    version="1.0.0"
+    description="ML predictions and explanations API with MLflow and SHAP",
+    version="2.0.0"
 )
 
 # CORS middleware
@@ -24,50 +28,201 @@ app.add_middleware(
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://ollama:11434")
 
-class PredictionRequest(BaseModel):
+# Request Models
+class MLPredictionRequest(BaseModel):
+    model_name: str
+    features: Dict[str, Any]
+
+class MLExplainRequest(BaseModel):
+    model_name: str
+    features: Dict[str, Any]
+    feature_names: Optional[List[str]] = None
+    include_plots: bool = True
+
+class OllamaPredictionRequest(BaseModel):
     prompt: str
     model: str = "llama3.1"
     temperature: float = 0.7
     max_tokens: int = 1000
 
-class ExplainRequest(BaseModel):
-    features: Dict[str, Any]
-    model_type: str = "revenue"
-
 @app.get("/")
 async def root():
     return {
-        "service": "Biz Stratosphere ML API",
+        "service": "Biz Stratosphere ML API v2.0",
         "status": "running",
-        "endpoints": [
-            "/predict",
-            "/explain",
-            "/models",
-            "/health"
-        ]
+        "features": ["ML Predictions", "SHAP Explainability", "MLflow Integration", "Ollama LLM"],
+        "endpoints": {
+            "ml": ["/ml/predict", "/ml/explain", "/ml/models"],
+            "llm": ["/llm/predict", "/llm/chat", "/llm/models"],
+            "health": ["/health"]
+        }
     }
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    try:
-        # Check Ollama connection
-        response = requests.get(f"{OLLAMA_HOST}/api/tags", timeout=5)
-        ollama_status = "healthy" if response.ok else "unhealthy"
-    except Exception as e:
-        ollama_status = f"error: {str(e)}"
-    
-    return {
+    health_status = {
         "status": "healthy",
-        "ollama": ollama_status,
-        "ollama_host": OLLAMA_HOST
+        "services": {}
     }
+    
+    # Check ML models
+    try:
+        models = model_service.list_models()
+        health_status["services"]["ml_models"] = {
+            "status": "healthy",
+            "count": len(models)
+        }
+    except Exception as e:
+        health_status["services"]["ml_models"] = {
+            "status": "unhealthy",
+            "error": str(e)
+        }
+    
+    # Check Ollama
+    try:
+        response = requests.get(f"{OLLAMA_HOST}/api/tags", timeout=5)
+        health_status["services"]["ollama"] = {
+            "status": "healthy" if response.ok else "unhealthy",
+            "host": OLLAMA_HOST
+        }
+    except Exception as e:
+        health_status["services"]["ollama"] = {
+            "status": "unavailable",
+            "error": str(e)
+        }
+    
+    return health_status
 
-@app.post("/predict")
-async def predict(request: PredictionRequest):
+# ============================================================================
+# ML PREDICTION ENDPOINTS
+# ============================================================================
+
+@app.post("/ml/predict")
+async def ml_predict(request: MLPredictionRequest):
     """
-    Make predictions using Ollama models
+    Make predictions using trained ML models
+    
+    Example request:
+    {
+        "model_name": "churn_model",
+        "features": {
+            "usage_frequency": 45,
+            "support_tickets": 5,
+            "tenure_months": 12,
+            "monthly_spend": 150.50,
+            "feature_usage_pct": 60.0
+        }
+    }
     """
+    try:
+        result = model_service.predict(request.model_name, request.features)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ml/batch-predict")
+async def ml_batch_predict(model_name: str, features_list: List[Dict[str, Any]]):
+    """Make batch predictions"""
+    try:
+        results = []
+        for features in features_list:
+            result = model_service.predict(model_name, features)
+            results.append(result)
+        
+        return {
+            "predictions": results,
+            "count": len(results),
+            "model": model_name
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/ml/models")
+async def list_ml_models():
+    """List all available ML models"""
+    try:
+        models = model_service.list_models()
+        return {
+            "models": models,
+            "count": len(models)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/ml/models/{model_name}/info")
+async def get_model_info(model_name: str):
+    """Get detailed information about a specific model"""
+    try:
+        info = model_service.get_model_info(model_name)
+        return info
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================================================
+# SHAP EXPLAINABILITY ENDPOINTS
+# ============================================================================
+
+@app.post("/ml/explain")
+async def ml_explain(request: MLExplainRequest):
+    """
+    Generate SHAP explanations for predictions
+    
+    Example request:
+    {
+        "model_name": "churn_model",
+        "features": {...},
+        "feature_names": ["usage_frequency", "support_tickets", ...],
+        "include_plots": true
+    }
+    """
+    try:
+        # Load model
+        model = model_service.load_model(request.model_name)
+        
+        # Get feature names
+        feature_names = request.feature_names
+        if not feature_names:
+            feature_names = list(request.features.keys())
+        
+        # Generate explanation
+        explanation = shap_service.explain_prediction(
+            model,
+            request.model_name,
+            request.features,
+            feature_names
+        )
+        
+        # Make prediction
+        prediction_result = model_service.predict(request.model_name, request.features)
+        explanation["prediction"] = prediction_result.get("prediction")
+        
+        # Generate plots if requested
+        if request.include_plots:
+            waterfall = shap_service.generate_waterfall_plot(
+                explanation["shap_values"],
+                explanation["base_value"],
+                prediction_result.get("prediction", 0)
+            )
+            summary = shap_service.generate_summary_plot(explanation["shap_values"])
+            
+            explanation["visualizations"] = {
+                "waterfall_plot": waterfall,
+                "summary_plot": summary
+            }
+        
+        return explanation
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Explanation error: {str(e)}")
+
+# ============================================================================
+# OLLAMA LLM ENDPOINTS (Keep existing functionality)
+# ============================================================================
+
+@app.post("/llm/predict")
+async def llm_predict(request: OllamaPredictionRequest):
+    """Make predictions using Ollama models"""
     try:
         response = requests.post(
             f"{OLLAMA_HOST}/api/generate",
@@ -100,72 +255,45 @@ async def predict(request: PredictionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/explain")
-async def explain_prediction(request: ExplainRequest):
-    """
-    Generate SHAP-style explanations for predictions
-    """
+@app.post("/llm/chat")
+async def llm_chat(request: OllamaPredictionRequest):
+    """Chat completion endpoint"""
     try:
-        features = request.features
+        response = requests.post(
+            f"{OLLAMA_HOST}/api/chat",
+            json={
+                "model": request.model,
+                "messages": [
+                    {"role": "user", "content": request.prompt}
+                ],
+               "stream": False
+            },
+            timeout=60
+        )
         
-        # Simulate SHAP values based on business logic
-        # In real implementation, this would use actual ML model
-        feature_importance = {}
+        if not response.ok:
+            return await llm_predict(request)
         
-        if request.model_type == "revenue":
-            # Revenue prediction explanation
-            feature_importance = {
-                "customers": min(abs(hash(str(features.get("customers", 0))) % 100) / 100, 1.0),
-                "avg_deal_size": min(abs(hash(str(features.get("avg_deal_size", 0))) % 100) / 100, 1.0),
-                "churn_rate": min(abs(hash(str(features.get("churn_rate", 0))) % 100) / 100, 1.0),
-                "market_conditions": min(abs(hash(str(features.get("market", "stable"))) % 100) / 100, 1.0)
-            }
-        elif request.model_type == "churn":
-            # Churn prediction explanation
-            feature_importance = {
-                "usage_frequency": min(abs(hash(str(features.get("usage", 0))) % 100) / 100, 1.0),
-                "support_tickets": min(abs(hash(str(features.get("tickets", 0))) % 100) / 100, 1.0),
-                "payment_issues": min(abs(hash(str(features.get("payment", 0))) % 100) / 100, 1.0),
-                "tenure": min(abs(hash(str(features.get("tenure", 0))) % 100) / 100, 1.0)
-            }
-        else:
-            # Generic explanation
-            feature_importance = {
-                key: min(abs(hash(str(value)) % 100) / 100, 1.0)
-                for key, value in features.items()
-            }
-        
-        # Sort by importance
-        sorted_features = dict(sorted(
-            feature_importance.items(),
-            key=lambda x: x[1],
-            reverse=True
-        ))
+        result = response.json()
+        message = result.get("message", {})
         
         return {
-            "model_type": request.model_type,
-            "feature_importance": sorted_features,
-            "explanation": f"The most important factors for {request.model_type} prediction are: " + 
-                          ", ".join(list(sorted_features.keys())[:3]),
-            "confidence": sum(sorted_features.values()) / len(sorted_features)
+            "response": message.get("content", ""),
+            "model": request.model,
+            "role": message.get("role", "assistant")
         }
     
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        return await llm_predict(request)
 
-@app.get("/models")
-async def list_models():
-    """
-    List available Ollama models
-    """
+@app.get("/llm/models")
+async def list_llm_models():
+    """List available Ollama models"""
     try:
         response = requests.get(f"{OLLAMA_HOST}/api/tags", timeout=10)
         
         if not response.ok:
-            return {
-                "models": [],
-                "error": "Could not fetch models from Ollama"
-            }
+            return {"models": [], "error": "Could not fetch models from Ollama"}
         
         data = response.json()
         models = data.get("models", [])
@@ -183,47 +311,16 @@ async def list_models():
         }
     
     except Exception as e:
-        return {
-            "models": [],
-            "error": str(e)
-        }
-
-@app.post("/chat")
-async def chat_completion(request: PredictionRequest):
-    """
-    Chat completion endpoint compatible with OpenAI format
-    """
-    try:
-        # Use Ollama for chat
-        response = requests.post(
-            f"{OLLAMA_HOST}/api/chat",
-            json={
-                "model": request.model,
-                "messages": [
-                    {"role": "user", "content": request.prompt}
-                ],
-               "stream": False
-            },
-            timeout=60
-        )
-        
-        if not response.ok:
-            # Fallback to generate endpoint
-            return await predict(request)
-        
-        result = response.json()
-        message = result.get("message", {})
-        
-        return {
-            "response": message.get("content", ""),
-            "model": request.model,
-            "role": message.get("role", "assistant")
-        }
-    
-    except Exception as e:
-        # Fallback to generate endpoint
-        return await predict(request)
+        return {"models": [], "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
+    print("="*60)
+    print("Starting Biz Stratosphere ML Service v2.0")
+    print("="*60)
+    print("Features:")
+    print("  ✓ ML Predictions (MLflow)")
+    print("  ✓ SHAP Explainability")
+    print("  ✓ Ollama LLM Integration")
+    print("="*60)
     uvicorn.run(app, host="0.0.0.0", port=8000)
