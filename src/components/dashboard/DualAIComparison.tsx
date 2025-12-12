@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Cloud, Server, Loader2, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useAIConversation } from '@/hooks/useAIConversation';
-import { useOllamaML } from '@/hooks/use OllamaML';
+import { useOllamaML } from '@/hooks/useOllamaML';
 import ReactMarkdown from 'react-markdown';
 
 export function DualAIComparison() {

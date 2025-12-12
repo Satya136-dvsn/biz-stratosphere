@@ -18,6 +18,7 @@ import APIManagement from "./pages/APIManagement";
 import AdvancedCharts from "./pages/AdvancedCharts";
 import { AIChat } from "./pages/AIChat";
 import { MLPredictions } from "./pages/MLPredictions";
+import { AIComparison } from "./pages/AIComparison";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -138,6 +139,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MLPredictions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ai-comparison"
+              element={
+                <ProtectedRoute>
+                  <AIComparison />
                 </ProtectedRoute>
               }
             />
