@@ -23,6 +23,7 @@ const AdvancedCharts = lazy(() => import("./pages/AdvancedCharts"));
 const AIChat = lazy(() => import("./pages/AIChat").then(m => ({ default: m.AIChat })));
 const MLPredictions = lazy(() => import("./pages/MLPredictions").then(m => ({ default: m.MLPredictions })));
 const AIComparison = lazy(() => import("./pages/AIComparison").then(m => ({ default: m.AIComparison })));
+const Help = lazy(() => import("./pages/Help"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -158,6 +159,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <AIComparison />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/help"
+                element={
+                  <ProtectedRoute>
+                    <Help />
                   </ProtectedRoute>
                 }
               />
