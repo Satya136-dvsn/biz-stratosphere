@@ -177,6 +177,7 @@ export function EnhancedDataUpload() {
       const { error: datasetError } = await supabase
         .from('datasets')
         .insert([{
+          user_id: user.id,
           name: file.name,
           file_name: file.name,
           file_type: 'csv',
