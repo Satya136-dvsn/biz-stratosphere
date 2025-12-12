@@ -244,7 +244,7 @@ export function Reports() {
                         <SelectValue placeholder="All datasets" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All datasets</SelectItem>
+                        <SelectItem value="all">All datasets</SelectItem>
                         {datasets.map(dataset => (
                           <SelectItem key={dataset.id} value={dataset.id}>
                             {dataset.name || dataset.file_name}
@@ -338,8 +338,8 @@ export function Reports() {
                       <Card
                         key={template.id}
                         className={`cursor-pointer transition-colors ${reportConfig.report_type === template.id
-                            ? 'border-primary'
-                            : 'hover:border-primary/50'
+                          ? 'border-primary'
+                          : 'hover:border-primary/50'
                           }`}
                         onClick={() =>
                           setReportConfig({ ...reportConfig, report_type: template.id as any })
