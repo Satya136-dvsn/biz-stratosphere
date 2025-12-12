@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, AlertCircle, CheckCircle2, Clock, TrendingUp, Zap } from 'lucide-react';
+import { Activity, AlertCircle, CheckCircle2, Clock, TrendingUp, Zap, Users, Database } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { useSystemMetrics } from '@/hooks/useSystemMetrics';
 
 interface PerformanceMetric {
     name: string;
@@ -16,6 +17,7 @@ interface PerformanceMetric {
 export function Monitoring() {
     const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
     const [errors, setErrors] = useState<any[]>([]);
+    const { data: systemMetrics, isLoading: metricsLoading } = useSystemMetrics();
 
     // Monitor performance
     useEffect(() => {
@@ -149,26 +151,42 @@ export function Monitoring() {
                                 <CheckCircle2 className="h-4 w-4 text-green-500" />
                                 <span className="text-sm">Operational</span>
                             </div>
+                            {systemMetrics && (
+                                <div className="text-xs text-muted-foreground">
+                                    {systemMetrics.apiResponseTime}ms avg
+                                </div>
+                            )}
                         </div>
                         <div className="space-y-1">
                             <div className="text-sm font-medium">Database</div>
                             <div className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                <Database className="h-4 w-4 text-green-500" />
                                 <span className="text-sm">Healthy</span>
                             </div>
+                            {systemMetrics && (
+                                <div className="text-xs text-muted-foreground">
+                                    {systemMetrics.dataSetsCount} datasets
+                                </div>
+                            )}
                         </div>
                         <div className="space-y-1">
-                            <div className="text-sm font-medium">AI Services</div>
+                            <div className="text-sm font-medium">Active Users</div>
                             <div className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                <span className="text-sm">Running</span>
+                                <Users className="h-4 w-4 text-blue-500" />
+                                <span className="text-sm">{systemMetrics?.activeUsers || 0}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                                Online now
                             </div>
                         </div>
                         <div className="space-y-1">
                             <div className="text-sm font-medium">Uptime</div>
                             <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-blue-500" />
-                                <span className="text-sm">99.9%</span>
+                                <Clock className="h-4 w-4 text-green-500" />
+                                <span className="text-sm">{systemMetrics?.uptime.toFixed(2)}%</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                                {systemMetrics?.totalRequests || 0} requests
                             </div>
                         </div>
                     </div>
