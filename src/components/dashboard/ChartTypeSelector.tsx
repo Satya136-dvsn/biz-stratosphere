@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { BarChart3, LineChart, PieChart, AreaChart, Radar, TreePine, Gauge, TrendingUp } from 'lucide-react';
+import { BarChart3, LineChart, PieChart, AreaChart, Radar, Network, Gauge, TrendingUp } from 'lucide-react';
 
 export type ChartType = 'line' | 'bar' | 'area' | 'pie' | 'scatter' | 'radar' | 'treemap' | 'gauge' | 'funnel';
 
@@ -23,7 +23,7 @@ export function ChartTypeSelector({
     { type: 'pie' as ChartType, icon: PieChart, label: 'Pie Chart' },
     { type: 'scatter' as ChartType, icon: TrendingUp, label: 'Scatter Plot' },
     { type: 'radar' as ChartType, icon: Radar, label: 'Radar Chart' },
-    { type: 'treemap' as ChartType, icon: TreePine, label: 'Treemap' },
+    { type: 'treemap' as ChartType, icon: Network, label: 'Treemap' },
     { type: 'gauge' as ChartType, icon: Gauge, label: 'Gauge' },
     { type: 'funnel' as ChartType, icon: BarChart3, label: 'Funnel' },
   ].filter(chart => availableTypes.includes(chart.type));
