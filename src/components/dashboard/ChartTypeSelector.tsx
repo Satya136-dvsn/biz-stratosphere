@@ -47,7 +47,6 @@ export function ChartTypeSelector({
           ))}
         </div>
       </div>
-    </div>
-    </Card >
+    </Card>
   );
 }
