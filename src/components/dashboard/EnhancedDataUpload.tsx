@@ -226,17 +226,21 @@ export function EnhancedDataUpload() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center gap-4">
-          <Input
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
-            disabled={loading}
-          />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="flex-1">
+            <Input
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              disabled={loading}
+              className="cursor-pointer"
+            />
+          </div>
           <Button
             onClick={handleAnalyze}
             disabled={!file || loading}
             variant="secondary"
+            className="transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 whitespace-nowrap"
           >
             <FileText className="h-4 w-4 mr-2" />
             Analyze
@@ -317,7 +321,7 @@ export function EnhancedDataUpload() {
             <Button
               onClick={handleUpload}
               disabled={loading || (piiScan?.hasPII && !piiConsent)}
-              className="w-full"
+              className="w-full transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95"
             >
               <Upload className="h-4 w-4 mr-2" />
               {piiScan?.hasPII && !piiConsent ? 'Consent Required to Upload' : 'Upload Dataset'}
