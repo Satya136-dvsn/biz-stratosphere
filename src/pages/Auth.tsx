@@ -75,11 +75,17 @@ export default function Auth() {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center text-white">
           <div className="mb-8">
-            <img
-              src="/logo-full.png"
-              alt="Biz Stratosphere"
-              className="h-16 w-auto mb-2"
-            />
+            <div className="flex items-center gap-3 mb-2">
+              <img
+                src="/logo-orbit.png"
+                alt="Biz Stratosphere"
+                className="h-12 w-12 rounded-full bg-transparent object-contain"
+              />
+              <div>
+                <h2 className="text-2xl font-bold text-white">Biz Stratosphere</h2>
+                <p className="text-xs text-white/80">Analytics</p>
+              </div>
+            </div>
             <p className="text-white/90 text-sm">Business Intelligence Platform</p>
           </div>
 
@@ -117,12 +123,16 @@ export default function Auth() {
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <Card className="w-full max-w-md glass border-2">
           <CardHeader className="space-y-1">
-            <div className="lg:hidden flex justify-center mb-6">
+            <div className="lg:hidden flex justify-center items-center gap-3 mb-6">
               <img
-                src="/logo-full.png"
+                src="/logo-orbit.png"
                 alt="Biz Stratosphere"
-                className="h-12 w-auto"
+                className="h-10 w-10 rounded-full bg-transparent object-contain"
               />
+              <div className="text-left">
+                <h2 className="text-xl font-bold text-foreground">Biz Stratosphere</h2>
+                <p className="text-xs text-muted-foreground">Analytics</p>
+              </div>
             </div>
             <CardTitle className="text-2xl">Welcome</CardTitle>
             <CardDescription>
