@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRAGChat } from '@/hooks/useRAGChat';
-import { use Embeddings } from '@/hooks/useEmbeddings';
+import { useEmbeddings } from '@/hooks/useEmbeddings';
 import { ChatMessageComponent } from '@/components/ai/ChatMessage';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -170,8 +170,8 @@ export function AIChat() {
                                             <div
                                                 key={conv.id}
                                                 className={`p-3 rounded-lg cursor-pointer transition-colors group ${selectedConversationId === conv.id
-                                                        ? 'bg-primary text-primary-foreground'
-                                                        : 'hover:bg-muted'
+                                                    ? 'bg-primary text-primary-foreground'
+                                                    : 'hover:bg-muted'
                                                     }`}
                                                 onClick={() => setSelectedConversationId(conv.id)}
                                             >

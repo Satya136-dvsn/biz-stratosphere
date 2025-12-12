@@ -16,6 +16,7 @@ import { Profile } from "./pages/Profile";
 import Workspaces from "./pages/Workspaces";
 import APIManagement from "./pages/APIManagement";
 import AdvancedCharts from "./pages/AdvancedCharts";
+import { AIChat } from "./pages/AIChat";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -120,6 +121,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdvancedCharts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ai-chat"
+              element={
+                <ProtectedRoute>
+                  <AIChat />
                 </ProtectedRoute>
               }
             />
