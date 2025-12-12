@@ -5,7 +5,7 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { useEmbeddings } from './useEmbeddings';
 
-const GEMINI_API_KEY = 'AIzaSyDjDkdABjnP6prb55lC1ayCt9TbUHJ11vQ';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
 export interface ChatMessage {
