@@ -17,6 +17,7 @@ import Workspaces from "./pages/Workspaces";
 import APIManagement from "./pages/APIManagement";
 import AdvancedCharts from "./pages/AdvancedCharts";
 import { AIChat } from "./pages/AIChat";
+import { MLPredictions } from "./pages/MLPredictions";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -129,6 +130,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AIChat />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ml-predictions"
+              element={
+                <ProtectedRoute>
+                  <MLPredictions />
                 </ProtectedRoute>
               }
             />
