@@ -1,7 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import './professional-ui.css'; // Professional UI enhancements
 import { StrictMode } from "react";
 import { initializeAnalytics, trackWebVitals } from "./lib/analytics";
 import { initializeErrorTracking } from "./lib/errorTracking";
