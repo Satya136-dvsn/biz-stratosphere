@@ -29,24 +29,19 @@ export function ChartTypeSelector({
   ].filter(chart => availableTypes.includes(chart.type));
 
   return (
-    <Card className="p-4">
-      <div className="space-y-3">
-        <h4 className="text-sm font-medium">Chart Type</h4>
-        <div className="grid grid-cols-3 gap-2">
-          {chartTypes.map(({ type, icon: Icon, label }) => (
-            <Button
-              key={type}
-              variant={selectedType === type ? "default" : "outline"}
-              size="sm"
-              onClick={() => onTypeChange(type)}
-              className="flex items-center justify-start"
-            >
-              <Icon className="mr-2 h-4 w-4" />
-              <span className="truncate">{label}</span>
-            </Button>
-          ))}
-        </div>
-      </div>
-    </Card>
+    <div className="grid grid-cols-3 gap-1.5">
+      {chartTypes.map(({ type, icon: Icon, label }) => (
+        <Button
+          key={type}
+          variant={selectedType === type ? "default" : "outline"}
+          size="sm"
+          onClick={() => onTypeChange(type)}
+          className="h-8 w-full flex flex-col items-center justify-center p-1 text-xs"
+          title={label}
+        >
+          <Icon className="h-4 w-4" />
+        </Button>
+      ))}
+    </div>
   );
 }

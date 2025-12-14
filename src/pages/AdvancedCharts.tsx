@@ -404,27 +404,25 @@ export default function AdvancedCharts() {
                 </div>
             </div>
 
-            {/* Main Layout - Improved Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-[350px_1fr] gap-6">
-                {/* Sidebar - Fixed width for consistency */}
-                <div className="space-y-4">
-                    <Card className="border-2 hover:border-primary/20 transition-colors">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Chart Type</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+            {/* Main Layout - Compact Design */}
+            <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-6">
+                {/* Compact Sidebar */}
+                <Card className="h-fit max-h-[calc(100vh-200px)] overflow-y-auto">
+                    <CardContent className="p-4 space-y-6">
+                        {/* Chart Type Section */}
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Chart Type</h3>
                             <ChartTypeSelector
                                 selectedType={chartType}
                                 onTypeChange={setChartType}
                             />
-                        </CardContent>
-                    </Card>
+                        </div>
 
-                    <Card className="border-2 hover:border-primary/20 transition-colors">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Data Source</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                        <div className="border-t" />
+
+                        {/* Data Source Section */}
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Data Source</h3>
                             <DataSourcePicker
                                 selectedDatasetId={selectedDatasetId}
                                 onDatasetChange={setSelectedDatasetId}
@@ -434,34 +432,32 @@ export default function AdvancedCharts() {
                                 onYColumnChange={setYColumn}
                                 availableColumns={availableColumns}
                             />
-                        </CardContent>
-                    </Card>
+                        </div>
 
-                    <Card className="border-2 hover:border-primary/20 transition-colors">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Filters</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                        <div className="border-t" />
+
+                        {/* Filters Section */}
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Filters</h3>
                             <ChartFilters
                                 filters={filters}
                                 onFiltersChange={setFilters}
                                 numericColumns={numericColumns}
                             />
-                        </CardContent>
-                    </Card>
+                        </div>
 
-                    <Card className="border-2 hover:border-primary/20 transition-colors">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Customization</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                        <div className="border-t" />
+
+                        {/* Customization Section */}
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Customization</h3>
                             <ChartCustomizer
                                 customization={customization}
                                 onCustomizationChange={setCustomization}
                             />
-                        </CardContent>
-                    </Card>
-                </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {/* Chart Area - Flexible width */}
                 <div className="space-y-6">
