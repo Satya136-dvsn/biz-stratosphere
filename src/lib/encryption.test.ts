@@ -2,12 +2,12 @@
  * Tests for encryption utilities
  * 
  * Tests AES-256-GCM encryption/decryption, key derivation,
- * dataset encryption, and file encryption.
+ * dataset encryption, and file encryption using Web Crypto API.
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-    generateEncryptionKey,
+    generateKey,
     generateSalt,
     deriveKeyFromPassword,
     encryptData,
@@ -18,67 +18,66 @@ import {
     decryptFile,
     hashData,
     verifyHash,
-    generateSecureId,
     exportKey,
     importKey,
 } from './encryption';
 
-describe('Encryption Utilities', () => {
+describe('Encryption Utilities (Web Crypto API)', () => {
     describe('Key Generation', () => {
         it('should generate a 32-byte encryption key', () => {
-            const key = generateEncryptionKey();
+            const key = generateKey();
             expect(key).toBeInstanceOf(Uint8Array);
             expect(key.length).toBe(32); // 256 bits
         });
 
         it('should generate unique keys each time', () => {
-            const key1 = generateEncryptionKey();
-            const key2 = generateEncryptionKey();
+            const key1 = generateKey();
+            const key2 = generateKey();
             expect(key1).not.toEqual(key2);
         });
 
-        it('should generate a base64-encoded salt', () => {
+        it('should generate a salt', () => {
             const salt = generateSalt();
-            expect(typeof salt).toBe('string');
-            expect(salt.length).toBeGreaterThan(0);
+            expect(salt).toBeInstanceOf(Uint8Array);
+            expect(salt.length).toBe(32);
         });
 
         it('should generate unique salts', () => {
             const salt1 = generateSalt();
             const salt2 = generateSalt();
-            expect(salt1).not.toBe(salt2);
+            expect(salt1).not.toEqual(salt2);
         });
     });
 
     describe('Key Derivation (PBKDF2)', () => {
-        it('should derive a key from password', () => {
+        it('should derive a key from password', async () => {
             const password = 'mySecurePassword123!';
-            const { key, salt } = deriveKeyFromPassword(password);
+            const { key, salt } = await deriveKeyFromPassword(password);
 
             expect(key).toBeInstanceOf(Uint8Array);
             expect(key.length).toBe(32); // 256 bits
-            expect(typeof salt).toBe('string');
+            expect(salt).toBeInstanceOf(Uint8Array);
         });
 
-        it('should derive the same key from same password and salt', () => {
+        it('should derive the same key from same password and salt', async () => {
             const password = 'mySecurePassword123!';
-            const { key: key1, salt } = deriveKeyFromPassword(password);
-            const { key: key2 } = deriveKeyFromPassword(password, salt);
+            const { key: key1, salt } = await deriveKeyFromPassword(password);
+            const { key: key2 } = await deriveKeyFromPassword(password, salt);
 
             expect(key1).toEqual(key2);
         });
 
-        it('should derive different keys from different passwords', () => {
-            const { key: key1 } = deriveKeyFromPassword('password1');
-            const { key: key2 } = deriveKeyFromPassword('password2');
+        it('should derive different keys from different passwords', async () => {
+            const { key: key1 } = await deriveKeyFromPassword('password1');
+            const { key: key2 } = await deriveKeyFromPassword('password2');
 
             expect(key1).not.toEqual(key2);
         });
 
-        it('should derive different keys with different salts', () => {
+        it('should derive different keys with different salts', async () => {
             const password = 'mySecurePassword123!';
-            const { key: key1 } = deriveKeyFromPassword(password);
-            const { key: key2 } = deriveKeyFromPassword(password);
+            const { key: key1 } = await deriveKeyFromPassword(password);
+            const { key: key2 } = await deriveKeyFromPassword(password);
 
             expect(key1).not.toEqual(key2);
         });
@@ -88,69 +87,67 @@ describe('Encryption Utilities', () => {
         let key: Uint8Array;
 
         beforeEach(() => {
-            key = generateEncryptionKey();
+            key = generateKey();
         });
 
-        it('should encrypt and decrypt string data', () => {
+        it('should encrypt and decrypt string data', async () => {
             const plaintext = 'Hello, World! This is a secret message.';
-            const encrypted = encryptData(plaintext, key);
+            const encrypted = await encryptData(plaintext, key);
 
             expect(encrypted).toHaveProperty('ciphertext');
             expect(encrypted).toHaveProperty('iv');
             expect(encrypted).toHaveProperty('tag');
-            expect(encrypted).toHaveProperty('algorithm');
-            expect(encrypted.algorithm).toBe('AES-256-GCM');
 
-            const decrypted = decryptData(encrypted, key);
+            const decrypted = await decryptData(encrypted, key);
             expect(decrypted).toBe(plaintext);
         });
 
-        it('should encrypt and decrypt object data', () => {
+        it('should encrypt and decrypt object data', async () => {
             const data = { name: 'John', age: 30, email: 'john@example.com' };
-            const encrypted = encryptData(data, key);
-            const decrypted = decryptData(encrypted, key);
+            const encrypted = await encryptData(data, key);
+            const decrypted = await decryptData(encrypted, key);
 
             expect(JSON.parse(decrypted)).toEqual(data);
         });
 
-        it('should produce different ciphertexts for same data', () => {
+        it('should produce different ciphertexts for same data', async () => {
             const plaintext = 'Same data';
-            const encrypted1 = encryptData(plaintext, key);
-            const encrypted2 = encryptData(plaintext, key);
+            const encrypted1 = await encryptData(plaintext, key);
+            const encrypted2 = await encryptData(plaintext, key);
 
             // Different IVs should result in different ciphertexts
             expect(encrypted1.iv).not.toBe(encrypted2.iv);
             expect(encrypted1.ciphertext).not.toBe(encrypted2.ciphertext);
         });
 
-        it('should fail decryption with wrong key', () => {
+        it('should fail decryption with wrong key', async () => {
             const plaintext = 'Secret data';
-            const encrypted = encryptData(plaintext, key);
-            const wrongKey = generateEncryptionKey();
+            const encrypted = await encryptData(plaintext, key);
+            const wrongKey = generateKey();
 
-            expect(() => {
-                decryptData(encrypted, wrongKey);
-            }).toThrow('Decryption failed');
+            await expect(async () => {
+                await decryptData(encrypted, wrongKey);
+            }).rejects.toThrow('Decryption failed');
         });
 
-        it('should fail decryption with tampered ciphertext', () => {
+        it('should fail decryption with tampered ciphertext', async () => {
             const plaintext = 'Secret data';
-            const encrypted = encryptData(plaintext, key);
+            const encrypted = await encryptData(plaintext, key);
 
             // Tamper with ciphertext
             encrypted.ciphertext = encrypted.ciphertext.slice(0, -5) + 'XXXXX';
 
-            expect(() => {
-                decryptData(encrypted, key);
-            }).toThrow('Decryption failed');
+            await expect(async () => {
+                await decryptData(encrypted, key);
+            }).rejects.toThrow('Decryption failed');
         });
 
-        it('should throw error with invalid key size', () => {
+        it('should throw error with invalid key size', async () => {
             const invalidKey = new Uint8Array(16); // 128-bit instead of 256-bit
 
-            expect(() => {
-                encryptData('data', invalidKey);
-            }).toThrow('Encryption key must be 32 bytes');
+            await expect(async () => {
+                await encryptData('data', invalidKey);
+            }).rejects.toThrow('Encryption key must be 32 bytes');
         });
     });
 
@@ -158,39 +155,39 @@ describe('Encryption Utilities', () => {
         let key: Uint8Array;
 
         beforeEach(() => {
-            key = generateEncryptionKey();
+            key = generateKey();
         });
 
-        it('should encrypt and decrypt a dataset', () => {
+        it('should encrypt and decrypt a dataset', async () => {
             const dataset = [
                 { id: 1, name: 'Alice', age: 25 },
                 { id: 2, name: 'Bob', age: 30 },
                 { id: 3, name: 'Charlie', age: 35 },
             ];
 
-            const encrypted = encryptDataset(dataset, key);
-            const decrypted = decryptDataset(encrypted, key);
+            const encrypted = await encryptDataset(dataset, key);
+            const decrypted = await decryptDataset(encrypted, key);
 
             expect(decrypted).toEqual(dataset);
         });
 
-        it('should handle empty dataset', () => {
+        it('should handle empty dataset', async () => {
             const dataset: any[] = [];
-            const encrypted = encryptDataset(dataset, key);
-            const decrypted = decryptDataset(encrypted, key);
+            const encrypted = await encryptDataset(dataset, key);
+            const decrypted = await decryptDataset(encrypted, key);
 
             expect(decrypted).toEqual(dataset);
         });
 
-        it('should handle large dataset', () => {
+        it('should handle large dataset', async () => {
             const dataset = Array.from({ length: 1000 }, (_, i) => ({
                 id: i,
                 value: Math.random(),
                 text: `Row ${i}`,
             }));
 
-            const encrypted = encryptDataset(dataset, key);
-            const decrypted = decryptDataset(encrypted, key);
+            const encrypted = await encryptDataset(dataset, key);
+            const decrypted = await decryptDataset(encrypted, key);
 
             expect(decrypted).toEqual(dataset);
         });
@@ -200,69 +197,74 @@ describe('Encryption Utilities', () => {
         let key: Uint8Array;
 
         beforeEach(() => {
-            key = generateEncryptionKey();
+            key = generateKey();
         });
 
-        it('should encrypt and decrypt file data', () => {
-            const fileData = new TextEncoder().encode('File contents here');
-            const encrypted = encryptFile(fileData.buffer, key);
-            const decrypted = decryptFile(encrypted, key);
+        it('should encrypt and decrypt file data', async () => {
+            const fileContent = 'File contents here';
+            const file = new File([fileContent], 'test.txt', { type: 'text/plain' });
 
-            const decryptedText = new TextDecoder().decode(decrypted);
-            expect(decryptedText).toBe('File contents here');
+            const encrypted = await encryptFile(file, key);
+            const decrypted = await decryptFile(encrypted, key, 'test.txt', 'text/plain');
+
+            const decryptedText = await decrypted.text();
+            expect(decryptedText).toBe(fileContent);
         });
 
-        it('should handle binary file data', () => {
+        it('should handle binary file data', async () => {
             const binaryData = new Uint8Array([0, 1, 2, 3, 255, 254, 253]);
-            const encrypted = encryptFile(binaryData.buffer, key);
-            const decrypted = decryptFile(encrypted, key);
+            const file = new File([binaryData], 'binary.bin', { type: 'application/octet-stream' });
 
-            expect(new Uint8Array(decrypted)).toEqual(binaryData);
+            const encrypted = await encryptFile(file, key);
+            const decrypted = await decryptFile(encrypted, key, 'binary.bin', 'application/octet-stream');
+
+            const arrayBuffer = await decrypted.arrayBuffer();
+            expect(new Uint8Array(arrayBuffer)).toEqual(binaryData);
         });
     });
 
     describe('Hashing', () => {
-        it('should hash data with SHA-256', () => {
+        it('should hash data with SHA-256', async () => {
             const data = 'test data';
-            const hash = hashData(data);
+            const hash = await hashData(data);
 
             expect(typeof hash).toBe('string');
             expect(hash.length).toBe(64); // SHA-256 produces 64 hex characters
         });
 
-        it('should produce consistent hashes', () => {
+        it('should produce consistent hashes', async () => {
             const data = 'test data';
-            const hash1 = hashData(data);
-            const hash2 = hashData(data);
+            const hash1 = await hashData(data);
+            const hash2 = await hashData(data);
 
             expect(hash1).toBe(hash2);
         });
 
-        it('should produce different hashes for different data', () => {
-            const hash1 = hashData('data1');
-            const hash2 = hashData('data2');
+        it('should produce different hashes for different data', async () => {
+            const hash1 = await hashData('data1');
+            const hash2 = await hashData('data2');
 
             expect(hash1).not.toBe(hash2);
         });
 
-        it('should verify correct hash', () => {
+        it('should verify correct hash', async () => {
             const data = 'test data';
-            const hash = hashData(data);
+            const hash = await hashData(data);
 
-            expect(verifyHash(data, hash)).toBe(true);
+            expect(await verifyHash(data, hash)).toBe(true);
         });
 
-        it('should reject incorrect hash', () => {
+        it('should reject incorrect hash', async () => {
             const data = 'test data';
-            const hash = hashData(data);
+            const hash = await hashData(data);
 
-            expect(verifyHash('wrong data', hash)).toBe(false);
+            expect(await verifyHash('wrong data', hash)).toBe(false);
         });
     });
 
     describe('Key Import/Export', () => {
         it('should export and import a key', () => {
-            const originalKey = generateEncryptionKey();
+            const originalKey = generateKey();
             const exported = exportKey(originalKey);
             const imported = importKey(exported);
 
@@ -270,52 +272,60 @@ describe('Encryption Utilities', () => {
         });
 
         it('should export key as base64 string', () => {
-            const key = generateEncryptionKey();
+            const key = generateKey();
             const exported = exportKey(key);
 
             expect(typeof exported).toBe('string');
             expect(exported).toMatch(/^[A-Za-z0-9+/=]+$/); // Base64 pattern
         });
-    });
 
-    describe('Utilities', () => {
-        it('should generate a secure random ID', () => {
-            const id = generateSecureId();
+        it('should round-trip encryption with exported/imported key', async () => {
+            const originalKey = generateKey();
+            const exported = exportKey(originalKey);
+            const imported = importKey(exported);
 
-            expect(typeof id).toBe('string');
-            expect(id.length).toBe(32); // 16 bytes = 32 hex characters
-        });
+            const plaintext = 'Test data';
+            const encrypted = await encryptData(plaintext, imported);
+            const decrypted = await decryptData(encrypted, imported);
 
-        it('should generate unique IDs', () => {
-            const id1 = generateSecureId();
-            const id2 = generateSecureId();
-
-            expect(id1).not.toBe(id2);
+            expect(decrypted).toBe(plaintext);
         });
     });
 
     describe('Performance', () => {
-        it('should encrypt small data quickly', () => {
-            const key = generateEncryptionKey();
+        it('should encrypt small data quickly', async () => {
+            const key = generateKey();
             const data = 'Small data';
 
             const start = performance.now();
-            encryptData(data, key);
+            await encryptData(data, key);
             const end = performance.now();
 
-            expect(end - start).toBeLessThan(10); // Should be < 10ms
+            expect(end - start).toBeLessThan(100); // Should be < 100ms for async operation
         });
 
-        it('should decrypt small data quickly', () => {
-            const key = generateEncryptionKey();
+        it('should decrypt small data quickly', async () => {
+            const key = generateKey();
             const data = 'Small data';
-            const encrypted = encryptData(data, key);
+            const encrypted = await encryptData(data, key);
 
             const start = performance.now();
-            decryptData(encrypted, key);
+            await decryptData(encrypted, key);
             const end = performance.now();
 
-            expect(end - start).toBeLessThan(10); // Should be < 10ms
+            expect(end - start).toBeLessThan(100); // Should be < 100ms for async operation
+        });
+
+        it('should handle medium-sized data efficiently', async () => {
+            const key = generateKey();
+            const data = 'x'.repeat(10000); // 10KB
+
+            const start = performance.now();
+            const encrypted = await encryptData(data, key);
+            await decryptData(encrypted, key);
+            const end = performance.now();
+
+            expect(end - start).toBeLessThan(500); // Should be < 500ms
         });
     });
 });
