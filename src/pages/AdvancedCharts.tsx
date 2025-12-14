@@ -522,13 +522,3 @@ export default function AdvancedCharts() {
         </div>
     );
 }
-
-                                </div >
-                            </CardContent >
-                        </Card >
-                    )}
-                </div >
-            </div >
-        </div >
-    );
-}
