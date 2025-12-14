@@ -34,42 +34,170 @@ export function useDataExport() {
         URL.revokeObjectURL(url);
     };
 
-    // Export to PDF
+    // Export to PDF - Professional Version
     const exportToPDF = async ({ data, filename, title }: ExportData) => {
-        const doc = new jsPDF();
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 20;
+        let currentY = margin;
 
-        // Add title
-        if (title) {
+        // Helper function to add header
+        const addHeader = () => {
+            // Company Logo & Branding
+            doc.setFillColor(139, 92, 246); // Purple
+            doc.rect(0, 0, pageWidth, 15, 'F');
+
+            doc.setTextColor(255, 255, 255);
             doc.setFontSize(16);
-            doc.text(title, 14, 15);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Biz Stratosphere', margin, 10);
+
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text('AI-Powered Business Intelligence', margin, 14);
+        };
+
+        // Helper function to add footer
+        const addFooter = (pageNum: number) => {
+            doc.setTextColor(128, 128, 128);
+            doc.setFontSize(8);
+            const footerText = `Page ${pageNum} | Generated on ${new Date().toLocaleDateString()} | Biz Stratosphere Analytics`;
+            doc.text(footerText, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+            // Footer line
+            doc.setDrawColor(200, 200, 200);
+            doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+        };
+
+        // Add first page header
+        addHeader();
+        currentY = 25;
+
+        // Report Title
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        if (title) {
+            doc.text(title, margin, currentY);
+            currentY += 10;
         }
 
-        // Add data as table
-        const headers = Object.keys(data[0] || {});
-        const rows = data.map(item => headers.map(header => String(item[header] || '')));
+        // Report Metadata Box
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(margin, currentY, pageWidth - 2 * margin, 20, 2, 2, 'F');
 
-        let y = title ? 25 : 15;
-
-        // Headers
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        headers.forEach((header, i) => {
-            doc.text(header, 14 + (i * 40), y);
-        });
-
-        // Rows
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        y += 10;
-        rows.forEach((row) => {
-            if (y > 280) {
-                doc.addPage();
-                y = 15;
+        doc.setTextColor(80, 80, 80);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, margin + 5, currentY + 7);
+        doc.text(`Total Records: ${data.length}`, margin + 5, currentY + 14);
+        doc.text(`Format: PDF`, pageWidth - margin - 30, currentY + 7);
+        currentY += 30;
+
+        // Table Data
+        if (data.length > 0) {
+            const headers = Object.keys(data[0]);
+            const rows = data.map(item => headers.map(header => {
+                const value = item[header];
+                if (value === null || value === undefined) return '';
+                if (typeof value === 'number') return value.toLocaleString();
+                return String(value);
+            }));
+
+            // Import jsPDF-AutoTable if available, otherwise use manual table
+            try {
+                // Using manual table with better formatting
+                const colWidth = (pageWidth - 2 * margin) / headers.length;
+
+                // Table headers
+                doc.setFillColor(139, 92, 246);
+                doc.rect(margin, currentY, pageWidth - 2 * margin, 10, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+
+                headers.forEach((header, i) => {
+                    doc.text(
+                        header.length > 15 ? header.substring(0, 12) + '...' : header,
+                        margin + (i * colWidth) + 2,
+                        currentY + 7
+                    );
+                });
+
+                currentY += 10;
+
+                // Table rows
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                let pageNumber = 1;
+
+                rows.forEach((row, rowIndex) => {
+                    // Check if we need a new page
+                    if (currentY > pageHeight - 40) {
+                        addFooter(pageNumber);
+                        doc.addPage();
+                        addHeader();
+                        pageNumber++;
+                        currentY = 35;
+
+                        // Re-add table headers
+                        doc.setFillColor(139, 92, 246);
+                        doc.rect(margin, currentY, pageWidth - 2 * margin, 10, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFont('helvetica', 'bold');
+                        headers.forEach((header, i) => {
+                            doc.text(
+                                header.length > 15 ? header.substring(0, 12) + '...' : header,
+                                margin + (i * colWidth) + 2,
+                                currentY + 7
+                            );
+                        });
+                        currentY += 10;
+                        doc.setFont('helvetica', 'normal');
+                    }
+
+                    // Alternate row colors
+                    if (rowIndex % 2 === 0) {
+                        doc.setFillColor(250, 250, 250);
+                        doc.rect(margin, currentY, pageWidth - 2 * margin, 8, 'F');
+                    }
+
+                    doc.setTextColor(0, 0, 0);
+                    row.forEach((cell, i) => {
+                        const cellText = cell.length > 20 ? cell.substring(0, 17) + '...' : cell;
+                        doc.text(cellText, margin + (i * colWidth) + 2, currentY + 6);
+                    });
+
+                    currentY += 8;
+                });
+
+                // Add footer to last page
+                addFooter(pageNumber);
+
+            } catch (error) {
+                console.error('Error creating table:', error);
+                doc.text('Error generating table. Please try another format.', margin, currentY);
             }
-            row.forEach((cell, i) => {
-                doc.text(String(cell).substring(0, 20), 14 + (i * 40), y);
-            });
-            y += 10;
-        });
+        } else {
+            doc.setTextColor(128, 128, 128);
+            doc.text('No data available to export.', margin, currentY);
+            addFooter(1);
+        }
+
+        // Add final touches - Summary box if space available
+        if (currentY < pageHeight - 60) {
+            currentY = pageHeight - 50;
+            doc.setDrawColor(139, 92, 246);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(margin, currentY, pageWidth - 2 * margin, 25, 2, 2, 'S');
+
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('📊 Analytics Report', margin + 5, currentY + 7);
+            doc.text(`This report contains ${data.length} records with ${Object.keys(data[0] || {}).length} fields.`, margin + 5, currentY + 13);
+            doc.text('For questions or support, contact: support@bizstratosphere.com', margin + 5, currentY + 19);
+        }
 
         doc.save(`${filename}.pdf`);
     };
