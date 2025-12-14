@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@noble/ciphers": "^2.1.1",
+    "@noble/hashes": "^2.0.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -60,7 +62,9 @@
     "jspdf": "^3.0.4",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
+    "otpauth": "^9.4.1",
     "papaparse": "^5.5.3",
+    "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -72,9 +76,13 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "uuid": "^13.0.0",
     "vaul": "^0.9.9",
     "xlsx": "^0.18.5",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",

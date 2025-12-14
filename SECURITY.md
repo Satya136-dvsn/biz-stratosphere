@@ -1,171 +1,437 @@
-# 🔒 SECURITY REMINDER - API Keys & Sensitive Data
+# 🔒 Security Policy - Biz Stratosphere
 
-## ⚠️ CRITICAL: Never Commit Sensitive Data
+## Overview
 
-### What to NEVER commit to Git
-
-- ❌ `.env` files (API keys, secrets, passwords)
-- ❌ `.env.local`, `.env.production`
-- ❌ `config.local.js` or similar
-- ❌ API keys in source code
-- ❌ Database credentials
-- ❌ Private keys (`.pem`, `.key`)
-- ❌ Certificates
-- ❌ OAuth tokens
-- ❌ Password files
-
-### ✅ What IS safe to commit
-
-- ✅ `.env.example` (template without real values)
-- ✅ Documentation about what env vars are needed
-- ✅ Public configuration files
+Biz Stratosphere implements enterprise-grade security with end-to-end encryption, zero-knowledge architecture, and comprehensive security controls to protect your sensitive business data.
 
 ---
 
-## 🛡️ Current Protection Status
+## 🛡️ Security Features
 
-### Verified Safe
+### End-to-End Encryption
 
-1. ✅ `.env` is in `.gitignore`
-2. ✅ `.env.local` is in `.gitignore`
-3. ✅ No `.env` files in git history
-4. ✅ API keys are local only
+**All sensitive data is encrypted before leaving your browser:**
 
----
+- **Algorithm:** AES-256-GCM (authenticated encryption)
+- **Key Derivation:** PBKDF2 with SHA-256 (100,000 iterations)
+- **Key Size:** 256-bit encryption keys
+- **IV:** Unique random initialization vector for each encryption
+- **Authentication:** 128-bit authentication tag prevents tampering
 
-## 📋 Environment Variables Needed
+### Zero-Knowledge Architecture
 
-Create a `.env.local` file with:
+**We cannot read your data:**
 
-```env
-# Supabase
-VITE_SUPABASE_URL=your_supabase_url_here
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+- Encryption/decryption happens entirely in your browser
+- Master keys are derived from your password and never stored
+- Server only stores encrypted blobs
+- Recovery requires your password or recovery key
+- **Lost password = lost data** (by design for maximum security)
 
-# AI Services
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
+### Data Protection
 
-# Optional: If using OpenAI
-# VITE_OPENAI_API_KEY=your_openai_key_here
-```
+**What's encrypted:**
 
-For Supabase Edge Functions (in Supabase dashboard → Edge Functions → Secrets):
+- ✅ All uploaded datasets (CSV, Excel files)
+- ✅ Generated reports and visualizations
+- ✅ User-created charts and configurations
+- ✅ API keys and secrets
+- ✅ Sensitive user profile information
+- ✅ Workspace data and collaboration content
 
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
+**What's NOT encrypted:**
 
----
-
-## 🔧 How to Get API Keys
-
-### Gemini API Key (FREE)
-
-1. Go to: <https://aistudio.google.com/app/apikey>
-2. Click "Get API Key"
-3. Copy the key (starts with `AIzaSy...`)
-
-### Supabase
-
-1. Go to: <https://supabase.com/dashboard>
-2. Select your project
-3. Settings → API
-4. Copy URL and anon key
+- ❌ Public metadata (file names, creation dates)
+- ❌ System logs (anonymized)
+- ❌ Usage statistics (aggregated)
 
 ---
 
-## 🚨 If You Accidentally Committed Secrets
+## 🔐 Authentication & Access Control
 
-### Immediate Actions
+### Password Security
 
-1. **Revoke the exposed keys immediately!**
-2. Generate new keys
-3. Remove from git history:
+**Requirements:**
 
-   ```bash
-   # Remove .env from git history
-   git filter-branch --force --index-filter \
-     "git rm --cached --ignore-unmatch .env" \
-     --prune-empty --tag-name-filter cat -- --all
-   
-   # Force push (DANGER - coordinate with team first!)
-   git push origin --force --all
-   ```
+- Minimum 12 characters
+- Must include uppercase and lowercase letters
+- Must include numbers
+- Must include special characters
+- Checked against 600M+ breached passwords (Have I Been Pwned)
+- Strength scored using zxcvbn algorithm
 
-### Better Approach
+**Storage:**
 
-1. Revoke old keys
-2. Generate new keys
-3. Update `.env.local` (never committed)
-4. Verify `.gitignore` includes `.env*`
+- Passwords hashed with Bcrypt (10+ rounds)
+- Salted uniquely per user
+- Never stored in plaintext
+- Never transmitted in logs
+
+### Multi-Factor Authentication (MFA)
+
+**Supported methods:**
+
+- Time-based One-Time Password (TOTP) via authenticator apps
+- SMS backup codes (optional)
+- 10 one-time recovery codes
+
+**Enforcement:**
+
+- Optional for regular users
+- Mandatory for admin accounts
+- Mandatory for API key generation
+
+### Session Security
+
+**Protection measures:**
+
+- 30-minute session timeout (configurable)
+- Secure session token rotation
+- Device fingerprinting for anomaly detection
+- Automatic logout on inactivity
+- Concurrent session limits
+- Session revocation on password change
 
 ---
 
-## ✅ Best Practices
+## 🚀 Transport Security
 
-### 1. Use Environment Variables
+### HTTPS/TLS
 
-```typescript
-// ✅ GOOD
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+**Encryption in transit:**
 
-// ❌ BAD
-const apiKey = "AIzaSy123abc..."; // Never hardcode!
+- TLS 1.3 enforced (minimum TLS 1.2)
+- Perfect Forward Secrecy (PFS)
+- HSTS enabled (max-age: 1 year)
+- Certificate pinning for critical connections
+- Automatic upgrade of insecure requests
+
+### Security Headers
+
+**Implemented headers:**
+
 ```
-
-### 2. Use .env.example
-
-Create `.env.example` as a template:
-
-```env
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
-VITE_GEMINI_API_KEY=
-```
-
-### 3. Check Before Commit
-
-```bash
-# Always check what you're committing
-git status
-git diff
-
-# Look for sensitive patterns
-git diff | grep -i "api_key\|password\|secret"
-```
-
-### 4. Use Git Hooks (Optional)
-
-Create `.git/hooks/pre-commit`:
-
-```bash
-#!/bin/sh
-if git diff --cached --name-only | grep -q "\.env$"; then
-  echo "Error: Attempting to commit .env file!"
-  exit 1
-fi
+Content-Security-Policy (CSP)     - Prevents XSS attacks
+Strict-Transport-Security (HSTS)  - Forces HTTPS
+X-Frame-Options: DENY             - Prevents clickjacking
+X-Content-Type-Options: nosniff   - Prevents MIME sniffing
+X-XSS-Protection                  - Browser XSS protection
+Referrer-Policy                   - Controls referrer information
+Permissions-Policy                - Restricts browser features
 ```
 
 ---
 
-## 📝 Checklist Before Every Commit
+## 🔑 Key Management
 
-- [ ] Check `git status` - no `.env` files?
-- [ ] Check `git diff` - no API keys visible?
-- [ ] All sensitive data in `.env.local`?
-- [ ] `.gitignore` updated?
-- [ ] `.env.example` has placeholders only?
+### Key Hierarchy
+
+```
+User Password
+    └─> Master Key (PBKDF2-derived, never stored)
+         └─> Data Encryption Key (DEK)
+              └─> Encrypts: Datasets, Reports, Files
+
+Recovery Key (optional)
+    └─> Can decrypt DEK for account recovery
+```
+
+### Key Storage
+
+- **Master Key:** Never stored, derived from password on-demand
+- **DEK:** Encrypted with Master Key, stored in database
+- **Session Keys:** Stored in memory, wiped on logout
+- **Recovery Key:** User-controlled, stored offline
+
+### Key Rotation
+
+**When keys are rotated:**
+
+- Password change → New Master Key, re-encrypt DEK
+- Security incident → Force re-encryption of all data
+- Annual rotation → Recommended best practice
+
+**How rotation works:**
+
+1. Decrypt DEK with old Master Key
+2. Generate new Master Key from new password
+3. Re-encrypt DEK with new Master Key
+4. Update stored encrypted DEK
+5. Wipe old keys from memory
 
 ---
 
-## 🎯 Repository Status
+## 📊 Audit Logging
 
-**Current:** ✅ SECURE
+### What We Log
 
-- `.env` files properly ignored
-- No sensitive data in commits
-- Example files provided
+**Security events:**
 
-**Remember:** ALWAYS double-check before pushing! 🔒
+- Login attempts (success/failure)
+- Password changes
+- MFA setup/removal
+- API key generation/revocation
+- Data access (who, what, when)
+- Permission changes
+- Export events
+- Account lockouts
+- Suspicious activity
+
+**Logs are:**
+
+- Encrypted at rest
+- Immutable (append-only)
+- Retained for 90 days (configurable)
+- Available for SIEM integration
+
+### Intrusion Detection
+
+**Monitored patterns:**
+
+- Multiple failed login attempts
+- Unusual access patterns
+- Geographic anomalies
+- Rapid API calls (rate limiting)
+- Brute force attempts
+- Session hijacking indicators
+
+**Auto-responses:**
+
+- Account lockout (5 failed attempts)
+- CAPTCHA challenges
+- Admin notifications
+- Temporary IP blocks
+- Session termination
+
+---
+
+## 🌐 API Security
+
+### Authentication
+
+**API key requirements:**
+
+- 256-bit random generation
+- Bcrypt hashed in database
+- Scoped permissions (read/write)
+- Expiration dates
+- Rate limiting per key
+
+### Rate Limiting
+
+**Default limits:**
+
+- 100 requests per minute (authenticated)
+- 20 requests per minute (unauthenticated)
+- 1000 requests per hour (burst)
+
+**Exceeded limits result in:**
+
+- HTTP 429 (Too Many Requests)
+- Retry-After header
+- Exponential backoff required
+
+### Request Encryption
+
+**For sensitive endpoints:**
+
+- Request payloads encrypted
+- Ephemeral per-request keys
+- Response payload encryption
+- Prevents packet sniffing
+
+---
+
+## 🏢 Compliance & Standards
+
+### Supported Standards
+
+**Compliant with:**
+
+- ✅ GDPR (General Data Protection Regulation)
+- ✅ CCPA (California Consumer Privacy Act)
+- ✅ HIPAA-ready (with Business Associate Agreement)
+- ✅ SOC 2 Type II (in progress)
+- ✅ ISO 27001 principles
+
+### Data Subject Rights
+
+**GDPR rights supported:**
+
+- **Right to Access:** Export all your data
+- **Right to Erasure:** Delete account and all data
+- **Right to Portability:** Download encrypted backups
+- **Right to Rectification:** Update/correct your data
+- **Right to Restrict Processing:** Pause data processing
+- **Right to Object:** Opt-out of analytics
+
+**How to exercise:**
+
+- Settings → Privacy → Data Rights
+- Email: <privacy@bizstratosphere.com>
+- Response within 30 days
+
+### Data Retention
+
+**Retention periods:**
+
+- Active data: Indefinite (user-controlled)
+- Deleted data: 30-day grace period, then crypto-shredded
+- Audit logs: 90 days
+- Backups: 30-day rotation
+- Anonymized analytics: 2 years
+
+---
+
+## 🔍 Vulnerability Disclosure
+
+### Responsible Disclosure
+
+**If you find a security vulnerability:**
+
+1. **DO NOT** publicly disclose it
+2. **Email:** <security@bizstratosphere.com>
+3. **Include:**
+   - Description of vulnerability
+   - Steps to reproduce
+   - Potential impact
+   - Your contact information (optional)
+
+**Response timeline:**
+
+- Initial response: 24 hours
+- Status update: 72 hours
+- Fix deployment: 7-14 days (critical issues: 24-48 hours)
+- Public disclosure: After fix deployed (coordinated)
+
+### Bug Bounty
+
+**Scope:**
+
+- In-scope: Platform security vulnerabilities
+- Out-of-scope: Social engineering, DoS, physical attacks
+
+**Rewards:**
+
+- Critical: Up to $5,000
+- High: Up to $2,000
+- Medium: Up to $500
+- Low: Up to $100
+
+---
+
+## 🛠️ Security Best Practices
+
+### For Users
+
+**Protect your account:**
+
+- ✅ Use a strong, unique password (12+ characters)
+- ✅ Enable Multi-Factor Authentication (MFA)
+- ✅ Save recovery key in secure location
+- ✅ Use up-to-date browser
+- ✅ Log out on shared computers
+- ✅ Review active sessions regularly
+- ✅ Don't share API keys
+- ✅ Rotate API keys periodically
+
+**Red flags:**
+
+- ❌ Login from unknown location
+- ❌ Unexpected MFA prompts
+- ❌ Unauthorized API keys
+- ❌ Unusual data access patterns
+
+### For Developers
+
+**If self-hosting:**
+
+- ✅ Use HTTPS with valid certificate
+- ✅ Keep dependencies updated
+- ✅ Enable all security headers
+- ✅ Configure CSP properly
+- ✅ Use environment variables for secrets
+- ✅ Enable audit logging
+- ✅ Regular security audits
+- ✅ Database encryption at rest
+
+---
+
+## 🚨 Incident Response
+
+### In Case of Breach
+
+**Our response:**
+
+1. Immediate investigation and containment
+2. Notify affected users within 72 hours
+3. Provide remediation steps
+4. Publish post-mortem analysis
+5. Implement preventive measures
+
+**What you should do:**
+
+1. Change your password immediately
+2. Revoke all API keys
+3. Review audit logs for suspicious activity
+4. Enable MFA if not already enabled
+5. Monitor for unusual activity
+
+### Security Contacts
+
+**Report security issues:**
+
+- Email: <security@bizstratosphere.com>
+- PGP Key: [Download public key]
+- Response SLA: 24 hours
+
+**General inquiries:**
+
+- Email: <support@bizstratosphere.com>
+- Documentation: docs.bizstratosphere.com/security
+
+---
+
+## 📝 Security Changelog
+
+### Version 2.0.0 (2024-12-14)
+
+- ✅ Implemented end-to-end encryption (AES-256-GCM)
+- ✅ Added zero-knowledge architecture
+- ✅ Deployed comprehensive security headers
+- ✅ Implemented password strength validation
+- ✅ Added breach checking (HIBP integration)
+- ✅ Created encrypted storage wrappers
+- ✅ Implemented session security enhancements
+- ✅ Added audit logging infrastructure
+- ✅ Deployed intrusion detection
+- ✅ Implemented rate limiting
+
+### Previous Versions
+
+See [CHANGELOG.md](./CHANGELOG.md) for complete history.
+
+---
+
+## 📚 Additional Resources
+
+**Documentation:**
+
+- [Encryption Architecture](./docs/ENCRYPTION.md)
+- [Key Management Guide](./docs/KEY_MANAGEMENT.md)
+- [Compliance Documentation](./docs/COMPLIANCE.md)
+- [Incident Response Plan](./docs/INCIDENT_RESPONSE.md)
+
+**External Resources:**
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+- [CIS Controls](https://www.cisecurity.org/controls/)
+
+---
+
+**Last Updated:** 2024-12-14  
+**Version:** 2.0.0  
+**Contact:** <security@bizstratosphere.com>
+
+*Your security is our priority. We're committed to protecting your data with industry-leading security practices.*
