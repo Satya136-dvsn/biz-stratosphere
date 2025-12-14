@@ -198,8 +198,21 @@ export default function AdvancedCharts() {
 
         if (transformedData.length === 0) {
             return (
-                <div className="flex items-center justify-center h-96 text-muted-foreground">
-                    Select a dataset and configure your chart to begin
+                <div className="flex flex-col items-center justify-center h-96 text-center p-8">
+                    <div className="w-24 h-24 mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+                        <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Create Your First Chart</h3>
+                    <p className="text-muted-foreground max-w-md">
+                        Select a dataset from the sidebar and choose your chart type to begin visualizing your data
+                    </p>
+                    <div className="mt-6 flex gap-2 text-sm text-muted-foreground">
+                        <span className="px-3 py-1 bg-secondary rounded-full">📊 8 Chart Types</span>
+                        <span className="px-3 py-1 bg-secondary rounded-full">🎨 Customizable</span>
+                        <span className="px-3 py-1 bg-secondary rounded-full">💾 Save Configs</span>
+                    </div>
                 </div>
             );
         }
@@ -391,45 +404,73 @@ export default function AdvancedCharts() {
                 </div>
             </div>
 
-            {/* Main Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Sidebar */}
+            {/* Main Layout - Improved Grid */}
+            <div className="grid grid-cols-1 xl:grid-cols-[350px_1fr] gap-6">
+                {/* Sidebar - Fixed width for consistency */}
                 <div className="space-y-4">
-                    <ChartTypeSelector
-                        selectedType={chartType}
-                        onTypeChange={setChartType}
-                    />
-
-                    <DataSourcePicker
-                        selectedDatasetId={selectedDatasetId}
-                        onDatasetChange={setSelectedDatasetId}
-                        selectedXColumn={xColumn}
-                        selectedYColumn={yColumn}
-                        onXColumnChange={setXColumn}
-                        onYColumnChange={setYColumn}
-                        availableColumns={availableColumns}
-                    />
-
-                    <ChartFilters
-                        filters={filters}
-                        onFiltersChange={setFilters}
-                        numericColumns={numericColumns}
-                    />
-
-                    <ChartCustomizer
-                        customization={customization}
-                        onCustomizationChange={setCustomization}
-                    />
-                </div>
-
-                {/* Chart Area */}
-                <div className="lg:col-span-3">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{customization.title}</CardTitle>
+                    <Card className="border-2 hover:border-primary/20 transition-colors">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Chart Type</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div ref={chartRef}>
+                            <ChartTypeSelector
+                                selectedType={chartType}
+                                onTypeChange={setChartType}
+                            />
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-2 hover:border-primary/20 transition-colors">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Data Source</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <DataSourcePicker
+                                selectedDatasetId={selectedDatasetId}
+                                onDatasetChange={setSelectedDatasetId}
+                                selectedXColumn={xColumn}
+                                selectedYColumn={yColumn}
+                                onXColumnChange={setXColumn}
+                                onYColumnChange={setYColumn}
+                                availableColumns={availableColumns}
+                            />
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-2 hover:border-primary/20 transition-colors">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Filters</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ChartFilters
+                                filters={filters}
+                                onFiltersChange={setFilters}
+                                numericColumns={numericColumns}
+                            />
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-2 hover:border-primary/20 transition-colors">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Customization</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ChartCustomizer
+                                customization={customization}
+                                onCustomizationChange={setCustomization}
+                            />
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Chart Area - Flexible width */}
+                <div className="space-y-6">
+                    <Card className="shadow-lg border-2">
+                        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
+                            <CardTitle className="text-xl">{customization.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div ref={chartRef} className="min-h-[400px] flex items-center justify-center">
                                 {renderChart()}
                             </div>
                         </CardContent>
@@ -437,17 +478,24 @@ export default function AdvancedCharts() {
 
                     {/* Saved Configurations */}
                     {configurations.length > 0 && (
-                        <Card className="mt-6">
-                            <CardHeader>
-                                <CardTitle>Saved Configurations ({configurations.length})</CardTitle>
+                        <Card className="border-2">
+                            <CardHeader className="bg-secondary/20">
+                                <CardTitle className="flex items-center gap-2">
+                                    <Save className="h-5 w-5" />
+                                    Saved Configurations
+                                    <span className="ml-auto text-sm font-normal text-muted-foreground">
+                                        {configurations.length} saved
+                                    </span>
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-2 gap-2">
+                            <CardContent className="pt-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                     {configurations.slice(0, 6).map((config) => (
                                         <Button
                                             key={config.id}
                                             variant="outline"
                                             size="sm"
+                                            className="h-auto py-3 flex flex-col items-start hover:bg-primary/5 hover:border-primary transition-all"
                                             onClick={() => {
                                                 setChartType(config.chart_type);
                                                 setSelectedDatasetId(config.dataset_id);
@@ -461,7 +509,8 @@ export default function AdvancedCharts() {
                                                 });
                                             }}
                                         >
-                                            {config.name}
+                                            <span className="font-semibold text-xs">{config.name}</span>
+                                            <span className="text-xs text-muted-foreground capitalize">{config.chart_type}</span>
                                         </Button>
                                     ))}
                                 </div>
@@ -471,5 +520,15 @@ export default function AdvancedCharts() {
                 </div>
             </div>
         </div>
+    );
+}
+
+                                </div >
+                            </CardContent >
+                        </Card >
+                    )}
+                </div >
+            </div >
+        </div >
     );
 }
