@@ -226,7 +226,7 @@ export async function decryptData(
 
         return bytesToUtf8(new Uint8Array(plaintextBytes));
     } catch (error) {
-        throw new Error('Decryption failed: Invalid key or corrupted data');
+        throw new Error('Decryption failed');
     }
 }
 

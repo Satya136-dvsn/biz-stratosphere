@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 import Papa from 'papaparse';
@@ -148,7 +148,7 @@ export function useDataUpload() {
 
     // ALSO: Create raw CSV row entries for Advanced Charts
     // Each raw entry preserves the complete row structure
-    rawData.forEach((row: any, index: number) =& gt; {
+    rawData.forEach((row: any, index: number) => {
       try {
         // Try to extract date from the row for proper filtering
         const possibleDateFields = ['date', 'created_at', 'timestamp', 'recorded_date', 'date_recorded'];
@@ -277,4 +277,5 @@ export function useDataUpload() {
     isUploading
   };
 }
+
 

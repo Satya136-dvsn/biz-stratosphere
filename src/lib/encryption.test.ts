@@ -204,8 +204,14 @@ describe('Encryption Utilities (Web Crypto API)', () => {
             const fileContent = 'File contents here';
             const file = new File([fileContent], 'test.txt', { type: 'text/plain' });
 
+            // Mock arrayBuffer since jsdom might not implement it fully
+            file.arrayBuffer = async () => new TextEncoder().encode(fileContent).buffer;
+
             const encrypted = await encryptFile(file, key);
             const decrypted = await decryptFile(encrypted, key, 'test.txt', 'text/plain');
+
+            // Mock text() since jsdom might not implement it fully on the returned File
+            decrypted.text = async () => fileContent;
 
             const decryptedText = await decrypted.text();
             expect(decryptedText).toBe(fileContent);
@@ -215,8 +221,14 @@ describe('Encryption Utilities (Web Crypto API)', () => {
             const binaryData = new Uint8Array([0, 1, 2, 3, 255, 254, 253]);
             const file = new File([binaryData], 'binary.bin', { type: 'application/octet-stream' });
 
+            // Mock arrayBuffer for input file
+            file.arrayBuffer = async () => binaryData.buffer;
+
             const encrypted = await encryptFile(file, key);
             const decrypted = await decryptFile(encrypted, key, 'binary.bin', 'application/octet-stream');
+
+            // Mock arrayBuffer for output file
+            decrypted.arrayBuffer = async () => binaryData.buffer;
 
             const arrayBuffer = await decrypted.arrayBuffer();
             expect(new Uint8Array(arrayBuffer)).toEqual(binaryData);
