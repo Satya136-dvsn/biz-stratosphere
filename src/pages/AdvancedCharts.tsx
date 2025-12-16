@@ -73,7 +73,21 @@ export default function AdvancedCharts() {
             }
 
             const { data, error } = await query;
-            if (error) throw error;
+
+            // Debug logging
+            console.log('🔍 Advanced Charts Query Debug:', {
+                dataset_id: selectedDatasetId,
+                raw_data_count: data?.length || 0,
+                has_error: !!error,
+                error_message: error?.message,
+                sample_raw_point: data?.[0],
+                metric_names: data?.map(d => d.metric_name).slice(0, 5)
+            });
+
+            if (error) {
+                console.error('❌ Query error:', error);
+                throw error;
+            }
 
             let extractedData = (data || []).map((point: any) => ({
                 // Extract the full row data from metadata
@@ -82,6 +96,12 @@ export default function AdvancedCharts() {
                 _id: point.id,
                 _date_recorded: point.date_recorded
             }));
+
+            console.log('📊 Extracted Data:', {
+                extracted_count: extractedData.length,
+                sample_row: extractedData[0],
+                columns: extractedData[0] ? Object.keys(extractedData[0]) : []
+            });
 
             // Apply search filter
             if (filters.searchText) {
