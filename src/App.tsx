@@ -24,6 +24,7 @@ const AIChat = lazy(() => import("./pages/AIChat").then(m => ({ default: m.AICha
 const MLPredictions = lazy(() => import("./pages/MLPredictions").then(m => ({ default: m.MLPredictions })));
 const AIComparison = lazy(() => import("./pages/AIComparison").then(m => ({ default: m.AIComparison })));
 const Help = lazy(() => import("./pages/Help"));
+const PlatformStatus = lazy(() => import("./pages/PlatformStatus"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -73,6 +74,8 @@ const App = () => (
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/platform-status" element={<PlatformStatus />} />
               <Route
                 path="/dashboard"
                 element={
@@ -81,7 +84,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route path="/" element={<Landing />} />
               <Route
                 path="/enterprise"
                 element={

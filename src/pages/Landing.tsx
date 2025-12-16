@@ -23,36 +23,38 @@ export default function LandingPage() {
                         </div>
 
                         <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-tight">
-                            Elevate Your Business
+                            Turn Business Data into
                             <br />
                             <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">
-                                Intelligence
+                                Actionable Insights — Faster.
                             </span>
                         </h1>
 
                         <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-medium">
-                            Data insights that reach the stratosphere. Make data-driven decisions with
-                            AI-powered RAG chatbots, ML predictions, SHAP explainability, and enterprise-grade intelligence.
+                            Production-ready BI platform with advanced dashboards, secure multi-workspace collaboration,
+                            and evolving AI-assisted analytics. Built for clarity, security, and scale.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-6 justify-center pt-12">
-                            <Link to="/auth">
+                            <Link to="/dashboard">
                                 <Button
                                     size="lg"
                                     className="text-lg px-10 py-7 shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 hover:scale-105"
                                 >
-                                    Get Started Free
+                                    Explore Demo Workspace
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="text-lg px-10 py-7 glass hover:bg-primary/10 transition-all duration-300"
-                            >
-                                <Sparkles className="mr-2 h-5 w-5" />
-                                Watch Demo
-                            </Button>
+                            <Link to="/platform-status">
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="text-lg px-10 py-7 glass hover:bg-primary/10 transition-all duration-300"
+                                >
+                                    <Sparkles className="mr-2 h-5 w-5" />
+                                    Platform Status
+                                </Button>
+                            </Link>
                         </div>
 
                         <div className="pt-12 flex flex-wrap items-center justify-center gap-8 text-sm">
@@ -88,34 +90,95 @@ export default function LandingPage() {
                     <div className="grid md:grid-cols-3 gap-8">
                         <FeatureCard
                             icon={<BarChart3 className="h-10 w-10" />}
-                            title="Real-time Analytics"
-                            description="Track revenue, customers, churn, and growth with live dashboards and KPI metrics."
+                            title="Dashboards & KPIs"
+                            description="Real-time analytics dashboards with live KPI monitoring, time-series charts, and export capabilities (PDF, Excel, PNG)."
                         />
                         <FeatureCard
                             icon={<Zap className="h-10 w-10" />}
-                            title="AI & ML Features"
-                            description="RAG chatbot with Gemini, ML model serving with SHAP explainability, and dual AI comparison."
+                            title="Advanced Custom Charts"
+                            description="8 chart types with full CSV column access: bar, line, area, pie, scatter, radar, treemap, and funnel charts."
                         />
                         <FeatureCard
                             icon={<Users className="h-10 w-10" />}
-                            title="Team Collaboration"
-                            description="Multi-workspace support with role-based access control for your entire team."
-                        />
-                        <FeatureCard
-                            icon={<TrendingUp className="h-10 w-10" />}
-                            title="Growth Tracking"
-                            description="Monitor conversion rates, deal sizes, and trends with advanced visualizations."
+                            title="Secure Multi-Workspace Collaboration"
+                            description="Role-based access control (RBAC), row-level security (RLS), and multi-tenant workspace management."
                         />
                         <FeatureCard
                             icon={<Shield className="h-10 w-10" />}
                             title="Enterprise Security"
-                            description="GDPR compliant with PII detection, data isolation, and secure API access."
+                            description="MFA authentication, AES-256 encryption, GDPR compliance principles, and secure data isolation."
+                            badge="✅"
+                        />
+                        <FeatureCard
+                            icon={<TrendingUp className="h-10 w-10" />}
+                            title="AI-Assisted Insights"
+                            description="Natural language queries and ML predictions with SHAP explainability (prototype stage)."
+                            badge="🧪"
                         />
                         <FeatureCard
                             icon={<Globe className="h-10 w-10" />}
-                            title="Public API"
-                            description="Integrate your data with webhooks, REST API, and automated workflows."
+                            title="Data Upload & ETL"
+                            description="CSV and Excel file upload with automatic ETL processing and dual storage strategy."
                         />
+                    </div>
+                </div>
+            </section>
+
+            {/* Architecture / Trust Section */}
+            <section className="container mx-auto px-4 py-24">
+                <div className="max-w-4xl mx-auto text-center space-y-8">
+                    <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                        Built on Enterprise-Grade Technology
+                    </h2>
+                    <div className="grid md:grid-cols-3 gap-8 text-left">
+                        <div className="glass rounded-xl p-6 space-y-3">
+                            <h3 className="font-bold text-xl">Modern Stack</h3>
+                            <p className="text-muted-foreground">
+                                React 18, TypeScript 5, Supabase, PostgreSQL 14+
+                            </p>
+                        </div>
+                        <div className="glass rounded-xl p-6 space-y-3">
+                            <h3 className="font-bold text-xl">Secure by Design</h3>
+                            <p className="text-muted-foreground">
+                                Multi-tenant, Row-Level Security, AES-256 encryption
+                            </p>
+                        </div>
+                        <div className="glass rounded-xl p-6 space-y-3">
+                            <h3 className="font-bold text-xl">Scalable</h3>
+                            <p className="text-muted-foreground">
+                                Designed for enterprise BI workflows and team collaboration
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Roadmap Preview Section */}
+            <section className="container mx-auto px-4 py-24 bg-secondary/10">
+                <div className="max-w-4xl mx-auto">
+                    <div className="text-center mb-12">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-4">What's Next</h2>
+                        <p className="text-xl text-muted-foreground">Our roadmap for AI-native analytics</p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-6">
+                        <div className="glass rounded-xl p-6 border-l-4 border-primary space-y-2">
+                            <h3 className="font-bold text-lg">AI Query Hardening</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Enhanced RAG capabilities and context-aware responses
+                            </p>
+                        </div>
+                        <div className="glass rounded-xl p-6 border-l-4 border-secondary space-y-2">
+                            <h3 className="font-bold text-lg">Automation & Alerts</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Workflow automation and intelligent alerting system
+                            </p>
+                        </div>
+                        <div className="glass rounded-xl p-6 border-l-4 border-accent space-y-2">
+                            <h3 className="font-bold text-lg">RAG-based Chat Assistant</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Vector-powered knowledge base for deep business insights
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -154,21 +217,48 @@ export default function LandingPage() {
                     </Link>
                 </div>
             </section>
+
+            {/* Footer */}
+            <footer className="container mx-auto px-4 py-12 border-t border-border/40">
+                <div className="max-w-6xl mx-auto">
+                    <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
+                        <Link to="/platform-status" className="hover:text-primary transition-colors font-medium">
+                            Platform Status
+                        </Link>
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors font-medium">
+                            GitHub
+                        </a>
+                        <Link to="/help" className="hover:text-primary transition-colors font-medium">
+                            Documentation
+                        </Link>
+                        <Link to="/auth" className="hover:text-primary transition-colors font-medium">
+                            Get Started
+                        </Link>
+                    </div>
+                    <div className="text-center mt-8 text-sm text-muted-foreground">
+                        <p>© 2024 Biz Stratosphere. Built for analytical clarity and enterprise scale.</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }
 
-function FeatureCard({ icon, title, description }: {
+function FeatureCard({ icon, title, description, badge }: {
     icon: React.ReactNode;
     title: string;
     description: string;
+    badge?: string;
 }) {
     return (
         <div className="glass rounded-2xl p-8 hover-lift transition-all duration-300 hover:shadow-glow-primary group">
             <div className="text-primary mb-6 transform group-hover:scale-110 transition-transform duration-300">
                 {icon}
             </div>
-            <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors">{title}</h3>
+            <div className="flex items-center gap-2 mb-4">
+                <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">{title}</h3>
+                {badge && <span className="text-lg">{badge}</span>}
+            </div>
             <p className="text-muted-foreground leading-relaxed">{description}</p>
         </div>
     );

@@ -1,0 +1,49 @@
+date,metric_name,metric_value,category,region,customer_count
+2024-01-01,Revenue,18393.91,Marketing,East,117
+2024-01-01,Customer Acquisition Cost,117604.52,Sales,South,448
+2024-01-01,Profit,39025.79,Marketing,East,92
+2024-01-01,Expenses,39528.29,Operations,North,482
+2024-02-01,Revenue,98411.29,Sales,North,125
+2024-02-01,Customer Acquisition Cost,84176.35,Operations,West,494
+2024-02-01,Profit,33472.39,Marketing,North,202
+2024-02-01,Expenses,38884.21,Sales,West,239
+2024-03-01,Revenue,114514.25,Sales,South,88
+2024-03-01,Customer Acquisition Cost,110004.12,Marketing,West,245
+2024-03-01,Profit,92545.08,Sales,South,242
+2024-03-01,Expenses,21052.14,Marketing,North,142
+2024-04-01,Revenue,114637.32,Operations,South,341
+2024-04-01,Customer Acquisition Cost,59115.65,Sales,West,274
+2024-04-01,Profit,40365.4,Marketing,West,429
+2024-04-01,Expenses,82313.94,Sales,West,83
+2024-05-01,Revenue,56063.29,Marketing,South,379
+2024-05-01,Customer Acquisition Cost,29849.68,Operations,West,484
+2024-05-01,Profit,78558.14,Operations,West,322
+2024-05-01,Expenses,83398.68,Marketing,South,382
+2024-06-01,Revenue,85309.18,Operations,North,326
+2024-06-01,Customer Acquisition Cost,85120.52,Sales,North,349
+2024-06-01,Profit,35863.24,Operations,East,93
+2024-06-01,Expenses,59269.48,Marketing,East,89
+2024-07-01,Revenue,102562.44,Sales,North,385
+2024-07-01,Customer Acquisition Cost,14361.07,Operations,East,423
+2024-07-01,Profit,63440.78,Sales,West,185
+2024-07-01,Expenses,65211.58,Marketing,North,230
+2024-08-01,Revenue,114646.98,Marketing,East,370
+2024-08-01,Customer Acquisition Cost,95239.04,Operations,East,62
+2024-08-01,Profit,22100.61,Operations,West,156
+2024-08-01,Expenses,107601.78,Marketing,South,284
+2024-09-01,Revenue,113302.25,Marketing,East,382
+2024-09-01,Customer Acquisition Cost,40421.94,Sales,East,225
+2024-09-01,Profit,53835.64,Marketing,North,126
+2024-09-01,Expenses,17617.73,Operations,North,275
+2024-10-01,Revenue,62165.82,Operations,West,362
+2024-10-01,Customer Acquisition Cost,14573.03,Marketing,North,126
+2024-10-01,Profit,29626.83,Marketing,East,347
+2024-10-01,Expenses,33421.04,Operations,West,462
+2024-11-01,Revenue,113599.02,Marketing,North,167
+2024-11-01,Customer Acquisition Cost,82507.42,Marketing,South,474
+2024-11-01,Profit,69869.9,Operations,South,411
+2024-11-01,Expenses,96045.32,Operations,West,418
+2024-12-01,Revenue,34263.76,Operations,South,319
+2024-12-01,Customer Acquisition Cost,63630.77,Marketing,West,448
+2024-12-01,Profit,106437.1,Marketing,South,211
+2024-12-01,Expenses,58568.27,Operations,North,364
