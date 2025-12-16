@@ -146,6 +146,42 @@ export function useDataUpload() {
       }
     });
 
+    // ALSO: Create raw CSV row entries for Advanced Charts
+    // Each raw entry preserves the complete row structure
+    rawData.forEach((row: any, index: number) =& gt; {
+      try {
+        // Try to extract date from the row for proper filtering
+        const possibleDateFields = ['date', 'created_at', 'timestamp', 'recorded_date', 'date_recorded'];
+        let dateRecorded = new Date().toISOString();
+
+        for (const field of possibleDateFields) {
+          if (row[field]) {
+            const date = new Date(row[field]);
+            if (!isNaN(date.getTime())) {
+              dateRecorded = date.toISOString();
+              break;
+            }
+          }
+        }
+
+        // Create raw row entry
+        dataPoints.push({
+          metric_name: 'raw_csv_row',  // Special marker for Advanced Charts
+          metric_value: 0,              // Not used for raw rows
+          metric_type: 'raw',
+          date_recorded: dateRecorded,
+          metadata: {
+            row_data: row as import("@/integrations/supabase/types").Json,
+            is_raw: true,
+            columns: Object.keys(row),
+            row_index: index
+          }
+        });
+      } catch (error) {
+        console.warn(`Skipping raw row ${index + 1}:`, error);
+      }
+    });
+
     if (dataPoints.length === 0) {
       throw new Error('No valid data points found in the file. Please check your data format.');
     }

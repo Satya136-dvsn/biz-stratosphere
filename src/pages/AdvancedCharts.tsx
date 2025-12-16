@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,9 +51,9 @@ export default function AdvancedCharts() {
 
     const { configurations, saveConfiguration, isSaving } = useChartConfigurations();
 
-    // Fetch data points for selected dataset
+    // Fetch raw CSV data points for selected dataset
     const { data: chartData = [], isLoading: dataLoading } = useQuery({
-        queryKey: ['chart-data-points', selectedDatasetId, filters],
+        queryKey: ['chart-raw-data', selectedDatasetId, filters],
         queryFn: async () => {
             if (!selectedDatasetId || !user) return [];
 
@@ -61,6 +61,7 @@ export default function AdvancedCharts() {
                 .from('data_points')
                 .select('*')
                 .eq('dataset_id', selectedDatasetId)
+                .eq('metric_name', 'raw_csv_row')  // Only fetch raw CSV rows for Advanced Charts
                 .limit(500);
 
             // Apply date filter if set
@@ -74,47 +75,49 @@ export default function AdvancedCharts() {
             const { data, error } = await query;
             if (error) throw error;
 
-            let filteredData = data || [];
-
-            // Apply numeric range filters
-            if (filters.numericRanges && Object.keys(filters.numericRanges).length > 0) {
-                Object.entries(filters.numericRanges).forEach(([column, range]) => {
-                    if (range.min !== undefined || range.max !== undefined) {
-                        filteredData = filteredData.filter(point => {
-                            const value = parseFloat(point.metric_value);
-                            if (isNaN(value)) return false;
-                            if (range.min !== undefined && value < range.min) return false;
-                            if (range.max !== undefined && value > range.max) return false;
-                            return true;
-                        });
-                    }
-                });
-            }
+            let extractedData = (data || []).map((point: any) => ({
+                // Extract the full row data from metadata
+                ...(point.metadata?.row_data || {}),
+                // Keep the ID and date for reference
+                _id: point.id,
+                _date_recorded: point.date_recorded
+            }));
 
             // Apply search filter
             if (filters.searchText) {
                 const searchLower = filters.searchText.toLowerCase();
-                filteredData = filteredData.filter(point =>
-                    point.metric_name?.toLowerCase().includes(searchLower)
+                extractedData = extractedData.filter((row: any) =>
+                    Object.values(row).some(val =>
+                        String(val).toLowerCase().includes(searchLower)
+                    )
                 );
             }
 
-            return filteredData;
+            return extractedData;
         },
         enabled: !!selectedDatasetId && !!user,
     });
 
-    // Get available columns from data
-    const availableColumns = chartData.length > 0 ? Object.keys(chartData[0]).filter(key =>
-        !['id', 'user_id', 'dataset_id', 'created_at'].includes(key)
-    ) : [];
+    // Get available columns from raw data
+    const availableColumns = useMemo(() => {
+        if (chartData.length === 0) return [];
+
+        const allColumns = Object.keys(chartData[0]);
+
+        // Exclude internal fields added during extraction
+        const excludedFields = ['_id', '_date_recorded', 'id', 'user_id', 'dataset_id', 'created_at', 'updated_at'];
+
+        return allColumns.filter(col => !excludedFields.includes(col));
+    }, [chartData]);
 
     // Get numeric columns for filters
-    const numericColumns = availableColumns.filter(col => {
-        if (chartData.length === 0) return false;
-        const value = chartData[0][col];
-        return !isNaN(parseFloat(String(value)));
-    });
+    const numericColumns = useMemo(() => {
+        return availableColumns.filter(col => {
+            if (chartData.length === 0) return false;
+            const value = chartData[0][col];
+            return !isNaN(parseFloat(String(value)));
+        });
+    }, [chartData, availableColumns]);
 
     // Transform data for charts
     const transformedData = chartData.map(point => ({

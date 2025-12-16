@@ -54,7 +54,7 @@ export function DataSourcePicker({
                 <div className="space-y-2">
                     <Label>Dataset</Label>
                     <Select
-                        value={selectedDatasetId}
+                        value={selectedDatasetId || ''}
                         onValueChange={onDatasetChange}
                         disabled={isLoading}
                     >
@@ -75,7 +75,7 @@ export function DataSourcePicker({
                     <>
                         <div className="space-y-2">
                             <Label>X-Axis Column</Label>
-                            <Select value={selectedXColumn} onValueChange={onXColumnChange}>
+                            <Select value={selectedXColumn || ''} onValueChange={onXColumnChange}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select X column" />
                                 </SelectTrigger>
@@ -91,7 +91,7 @@ export function DataSourcePicker({
 
                         <div className="space-y-2">
                             <Label>Y-Axis Column</Label>
-                            <Select value={selectedYColumn} onValueChange={onYColumnChange}>
+                            <Select value={selectedYColumn || ''} onValueChange={onYColumnChange}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select Y column" />
                                 </SelectTrigger>

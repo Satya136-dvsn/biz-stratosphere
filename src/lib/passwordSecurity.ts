@@ -139,8 +139,8 @@ export async function checkPasswordPwned(password: string): Promise<boolean> {
     try {
         // Hash password with SHA-1
         const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+        const encodedPassword = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-1', encodedPassword);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
 
@@ -156,10 +156,10 @@ export async function checkPasswordPwned(password: string): Promise<boolean> {
             return false;
         }
 
-        const data = await response.text();
+        const responseData = await response.text();
 
         // Check if our hash suffix appears in results
-        return data.includes(suffix);
+        return responseData.includes(suffix);
     } catch (error) {
         console.error('Error checking password:', error);
         return false;
