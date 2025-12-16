@@ -24,8 +24,16 @@ import { useKPIData } from "@/hooks/useKPIData";
 import { useChartData } from "@/hooks/useChartData";
 import { useRealtimeKPIs } from "@/hooks/useRealtimeKPIs";
 import { subMonths } from 'date-fns';
+import { KPIGrid } from "@/components/dashboard/KPIGrid";
+import { AIInsights } from "@/components/dashboard/AIInsights";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   const { kpiData, isLoading } = useKPIData();
   const { realtimeData } = useRealtimeKPIs();
 

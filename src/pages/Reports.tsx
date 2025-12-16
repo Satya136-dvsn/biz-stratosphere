@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { FileText, Plus, Download, Loader2, Play, Save, FileDown, Trash2, Copy } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const REPORT_TEMPLATES = [
   { id: 'kpi_summary', name: 'KPI Summary', description: 'Overview of key performance indicators' },

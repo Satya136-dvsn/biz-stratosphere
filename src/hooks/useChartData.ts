@@ -26,7 +26,7 @@ export function useChartData(filters: ChartFilters) {
     if (!user) return;
 
     setIsLoading(true);
-    
+
     try {
       const { data: dataPoints, error } = await supabase
         .from('data_points')
@@ -53,7 +53,7 @@ export function useChartData(filters: ChartFilters) {
       dataPoints.forEach(dp => {
         const date = new Date(dp.date_recorded);
         let key: string;
-        
+
         if (filters.period === 'monthly') {
           key = format(date, 'MMM yyyy');
         } else if (filters.period === 'weekly') {
@@ -71,7 +71,7 @@ export function useChartData(filters: ChartFilters) {
         }
 
         const group = groupedData.get(key)!;
-        
+
         // Categorize metrics
         const metricName = dp.metric_name.toLowerCase();
         if (metricName.includes('revenue') || metricName.includes('sales') || metricName.includes('income')) {
@@ -82,22 +82,22 @@ export function useChartData(filters: ChartFilters) {
       });
 
       // Convert to chart format
-      const chartPoints: ChartDataPoint[] = Array.from(groupedData.entries()).map(([key, data]) => {
-        const revenue = data.revenue.reduce((sum, val) => sum + val, 0);
-        const customers = data.customers.reduce((sum, val) => sum + val, 0);
-        
+      const chartPoints: ChartDataPoint[] = Array.from(groupedData.entries()).map(([key, groupData]) => {
+        const revenue = groupData.revenue.reduce((sum, val) => sum + val, 0);
+        const customers = groupData.customers.reduce((sum, val) => sum + val, 0);
+
         return {
           month: key,
           revenue: revenue,
           target: revenue * 0.9, // Set target as 90% of actual for now
           customers: customers,
-          date: data.date
+          date: groupData.date
         };
       });
 
       // Sort by date
       chartPoints.sort((a, b) => a.date.getTime() - b.date.getTime());
-      
+
       setChartData(chartPoints);
 
     } catch (error) {
@@ -110,7 +110,7 @@ export function useChartData(filters: ChartFilters) {
 
   useEffect(() => {
     fetchChartData();
-    
+
     // Set up real-time subscription
     const channel = supabase
       .channel('chart-data-changes')
@@ -132,9 +132,9 @@ export function useChartData(filters: ChartFilters) {
     const handleDataUploaded = () => {
       fetchChartData();
     };
-    
+
     window.addEventListener('dataUploaded', handleDataUploaded);
-    
+
     return () => {
       supabase.removeChannel(channel);
       window.removeEventListener('dataUploaded', handleDataUploaded);
