@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { useMLPredictions } from '@/hooks/useMLPredictions';
 import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3 } from 'lucide-react';
+import { FeatureBadge } from '@/components/ui/FeatureBadge';
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -82,12 +83,15 @@ export function MLPredictions() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                    <Brain className="h-8 w-8 text-primary" />
-                    ML Predictions & Explainability
-                </h2>
+                <div className="flex items-center gap-3 mb-2">
+                    <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                        <Brain className="h-8 w-8 text-primary" />
+                        ML Predictions & Explainability
+                    </h2>
+                    <FeatureBadge variant="prototype" size="md" />
+                </div>
                 <p className="text-muted-foreground">
-                    Make predictions with trained ML models and understand the results with SHAP explanations
+                    Make predictions with trained ML models and understand results with SHAP explanations (evolving feature)
                 </p>
             </div>
 

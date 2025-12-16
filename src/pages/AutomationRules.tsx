@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, Plus, Trash2, Play, Pause, Settings } from 'lucide-react';
 import { useAutomationRules } from '@/hooks/useAutomationRules';
 import { useState } from 'react';
+import { FeatureBadge } from '@/components/ui/FeatureBadge';
 
 export function AutomationRules() {
     const { rules, isLoading, createRule, toggleRule, deleteRule } = useAutomationRules();
@@ -18,9 +19,12 @@ export function AutomationRules() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Automation Rules</h2>
+                    <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-3xl font-bold tracking-tight">Automation Rules</h2>
+                        <FeatureBadge variant="prototype" size="md" />
+                    </div>
                     <p className="text-muted-foreground">
-                        Create rules to automate alerts and actions based on your data
+                        Create rules to automate alerts and actions based on your data (UI refinement in progress)
                     </p>
                 </div>
                 <Button onClick={() => setShowWizard(true)}>

@@ -19,6 +19,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.0] - 2024-12-17
+
+### Added - Phase 6: Platform Polish & Transparency
+
+#### Platform Status Page
+
+- **NEW `/platform-status` page**: Transparent categorization of all features
+- Production-Ready section: Auth, Data Upload, Dashboards, Charts, Security
+- Prototype section: AI queries, ML predictions, Automation rules
+- Planned section: RAG chatbot, Monitoring, Compliance tools
+- CSV capability transparency documentation
+- Professional disclaimers with design-decision framing
+
+#### Landing Page Redesign
+
+- Updated hero section: "Turn Business Data into Actionable Insights — Faster"
+- Professional subtitle highlighting production-ready status
+- Redesigned CTA buttons: "Explore Demo Workspace" & "Platform Status"
+- Honest features section (only implemented strengths)
+- NEW Architecture/Trust section (Modern Stack, Secure by Design, Scalable)
+- NEW Roadmap Preview section (AI Query Hardening, Automation & Alerts, RAG Assistant)
+- NEW Professional footer with navigation links
+
+#### Feature Badging System
+
+- Created reusable `FeatureBadge` component with semantic color coding
+- Green badges for production-ready features
+- Amber/yellow badges for prototype features  
+- Gray badges for planned features
+- Added prototype badges to AI Chat, ML Predictions, and Automation Rules pages
+
+#### CSV Transparency
+
+- Added info box to Advanced Charts page (500 row limit disclosure)
+- Helper text about optimal dataset sizes (1-10K rows)
+- Data validation behavior documentation
+- Professional language: "Some invalid rows may be skipped during ingestion; a detailed validation report is planned"
+
+#### UX Refinements
+
+- Softer CSV validation language (roadmap-aware)
+- Enhanced platform disclaimer (design-decision framing)
+- Professional CTA naming ("Explore Demo Workspace" vs "View Demo")
+- Semantic color coding throughout UI
+
+### Changed
+
+- Landing page now focuses only on implemented strengths
+- Removed misleading "fully AI-powered" claims
+- Updated AI/ML page descriptions to include "evolving feature" notation
+
+---
+
 ## [2.0.0] - 2024-12-17
 
 ### Added - Phase 5: Advanced Charts Enhancement

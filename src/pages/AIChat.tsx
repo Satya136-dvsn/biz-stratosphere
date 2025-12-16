@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2 } from 'lucide-react';
+import { FeatureBadge } from '@/components/ui/FeatureBadge';
 
 export function AIChat() {
     const { user } = useAuth();
@@ -88,12 +89,15 @@ export function AIChat() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                    <Sparkles className="h-8 w-8 text-primary" />
-                    AI Assistant
-                </h2>
+                <div className="flex items-center gap-3 mb-2">
+                    <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                        <Sparkles className="h-8 w-8 text-primary" />
+                        AI Assistant
+                    </h2>
+                    <FeatureBadge variant="prototype" size="md" />
+                </div>
                 <p className="text-muted-foreground">
-                    Ask questions about your data using AI-powered search
+                    Ask questions about your data using AI-powered search (evolving feature)
                 </p>
             </div>
 
