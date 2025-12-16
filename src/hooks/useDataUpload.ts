@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useCompany } from '@/hooks/useCompany';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { useQueryClient } from '@tanstack/react-query';
 
 type DataPoint = {
   metric_name: string;
@@ -21,6 +22,7 @@ export function useDataUpload() {
   const { toast } = useToast();
   const { user } = useAuth();
   const { company } = useCompany();
+  const queryClient = useQueryClient();
 
   const processFile = async (file: File): Promise<DataPoint[]> => {
     return new Promise((resolve, reject) => {
@@ -259,6 +261,9 @@ export function useDataUpload() {
           title: "Upload Successful",
           description: `Processed ${dataPoints.length} data points from ${file.name}`,
         });
+
+        // Invalidate datasets query to refresh the list automatically
+        queryClient.invalidateQueries({ queryKey: ['datasets'] });
       }
     } catch (error) {
       console.error('Upload error:', error);
