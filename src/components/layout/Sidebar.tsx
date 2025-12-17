@@ -16,6 +16,7 @@ import {
     Sparkles,
     Brain,
     Workflow,
+    Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -68,7 +69,13 @@ const navItems: NavItem[] = [
         title: "AI Chat",
         href: "/ai-chat",
         icon: Sparkles,
-        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
+        badgeComponent: <FeatureBadge variant="production" size="sm" />,
+    },
+    {
+        title: "AI Analytics",
+        href: "/ai-analytics",
+        icon: Activity,
+        badge: "NEW",
     },
     {
         title: "ML Predictions",

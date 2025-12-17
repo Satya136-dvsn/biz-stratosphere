@@ -24,6 +24,7 @@ const Workspaces = lazy(() => import("./pages/Workspaces"));
 const APIManagement = lazy(() => import("./pages/APIManagement"));
 const AdvancedCharts = lazy(() => import("./pages/AdvancedCharts"));
 const AIChat = lazy(() => import("./pages/AIChat").then(m => ({ default: m.AIChat })));
+const AIAnalytics = lazy(() => import("./pages/AIAnalytics").then(m => ({ default: m.AIAnalytics })));
 const MLPredictions = lazy(() => import("./pages/MLPredictions").then(m => ({ default: m.MLPredictions })));
 const AutomationRules = lazy(() => import("./pages/AutomationRules"));
 const AIComparison = lazy(() => import("./pages/AIComparison").then(m => ({ default: m.AIComparison })));
@@ -155,6 +156,16 @@ const App = () => (
                   <ProtectedRoute>
                     <ErrorBoundary>
                       <AIChat />
+                    </ErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai-analytics"
+                element={
+                  <ProtectedRoute>
+                    <ErrorBoundary>
+                      <AIAnalytics />
                     </ErrorBoundary>
                   </ProtectedRoute>
                 }
