@@ -301,3 +301,5 @@ function RuleWizard({ onClose, onCreate }: { onClose: () => void; onCreate: (rul
         </div>
     );
 }
+
+export default AutomationRules;
