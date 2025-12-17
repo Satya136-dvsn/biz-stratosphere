@@ -107,7 +107,7 @@ export function Sidebar() {
     return (
         <div
             className={cn(
-                "relative flex flex-col h-screen border-r border-border/50 bg-card/50 backdrop-blur-xl transition-all duration-300",
+                "hidden lg:flex relative flex-col h-screen border-r border-border/50 bg-card/50 backdrop-blur-xl transition-all duration-300 z-30",
                 collapsed ? "w-16" : "w-64"
             )}
         >
