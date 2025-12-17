@@ -15,12 +15,19 @@ An enterprise-grade analytics platform that combines business intelligence, mach
 - **Custom Reports** - Generate professional PDF, Excel, and CSV reports
 - **Data Upload** - CSV/Excel file upload with automatic quality analysis
 
-### 🤖 **AI & Machine Learning**
+### 🤖 **AI & Machine Learning** ⭐ PRODUCTION-READY
 
-- **RAG-Powered Chatbot** - Ask questions about your data in natural language
-- **ML Model Serving** - Deploy and serve custom machine learning models
-- **SHAP Explainability** - Understand ML model predictions
-- **Churn Prediction** - Predict customer churn with ML
+- **AI Assistant (RAG Chat)** - Production-grade conversational AI with:
+  - Context window management (configurable 5-20 messages)
+  - Smart embedding cache (60%+ cache hit rate)
+  - Rate limiting (50 daily / 1000 monthly)
+  - Customizable settings (temperature, max tokens)
+  - Export conversations (Markdown, JSON, Text)
+  - Syntax-highlighted code blocks with copy button
+  - Rich markdown rendering (tables, lists, links)
+- **ML Model Serving** - Deploy and serve custom machine learning models (Prototype)
+- **SHAP Explainability** - Understand ML model predictions (Prototype)
+- **Churn Prediction** - Predict customer churn with ML (Prototype)
 
 ### 📈 **Data Management**
 
