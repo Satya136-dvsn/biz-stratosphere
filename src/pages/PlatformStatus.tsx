@@ -87,6 +87,13 @@ export default function PlatformStatus() {
                                     description="Production-ready conversational AI with context management, markdown rendering, code highlighting, and export capabilities. Powered by Google Gemini API."
                                     badge={<FeatureBadge variant="production" size="sm" />}
                                 />
+
+                                <FeatureItem
+                                    icon={<Zap className="h-5 w-5" />}
+                                    title="Automation Rules Engine"
+                                    description="Production-grade automation with scheduled execution, advanced triggers (trend/anomaly detection), action chaining, webhook support, email alerts, and 10+ pre-configured templates."
+                                    badge={<FeatureBadge variant="production" size="sm" />}
+                                />
                             </div>
                         </CardContent>
                     </Card>
@@ -108,13 +115,6 @@ export default function PlatformStatus() {
                                     icon={<BarChart3 className="h-5 w-5" />}
                                     title="ML Model Training & Predictions"
                                     description="Machine learning model serving with SHAP explainability. Prototype implementation with MLflow tracking."
-                                    badge={<FeatureBadge variant="prototype" size="sm" />}
-                                />
-
-                                <FeatureItem
-                                    icon={<Zap className="h-5 w-5" />}
-                                    title="Automation Rules Engine"
-                                    description="Workflow automation and alert rules. Core engine implemented with manual execution capability."
                                     badge={<FeatureBadge variant="prototype" size="sm" />}
                                 />
                             </div>
