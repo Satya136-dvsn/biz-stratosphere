@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FeatureBadge } from "@/components/ui/FeatureBadge";
-import { CheckCircle2, Beaker, Construction, AlertCircle, BarChart3, Shield, Zap, Database } from "lucide-react";
+import { CheckCircle2, Beaker, Construction, AlertCircle, BarChart3, Shield, Zap, Database, Sparkles } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/layout/Footer";
 
@@ -80,6 +80,13 @@ export default function PlatformStatus() {
                                     description="Row-Level Security (RLS), Multi-Factor Authentication (MFA), AES-256 encryption, GDPR compliance principles"
                                     badge={<FeatureBadge variant="production" size="sm" />}
                                 />
+
+                                <FeatureItem
+                                    icon={<Sparkles className="h-5 w-5" />}
+                                    title="AI Assistant (RAG Chat)"
+                                    description="Production-ready conversational AI with context management, markdown rendering, code highlighting, and export capabilities. Powered by Google Gemini API."
+                                    badge={<FeatureBadge variant="production" size="sm" />}
+                                />
                             </div>
                         </CardContent>
                     </Card>
@@ -98,13 +105,6 @@ export default function PlatformStatus() {
                         <CardContent className="pt-6">
                             <div className="grid md:grid-cols-2 gap-6">
                                 <FeatureItem
-                                    icon={<Zap className="h-5 w-5" />}
-                                    title="AI Natural Language Queries"
-                                    description="Conversational AI for data insights using Google Gemini API. Currently in active development."
-                                    badge={<FeatureBadge variant="prototype" size="sm" />}
-                                />
-
-                                <FeatureItem
                                     icon={<BarChart3 className="h-5 w-5" />}
                                     title="ML Model Training & Predictions"
                                     description="Machine learning model serving with SHAP explainability. Prototype implementation with MLflow tracking."
@@ -114,7 +114,7 @@ export default function PlatformStatus() {
                                 <FeatureItem
                                     icon={<Zap className="h-5 w-5" />}
                                     title="Automation Rules Engine"
-                                    description="Workflow automation and alert rules. Core engine implemented, UI refinement in progress."
+                                    description="Workflow automation and alert rules. Core engine implemented with manual execution capability."
                                     badge={<FeatureBadge variant="prototype" size="sm" />}
                                 />
                             </div>

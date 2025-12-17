@@ -96,16 +96,17 @@ export function AIChat() {
                         <Sparkles className="h-8 w-8 text-primary" />
                         AI Assistant
                     </h2>
-                    <FeatureBadge variant="prototype" size="md" />
+                    <FeatureBadge variant="production" size="md" />
                 </div>
                 <p className="text-muted-foreground mb-3">
-                    Ask questions about your data using AI-powered search (evolving feature)
+                    Ask questions about your data using AI-powered RAG search with advanced context management
                 </p>
                 <Alert>
                     <Sparkles className="h-4 w-4" />
                     <AlertDescription>
-                        <strong>Prototype Feature:</strong> AI insights are experimental and may not be fully accurate.
-                        This feature demonstrates AI-powered data analysis capabilities and is actively being improved.
+                        <strong>Production Feature:</strong> AI-powered data analysis with customizable settings,
+                        markdown rendering, and export capabilities. Configure conversation context, temperature,
+                        and response length via the settings panel.
                     </AlertDescription>
                 </Alert>
             </div>
