@@ -112,7 +112,7 @@ export function AIChat() {
                                     <SelectValue placeholder="All datasets" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All datasets</SelectItem>
+                                    <SelectItem value="all">All datasets</SelectItem>
                                     {datasets.map((dataset) => (
                                         <SelectItem key={dataset.id} value={dataset.id}>
                                             {dataset.name || dataset.file_name}

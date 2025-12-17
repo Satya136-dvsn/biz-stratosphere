@@ -22,6 +22,7 @@ const APIManagement = lazy(() => import("./pages/APIManagement"));
 const AdvancedCharts = lazy(() => import("./pages/AdvancedCharts"));
 const AIChat = lazy(() => import("./pages/AIChat").then(m => ({ default: m.AIChat })));
 const MLPredictions = lazy(() => import("./pages/MLPredictions").then(m => ({ default: m.MLPredictions })));
+const AutomationRules = lazy(() => import("./pages/AutomationRules"));
 const AIComparison = lazy(() => import("./pages/AIComparison").then(m => ({ default: m.AIComparison })));
 const Help = lazy(() => import("./pages/Help"));
 const PlatformStatus = lazy(() => import("./pages/PlatformStatus"));
@@ -153,6 +154,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <MLPredictions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/automation-rules"
+                element={
+                  <ProtectedRoute>
+                    <AutomationRules />
                   </ProtectedRoute>
                 }
               />
