@@ -7,6 +7,7 @@ import { Suspense, lazy } from "react";
 import { Sidebar } from "./components/layout/Sidebar";
 import { CommandBar } from "./components/layout/CommandBar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { MainContent } from "./components/layout/MainContent";
 
 // Lazy load all page components for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -56,9 +57,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <CommandBar />
-          <main className="flex-1 overflow-y-auto p-6">
+          <MainContent>
             {children}
-          </main>
+          </MainContent>
         </div>
       </div>
     </div>
