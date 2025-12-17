@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { Bell, Plus, Trash2, Play, Pause, Settings, Info, Loader2 } from 'lucide
 import { useAutomationRules, useAutomationLogs } from '@/hooks/useAutomationRules';
 import { useState } from 'react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
+import { ScheduleBuilder } from '@/components/automation/ScheduleBuilder';
 
 export function AutomationRules() {
     const { rules, isLoading, createRule, toggleRule, deleteRule, runRule, isRunning } = useAutomationRules();
@@ -149,10 +150,12 @@ function RuleWizard({ onClose, onCreate }: { onClose: () => void; onCreate: (rul
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        trigger_type: 'threshold' as 'threshold' | 'schedule' | 'data_change',
-        condition: { metric: 'revenue', operator: '>' as '>' | '<' | '=' | '>=' | '<=', threshold: 0 },
-        action_type: 'notification' as 'email' | 'webhook' | 'notification',
-        action_config: {},
+        trigger_type: 'threshold',
+        condition: { metric: 'revenue', operator: '>', threshold: 10000 },
+        action_type: 'notification',
+        action_config: { title: '', message: '' },
+        schedule_type: 'manual' as 'manual' | 'cron' | 'interval',
+        schedule_config: {},
     });
 
     const handleCreate = () => {
@@ -161,11 +164,11 @@ function RuleWizard({ onClose, onCreate }: { onClose: () => void; onCreate: (rul
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <CardHeader>
                     <CardTitle>Create Automation Rule</CardTitle>
-                    <p className="text-sm text-muted-foreground">Step {step} of 3</p>
+                    <CardDescription>Step {step} of 4</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {step === 1 && (
@@ -275,6 +278,20 @@ function RuleWizard({ onClose, onCreate }: { onClose: () => void; onCreate: (rul
                     )}
 
                     {step === 3 && (
+                        <ScheduleBuilder
+                            value={{
+                                type: formData.schedule_type,
+                                config: formData.schedule_config,
+                            }}
+                            onChange={(schedule) => setFormData({
+                                ...formData,
+                                schedule_type: schedule.type,
+                                schedule_config: schedule.config,
+                            })}
+                        />
+                    )}
+
+                    {step === 4 && (
                         <div className="space-y-4">
                             <h3 className="font-semibold">Configure Action</h3>
                             <div>
@@ -316,8 +333,8 @@ function RuleWizard({ onClose, onCreate }: { onClose: () => void; onCreate: (rul
                         <Button variant="outline" onClick={step === 1 ? onClose : () => setStep(step - 1)}>
                             {step === 1 ? 'Cancel' : 'Back'}
                         </Button>
-                        <Button onClick={step === 3 ? handleCreate : () => setStep(step + 1)}>
-                            {step === 3 ? 'Create Rule' : 'Next'}
+                        <Button onClick={step === 4 ? handleCreate : () => setStep(step + 1)}>
+                            {step === 4 ? 'Create Rule' : 'Next'}
                         </Button>
                     </div>
                 </CardContent>
