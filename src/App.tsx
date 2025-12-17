@@ -7,6 +7,7 @@ import { Suspense, lazy } from "react";
 import { Sidebar } from "./components/layout/Sidebar";
 import { CommandBar } from "./components/layout/CommandBar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { MainContent } from "./components/layout/MainContent";
 import { MobileNav } from "./components/layout/MobileNav";
 
@@ -152,7 +153,9 @@ const App = () => (
                 path="/ai-chat"
                 element={
                   <ProtectedRoute>
-                    <AIChat />
+                    <ErrorBoundary>
+                      <AIChat />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
@@ -160,7 +163,9 @@ const App = () => (
                 path="/ml-predictions"
                 element={
                   <ProtectedRoute>
-                    <MLPredictions />
+                    <ErrorBoundary>
+                      <MLPredictions />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
@@ -168,7 +173,9 @@ const App = () => (
                 path="/automation-rules"
                 element={
                   <ProtectedRoute>
-                    <AutomationRules />
+                    <ErrorBoundary>
+                      <AutomationRules />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />

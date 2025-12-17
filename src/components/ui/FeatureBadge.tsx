@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export type FeatureBadgeVariant = "production" | "prototype" | "planned";
+export type FeatureBadgeVariant = "production" | "prototype" | "prototype-disabled" | "planned";
 
 interface FeatureBadgeProps {
     variant: FeatureBadgeVariant;
@@ -18,6 +18,11 @@ const variantConfig = {
         icon: "🧪",
         label: "Prototype",
         className: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+    },
+    "prototype-disabled": {
+        icon: "🧪",
+        label: "Prototype – Execution Not Enabled",
+        className: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
     },
     planned: {
         icon: "🚧",

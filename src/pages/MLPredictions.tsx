@@ -90,9 +90,16 @@ export function MLPredictions() {
                     </h2>
                     <FeatureBadge variant="prototype" size="md" />
                 </div>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground mb-3">
                     Make predictions with trained ML models and understand results with SHAP explanations (evolving feature)
                 </p>
+                <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                        <strong>Prototype Feature:</strong> Predictions are experimental and for demonstration purposes only.
+                        Results should not be used for business-critical decisions.
+                    </AlertDescription>
+                </Alert>
             </div>
 
             {/* Model Status */}
@@ -105,7 +112,8 @@ export function MLPredictions() {
                 <Alert>
                     <Info className="h-4 w-4" />
                     <AlertDescription>
-                        No ML models found. Please run `python train_models.py` in the ml-service directory.
+                        No ML models are currently available. The ML service may not be running.
+                        To use this feature, please start the ML backend service.
                     </AlertDescription>
                 </Alert>
             ) : (

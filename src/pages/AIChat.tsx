@@ -96,9 +96,16 @@ export function AIChat() {
                     </h2>
                     <FeatureBadge variant="prototype" size="md" />
                 </div>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground mb-3">
                     Ask questions about your data using AI-powered search (evolving feature)
                 </p>
+                <Alert>
+                    <Sparkles className="h-4 w-4" />
+                    <AlertDescription>
+                        <strong>Prototype Feature:</strong> AI insights are experimental and may not be fully accurate.
+                        This feature demonstrates AI-powered data analysis capabilities and is actively being improved.
+                    </AlertDescription>
+                </Alert>
             </div>
 
             {/* Settings Bar */}

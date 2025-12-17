@@ -153,30 +153,70 @@ Cite sources using [Source 1], [Source 2] format.`;
                     ? `Context from data:\n${context}\n\nQuestion: ${message}`
                     : `Question: ${message}\n\nNote: No relevant data found in the database.`;
 
-                // 5. Call Gemini API
-                const response = await fetch(`${GEMINI_CHAT_URL}?key=${GEMINI_API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [
-                            {
-                                role: 'user',
-                                parts: [{ text: systemPrompt + '\n\n' + userPrompt }]
+                // 5. Call Gemini API with comprehensive error handling
+                let assistantMessage: string;
+
+                try {
+                    // Check if API key is configured
+                    if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === '') {
+                        throw new Error('MISSING_API_KEY');
+                    }
+
+                    const response = await fetch(`${GEMINI_CHAT_URL}?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [
+                                {
+                                    role: 'user',
+                                    parts: [{ text: systemPrompt + '\n\n' + userPrompt }]
+                                }
+                            ],
+                            generationConfig: {
+                                temperature: 0.7,
+                                maxOutputTokens: 1024,
                             }
-                        ],
-                        generationConfig: {
-                            temperature: 0.7,
-                            maxOutputTokens: 1024,
+                        })
+                    });
+
+                    if (!response.ok) {
+                        // Handle specific HTTP status codes
+                        if (response.status === 429) {
+                            throw new Error('RATE_LIMIT');
+                        } else if (response.status === 401 || response.status === 403) {
+                            throw new Error('INVALID_API_KEY');
+                        } else {
+                            throw new Error('API_ERROR');
                         }
-                    })
-                });
+                    }
 
-                if (!response.ok) {
-                    throw new Error(`Gemini API error: ${response.statusText}`);
+                    const data = await response.json();
+
+                    // Validate response structure
+                    if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        throw new Error('MALFORMED_RESPONSE');
+                    }
+
+                    assistantMessage = data.candidates[0].content.parts[0].text;
+                } catch (error: any) {
+                    // Log error for debugging but don't expose to user
+                    console.error('[useRAGChat] AI error:', error);
+
+                    // Return friendly fallback message based on error type
+                    if (error.message === 'MISSING_API_KEY' || error.message === 'INVALID_API_KEY') {
+                        assistantMessage = 'AI insights are currently unavailable due to configuration. Please contact support.';
+                    } else if (error.message === 'RATE_LIMIT') {
+                        assistantMessage = 'AI insights are temporarily unavailable due to high demand. Please try again in a moment.';
+                    } else if (error.message === 'MALFORMED_RESPONSE') {
+                        assistantMessage = 'AI insights are currently unavailable. The response was incomplete. Please try again later.';
+                    } else if (error.name === 'TypeError' || error.message.includes('fetch')) {
+                        // Network error
+                        assistantMessage = 'AI insights are currently unavailable due to network issues. Please check your connection and try again.';
+                    } else {
+                        // Generic fallback
+                        assistantMessage = 'AI insights are currently unavailable. Please try again later.';
+                    }
                 }
-
-                const data = await response.json();
-                const assistantMessage = data.candidates[0].content.parts[0].text;
 
                 // 6. Save assistant message
                 const { data: aiMessage, error: aiMsgError } = await supabase

@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useToast } from './use-toast';
 import type { AutomationRule } from '@/lib/automation';
+import { runAutomationRule } from '@/lib/automation';
 
 export function useAutomationRules() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
+    const { toast } = useToast();
 
     // Fetch all rules
     const { data: rules = [], isLoading } = useQuery({
@@ -77,13 +80,36 @@ export function useAutomationRules() {
         },
     });
 
+    // Run rule manually
+    const runRule = useMutation({
+        mutationFn: async (ruleId: string) => {
+            await runAutomationRule(ruleId);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['automation-logs'] });
+            toast({
+                title: 'Rule Executed',
+                description: 'Check the execution logs below to see the result.',
+            });
+        },
+        onError: (error: any) => {
+            toast({
+                title: 'Execution Failed',
+                description: error.message || 'Failed to run rule',
+                variant: 'destructive',
+            });
+        },
+    });
+
     return {
         rules,
         isLoading,
         createRule: createRule.mutate,
         toggleRule: toggleRule.mutate,
         deleteRule: deleteRule.mutate,
+        runRule: runRule.mutate,
         isCreating: createRule.isPending,
+        isRunning: runRule.isPending,
     };
 }
 

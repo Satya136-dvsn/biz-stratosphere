@@ -39,10 +39,18 @@ export function useMLPredictions() {
     const { data: models = [], isLoading: modelsLoading } = useQuery({
         queryKey: ['ml-models'],
         queryFn: async () => {
-            const response = await fetch(`${ML_API_BASE}/ml/models`);
-            if (!response.ok) throw new Error('Failed to fetch models');
-            const data = await response.json();
-            return data.models as MLModel[];
+            try {
+                const response = await fetch(`${ML_API_BASE}/ml/models`);
+                if (!response.ok) {
+                    console.error('[useMLPredictions] Failed to fetch models:', response.status);
+                    return [];
+                }
+                const data = await response.json();
+                return data.models as MLModel[];
+            } catch (error: any) {
+                console.error('[useMLPredictions] Error fetching models:', error);
+                return [];
+            }
         },
         retry: 2,
     });
@@ -64,20 +72,40 @@ export function useMLPredictions() {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Prediction failed');
+                // Handle specific error codes
+                if (response.status === 404) {
+                    throw new Error('MODEL_NOT_FOUND');
+                } else if (response.status === 500) {
+                    throw new Error('SERVER_ERROR');
+                } else {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.detail || 'PREDICTION_FAILED');
+                }
             }
 
             const result = await response.json();
             toast({
                 title: 'Prediction Complete',
-                description: `Result: ${result.prediction}`,
+                description: 'Your prediction has been generated successfully.',
             });
             return result;
         } catch (error: any) {
+            console.error('[useMLPredictions] Prediction error:', error);
+
+            // User-friendly error messages
+            let errorMessage = 'Unable to generate prediction. Please try again later.';
+
+            if (error.name === 'TypeError' || error.message.includes('fetch')) {
+                errorMessage = 'ML service is currently unavailable. Please ensure the backend is running.';
+            } else if (error.message === 'MODEL_NOT_FOUND') {
+                errorMessage = 'The selected model was not found. Please try a different model.';
+            } else if (error.message === 'SERVER_ERROR') {
+                errorMessage = 'The ML service encountered an error. Please try again later.';
+            }
+
             toast({
-                title: 'Prediction Error',
-                description: error.message,
+                title: 'Prediction Unavailable',
+                description: errorMessage,
                 variant: 'destructive',
             });
             return null;
@@ -105,20 +133,40 @@ export function useMLPredictions() {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Explanation failed');
+                // Handle specific error codes
+                if (response.status === 404) {
+                    throw new Error('MODEL_NOT_FOUND');
+                } else if (response.status === 500) {
+                    throw new Error('SERVER_ERROR');
+                } else {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.detail || 'EXPLANATION_FAILED');
+                }
             }
 
             const result = await response.json();
             toast({
                 title: 'Explanation Generated',
-                description: `Top feature: ${result.top_features[0]}`,
+                description: 'Feature importance analysis is ready.',
             });
             return result;
         } catch (error: any) {
+            console.error('[useMLPredictions] Explanation error:', error);
+
+            // User-friendly error messages
+            let errorMessage = 'Unable to generate explanation. Please try again later.';
+
+            if (error.name === 'TypeError' || error.message.includes('fetch')) {
+                errorMessage = 'ML service is currently unavailable. Please ensure the backend is running.';
+            } else if (error.message === 'MODEL_NOT_FOUND') {
+                errorMessage = 'The selected model was not found. Please try a different model.';
+            } else if (error.message === 'SERVER_ERROR') {
+                errorMessage = 'The ML service encountered an error. Please try again later.';
+            }
+
             toast({
-                title: 'Explanation Error',
-                description: error.message,
+                title: 'Explanation Unavailable',
+                description: errorMessage,
                 variant: 'destructive',
             });
             return null;

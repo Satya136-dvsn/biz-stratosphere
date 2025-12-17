@@ -5,13 +5,15 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Plus, Trash2, Play, Pause, Settings } from 'lucide-react';
-import { useAutomationRules } from '@/hooks/useAutomationRules';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Bell, Plus, Trash2, Play, Pause, Settings, Info, Loader2 } from 'lucide-react';
+import { useAutomationRules, useAutomationLogs } from '@/hooks/useAutomationRules';
 import { useState } from 'react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
 
 export function AutomationRules() {
-    const { rules, isLoading, createRule, toggleRule, deleteRule } = useAutomationRules();
+    const { rules, isLoading, createRule, toggleRule, deleteRule, runRule, isRunning } = useAutomationRules();
     const [showWizard, setShowWizard] = useState(false);
 
     return (
@@ -21,11 +23,19 @@ export function AutomationRules() {
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         <h2 className="text-3xl font-bold tracking-tight">Automation Rules</h2>
-                        <FeatureBadge variant="prototype" size="md" />
+                        <FeatureBadge variant="prototype-disabled" size="md" />
                     </div>
-                    <p className="text-muted-foreground">
-                        Create rules to automate alerts and actions based on your data (UI refinement in progress)
+                    <p className="text-muted-foreground mb-3">
+                        Create and manage automation rules. Execution is manual and synchronous in this prototype.
                     </p>
+                    <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertDescription>
+                            <strong>Prototype Feature:</strong> You can create rules and run them manually.
+                            Click "Run Now" to evaluate a rule against your latest data.
+                            Execution is manual and synchronous — automated scheduling is not enabled in this prototype.
+                        </AlertDescription>
+                    </Alert>
                 </div>
                 <Button onClick={() => setShowWizard(true)}>
                     <Plus className="mr-2 h-4 w-4" />
@@ -73,11 +83,22 @@ export function AutomationRules() {
                                     </div>
                                     <div className="flex gap-2">
                                         <Button
-                                            size="icon"
+                                            size="sm"
                                             variant="outline"
-                                            onClick={() => toggleRule({ ruleId: rule.id, enabled: !rule.enabled })}
+                                            onClick={() => runRule(rule.id)}
+                                            disabled={isRunning}
                                         >
-                                            {rule.enabled ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                                            {isRunning ? (
+                                                <>
+                                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                    Running...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Play className="h-4 w-4 mr-2" />
+                                                    Run Now
+                                                </>
+                                            )}
                                         </Button>
                                         <Button
                                             size="icon"
@@ -107,6 +128,9 @@ export function AutomationRules() {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Execution Logs */}
+                                <RuleExecutionLogs ruleId={rule.id} />
                             </CardContent>
                         </Card>
                     ))
@@ -298,6 +322,47 @@ function RuleWizard({ onClose, onCreate }: { onClose: () => void; onCreate: (rul
                     </div>
                 </CardContent>
             </Card>
+        </div>
+    );
+}
+
+// Helper component to display recent execution logs for a rule
+function RuleExecutionLogs({ ruleId }: { ruleId: string }) {
+    const { data: logs = [], isLoading } = useAutomationLogs(ruleId);
+
+    if (isLoading) {
+        return <p className="text-xs text-muted-foreground mt-2">Loading executions...</p>;
+    }
+
+    if (logs.length === 0) {
+        return <p className="text-xs text-muted-foreground mt-2">No executions yet. Click "Run Now" to test this rule.</p>;
+    }
+
+    const latestLog = logs[0];
+    const statusColor = latestLog.status === 'success' ? 'text-green-600' :
+        latestLog.status === 'skipped' ? 'text-yellow-600' :
+            'text-red-600';
+
+    return (
+        <div className="mt-3 pt-3 border-t border-border">
+            <p className="text-xs font-medium mb-1">Last Execution:</p>
+            <div className="text-xs space-y-1">
+                <p>
+                    <span className="text-muted-foreground">Status:</span>{' '}
+                    <span className={statusColor + ' font-medium capitalize'}>{latestLog.status}</span>
+                </p>
+                {latestLog.condition_result && (
+                    <p>
+                        <span className="text-muted-foreground">Condition:</span>{' '}
+                        {latestLog.condition_result.matched ? 'Met' : 'Not met'}
+                        {latestLog.condition_result.currentValue !== undefined &&
+                            ` (value: ${latestLog.condition_result.currentValue})`}
+                    </p>
+                )}
+                <p className="text-muted-foreground">
+                    {new Date(latestLog.executed_at).toLocaleString()}
+                </p>
+            </div>
         </div>
     );
 }
