@@ -7,6 +7,7 @@ import { Plus, Users, Settings, Trash2, Crown } from 'lucide-react';
 import { useState } from 'react';
 import { useWorkspaces, useWorkspaceMembers } from '@/hooks/useWorkspaces';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 export default function Workspaces() {
     const { workspaces, isLoading, createWorkspace, deleteWorkspace } = useWorkspaces();
@@ -24,7 +25,7 @@ export default function Workspaces() {
     };
 
     return (
-        <div className="space-y-6">
+        <PageLayout>
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Workspaces</h2>
@@ -139,7 +140,7 @@ export default function Workspaces() {
                     onClose={() => setSelectedWorkspace(null)}
                 />
             )}
-        </div>
+        </PageLayout>
     );
 }
 

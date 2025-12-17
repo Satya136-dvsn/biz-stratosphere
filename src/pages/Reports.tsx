@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { FileText, Plus, Download, Loader2, Play, Save, FileDown, Trash2, Copy } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 const REPORT_TEMPLATES = [
   { id: 'kpi_summary', name: 'KPI Summary', description: 'Overview of key performance indicators' },
@@ -154,7 +155,7 @@ export function Reports() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageLayout>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -507,6 +508,6 @@ export function Reports() {
           </TabsContent>
         )}
       </Tabs>
-    </div>
+    </PageLayout>
   );
 }

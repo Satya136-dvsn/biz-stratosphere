@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { useEmbeddings } from './useEmbeddings';
+import { prepareContextForAI, estimateTokenCount } from '@/lib/conversationUtils';
+import { useAIUsageLimit } from './useAIUsageLimit';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
@@ -21,6 +23,10 @@ export interface Conversation {
     id: string;
     user_id: string;
     title: string;
+    context_window?: number;
+    temperature?: number;
+    max_tokens?: number;
+    model_name?: string;
     created_at: string;
     updated_at: string;
 }
@@ -30,6 +36,7 @@ export function useRAGChat(conversationId?: string) {
     const { toast } = useToast();
     const queryClient = useQueryClient();
     const { searchSimilar } = useEmbeddings();
+    const { checkLimit, incrementUsage } = useAIUsageLimit();
     const [isStreaming, setIsStreaming] = useState(false);
 
     // Fetch conversations
@@ -68,14 +75,30 @@ export function useRAGChat(conversationId?: string) {
         enabled: !!conversationId,
     });
 
-    // Create new conversation
+    // Create new conversation with settings
     const createConversation = useMutation({
-        mutationFn: async (title: string) => {
+        mutationFn: async ({
+            title,
+            context_window = 10,
+            temperature = 0.7,
+            max_tokens = 2000
+        }: {
+            title: string;
+            context_window?: number;
+            temperature?: number;
+            max_tokens?: number;
+        }) => {
             if (!user) throw new Error('Not authenticated');
 
             const { data, error } = await supabase
                 .from('chat_conversations')
-                .insert([{ user_id: user.id, title }])
+                .insert([{
+                    user_id: user.id,
+                    title,
+                    context_window,
+                    temperature,
+                    max_tokens
+                }])
                 .select()
                 .single();
 
@@ -118,6 +141,12 @@ export function useRAGChat(conversationId?: string) {
             datasetId?: string;
         }) => {
             if (!user) throw new Error('Not authenticated');
+
+            // Check rate limit before processing
+            const limitCheck = await checkLimit();
+            if (!limitCheck.allowed) {
+                throw new Error(limitCheck.reason || 'Rate limit exceeded');
+            }
 
             setIsStreaming(true);
 
@@ -162,19 +191,44 @@ Cite sources using [Source 1], [Source 2] format.`;
                         throw new Error('MISSING_API_KEY');
                     }
 
+                    // Get conversation settings
+                    const { data: conversation } = await supabase
+                        .from('chat_conversations')
+                        .select('context_window, temperature, max_tokens')
+                        .eq('id', convId)
+                        .single();
+
+                    const contextWindow = conversation?.context_window || 10;
+                    const temperature = conversation?.temperature || 0.7;
+                    const maxTokens = conversation?.max_tokens || 2000;
+
+                    // Prepare context with sliding window
+                    const currentMessages = await supabase
+                        .from('chat_messages')
+                        .select('*')
+                        .eq('conversation_id', convId)
+                        .order('created_at', { ascending: true });
+
+                    const allMessages = currentMessages.data || [];
+                    const contextMessages = prepareContextForAI(allMessages as ChatMessage[], contextWindow);
+
+                    // Build enhanced prompt with conversation history
+                    const conversationHistory = contextMessages;
+
                     const response = await fetch(`${GEMINI_CHAT_URL}?key=${GEMINI_API_KEY}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             contents: [
+                                ...conversationHistory,
                                 {
                                     role: 'user',
                                     parts: [{ text: systemPrompt + '\n\n' + userPrompt }]
                                 }
                             ],
                             generationConfig: {
-                                temperature: 0.7,
-                                maxOutputTokens: 1024,
+                                temperature: temperature,
+                                maxOutputTokens: maxTokens,
                             }
                         })
                     });
@@ -235,6 +289,9 @@ Cite sources using [Source 1], [Source 2] format.`;
                     .single();
 
                 if (aiMsgError) throw aiMsgError;
+
+                // 7. Increment usage counter
+                await incrementUsage();
 
                 return { userMessage, aiMessage };
             } finally {

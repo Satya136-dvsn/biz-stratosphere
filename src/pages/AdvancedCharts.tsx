@@ -23,6 +23,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Save, Download, FileDown, Loader2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F'];
 
@@ -377,7 +378,7 @@ export default function AdvancedCharts() {
     };
 
     return (
-        <div className="space-y-6">
+        <PageLayout>
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -548,6 +549,6 @@ export default function AdvancedCharts() {
                     )}
                 </div>
             </div>
-        </div>
+        </PageLayout>
     );
 }

@@ -40,7 +40,7 @@ export function DataUpload() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileUpload(files);
@@ -62,7 +62,7 @@ export function DataUpload() {
 
   const fetchDatasets = async () => {
     if (!user) return;
-    
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -100,11 +100,11 @@ export function DataUpload() {
     try {
       // Delete associated data points first
       await supabase.from('data_points').delete().eq('dataset_id', id);
-      
+
       // Then delete the dataset
       const { error } = await supabase.from('datasets').delete().eq('id', id);
       if (error) throw error;
-      
+
       await fetchDatasets(); // Refresh the list
     } catch (error) {
       console.error('Error deleting dataset:', error);
@@ -149,7 +149,7 @@ export function DataUpload() {
     // Inline fetchDatasets to avoid extra dependency in the array
     const fetchDatasetsAsync = async () => {
       if (!user) return;
-      
+
       setIsLoading(true);
       try {
         const { data, error } = await supabase
@@ -199,8 +199,8 @@ export function DataUpload() {
         <div
           className={cn(
             "border-2 border-dashed rounded-lg p-8 text-center transition-colors",
-            dragActive 
-              ? "border-primary bg-primary/5" 
+            dragActive
+              ? "border-primary bg-primary/5"
               : "border-border hover:border-primary/50"
           )}
           onDragEnter={handleDrag}
@@ -213,8 +213,8 @@ export function DataUpload() {
           <p className="text-muted-foreground mb-4">
             Drag and drop your CSV, Excel, or JSON files here
           </p>
-          <Button 
-            className="bg-gradient-primary" 
+          <Button
+            className="bg-gradient-primary"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
           >
@@ -248,45 +248,44 @@ export function DataUpload() {
             </div>
           ) : (
             <div className="space-y-2">
-              {datasets.map((dataset) => (
-                <div
-                  key={dataset.id}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-card/80 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FileText className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium text-sm">{dataset.file_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatFileSize(dataset.file_size)} • {new Date(dataset.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {getStatusIcon(dataset.status)}
-                    <span className={cn(
-                      "text-xs px-2 py-1 rounded-full",
-                      dataset.status === "completed" 
-                        ? "bg-accent/10 text-accent" 
-                        : dataset.status === "processing"
-                        ? "bg-warning/10 text-warning"
-                        : "bg-destructive/10 text-destructive"
-                    )}>
-                      {dataset.status}
-                    </span>
-                    {dataset.status === "completed" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteDataset(dataset.id)}
-                        className="h-6 w-6 p-0 hover:bg-destructive/10"
-                      >
-                        <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
-                      </Button>
-                    )}
+              {datasets.map((dataset) => <div
+                key={dataset.id}
+                className="flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-card/80 transition-colors overflow-hidden"
+              >
+                <div className="flex items-center space-x-3 min-w-0 flex-1">
+                  <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">{dataset.file_name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {formatFileSize(dataset.file_size)} • {new Date(dataset.created_at).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
-              ))}
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  {getStatusIcon(dataset.status)}
+                  <span className={cn(
+                    "text-xs px-2 py-1 rounded-full whitespace-nowrap",
+                    dataset.status === "completed"
+                      ? "bg-accent/10 text-accent"
+                      : dataset.status === "processing"
+                        ? "bg-warning/10 text-warning"
+                        : "bg-destructive/10 text-destructive"
+                  )}>
+                    {dataset.status}
+                  </span>
+                  {dataset.status === "completed" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteDataset(dataset.id)}
+                      className="h-6 w-6 p-0 hover:bg-destructive/10"
+                    >
+                      <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+              )}
             </div>
           )}
         </div>

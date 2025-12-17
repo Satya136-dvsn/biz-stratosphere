@@ -8,6 +8,7 @@ import { Key, Plus, Copy, Trash2, Shield, CheckCircle2, BarChart3, Activity, Tre
 import { useState } from 'react';
 import { useAPIKeys } from '@/hooks/useAPIKeys';
 import { useToast } from '@/hooks/use-toast';
+import { PageLayout } from '@/components/layout/PageLayout';
 
 function APIManagement({ workspaceId }: { workspaceId: string }) {
     const { apiKeys, createAPIKey, revokeAPIKey, deleteAPIKey } = useAPIKeys(workspaceId);
@@ -41,7 +42,7 @@ function APIManagement({ workspaceId }: { workspaceId: string }) {
     };
 
     return (
-        <div className="space-y-6">
+        <PageLayout>
             <div>
                 <h2 className="text-3xl font-bold tracking-tight">API Management</h2>
                 <p className="text-muted-foreground">
@@ -301,7 +302,7 @@ function APIManagement({ workspaceId }: { workspaceId: string }) {
                     </Card>
                 </div>
             )}
-        </div>
+        </PageLayout>
     );
 }
 

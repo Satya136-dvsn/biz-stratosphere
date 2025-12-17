@@ -9,12 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCompany } from '@/hooks/useCompany';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  BarChart3, 
-  RefreshCw, 
-  Download, 
-  Settings, 
-  Key, 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  BarChart3,
+  RefreshCw,
+  Download,
+  Settings,
+  Key,
   Clock,
   CheckCircle,
   XCircle,
@@ -26,8 +27,6 @@ interface PowerBISettings {
   dataset_id?: string;
   access_token?: string;
   powerbi_api_key?: string;
-  auto_refresh_enabled?: boolean;
-  refresh_frequency?: string;
 }
 
 export function PowerBIIntegration() {
@@ -36,14 +35,12 @@ export function PowerBIIntegration() {
   const [loading, setLoading] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
-  
+
   const [settings, setSettings] = useState<PowerBISettings>({
     workspace_id: '',
     dataset_id: '',
     access_token: '',
-    powerbi_api_key: '',
-    auto_refresh_enabled: false,
-    refresh_frequency: 'daily'
+    powerbi_api_key: ''
   });
 
   const [lastRefresh, setLastRefresh] = useState<string | null>(null);
@@ -55,9 +52,7 @@ export function PowerBIIntegration() {
         workspace_id: company.settings.powerbi_workspace_id || '',
         dataset_id: company.settings.powerbi_dataset_id || '',
         access_token: company.settings.powerbi_access_token || '',
-        powerbi_api_key: company.settings.powerbi_api_key || '',
-        auto_refresh_enabled: company.settings.auto_refresh_enabled || false,
-        refresh_frequency: company.settings.refresh_frequency || 'daily'
+        powerbi_api_key: company.settings.powerbi_api_key || ''
       });
     }
   }, [company]);
@@ -74,13 +69,11 @@ export function PowerBIIntegration() {
         powerbi_workspace_id: settings.workspace_id,
         powerbi_dataset_id: settings.dataset_id,
         powerbi_access_token: settings.access_token,
-        powerbi_api_key: settings.powerbi_api_key || crypto.randomUUID(),
-        auto_refresh_enabled: settings.auto_refresh_enabled,
-        refresh_frequency: settings.refresh_frequency
+        powerbi_api_key: settings.powerbi_api_key || crypto.randomUUID()
       };
 
       const { error } = await updateCompany({ settings: updatedSettings });
-      
+
       if (error) {
         throw error;
       }
@@ -104,7 +97,7 @@ export function PowerBIIntegration() {
   const handleManualRefresh = async () => {
     setRefreshLoading(true);
     setRefreshStatus('running');
-    
+
     try {
       const { error } = await supabase.functions.invoke('powerbi-scheduled-refresh', {
         body: {}
@@ -116,7 +109,7 @@ export function PowerBIIntegration() {
 
       setRefreshStatus('success');
       setLastRefresh(new Date().toISOString());
-      
+
       toast({
         title: "Success",
         description: "Power BI dataset refresh initiated successfully",
@@ -124,7 +117,7 @@ export function PowerBIIntegration() {
     } catch (error) {
       console.error('Error refreshing Power BI dataset:', error);
       setRefreshStatus('error');
-      
+
       toast({
         title: "Error",
         description: "Failed to refresh Power BI dataset",
@@ -137,7 +130,7 @@ export function PowerBIIntegration() {
 
   const handleGenerateReport = async (reportType: string) => {
     setReportLoading(true);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke('powerbi-report-generator', {
         body: {
@@ -289,40 +282,9 @@ export function PowerBIIntegration() {
 
               <Separator />
 
-              <div className="space-y-4">
-                <h4 className="font-medium">Automatic Refresh Settings</h4>
-                
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="auto-refresh"
-                    checked={settings.auto_refresh_enabled}
-                    onChange={(e) => setSettings({ ...settings, auto_refresh_enabled: e.target.checked })}
-                    disabled={!canManageIntegration}
-                    className="rounded border-gray-300"
-                  />
-                  <Label htmlFor="auto-refresh">Enable automatic data refresh</Label>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="refresh-frequency">Refresh Frequency</Label>
-                  <select
-                    id="refresh-frequency"
-                    value={settings.refresh_frequency}
-                    onChange={(e) => setSettings({ ...settings, refresh_frequency: e.target.value })}
-                    disabled={!canManageIntegration || !settings.auto_refresh_enabled}
-                    className="w-full px-3 py-2 border rounded-md"
-                  >
-                    <option value="hourly">Every Hour</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                  </select>
-                </div>
-              </div>
-
               {canManageIntegration && (
-                <Button 
-                  onClick={handleSaveSettings} 
+                <Button
+                  onClick={handleSaveSettings}
                   disabled={loading}
                   className="w-full"
                 >
@@ -375,18 +337,6 @@ export function PowerBIIntegration() {
                   Last refresh: {new Date(lastRefresh).toLocaleString()}
                 </div>
               )}
-
-              <div className="space-y-2">
-                <h4 className="font-medium">Refresh Schedule</h4>
-                <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-sm">
-                    {settings.auto_refresh_enabled 
-                      ? `Automatic refresh enabled - ${settings.refresh_frequency}`
-                      : 'Automatic refresh disabled - manual refresh only'
-                    }
-                  </p>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -511,7 +461,7 @@ export function PowerBIIntegration() {
               <div className="p-4 border rounded-lg">
                 <h4 className="font-medium mb-2">Example Request</h4>
                 <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto">
-{`curl -X POST '${window.location.origin}/functions/v1/powerbi-data-endpoint' \\
+                  {`curl -X POST '${window.location.origin}/functions/v1/powerbi-data-endpoint' \\
   -H 'x-api-key: ${settings.powerbi_api_key || 'YOUR_API_KEY'}' \\
   -H 'Content-Type: application/json' \\
   -d '{

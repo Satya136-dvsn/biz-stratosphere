@@ -10,6 +10,7 @@ import { UsageQuotas } from "@/components/settings/UsageQuotas";
 import { useAuth } from "@/hooks/useAuth";
 import { User, Bell, Shield, Database, Save, Palette, Moon, Sun } from "lucide-react";
 import { useState } from "react";
+import { PageLayout } from "@/components/layout/PageLayout";
 
 export function Settings() {
   const { user } = useAuth();
@@ -49,7 +50,7 @@ export function Settings() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageLayout>
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
@@ -320,6 +321,6 @@ export function Settings() {
           <UsageQuotas />
         </TabsContent>
       </Tabs>
-    </div>
+    </PageLayout>
   );
 }

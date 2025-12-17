@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { hashContent } from '@/lib/conversationUtils';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_EMBEDDING_URL = 'https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent';
@@ -28,8 +29,34 @@ export function useEmbeddings() {
     const { toast } = useToast();
     const queryClient = useQueryClient();
 
-    // Generate embedding for text using Gemini
-    const generateEmbedding = async (text: string): Promise<number[]> => {
+    // Generate embedding for text using Gemini with caching
+    const generateEmbedding = async (text: string, workspaceId?: string): Promise<number[]> => {
+        // Check cache first if workspace provided
+        if (workspaceId) {
+            const contentHash = await hashContent(text);
+
+            const { data: cached } = await supabase
+                .from('embedding_cache')
+                .select('embedding')
+                .eq('content_hash', contentHash)
+                .eq('workspace_id', workspaceId)
+                .single();
+
+            if (cached && cached.embedding) {
+                // Update access stats
+                await supabase
+                    .from('embedding_cache')
+                    .update({
+                        last_accessed: new Date().toISOString(),
+                        access_count: supabase.rpc('increment', { row_id: contentHash })
+                    })
+                    .eq('content_hash', contentHash);
+
+                return cached.embedding as number[];
+            }
+        }
+
+        // Generate new embedding
         const response = await fetch(`${GEMINI_EMBEDDING_URL}?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -44,7 +71,26 @@ export function useEmbeddings() {
         }
 
         const data = await response.json();
-        return data.embedding.values;
+        const embeddingVector = data.embedding.values;
+
+        // Cache the embedding if workspace provided
+        if (workspaceId) {
+            const contentHash = await hashContent(text);
+
+            supabase.from('embedding_cache').insert({
+                content_hash: contentHash,
+                content_text: text.substring(0, 1000), // Store truncated text
+                embedding: embeddingVector,
+                workspace_id: workspaceId
+            }).then(() => {
+                // Cache inserted successfully
+            }).catch((err) => {
+                // Ignore cache insert errors (might be duplicate)
+                console.warn('Cache insert failed:', err);
+            });
+        }
+
+        return embeddingVector;
     };
 
     // Generate embeddings for dataset

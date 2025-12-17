@@ -150,7 +150,7 @@ export function Sidebar() {
             </div>
 
             {/* Navigation Items */}
-            <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+            <nav className="flex-1 p-2 space-y-1 overflow-y-auto overflow-x-hidden">
                 {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = location.pathname === item.href;
@@ -165,19 +165,21 @@ export function Sidebar() {
                                     isActive && "bg-gradient-primary text-white shadow-glow hover:bg-gradient-primary/90"
                                 )}
                             >
-                                <Icon className={cn("h-5 w-5", !collapsed && "mr-3")} />
+                                <Icon className={cn("h-5 w-5 flex-shrink-0", !collapsed && "mr-3")} />
                                 {!collapsed && (
-                                    <span className="text-sm font-medium">{item.title}</span>
-                                )}
-                                {!collapsed && item.badge && (
-                                    <span className="ml-auto text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full">
-                                        {item.badge}
-                                    </span>
-                                )}
-                                {!collapsed && item.badgeComponent && (
-                                    <span className="ml-auto">
-                                        {item.badgeComponent}
-                                    </span>
+                                    <>
+                                        <span className="text-sm font-medium truncate flex-1">{item.title}</span>
+                                        {item.badge && (
+                                            <span className="ml-2 text-[10px] bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-full flex-shrink-0">
+                                                {item.badge}
+                                            </span>
+                                        )}
+                                        {item.badgeComponent && (
+                                            <span className="ml-2 flex-shrink-0">
+                                                {item.badgeComponent}
+                                            </span>
+                                        )}
+                                    </>
                                 )}
                             </Button>
                         </Link>
