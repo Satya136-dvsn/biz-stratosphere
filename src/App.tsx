@@ -8,6 +8,7 @@ import { Sidebar } from "./components/layout/Sidebar";
 import { CommandBar } from "./components/layout/CommandBar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MainContent } from "./components/layout/MainContent";
+import { MobileNav } from "./components/layout/MobileNav";
 
 // Lazy load all page components for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -56,7 +57,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex h-screen">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <CommandBar />
+          <div className="flex items-center border-b border-border/50">
+            <MobileNav />
+            <div className="flex-1">
+              <CommandBar />
+            </div>
+          </div>
           <MainContent>
             {children}
           </MainContent>
