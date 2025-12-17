@@ -13,16 +13,21 @@ import {
     Users,
     Key,
     LineChart,
+    Sparkles,
+    Brain,
+    Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FeatureBadge } from "@/components/ui/FeatureBadge";
 
 interface NavItem {
     title: string;
     href: string;
     icon: React.ElementType;
     badge?: string;
+    badgeComponent?: React.ReactNode;
 }
 
 const navItems: NavItem[] = [
@@ -58,6 +63,24 @@ const navItems: NavItem[] = [
         href: "/advanced-charts",
         icon: LineChart,
         badge: "NEW",
+    },
+    {
+        title: "AI Chat",
+        href: "/ai-chat",
+        icon: Sparkles,
+        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
+    },
+    {
+        title: "ML Predictions",
+        href: "/ml-predictions",
+        icon: Brain,
+        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
+    },
+    {
+        title: "Automation Rules",
+        href: "/automation-rules",
+        icon: Workflow,
+        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
     },
     {
         title: "Profile",
@@ -149,6 +172,11 @@ export function Sidebar() {
                                 {!collapsed && item.badge && (
                                     <span className="ml-auto text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full">
                                         {item.badge}
+                                    </span>
+                                )}
+                                {!collapsed && item.badgeComponent && (
+                                    <span className="ml-auto">
+                                        {item.badgeComponent}
                                     </span>
                                 )}
                             </Button>
