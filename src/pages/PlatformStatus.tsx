@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FeatureBadge } from "@/components/ui/FeatureBadge";
 import { CheckCircle2, Beaker, Construction, AlertCircle, BarChart3, Shield, Zap, Database } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { Footer } from "@/components/layout/Footer";
 
 export default function PlatformStatus() {
     return (
@@ -254,6 +255,9 @@ export default function PlatformStatus() {
                     </div>
                 </div>
             </div>
+
+            {/* Footer */}
+            <Footer />
         </>
     );
 }

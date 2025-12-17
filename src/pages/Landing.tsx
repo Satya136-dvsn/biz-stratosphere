@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, BarChart3, Users, TrendingUp, Zap, Shield, Globe, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Footer } from '@/components/layout/Footer';
 
 export default function LandingPage() {
     return (
@@ -219,27 +220,7 @@ export default function LandingPage() {
             </section>
 
             {/* Footer */}
-            <footer className="container mx-auto px-4 py-12 border-t border-border/40">
-                <div className="max-w-6xl mx-auto">
-                    <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
-                        <Link to="/platform-status" className="hover:text-primary transition-colors font-medium">
-                            Platform Status
-                        </Link>
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors font-medium">
-                            GitHub
-                        </a>
-                        <Link to="/help" className="hover:text-primary transition-colors font-medium">
-                            Documentation
-                        </Link>
-                        <Link to="/auth" className="hover:text-primary transition-colors font-medium">
-                            Get Started
-                        </Link>
-                    </div>
-                    <div className="text-center mt-8 text-sm text-muted-foreground">
-                        <p>© 2024 Biz Stratosphere. Built for analytical clarity and enterprise scale.</p>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }
