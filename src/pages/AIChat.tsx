@@ -14,6 +14,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2 } from 'lucide-react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
+import { ConversationSettings } from '@/components/ai/ConversationSettings';
+import { ExportConversation } from '@/components/ai/ExportConversation';
 
 export function AIChat() {
     const { user } = useAuth();
@@ -57,7 +59,7 @@ export function AIChat() {
     // Handle new conversation
     const handleNewConversation = () => {
         const title = `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-        createConversation(title, {
+        createConversation({ title }, {
             onSuccess: (data) => {
                 setSelectedConversationId(data.id);
             },
@@ -221,11 +223,24 @@ export function AIChat() {
                 <div className="lg:col-span-3">
                     <Card className="h-[600px] flex flex-col">
                         <CardHeader>
-                            <CardTitle className="text-lg">
-                                {selectedConversationId
-                                    ? conversations.find(c => c.id === selectedConversationId)?.title || 'Chat'
-                                    : 'Select or create a conversation'}
-                            </CardTitle>
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-lg">
+                                    {selectedConversationId
+                                        ? conversations.find(c => c.id === selectedConversationId)?.title || 'Chat'
+                                        : 'Select or create a conversation'}
+                                </CardTitle>
+                                {selectedConversationId && (
+                                    <div className="flex items-center gap-2">
+                                        <ExportConversation
+                                            conversation={conversations.find(c => c.id === selectedConversationId)!}
+                                            messages={messages}
+                                        />
+                                        <ConversationSettings
+                                            conversation={conversations.find(c => c.id === selectedConversationId) || null}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </CardHeader>
                         <Separator />
                         <CardContent className="flex-1 flex flex-col p-0">

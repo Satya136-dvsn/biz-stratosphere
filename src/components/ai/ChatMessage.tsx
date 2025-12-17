@@ -1,8 +1,14 @@
+import { useState } from 'react';
 import { ChatMessage } from '@/hooks/useRAGChat';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Bot, User, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Bot, User, ExternalLink, Copy, Check } from 'lucide-react';
 import { format } from 'date-fns';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
 
 interface ChatMessageProps {
     message: ChatMessage;
@@ -10,6 +16,13 @@ interface ChatMessageProps {
 
 export function ChatMessageComponent({ message }: ChatMessageProps) {
     const isUser = message.role === 'user';
+    const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+    const copyToClipboard = (code: string, language: string) => {
+        navigator.clipboard.writeText(code);
+        setCopiedCode(`${language}-${code.substring(0, 20)}`);
+        setTimeout(() => setCopiedCode(null), 2000);
+    };
 
     return (
         <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -26,10 +39,102 @@ export function ChatMessageComponent({ message }: ChatMessageProps) {
             {/* Message Content */}
             <div className={`flex-1 max-w-[80%] ${isUser ? 'items-end' : 'items-start'}  flex flex-col gap-2`}>
                 <Card className={`p-3 ${isUser
-                        ? 'bg-primary text-primary-foreground ml-auto'
-                        : 'bg-muted'
+                    ? 'bg-primary text-primary-foreground ml-auto'
+                    : 'bg-muted'
                     }`}>
-                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    {isUser ? (
+                        <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    ) : (
+                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                    code({ node, inline, className, children, ...props }) {
+                                        const match = /language-(\w+)/.exec(className || '');
+                                        const language = match ? match[1] : '';
+                                        const codeString = String(children).replace(/\n$/, '');
+                                        const codeId = `${language}-${codeString.substring(0, 20)}`;
+
+                                        return !inline && match ? (
+                                            <div className="relative group my-4">
+                                                <div className="flex items-center justify-between bg-zinc-800 px-4 py-2 rounded-t-lg">
+                                                    <span className="text-xs text-zinc-400 font-mono">{language}</span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-6 px-2 text-zinc-400 hover:text-zinc-100"
+                                                        onClick={() => copyToClipboard(codeString, language)}
+                                                    >
+                                                        {copiedCode === codeId ? (
+                                                            <>
+                                                                <Check className="h-3 w-3 mr-1" />
+                                                                Copied
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Copy className="h-3 w-3 mr-1" />
+                                                                Copy
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                                <SyntaxHighlighter
+                                                    style={oneDark}
+                                                    language={language}
+                                                    PreTag="div"
+                                                    className="!mt-0 !rounded-t-none"
+                                                    {...props}
+                                                >
+                                                    {codeString}
+                                                </SyntaxHighlighter>
+                                            </div>
+                                        ) : (
+                                            <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                                                {children}
+                                            </code>
+                                        );
+                                    },
+                                    a({ node, children, ...props }) {
+                                        return (
+                                            <a
+                                                {...props}
+                                                className="text-primary hover:underline"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {children}
+                                            </a>
+                                        );
+                                    },
+                                    table({ node, children, ...props }) {
+                                        return (
+                                            <div className="overflow-x-auto my-4">
+                                                <table className="min-w-full divide-y divide-border" {...props}>
+                                                    {children}
+                                                </table>
+                                            </div>
+                                        );
+                                    },
+                                    th({ node, children, ...props }) {
+                                        return (
+                                            <th className="px-4 py-2 bg-muted text-left text-sm font-semibold" {...props}>
+                                                {children}
+                                            </th>
+                                        );
+                                    },
+                                    td({ node, children, ...props }) {
+                                        return (
+                                            <td className="px-4 py-2 border-t text-sm" {...props}>
+                                                {children}
+                                            </td>
+                                        );
+                                    },
+                                }}
+                            >
+                                {message.content}
+                            </ReactMarkdown>
+                        </div>
+                    )}
                 </Card>
 
                 {/* Sources */}
