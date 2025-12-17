@@ -11,6 +11,29 @@ export interface AutomationRule {
     action_type: 'email' | 'webhook' | 'notification';
     action_config: any;
     last_triggered?: string;
+    // Production schedule fields
+    schedule_type?: 'manual' | 'cron' | 'interval';
+    schedule_config?: ScheduleConfig;
+    last_run_at?: string;
+    next_run_at?: string;
+    retry_config?: RetryConfig;
+    notification_channels?: NotificationChannel[];
+}
+
+export interface ScheduleConfig {
+    cron?: string; // Cron expression for 'cron' type
+    interval_minutes?: number; // Interval in minutes for 'interval' type
+}
+
+export interface RetryConfig {
+    max_retries: number;
+    retry_delay_seconds: number;
+}
+
+export interface NotificationChannel {
+    type: 'email' | 'webhook' | 'slack' | 'in_app';
+    recipient: string;
+    config?: any;
 }
 
 export interface RuleCondition {
