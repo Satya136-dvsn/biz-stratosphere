@@ -36,6 +36,36 @@ export interface NotificationChannel {
     config?: any;
 }
 
+// Advanced trigger types
+export interface AdvancedConfig {
+    type?: 'simple' | 'composite' | 'trend' | 'anomaly';
+    // Composite config
+    operator?: 'AND' | 'OR';
+    conditions?: RuleCondition[];
+    // Trend config
+    trend_direction?: 'increasing' | 'decreasing';
+    threshold_pct?: number;
+    period_days?: number;
+    // Anomaly config
+    std_dev_multiplier?: number;
+}
+
+export interface TrendAnalysis {
+    avg_value: number;
+    min_value: number;
+    max_value: number;
+    std_dev: number;
+    trend_direction: 'increasing' | 'decreasing' | 'stable';
+    trend_percentage: number;
+}
+
+export interface AnomalyDetection {
+    is_anomaly: boolean;
+    avg_value: number;
+    std_dev: number;
+    deviation_score: number;
+}
+
 export interface RuleCondition {
     metric: string; // 'revenue', 'customers', 'churn_rate', etc.
     operator: '>' | '<' | '=' | '>=' | '<=';
