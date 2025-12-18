@@ -145,6 +145,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_rule_status
 
 ALTER TABLE automation_notifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their notifications" ON automation_notifications;
 CREATE POLICY "Users can view their notifications"
   ON automation_notifications FOR SELECT
   USING (rule_id IN (
