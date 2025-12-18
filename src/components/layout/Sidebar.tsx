@@ -81,13 +81,13 @@ const navItems: NavItem[] = [
         title: "ML Predictions",
         href: "/ml-predictions",
         icon: Brain,
-        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
+        badgeComponent: <FeatureBadge variant="production" size="sm" />,
     },
     {
         title: "Automation Rules",
         href: "/automation-rules",
         icon: Workflow,
-        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
+        badgeComponent: <FeatureBadge variant="production" size="sm" />,
     },
     {
         title: "Profile",
