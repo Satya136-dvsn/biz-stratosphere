@@ -42,10 +42,9 @@ CREATE TABLE IF NOT EXISTS ml_prediction_cache (
   UNIQUE(model_id, input_hash)
 );
 
--- Index for cache lookups
+-- Index for cache lookups (removed NOW() predicate - not IMMUTABLE)
 CREATE INDEX IF NOT EXISTS idx_prediction_cache_lookup 
-  ON ml_prediction_cache(model_id, input_hash) 
-  WHERE expires_at > NOW();
+  ON ml_prediction_cache(model_id, input_hash, expires_at);
 
 -- Index for cleanup
 CREATE INDEX IF NOT EXISTS idx_prediction_cache_expiry 
