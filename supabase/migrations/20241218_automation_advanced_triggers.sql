@@ -41,6 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_trend_analysis_date
 -- RLS for trend analysis
 ALTER TABLE automation_trend_analysis ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their trend analysis" ON automation_trend_analysis;
 CREATE POLICY "Users can view their trend analysis"
   ON automation_trend_analysis FOR SELECT
   USING (rule_id IN (

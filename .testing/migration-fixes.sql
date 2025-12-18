@@ -27,7 +27,10 @@ CREATE INDEX IF NOT EXISTS idx_embeddings_conversation
 
 -- RLS
 ALTER TABLE embeddings ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Users can manage own embeddings"
+
+-- Drop if exists, then create (PostgreSQL doesn't support IF NOT EXISTS for policies)
+DROP POLICY IF EXISTS "Users can manage own embeddings" ON embeddings;
+CREATE POLICY "Users can manage own embeddings"
   ON embeddings FOR ALL
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
