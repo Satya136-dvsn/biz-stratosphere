@@ -174,6 +174,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS automation_notifications_updated_at ON automation_notifications;
 CREATE TRIGGER automation_notifications_updated_at
   BEFORE UPDATE ON automation_notifications
   FOR EACH ROW
