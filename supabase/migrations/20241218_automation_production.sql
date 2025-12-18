@@ -152,10 +152,12 @@ CREATE POLICY "Users can view their notifications"
     SELECT id FROM automation_rules WHERE user_id = auth.uid()
   ));
 
+DROP POLICY IF EXISTS "System can insert notifications" ON automation_notifications;
 CREATE POLICY "System can insert notifications"
   ON automation_notifications FOR INSERT
   WITH CHECK (true); -- Allow system to insert, will use service role
 
+DROP POLICY IF EXISTS "System can update notifications" ON automation_notifications;
 CREATE POLICY "System can update notifications"
   ON automation_notifications FOR UPDATE
   USING (true); -- Allow system to update, will use service role
