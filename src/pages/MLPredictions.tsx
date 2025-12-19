@@ -9,9 +9,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useBrowserML } from '@/hooks/useBrowserML';
-import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2 } from 'lucide-react';
+import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2, History } from 'lucide-react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
 import { ModelTrainingPanel } from '@/components/ml/ModelTrainingPanel';
+import { PredictionHistory } from '@/components/ml/PredictionHistory';
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -163,7 +164,7 @@ export function MLPredictions() {
             </div>
 
             <Tabs defaultValue="predict" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="predict" className="gap-2">
                         <Brain className="h-4 w-4" />
                         Make Prediction
@@ -171,6 +172,10 @@ export function MLPredictions() {
                     <TabsTrigger value="train" className="gap-2">
                         <Zap className="h-4 w-4" />
                         Train Models
+                    </TabsTrigger>
+                    <TabsTrigger value="history" className="gap-2">
+                        <History className="h-4 w-4" />
+                        History
                     </TabsTrigger>
                     <TabsTrigger value="models" className="gap-2">
                         <BarChart3 className="h-4 w-4" />
@@ -341,6 +346,11 @@ export function MLPredictions() {
                 {/* Training Tab */}
                 <TabsContent value="train">
                     <ModelTrainingPanel />
+                </TabsContent>
+
+                {/* History Tab */}
+                <TabsContent value="history">
+                    <PredictionHistory />
                 </TabsContent>
 
                 {/* Models Tab */}
