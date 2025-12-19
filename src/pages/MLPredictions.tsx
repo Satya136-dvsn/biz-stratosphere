@@ -138,7 +138,7 @@ export function MLPredictions() {
                         .from('ml_predictions')
                         .insert({
                             user_id: userData.user.id,
-                            model_id: selectedModel,
+                            model_name: selectedModel,
                             inputs: featureValues,
                             prediction: result.prediction,
                             confidence: result.confidence || 0,
