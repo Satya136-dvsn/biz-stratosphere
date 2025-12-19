@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { useBrowserML } from '@/hooks/useBrowserML';
 import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2 } from 'lucide-react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
+import { ModelTrainingPanel } from '@/components/ml/ModelTrainingPanel';
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -40,17 +41,10 @@ const MODEL_FEATURES = {
 };
 
 export function MLPredictions() {
-    const {
-        models,
-        isLoading: modelsLoading,
-        isPredicting,
-        makePrediction,
-        createDemoModels,
-    } = useBrowserML();
-
     const [selectedModel, setSelectedModel] = useState<string>('churn_model');
     const [features, setFeatures] = useState<Record<string, string>>({});
     const [prediction, setPrediction] = useState<any>(null);
+    const [isPredicting, setIsPredicting] = useState(false);
     const [modelsCreated, setModelsCreated] = useState(false);
 
     const modelConfig = MODEL_FEATURES[selectedModel as keyof typeof MODEL_FEATURES];
@@ -60,12 +54,22 @@ export function MLPredictions() {
     useEffect(() => {
         const initModels = async () => {
             if (!modelsCreated) {
-                await createDemoModels();
+                // Import TensorFlow.js functions
+                const { createChurnModel, createRevenueModel } = await import('@/lib/browserML');
+
+                // Create and save models locally
+                const churnModel = createChurnModel();
+                await churnModel.save('indexeddb://churn_model');
+
+                const revenueModel = createRevenueModel();
+                await revenueModel.save('indexeddb://revenue_model');
+
                 setModelsCreated(true);
+                console.log('✅ Demo models ready for predictions');
             }
         };
         initModels();
-    }, [modelsCreated, createDemoModels]);
+    }, [modelsCreated]);
 
     const handleFeatureChange = (name: string, value: string) => {
         setFeatures(prev => ({ ...prev, [name]: value }));
@@ -81,12 +85,54 @@ export function MLPredictions() {
             return;
         }
 
-        // Convert features to number array in correct order
-        const featureValues = modelConfig.features.map(f => parseFloat(features[f.name]) || 0);
+        setIsPredicting(true);
+        setPrediction(null);
 
-        // Make prediction using browser ML
-        const result = await makePrediction(selectedModel, featureValues, true);
-        setPrediction(result);
+        try {
+            // Import TensorFlow.js
+            const tf = await import('@tensorflow/tfjs');
+            const { predict: tfPredict, getFeatureImportance } = await import('@/lib/browserML');
+
+            // Try to load trained model first, fallback to untrained
+            let model;
+            const trainedModelPath = `indexeddb://${selectedModel}_trained`;
+            const untrainedModelPath = `indexeddb://${selectedModel}`;
+
+            try {
+                model = await tf.loadLayersModel(trainedModelPath);
+                console.log('✅ Using trained model');
+            } catch (error) {
+                console.log('⚠️ Trained model not found, using untrained model');
+                model = await tf.loadLayersModel(untrainedModelPath);
+            }
+
+            // Convert features to number array in correct order
+            const featureValues = modelConfig.features.map(f => parseFloat(features[f.name]) || 0);
+
+            // Make prediction using browser ML
+            const result = await tfPredict(model, featureValues);
+
+            // Get feature importance
+            const importance = await getFeatureImportance(
+                model,
+                featureValues,
+                modelConfig.features.map(f => f.name)
+            );
+
+            setPrediction({
+                ...result,
+                feature_importance: importance,
+                cache_hit: false,
+            });
+        } catch (error: any) {
+            console.error('Prediction error:', error);
+            setPrediction({
+                error: true,
+                message: 'Failed to make prediction. Please try again.',
+            });
+        } finally {
+            setIsPredicting(false);
+        }
     };
 
     return (
@@ -117,10 +163,14 @@ export function MLPredictions() {
             </div>
 
             <Tabs defaultValue="predict" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="predict" className="gap-2">
                         <Brain className="h-4 w-4" />
                         Make Prediction
+                    </TabsTrigger>
+                    <TabsTrigger value="train" className="gap-2">
+                        <Zap className="h-4 w-4" />
+                        Train Models
                     </TabsTrigger>
                     <TabsTrigger value="models" className="gap-2">
                         <BarChart3 className="h-4 w-4" />
@@ -184,7 +234,7 @@ export function MLPredictions() {
                                 {/* Predict Button */}
                                 <Button
                                     onClick={handlePredict}
-                                    disabled={isPredicting || modelsLoading}
+                                    disabled={isPredicting || !modelsCreated}
                                     className="w-full"
                                     size="lg"
                                 >
@@ -283,45 +333,40 @@ export function MLPredictions() {
                     </div>
                 </TabsContent>
 
+                {/* Training Tab */}
+                <TabsContent value="train">
+                    <ModelTrainingPanel />
+                </TabsContent>
+
                 {/* Models Tab */}
                 <TabsContent value="models">
                     <Card>
                         <CardHeader>
                             <CardTitle>Available Models</CardTitle>
-                            <CardDescription>Browser-based TensorFlow.js models</CardDescription>
+                            <CardDescription>Browser-based TensorFlow.js demo models</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {modelsLoading ? (
-                                    <div className="text-center py-8">
-                                        <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-                                        <p className="text-sm text-muted-foreground mt-2">Loading models...</p>
-                                    </div>
-                                ) : models.length > 0 ? (
-                                    models.map((model) => (
-                                        <div key={model.id} className="p-4 border rounded-lg">
-                                            <div className="flex items-start justify-between">
-                                                <div>
-                                                    <h3 className="font-semibold">{model.name}</h3>
-                                                    <p className="text-sm text-muted-foreground">{model.description}</p>
-                                                    <div className="flex gap-2 mt-2">
-                                                        <Badge variant="outline">{model.type}</Badge>
-                                                        <Badge variant="outline">v{model.version}</Badge>
-                                                        {model.accuracy && (
-                                                            <Badge variant="secondary">
-                                                                {(model.accuracy * 100).toFixed(0)}% accurate
-                                                            </Badge>
-                                                        )}
-                                                    </div>
+                                {Object.entries(MODEL_FEATURES).map(([key, modelInfo]) => (
+                                    <div key={key} className="p-4 border rounded-lg">
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <h3 className="font-semibold">{modelInfo.name}</h3>
+                                                <p className="text-sm text-muted-foreground">{modelInfo.description}</p>
+                                                <div className="flex gap-2 mt-2">
+                                                    <Badge variant="outline">
+                                                        {key.includes('churn') ? 'classification' : 'regression'}
+                                                    </Badge>
+                                                    <Badge variant="outline">v1.0</Badge>
+                                                    <Badge variant="secondary">Demo Model</Badge>
+                                                    <Badge variant="secondary" className="bg-green-50 text-green-700">
+                                                        Browser-Based
+                                                    </Badge>
                                                 </div>
                                             </div>
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <p>Demo models available</p>
                                     </div>
-                                )}
+                                ))}
                             </div>
                         </CardContent>
                     </Card>
