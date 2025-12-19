@@ -79,8 +79,18 @@ export async function predict(
         // Get prediction value
         const prediction = (await predictionTensor.data())[0];
 
-        // Calculate confidence (for binary classification)
-        const confidence = Math.abs(prediction - 0.5) * 2; // 0 to 1 scale
+        // Calculate confidence differently for classification vs regression
+        let confidence: number;
+
+        if (prediction >= 0 && prediction <= 1) {
+            // Classification model (sigmoid output 0-1)
+            // Confidence is how far from 0.5 (uncertain)
+            confidence = Math.abs(prediction - 0.5) * 2; // 0 to 1 scale
+        } else {
+            // Regression model (linear output, can be any value)
+            // Confidence based on prediction magnitude (capped at 1.0)
+            confidence = Math.min(1.0, Math.abs(prediction) / 10);
+        }
 
         // Clean up tensors
         inputTensor.dispose();
@@ -88,7 +98,7 @@ export async function predict(
 
         return {
             prediction: Number(prediction.toFixed(4)),
-            confidence: Number(confidence.toFixed(4)),
+            confidence: Number(Math.min(1.0, confidence).toFixed(4)), // Cap at 1.0 (100%)
         };
     } catch (error) {
         console.error('❌ Prediction error:', error);
@@ -145,7 +155,7 @@ export async function getFeatureImportance(
     featureNames: string[]
 ): Promise<Record<string, number>> {
     try {
-        // Get base prediction
+        // Get base prediction (without normalization for importance)
         const basePred = await predict(model, baseInputs, false);
 
         const importance: Record<string, number> = {};
@@ -153,13 +163,17 @@ export async function getFeatureImportance(
         // Test each feature by perturbing it
         for (let i = 0; i < baseInputs.length; i++) {
             const perturbedInputs = [...baseInputs];
-            perturbedInputs[i] = perturbedInputs[i] * 1.1; // 10% increase
+
+            // Use larger perturbation (50% increase) for better sensitivity
+            perturbedInputs[i] = perturbedInputs[i] * 1.5;
 
             const perturbedPred = await predict(model, perturbedInputs, false);
 
-            // Calculate impact
+            // Calculate absolute impact (always positive)
             const impact = Math.abs(perturbedPred.prediction - basePred.prediction);
-            importance[featureNames[i]] = Number(impact.toFixed(4));
+
+            // Ensure non-zero importance (minimum threshold)
+            importance[featureNames[i]] = Math.max(0.0001, Number(impact.toFixed(4)));
         }
 
         return importance;
