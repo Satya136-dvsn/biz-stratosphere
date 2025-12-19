@@ -9,7 +9,7 @@ import {
     createRevenueModel,
     getMemoryInfo,
 } from '@/lib/browserML';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseClient';
 
 export interface BrowserMLModel {
     id: string;

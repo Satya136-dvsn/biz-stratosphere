@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import { supabase } from './supabase';
+import { supabase } from './supabaseClient';
 
 // Model metadata interface
 export interface MLModel {
