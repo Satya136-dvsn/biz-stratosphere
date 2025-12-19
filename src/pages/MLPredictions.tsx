@@ -9,10 +9,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useBrowserML } from '@/hooks/useBrowserML';
-import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2, History } from 'lucide-react';
+import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2, History, Upload } from 'lucide-react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
 import { ModelTrainingPanel } from '@/components/ml/ModelTrainingPanel';
 import { PredictionHistory } from '@/components/ml/PredictionHistory';
+import { CSVUploadPanel } from '@/components/ml/CSVUploadPanel';
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -195,14 +196,18 @@ export function MLPredictions() {
             </div>
 
             <Tabs defaultValue="predict" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="predict" className="gap-2">
                         <Brain className="h-4 w-4" />
-                        Make Prediction
+                        Predict
                     </TabsTrigger>
                     <TabsTrigger value="train" className="gap-2">
                         <Zap className="h-4 w-4" />
-                        Train Models
+                        Train
+                    </TabsTrigger>
+                    <TabsTrigger value="upload" className="gap-2">
+                        <Upload className="h-4 w-4" />
+                        Upload CSV
                     </TabsTrigger>
                     <TabsTrigger value="history" className="gap-2">
                         <History className="h-4 w-4" />
@@ -210,7 +215,7 @@ export function MLPredictions() {
                     </TabsTrigger>
                     <TabsTrigger value="models" className="gap-2">
                         <BarChart3 className="h-4 w-4" />
-                        Model Info
+                        Info
                     </TabsTrigger>
                 </TabsList>
 
@@ -377,6 +382,11 @@ export function MLPredictions() {
                 {/* Training Tab */}
                 <TabsContent value="train">
                     <ModelTrainingPanel />
+                </TabsContent>
+
+                {/* Upload CSV Tab */}
+                <TabsContent value="upload">
+                    <CSVUploadPanel />
                 </TabsContent>
 
                 {/* History Tab */}
