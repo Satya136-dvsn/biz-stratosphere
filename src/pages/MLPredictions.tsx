@@ -264,16 +264,21 @@ export function MLPredictions() {
                             <CardContent>
                                 {prediction ? (
                                     <div className="space-y-4">
-                                        {/* Prediction Value */}
-                                        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                                            <div className="text-sm text-muted-foreground mb-1">Prediction</div>
-                                            <div className="text-3xl font-bold text-primary">
-                                                {selectedModel === 'churn_model'
-                                                    ? (prediction.prediction > 0.5 ? 'Will Churn' : 'Will Stay')
-                                                    : `$${(prediction.prediction * 10000).toFixed(0)}`
-                                                }
+                                        {/* Prediction Result */}
+                                        <div className="space-y-2">
+                                            <Label className="text-muted-foreground">Prediction</Label>
+                                            <div className="text-3xl font-bold">
+                                                {selectedModel === 'churn_model' ? (
+                                                    <span className={prediction.prediction > 0.5 ? 'text-red-600' : 'text-green-600'}>
+                                                        {prediction.prediction > 0.5 ? 'Will Churn' : 'Will Stay'}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-blue-600">
+                                                        ${(prediction.prediction * 1000).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                                                    </span>
+                                                )}
                                             </div>
-                                            <div className="text-sm text-muted-foreground mt-1">
+                                            <div className="text-sm text-muted-foreground">
                                                 Raw value: {prediction.prediction.toFixed(4)}
                                             </div>
                                         </div>
