@@ -120,11 +120,42 @@ export function MLPredictions() {
                 modelConfig.features.map(f => f.name)
             );
 
-            setPrediction({
+            const predictionResult = {
                 ...result,
                 feature_importance: importance,
                 cache_hit: false,
-            });
+            };
+
+            setPrediction(predictionResult);
+
+            // Save prediction to database for history
+            try {
+                const { supabase } = await import('@/lib/supabaseClient');
+                const { data: userData } = await supabase.auth.getUser();
+
+                if (userData.user) {
+                    const { error: dbError } = await supabase
+                        .from('ml_predictions')
+                        .insert({
+                            user_id: userData.user.id,
+                            model_id: selectedModel,
+                            inputs: featureValues,
+                            prediction: result.prediction,
+                            confidence: result.confidence || 0,
+                            feature_importance: importance,
+                            cache_hit: false,
+                        });
+
+                    if (dbError) {
+                        console.error('Error saving prediction:', dbError);
+                    } else {
+                        console.log('✅ Prediction saved to history');
+                    }
+                }
+            } catch (dbError) {
+                console.error('Database save error:', dbError);
+            }
+
         } catch (error: any) {
             console.error('Prediction error:', error);
             setPrediction({
