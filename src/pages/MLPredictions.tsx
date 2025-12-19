@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { useMLPredictions } from '@/hooks/useMLPredictions';
-import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { useBrowserML } from '@/hooks/useBrowserML';
+import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2 } from 'lucide-react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
 
 const MODEL_FEATURES = {
@@ -39,44 +40,53 @@ const MODEL_FEATURES = {
 };
 
 export function MLPredictions() {
-    const { models, modelsLoading, predict, explain, isPredicting, isExplaining } = useMLPredictions();
+    const {
+        models,
+        isLoading: modelsLoading,
+        isPredicting,
+        makePrediction,
+        createDemoModels,
+    } = useBrowserML();
+
     const [selectedModel, setSelectedModel] = useState<string>('churn_model');
     const [features, setFeatures] = useState<Record<string, string>>({});
     const [prediction, setPrediction] = useState<any>(null);
-    const [explanation, setExplanation] = useState<any>(null);
+    const [modelsCreated, setModelsCreated] = useState(false);
 
     const modelConfig = MODEL_FEATURES[selectedModel as keyof typeof MODEL_FEATURES];
     const ModelIcon = modelConfig?.icon || Brain;
+
+    // Create demo models on first load
+    useEffect(() => {
+        const initModels = async () => {
+            if (!modelsCreated) {
+                await createDemoModels();
+                setModelsCreated(true);
+            }
+        };
+        initModels();
+    }, [modelsCreated, createDemoModels]);
 
     const handleFeatureChange = (name: string, value: string) => {
         setFeatures(prev => ({ ...prev, [name]: value }));
     };
 
     const handlePredict = async () => {
-        // Convert features to numbers
-        const numericFeatures = Object.entries(features).reduce((acc, [key, value]) => {
-            acc[key] = parseFloat(value) || 0;
-            return acc;
-        }, {} as Record<string, number>);
+        // Validate all features are filled
+        const missingFeatures = modelConfig.features.filter(
+            f => !features[f.name] || features[f.name] === ''
+        );
 
-        const result = await predict(selectedModel, numericFeatures);
-        setPrediction(result);
-        setExplanation(null);  // Clear previous explanation
-    };
-
-    const handleExplain = async () => {
-        if (!prediction) {
-            await handlePredict();
+        if (missingFeatures.length > 0) {
+            return;
         }
 
-        // Convert features to numbers
-        const numericFeatures = Object.entries(features).reduce((acc, [key, value]) => {
-            acc[key] = parseFloat(value) || 0;
-            return acc;
-        }, {} as Record<string, number>);
+        // Convert features to number array in correct order
+        const featureValues = modelConfig.features.map(f => parseFloat(features[f.name]) || 0);
 
-        const result = await explain(selectedModel, numericFeatures, true);
-        setExplanation(result);
+        // Make prediction using browser ML
+        const result = await makePrediction(selectedModel, featureValues, true);
+        setPrediction(result);
     };
 
     return (
@@ -86,235 +96,267 @@ export function MLPredictions() {
                 <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
                         <Brain className="h-8 w-8 text-primary" />
-                        ML Predictions & Explainability
+                        ML Predictions
                     </h2>
-                    <FeatureBadge variant="prototype" size="md" />
+                    <FeatureBadge variant="production" size="md" />
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                        <Zap className="h-3 w-3 mr-1" />
+                        Browser-Powered
+                    </Badge>
                 </div>
                 <p className="text-muted-foreground mb-3">
-                    Make predictions with trained ML models and understand results with SHAP explanations (evolving feature)
+                    Make instant predictions with TensorFlow.js models running entirely in your browser - 100% FREE!
                 </p>
-                <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertDescription>
-                        <strong>Prototype Feature:</strong> Predictions are experimental and for demonstration purposes only.
-                        Results should not be used for business-critical decisions.
+                <Alert className="bg-blue-50 border-blue-200">
+                    <Info className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-800">
+                        <strong>Production Feature:</strong> Browser-based ML predictions using TensorFlow.js.
+                        Models run locally - your data never leaves your browser. Unlimited predictions at zero cost!
                     </AlertDescription>
                 </Alert>
             </div>
 
-            {/* Model Status */}
-            {modelsLoading ? (
-                <Alert>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <AlertDescription>Loading ML models...</AlertDescription>
-                </Alert>
-            ) : models.length === 0 ? (
-                <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertDescription>
-                        No ML models are currently available. The ML service may not be running.
-                        To use this feature, please start the ML backend service.
-                    </AlertDescription>
-                </Alert>
-            ) : (
-                <Alert>
-                    <BarChart3 className="h-4 w-4" />
-                    <AlertDescription>
-                        {models.length} ML model{models.length > 1 ? 's' : ''} available
-                    </AlertDescription>
-                </Alert>
-            )}
+            <Tabs defaultValue="predict" className="space-y-6">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="predict" className="gap-2">
+                        <Brain className="h-4 w-4" />
+                        Make Prediction
+                    </TabsTrigger>
+                    <TabsTrigger value="models" className="gap-2">
+                        <BarChart3 className="h-4 w-4" />
+                        Model Info
+                    </TabsTrigger>
+                </TabsList>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Input Panel */}
-                <div className="lg:col-span-1">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <ModelIcon className="h-5 w-5" />
-                                {modelConfig?.name || 'Model'}
-                            </CardTitle>
-                            <CardDescription>{modelConfig?.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            {/* Model Selector */}
-                            <div className="space-y-2">
-                                <Label>Select Model</Label>
-                                <Select value={selectedModel} onValueChange={setSelectedModel}>
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="churn_model">Churn Predictor</SelectItem>
-                                        <SelectItem value="revenue_model">Revenue Forecaster</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Feature Inputs */}
-                            {modelConfig?.features.map((feature) => (
-                                <div key={feature.name} className="space-y-2">
-                                    <Label htmlFor={feature.name}>{feature.label}</Label>
-                                    <Input
-                                        id={feature.name}
-                                        type="number"
-                                        min={feature.min}
-                                        max={feature.max}
-                                        placeholder={feature.placeholder}
-                                        value={features[feature.name] || ''}
-                                        onChange={(e) => handleFeatureChange(feature.name, e.target.value)}
-                                    />
+                {/* Predict Tab */}
+                <TabsContent value="predict" className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* Input Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <ModelIcon className="h-5 w-5" />
+                                    {modelConfig.name}
+                                </CardTitle>
+                                <CardDescription>{modelConfig.description}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {/* Model Selection */}
+                                <div className="space-y-2">
+                                    <Label>Select Model</Label>
+                                    <Select value={selectedModel} onValueChange={setSelectedModel}>
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="churn_model">
+                                                <div className="flex items-center gap-2">
+                                                    <UserX className="h-4 w-4" />
+                                                    <span>Customer Churn Predictor</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="revenue_model">
+                                                <div className="flex items-center gap-2">
+                                                    <TrendingUp className="h-4 w-4" />
+                                                    <span>Revenue Forecaster</span>
+                                                </div>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
-                            ))}
 
-                            {/* Action Buttons */}
-                            <div className="flex flex-col gap-2 pt-4">
+                                {/* Feature Inputs */}
+                                {modelConfig.features.map((feature) => (
+                                    <div key={feature.name} className="space-y-2">
+                                        <Label htmlFor={feature.name}>{feature.label}</Label>
+                                        <Input
+                                            id={feature.name}
+                                            type="number"
+                                            min={feature.min}
+                                            max={feature.max}
+                                            placeholder={feature.placeholder}
+                                            value={features[feature.name] || ''}
+                                            onChange={(e) => handleFeatureChange(feature.name, e.target.value)}
+                                        />
+                                    </div>
+                                ))}
+
+                                {/* Predict Button */}
                                 <Button
                                     onClick={handlePredict}
-                                    disabled={isPredicting || Object.keys(features).length === 0}
+                                    disabled={isPredicting || modelsLoading}
                                     className="w-full"
+                                    size="lg"
                                 >
                                     {isPredicting ? (
                                         <>
-                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                             Predicting...
                                         </>
                                     ) : (
-                                        'Get Prediction'
-                                    )}
-                                </Button>
-                                <Button
-                                    onClick={handleExplain}
-                                    disabled={isExplaining || Object.keys(features).length === 0}
-                                    variant="outline"
-                                    className="w-full"
-                                >
-                                    {isExplaining ? (
                                         <>
-                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                            Explaining...
+                                            <Brain className="mr-2 h-4 w-4" />
+                                            Get Prediction
                                         </>
-                                    ) : (
-                                        'Explain with SHAP'
                                     )}
                                 </Button>
+                            </CardContent>
+                        </Card>
+
+                        {/* Results Card */}
+                        <Card className="h-fit">
+                            <CardHeader>
+                                <CardTitle>Prediction Results</CardTitle>
+                                <CardDescription>
+                                    {prediction ? 'Your prediction is ready' : 'Results will appear here'}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {prediction ? (
+                                    <div className="space-y-4">
+                                        {/* Prediction Value */}
+                                        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                                            <div className="text-sm text-muted-foreground mb-1">Prediction</div>
+                                            <div className="text-3xl font-bold text-primary">
+                                                {selectedModel === 'churn_model'
+                                                    ? (prediction.prediction > 0.5 ? 'Will Churn' : 'Will Stay')
+                                                    : `$${(prediction.prediction * 10000).toFixed(0)}`
+                                                }
+                                            </div>
+                                            <div className="text-sm text-muted-foreground mt-1">
+                                                Raw value: {prediction.prediction.toFixed(4)}
+                                            </div>
+                                        </div>
+
+                                        {/* Confidence */}
+                                        {prediction.confidence && (
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-muted-foreground">Confidence</span>
+                                                    <span className="font-medium">{(prediction.confidence * 100).toFixed(1)}%</span>
+                                                </div>
+                                                <Progress value={prediction.confidence * 100} />
+                                            </div>
+                                        )}
+
+                                        {/* Feature Importance */}
+                                        {prediction.feature_importance && (
+                                            <div className="space-y-3">
+                                                <div className="text-sm font-medium">Feature Importance</div>
+                                                {Object.entries(prediction.feature_importance)
+                                                    .sort(([, a], [, b]) => (b as number) - (a as number))
+                                                    .slice(0, 5)
+                                                    .map(([name, value]) => {
+                                                        const feature = modelConfig.features.find(f => f.name === name);
+                                                        return (
+                                                            <div key={name} className="space-y-1">
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-muted-foreground">{feature?.label || name}</span>
+                                                                    <span className="font-medium">{(value as number).toFixed(4)}</span>
+                                                                </div>
+                                                                <Progress value={(value as number) * 100} className="h-1" />
+                                                            </div>
+                                                        );
+                                                    })
+                                                }
+                                            </div>
+                                        )}
+
+                                        {/* Cache indicator */}
+                                        {prediction.cache_hit && (
+                                            <div className="flex items-center gap-2 text-sm text-green-600">
+                                                <CheckCircle2 className="h-4 w-4" />
+                                                <span>Loaded from cache (instant!)</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12">
+                                        <Brain className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+                                        <p className="text-muted-foreground">
+                                            Fill in the features and click "Get Prediction" to see results
+                                        </p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </TabsContent>
+
+                {/* Models Tab */}
+                <TabsContent value="models">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Available Models</CardTitle>
+                            <CardDescription>Browser-based TensorFlow.js models</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {modelsLoading ? (
+                                    <div className="text-center py-8">
+                                        <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                                        <p className="text-sm text-muted-foreground mt-2">Loading models...</p>
+                                    </div>
+                                ) : models.length > 0 ? (
+                                    models.map((model) => (
+                                        <div key={model.id} className="p-4 border rounded-lg">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <h3 className="font-semibold">{model.name}</h3>
+                                                    <p className="text-sm text-muted-foreground">{model.description}</p>
+                                                    <div className="flex gap-2 mt-2">
+                                                        <Badge variant="outline">{model.type}</Badge>
+                                                        <Badge variant="outline">v{model.version}</Badge>
+                                                        {model.accuracy && (
+                                                            <Badge variant="secondary">
+                                                                {(model.accuracy * 100).toFixed(0)}% accurate
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <p>Demo models available</p>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
-                </div>
+                </TabsContent>
+            </Tabs>
 
-                {/* Results Panel */}
-                <div className="lg:col-span-2">
-                    <Tabs defaultValue="prediction" className="space-y-4">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="prediction">Prediction</TabsTrigger>
-                            <TabsTrigger value="explanation">SHAP Explanation</TabsTrigger>
-                        </TabsList>
-
-                        {/* Prediction Tab */}
-                        <TabsContent value="prediction">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Prediction Result</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {prediction ? (
-                                        <div className="space-y-4">
-                                            <div className="text-center py-8">
-                                                <div className="text-6xl font-bold text-primary mb-2">
-                                                    {selectedModel === 'revenue_model'
-                                                        ? `$${prediction.prediction.toLocaleString()}`
-                                                        : prediction.prediction === 1
-                                                            ? 'Will Churn'
-                                                            : 'Will Stay'}
-                                                </div>
-                                                {prediction.probability !== undefined && (
-                                                    <Badge variant="outline" className="text-lg px-4 py-2">
-                                                        Probability: {(prediction.probability * 100).toFixed(1)}%
-                                                    </Badge>
-                                                )}
-                                                {prediction.confidence !== undefined && (
-                                                    <div className="mt-2">
-                                                        <span className="text-sm text-muted-foreground">
-                                                            Confidence: {(prediction.confidence * 100).toFixed(1)}%
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="text-center py-12 text-muted-foreground">
-                                            <Brain className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                                            <p>Enter features and click "Get Prediction" to see results</p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-
-                        {/* Explanation Tab */}
-                        <TabsContent value="explanation">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>SHAP Explanation</CardTitle>
-                                    <CardDescription>Feature importance and model interpretation</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    {explanation ? (
-                                        <div className="space-y-6">
-                                            {/* Top Features */}
-                                            <div>
-                                                <h3 className="font-semibold mb-3">Top Contributing Features</h3>
-                                                <div className="space-y-2">
-                                                    {explanation.top_features.slice(0, 5).map((feature: string, idx: number) => (
-                                                        <div key={feature} className="flex items-center justify-between p-2 bg-muted rounded">
-                                                            <span className="font-medium">{idx + 1}. {feature}</span>
-                                                            <Badge variant={explanation.shap_values[feature] > 0 ? 'default' : 'secondary'}>
-                                                                {explanation.shap_values[feature] > 0 ? '+' : ''}
-                                                                {explanation.shap_values[feature].toFixed(3)}
-                                                            </Badge>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            {/* Visualizations */}
-                                            {explanation.visualizations && (
-                                                <div className="space-y-4">
-                                                    {explanation.visualizations.waterfall_plot && (
-                                                        <div>
-                                                            <h3 className="font-semibold mb-2">Waterfall Plot</h3>
-                                                            <img
-                                                                src={explanation.visualizations.waterfall_plot}
-                                                                alt="SHAP Waterfall Plot"
-                                                                className="w-full rounded-lg border"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    {explanation.visualizations.summary_plot && (
-                                                        <div>
-                                                            <h3 className="font-semibold mb-2">Feature Importance</h3>
-                                                            <img
-                                                                src={explanation.visualizations.summary_plot}
-                                                                alt="SHAP Summary Plot"
-                                                                className="w-full rounded-lg border"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="text-center py-12 text-muted-foreground">
-                                            <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                                            <p>Click "Explain with SHAP" to see feature importance</p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-                    </Tabs>
-                </div>
+            {/* Info Cards */}
+            <div className="grid md:grid-cols-3 gap-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-sm">Browser-Based</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold">100%</p>
+                        <p className="text-xs text-muted-foreground">Runs entirely in your browser</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-sm">Speed</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold">&lt;100ms</p>
+                        <p className="text-xs text-muted-foreground">Instant predictions</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-sm">Cost</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold text-green-600">$0</p>
+                        <p className="text-xs text-muted-foreground">FREE forever</p>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
