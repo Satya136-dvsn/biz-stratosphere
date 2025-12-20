@@ -33,8 +33,8 @@ export async function trainChurnModel(
     const xs = tf.tensor2d(trainingData.map(d => d.features));
     const ys = tf.tensor2d(trainingData.map(d => [d.label]));
 
-    // Training configuration
-    const epochs = 50;
+    // Training configuration - increased epochs for advanced model
+    const epochs = 100;
     let finalLoss = 0;
     let finalAccuracy = 0;
 
@@ -100,8 +100,8 @@ export async function trainRevenueModel(
     const xs = tf.tensor2d(trainingData.map(d => d.features));
     const ys = tf.tensor2d(trainingData.map(d => [d.label]));
 
-    // Training configuration
-    const epochs = 50;
+    // Training configuration - increased epochs for advanced model
+    const epochs = 100;
     let finalLoss = 0;
 
     try {
