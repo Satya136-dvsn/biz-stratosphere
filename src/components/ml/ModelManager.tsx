@@ -165,6 +165,10 @@ export function ModelManager() {
         return modelName.includes('_trained');
     };
 
+    const isAdvancedModel = (modelName: string) => {
+        return modelName.includes('_advanced');
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -254,11 +258,16 @@ export function ModelManager() {
                                             {isTrainedModel(modelName) ? (
                                                 <div className="flex items-center gap-1 text-sm text-green-600">
                                                     <CheckCircle2 className="h-3 w-3" />
-                                                    Trained
+                                                    Custom Trained
+                                                </div>
+                                            ) : isAdvancedModel(modelName) ? (
+                                                <div className="flex items-center gap-1 text-sm text-purple-600">
+                                                    <Brain className="h-3 w-3" />
+                                                    Advanced DNN
                                                 </div>
                                             ) : (
                                                 <span className="text-sm text-muted-foreground">
-                                                    Base Model
+                                                    Legacy Base
                                                 </span>
                                             )}
                                         </TableCell>

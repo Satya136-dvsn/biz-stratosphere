@@ -6,8 +6,6 @@ import { initializeAnalytics, trackWebVitals } from "./lib/analytics";
 import { initializeErrorTracking } from "./lib/errorTracking";
 
 // ⬇️ import the test function
-import { testConnection } from './testsupabase';
-
 // Initialize analytics and monitoring
 initializeAnalytics();
 initializeErrorTracking();
@@ -22,6 +20,3 @@ createRoot(document.getElementById("root")!).render(
         </HelmetProvider>
     </StrictMode>
 );
-
-// ⬇️ run test once when app loads
-testConnection();

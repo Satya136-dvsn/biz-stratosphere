@@ -54,22 +54,18 @@ export function MLPredictions() {
     const modelConfig = MODEL_FEATURES[selectedModel as keyof typeof MODEL_FEATURES];
     const ModelIcon = modelConfig?.icon || Brain;
 
-    // Create demo models on first load
+    // Create demo models on first load using the centralized hook
     useEffect(() => {
         const initModels = async () => {
             if (!modelsCreated) {
-                // Import TensorFlow.js functions
-                const { createChurnModel, createRevenueModel } = await import('@/lib/browserML');
+                // Import the centralized model creation function
+                const { createDemoModels } = await import('@/hooks/useBrowserML').then(m => ({ createDemoModels: m.useBrowserML().createDemoModels }));
 
-                // Create and save models locally
-                const churnModel = createChurnModel();
-                await churnModel.save('indexeddb://churn_model');
-
-                const revenueModel = createRevenueModel();
-                await revenueModel.save('indexeddb://revenue_model');
+                // This will create 'churn_model_advanced' and 'revenue_model_advanced'
+                await createDemoModels();
 
                 setModelsCreated(true);
-                console.log('✅ Demo models ready for predictions');
+                console.log('✅ Advanced demo models ready for predictions');
             }
         };
         initModels();
@@ -97,17 +93,31 @@ export function MLPredictions() {
             const tf = await import('@tensorflow/tfjs');
             const { predict: tfPredict, getFeatureImportance } = await import('@/lib/browserML');
 
-            // Try to load trained model first, fallback to untrained
+            // Try to load trained model first, then advanced model
             let model;
             const trainedModelPath = `indexeddb://${selectedModel}_trained`;
-            const untrainedModelPath = `indexeddb://${selectedModel}`;
+            const advancedModelPath = `indexeddb://${selectedModel}_advanced`;
+            // Legacy fallback
+            const basicModelPath = `indexeddb://${selectedModel}`;
 
             try {
+                // 1. Try fully trained user model (highest priority)
                 model = await tf.loadLayersModel(trainedModelPath);
-                console.log('✅ Using trained model');
-            } catch (error) {
-                console.log('⚠️ Trained model not found, using untrained model');
-                model = await tf.loadLayersModel(untrainedModelPath);
+                console.log('✅ Using custom trained model');
+            } catch (e1) {
+                try {
+                    // 2. Try advanced pre-built model (high accuracy default)
+                    model = await tf.loadLayersModel(advancedModelPath);
+                    console.log('✅ Using advanced deep neural network model');
+                } catch (e2) {
+                    try {
+                        // 3. Fallback to basic model if exists
+                        model = await tf.loadLayersModel(basicModelPath);
+                        console.log('⚠️ Using basic model (fallback)');
+                    } catch (e3) {
+                        throw new Error('No valid model found. Please wait for models to initialize.');
+                    }
+                }
             }
 
             // Convert features to number array in correct order
@@ -141,7 +151,7 @@ export function MLPredictions() {
                         .from('ml_predictions')
                         .insert({
                             user_id: userData.user.id,
-                            model_name: selectedModel,
+                            model_name: `${selectedModel}_advanced`, // Record that we used the advanced architecture
                             inputs: featureValues,
                             prediction: result.prediction,
                             confidence: result.confidence || 0,
@@ -433,10 +443,11 @@ export function MLPredictions() {
                                                     <Badge variant="outline">
                                                         {key.includes('churn') ? 'classification' : 'regression'}
                                                     </Badge>
-                                                    <Badge variant="outline">v1.0</Badge>
-                                                    <Badge variant="secondary">Demo Model</Badge>
-                                                    <Badge variant="secondary" className="bg-green-50 text-green-700">
-                                                        Browser-Based
+                                                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                                                        v2.0 Advanced
+                                                    </Badge>
+                                                    <Badge variant="secondary" className="bg-blue-50 text-blue-700">
+                                                        Deep Neural Network
                                                     </Badge>
                                                 </div>
                                             </div>

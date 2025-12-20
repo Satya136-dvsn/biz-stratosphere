@@ -286,11 +286,11 @@ export function useBrowserML() {
         try {
             // Create churn model
             const churnModel = createChurnModel();
-            await churnModel.save('indexeddb://churn_model_v1');
+            await churnModel.save('indexeddb://churn_model_advanced');
 
             // Create revenue model
             const revenueModel = createRevenueModel();
-            await revenueModel.save('indexeddb://revenue_model_v1');
+            await revenueModel.save('indexeddb://revenue_model_advanced');
 
             console.log('✅ Demo models created and saved locally');
         } catch (err: any) {

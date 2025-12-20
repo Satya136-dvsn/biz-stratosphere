@@ -10,12 +10,38 @@ import { useAPIKeys } from '@/hooks/useAPIKeys';
 import { useToast } from '@/hooks/use-toast';
 import { PageLayout } from '@/components/layout/PageLayout';
 
-function APIManagement({ workspaceId }: { workspaceId: string }) {
-    const { apiKeys, createAPIKey, revokeAPIKey, deleteAPIKey } = useAPIKeys(workspaceId);
+import { useWorkspaces } from '@/hooks/useWorkspaces';
+
+function APIManagement({ workspaceId }: { workspaceId?: string }) {
+    const { workspaces, isLoading: isLoadingWorkspaces } = useWorkspaces();
+    const activeWorkspaceId = workspaceId || workspaces[0]?.id;
+
+    // We can't call useAPIKeys conditionally, but we can pass a dummy ID or skip query if empty.
+    // However, useAPIKeys hook likely depends on the ID.
+    // Let's assume useAPIKeys handles null/undefined or we pass a safe fallback.
+    // Looking at the file content, useAPIKeys takes a string.
+
+    // Standard pattern: Only run logic if we have an ID
+    const { apiKeys, createAPIKey, revokeAPIKey, deleteAPIKey } = useAPIKeys(activeWorkspaceId || '');
+
     const { toast } = useToast();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newKeyName, setNewKeyName] = useState('');
     const [createdKey, setCreatedKey] = useState<string | null>(null);
+
+    if (isLoadingWorkspaces) {
+        return <div className="p-8 text-center">Loading workspace...</div>;
+    }
+
+    if (!activeWorkspaceId) {
+        return (
+            <PageLayout>
+                <div className="p-8 text-center text-muted-foreground">
+                    No workspace found. Please create a workspace first.
+                </div>
+            </PageLayout>
+        );
+    }
 
     const handleCreate = async () => {
         createAPIKey.mutate(
