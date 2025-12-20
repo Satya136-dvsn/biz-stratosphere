@@ -87,29 +87,58 @@ export function parseChurnCSV(csvText: string): CSVParseResult {
                 const featureUsage = parseFloat(values[indices.feature_usage_pct]);
                 const churned = parseFloat(values[indices.churned]);
 
-                // Validate ranges
-                if (isNaN(usageFreq) || usageFreq < 0 || usageFreq > 100) {
-                    errors.push(`Row ${i + 1}: usage_frequency must be 0-100`);
+                // Validate ranges with specific error messages
+                if (isNaN(usageFreq)) {
+                    errors.push(`Row ${i + 1}: usage_frequency must be a number (got: "${values[indices.usage_frequency]}")`);
                     continue;
                 }
-                if (isNaN(supportTickets) || supportTickets < 0) {
-                    errors.push(`Row ${i + 1}: support_tickets must be >= 0`);
+                if (usageFreq < 0 || usageFreq > 100) {
+                    errors.push(`Row ${i + 1}: usage_frequency must be 0-100 (got: ${usageFreq})`);
                     continue;
                 }
-                if (isNaN(tenureMonths) || tenureMonths < 0) {
-                    errors.push(`Row ${i + 1}: tenure_months must be >= 0`);
+
+                if (isNaN(supportTickets)) {
+                    errors.push(`Row ${i + 1}: support_tickets must be a number (got: "${values[indices.support_tickets]}")`);
                     continue;
                 }
-                if (isNaN(monthlySpend) || monthlySpend < 0) {
-                    errors.push(`Row ${i + 1}: monthly_spend must be >= 0`);
+                if (supportTickets < 0) {
+                    errors.push(`Row ${i + 1}: support_tickets must be >= 0 (got: ${supportTickets})`);
                     continue;
                 }
-                if (isNaN(featureUsage) || featureUsage < 0 || featureUsage > 100) {
-                    errors.push(`Row ${i + 1}: feature_usage_pct must be 0-100`);
+
+                if (isNaN(tenureMonths)) {
+                    errors.push(`Row ${i + 1}: tenure_months must be a number (got: "${values[indices.tenure_months]}")`);
                     continue;
                 }
-                if (isNaN(churned) || (churned !== 0 && churned !== 1)) {
-                    errors.push(`Row ${i + 1}: churned must be 0 or 1`);
+                if (tenureMonths < 0) {
+                    errors.push(`Row ${i + 1}: tenure_months must be >= 0 (got: ${tenureMonths})`);
+                    continue;
+                }
+
+                if (isNaN(monthlySpend)) {
+                    errors.push(`Row ${i + 1}: monthly_spend must be a number (got: "${values[indices.monthly_spend]}")`);
+                    continue;
+                }
+                if (monthlySpend < 0) {
+                    errors.push(`Row ${i + 1}: monthly_spend must be >= 0 (got: ${monthlySpend})`);
+                    continue;
+                }
+
+                if (isNaN(featureUsage)) {
+                    errors.push(`Row ${i + 1}: feature_usage_pct must be a number (got: "${values[indices.feature_usage_pct]}")`);
+                    continue;
+                }
+                if (featureUsage < 0 || featureUsage > 100) {
+                    errors.push(`Row ${i + 1}: feature_usage_pct must be 0-100 (got: ${featureUsage})`);
+                    continue;
+                }
+
+                if (isNaN(churned)) {
+                    errors.push(`Row ${i + 1}: churned must be 0 or 1 (got: "${values[indices.churned]}")`);
+                    continue;
+                }
+                if (churned !== 0 && churned !== 1) {
+                    errors.push(`Row ${i + 1}: churned must be exactly 0 (stayed) or 1 (churned) (got: ${churned})`);
                     continue;
                 }
 
@@ -118,7 +147,7 @@ export function parseChurnCSV(csvText: string): CSVParseResult {
                     label: churned,
                 });
             } catch (error) {
-                errors.push(`Row ${i + 1}: Invalid data format`);
+                errors.push(`Row ${i + 1}: Failed to parse row - check all values are numbers in correct format`);
             }
         }
 
@@ -201,36 +230,61 @@ export function parseRevenueCSV(csvText: string): CSVParseResult {
             }
 
             try {
-                const numCustomers = parseFloat(values[indices.num_customers]);
+                const num_customers = parseFloat(values[indices.num_customers]);
                 const avgDealSize = parseFloat(values[indices.avg_deal_size]);
                 const marketingSpend = parseFloat(values[indices.marketing_spend]);
                 const salesTeamSize = parseFloat(values[indices.sales_team_size]);
                 const marketGrowth = parseFloat(values[indices.market_growth_pct]);
                 const revenue = parseFloat(values[indices.revenue]);
 
-                // Validate data
-                if (isNaN(numCustomers) || numCustomers < 0) {
-                    errors.push(`Row ${i + 1}: num_customers must be >= 0`);
+                // Validate data with specific error messages
+                if (isNaN(numCustomers)) {
+                    errors.push(`Row ${i + 1}: num_customers must be a number (got: "${values[indices.num_customers]}")`);
                     continue;
                 }
-                if (isNaN(avgDealSize) || avgDealSize < 0) {
-                    errors.push(`Row ${i + 1}: avg_deal_size must be >= 0`);
+                if (numCustomers < 0) {
+                    errors.push(`Row ${i + 1}: num_customers must be >= 0 (got: ${numCustomers})`);
                     continue;
                 }
-                if (isNaN(marketingSpend) || marketingSpend < 0) {
-                    errors.push(`Row ${i + 1}: marketing_spend must be >= 0`);
+
+                if (isNaN(avgDealSize)) {
+                    errors.push(`Row ${i + 1}: avg_deal_size must be a number (got: "${values[indices.avg_deal_size]}")`);
                     continue;
                 }
-                if (isNaN(salesTeamSize) || salesTeamSize < 0) {
-                    errors.push(`Row ${i + 1}: sales_team_size must be >= 0`);
+                if (avgDealSize < 0) {
+                    errors.push(`Row ${i + 1}: avg_deal_size must be >= 0 (got: ${avgDealSize})`);
                     continue;
                 }
+
+                if (isNaN(marketingSpend)) {
+                    errors.push(`Row ${i + 1}: marketing_spend must be a number (got: "${values[indices.marketing_spend]}")`);
+                    continue;
+                }
+                if (marketingSpend < 0) {
+                    errors.push(`Row ${i + 1}: marketing_spend must be >= 0 (got: ${marketingSpend})`);
+                    continue;
+                }
+
+                if (isNaN(salesTeamSize)) {
+                    errors.push(`Row ${i + 1}: sales_team_size must be a number (got: "${values[indices.sales_team_size]}")`);
+                    continue;
+                }
+                if (salesTeamSize < 0) {
+                    errors.push(`Row ${i + 1}: sales_team_size must be >= 0 (got: ${salesTeamSize})`);
+                    continue;
+                }
+
                 if (isNaN(marketGrowth)) {
-                    errors.push(`Row ${i + 1}: market_growth_pct must be a number`);
+                    errors.push(`Row ${i + 1}: market_growth_pct must be a number (got: "${values[indices.market_growth_pct]}")`);
                     continue;
                 }
-                if (isNaN(revenue) || revenue < 0) {
-                    errors.push(`Row ${i + 1}: revenue must be >= 0`);
+
+                if (isNaN(revenue)) {
+                    errors.push(`Row ${i + 1}: revenue must be a number (got: "${values[indices.revenue]}")`);
+                    continue;
+                }
+                if (revenue < 0) {
+                    errors.push(`Row ${i + 1}: revenue must be >= 0 (got: ${revenue})`);
                     continue;
                 }
 
@@ -242,7 +296,7 @@ export function parseRevenueCSV(csvText: string): CSVParseResult {
                     label: revenueInThousands,
                 });
             } catch (error) {
-                errors.push(`Row ${i + 1}: Invalid data format`);
+                errors.push(`Row ${i + 1}: Failed to parse row - check all values are numbers in correct format`);
             }
         }
 
