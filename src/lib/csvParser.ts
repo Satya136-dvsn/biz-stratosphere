@@ -230,7 +230,7 @@ export function parseRevenueCSV(csvText: string): CSVParseResult {
             }
 
             try {
-                const num_customers = parseFloat(values[indices.num_customers]);
+                const numCustomers = parseFloat(values[indices.num_customers]);
                 const avgDealSize = parseFloat(values[indices.avg_deal_size]);
                 const marketingSpend = parseFloat(values[indices.marketing_spend]);
                 const salesTeamSize = parseFloat(values[indices.sales_team_size]);

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, History, Trash2, Eye, Filter, TrendingUp, UserX } from 'lucide-react';
+import { Loader2, History, Trash2, Eye, Filter, TrendingUp, UserX, Download } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/hooks/use-toast';
 import { PredictionDetailsModal } from './PredictionDetailsModal';
@@ -139,6 +139,50 @@ export function PredictionHistory() {
         );
     };
 
+    const handleExportCSV = () => {
+        if (predictions.length === 0) {
+            toast({
+                title: 'No Data',
+                description: 'No predictions to export',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        // Create CSV content
+        const headers = ['Date', 'Model', 'Prediction', 'Confidence', 'Inputs'];
+        const rows = predictions.map(pred => {
+            const isChurn = pred.inputs.length === 5 && pred.prediction <= 1;
+            const modelType = isChurn ? 'Churn' : 'Revenue';
+            const predictionValue = formatPrediction(pred);
+            const confidence = (pred.confidence * 100).toFixed(1) + '%';
+            const inputs = pred.inputs.join('; ');
+            const date = formatDate(pred.created_at);
+
+            return [date, modelType, predictionValue, confidence, inputs];
+        });
+
+        // Build CSV string
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+        ].join('\n');
+
+        // Create download
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `prediction_history_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        toast({
+            title: 'Exported',
+            description: `Exported ${predictions.length} predictions to CSV`,
+        });
+    };
+
     return (
         <>
             <Card>
@@ -152,6 +196,15 @@ export function PredictionHistory() {
                             <CardDescription>View and manage your past predictions</CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleExportCSV}
+                                disabled={predictions.length === 0}
+                            >
+                                <Download className="h-4 w-4 mr-2" />
+                                Export CSV
+                            </Button>
                             <Filter className="h-4 w-4 text-muted-foreground" />
                             <Select value={filter} onValueChange={(value: any) => setFilter(value)}>
                                 <SelectTrigger className="w-[140px]">
