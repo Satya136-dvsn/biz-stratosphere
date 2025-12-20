@@ -15,6 +15,7 @@ import { ModelTrainingPanel } from '@/components/ml/ModelTrainingPanel';
 import { PredictionHistory } from '@/components/ml/PredictionHistory';
 import { CSVUploadPanel } from '@/components/ml/CSVUploadPanel';
 import { ModelManager } from '@/components/ml/ModelManager';
+import { BatchPredictionPanel } from '@/components/ml/BatchPredictionPanel';
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -396,6 +397,11 @@ export function MLPredictions() {
                 {/* Upload CSV Tab */}
                 <TabsContent value="upload">
                     <CSVUploadPanel />
+                </TabsContent>
+
+                {/* Batch Predictions Tab */}
+                <TabsContent value="batch">
+                    <BatchPredictionPanel />
                 </TabsContent>
 
                 {/* History Tab */}

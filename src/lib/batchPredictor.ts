@@ -98,7 +98,7 @@ export function formatBatchResultsCSV(
         ...featureNames,
         'prediction',
         'confidence',
-        ...rawScore'
+        'raw_score'
     ];
 
     const rows = results.map(result => {
@@ -108,7 +108,7 @@ export function formatBatchResultsCSV(
         if (isChurnModel) {
             predictionStr = result.prediction > 0.5 ? 'Will Churn' : 'Will Stay';
         } else {
-            pr predictionStr = (result.prediction * 1000).toFixed(2); // Revenue in thousands, then convert display
+            predictionStr = (result.prediction * 1000).toFixed(2);
         }
 
         const confidenceStr = (result.confidence * 100).toFixed(1) + '%';
