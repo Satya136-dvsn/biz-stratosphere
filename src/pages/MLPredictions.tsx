@@ -197,28 +197,32 @@ export function MLPredictions() {
             </div>
 
             <Tabs defaultValue="predict" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-6">
-                    <TabsTrigger value="predict" className="gap-2">
+                <TabsList className="grid w-full grid-cols-7 text-sm">
+                    <TabsTrigger value="predict" className="gap-1.5">
                         <Brain className="h-4 w-4" />
                         Predict
                     </TabsTrigger>
-                    <TabsTrigger value="train" className="gap-2">
+                    <TabsTrigger value="train" className="gap-1.5">
                         <Zap className="h-4 w-4" />
                         Train
                     </TabsTrigger>
-                    <TabsTrigger value="upload" className="gap-2">
+                    <TabsTrigger value="upload" className="gap-1.5">
                         <Upload className="h-4 w-4" />
-                        Upload CSV
+                        CSV
                     </TabsTrigger>
-                    <TabsTrigger value="history" className="gap-2">
+                    <TabsTrigger value="batch" className="gap-1.5">
+                        <Zap className="h-4 w-4" />
+                        Batch
+                    </TabsTrigger>
+                    <TabsTrigger value="history" className="gap-1.5">
                         <History className="h-4 w-4" />
                         History
                     </TabsTrigger>
-                    <TabsTrigger value="models" className="gap-2">
+                    <TabsTrigger value="models" className="gap-1.5">
                         <Package className="h-4 w-4" />
                         Models
                     </TabsTrigger>
-                    <TabsTrigger value="info" className="gap-2">
+                    <TabsTrigger value="info" className="gap-1.5">
                         <BarChart3 className="h-4 w-4" />
                         Info
                     </TabsTrigger>
