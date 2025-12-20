@@ -9,11 +9,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useBrowserML } from '@/hooks/useBrowserML';
-import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2, History, Upload } from 'lucide-react';
+import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2, History, Upload, Package } from 'lucide-react';
 import { FeatureBadge } from '@/components/ui/FeatureBadge';
 import { ModelTrainingPanel } from '@/components/ml/ModelTrainingPanel';
 import { PredictionHistory } from '@/components/ml/PredictionHistory';
 import { CSVUploadPanel } from '@/components/ml/CSVUploadPanel';
+import { ModelManager } from '@/components/ml/ModelManager';
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -196,7 +197,7 @@ export function MLPredictions() {
             </div>
 
             <Tabs defaultValue="predict" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-6">
                     <TabsTrigger value="predict" className="gap-2">
                         <Brain className="h-4 w-4" />
                         Predict
@@ -214,6 +215,10 @@ export function MLPredictions() {
                         History
                     </TabsTrigger>
                     <TabsTrigger value="models" className="gap-2">
+                        <Package className="h-4 w-4" />
+                        Models
+                    </TabsTrigger>
+                    <TabsTrigger value="info" className="gap-2">
                         <BarChart3 className="h-4 w-4" />
                         Info
                     </TabsTrigger>
@@ -396,6 +401,11 @@ export function MLPredictions() {
 
                 {/* Models Tab */}
                 <TabsContent value="models">
+                    <ModelManager />
+                </TabsContent>
+
+                {/* Info Tab */}
+                <TabsContent value="info">
                     <Card>
                         <CardHeader>
                             <CardTitle>Available Models</CardTitle>
