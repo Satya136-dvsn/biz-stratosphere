@@ -2,7 +2,47 @@
 
 **AI-Powered Business Intelligence & Analytics Platform**
 
-An enterprise-grade analytics platform that combines business intelligence, machine learning, and AI-powered insights to help organizations make data-driven decisions.
+A modern, serverless analytics platform that empowers businesses with AI-driven insights, real-time predictions, and comprehensive data visualization - all at **$0/month operational cost**.
+
+---
+
+## 📖 What is Biz Stratosphere?
+
+**Biz Stratosphere** is an enterprise-grade business intelligence platform designed to democratize data analytics and machine learning for businesses of all sizes. Unlike traditional BI tools that require expensive infrastructure and complex setup, Biz Stratosphere leverages modern serverless technologies to deliver powerful analytics capabilities with zero operational costs.
+
+### 🎯 What Does It Do?
+
+Biz Stratosphere provides a complete suite of business intelligence and AI capabilities:
+
+1. **📊 Visualize Your Data** - Upload CSV/Excel files and instantly create interactive dashboards with 8+ chart types (Bar, Line, Pie, Scatter, Radar, Treemap, Gauge, Funnel)
+
+2. **🤖 AI-Powered Predictions** - Run machine learning models directly in your browser:
+   - Predict customer churn before it happens
+   - Forecast revenue based on business metrics
+   - Train custom models with your own data
+   - All processing happens client-side (100% private and free)
+
+3. **💬 Chat with Your Data** - Ask questions about your business in plain English using our RAG-powered AI assistant
+
+4. **📈 Generate Reports** - Create professional reports in PDF, Excel, or CSV formats with automatic insights
+
+5. **🔧 Build with APIs** - Integrate analytics into your own applications using our RESTful API
+
+### 👥 Who Is It For?
+
+- **Small Businesses** - Get enterprise-grade analytics without enterprise costs
+- **Data Analysts** - Quickly prototype and share insights with stakeholders
+- **Developers** - Build data-driven applications with our API
+- **Product Teams** - Track KPIs and make data-informed decisions
+- **Startups** - Scale from zero to production without infrastructure costs
+
+### 💡 Why Choose Biz Stratosphere?
+
+- ✅ **Zero Operational Costs** - Serverless architecture means $0/month baseline
+- ✅ **Privacy-First** - ML models run in your browser, data never leaves
+- ✅ **No Setup Required** - Sign up and start analyzing in minutes
+- ✅ **Production-Ready** - Enterprise-grade security and performance
+- ✅ **Fully Open Source** - Customize and self-host if needed
 
 ---
 
@@ -91,7 +131,161 @@ An enterprise-grade analytics platform that combines business intelligence, mach
 
 ---
 
-## 🚀 Quick Start
+## 🎓 How to Use Biz Stratosphere
+
+### Getting Started in 5 Minutes
+
+1. **Sign Up** - Visit the platform and create a free account
+2. **Upload Data** - Go to the Data Upload page and upload your first CSV/Excel file
+3. **Explore Dashboard** - Navigate to the Analytics Dashboard to see your data visualized
+4. **Make Predictions** - Visit ML Predictions to forecast churn or revenue
+5. **Chat with AI** - Ask questions about your data using the AI Assistant
+
+### 📊 Using the Analytics Dashboard
+
+**Step 1: Upload Your Data**
+
+- Navigate to **Data Upload** from the sidebar
+- Click "Upload File" and select your CSV or Excel file
+- The system automatically analyzes data quality and detects any issues
+- Your data is now available across all features
+
+**Step 2: Create Visualizations**
+
+- Go to **Analytics Dashboard**
+- Click "Create Chart" and choose from 8 chart types:
+  - Bar Chart - Compare categories
+  - Line Chart - Show trends over time
+  - Pie Chart - Display proportions
+  - Scatter Plot - Find correlations
+  - Radar Chart - Multi-dimensional comparisons
+  - Treemap - Hierarchical data
+  - Gauge - Show progress toward goals
+  - Funnel - Conversion analysis
+- Configure your chart with drag-and-drop fields
+- Save and share your insights
+
+**Step 3: Generate Reports**
+
+- Click "Generate Report" on the dashboard
+- Choose format: PDF (presentation-ready), Excel (data analysis), or CSV (raw data)
+- Add charts, insights, and custom notes
+- Download and share with your team
+
+### 🤖 Using ML Predictions (100% Free, Browser-Based)
+
+**Customer Churn Prediction**
+
+1. Navigate to **ML Predictions** → **Predict** tab
+2. Select "Customer Churn Predictor"
+3. Enter customer metrics:
+   - Usage Frequency (1-100)
+   - Support Tickets (0-20)
+   - Tenure in Months (1-60)
+   - Monthly Spend ($10-$500)
+   - Feature Usage Percentage (0-100%)
+4. Click "Get Prediction"
+5. View results: "Will Churn" or "Will Stay" with confidence score
+6. Review feature importance to understand key drivers
+
+**Revenue Forecasting**
+
+1. Select "Revenue Forecaster" from the model dropdown
+2. Input business metrics:
+   - Number of Customers (10-1000)
+   - Average Deal Size ($100-$10,000)
+   - Marketing Spend ($1,000-$50,000)
+   - Sales Team Size (1-50)
+   - Market Growth % (-10% to +30%)
+3. Get instant revenue forecast in dollars
+4. Use for budgeting and planning
+
+**Training Custom Models**
+
+1. Go to **ML Predictions** → **Train** tab
+2. Click "Download Template" for your model type
+3. Fill the CSV with your historical data
+4. Upload via **CSV** tab
+5. Click "Train Model" - training happens in your browser (1-2 minutes)
+6. Your custom model is now available for predictions!
+
+**Viewing Prediction History**
+
+- Navigate to **ML Predictions** → **History** tab
+- Filter by model type, date range, or prediction value
+- Click any prediction to see detailed breakdown
+- Export history to CSV for analysis
+
+**Managing Models**
+
+- Go to **ML Predictions** → **Models** tab
+- See all available models (Advanced DNN, Custom Trained, Legacy)
+- Export models as `.bizml` files for backup
+- Import previously exported models
+- Delete unused models to free space
+
+### 💬 Using the AI Assistant
+
+**Starting a Conversation**
+
+1. Click the chat icon in the bottom-right corner (or navigate to AI Chat)
+2. Type your question in plain English, e.g.:
+   - "What's my average customer lifetime value?"
+   - "Show me revenue trends for the last quarter"
+   - "Which products have the highest profit margin?"
+3. The AI uses RAG (Retrieval-Augmented Generation) to provide accurate answers based on your data
+
+**Optimizing AI Responses**
+
+- Go to **Settings** (gear icon in chat)
+- Adjust context window (5-20 messages) for longer conversations
+- Modify temperature (0.0-1.0) for creative vs precise responses
+- Set max tokens to control response length
+- Configure rate limits for your usage patterns
+
+**Exporting Conversations**
+
+- Click the download icon in chat header
+- Choose format: Markdown (readable), JSON (structured), or Text (simple)
+- Save important insights for documentation
+
+### 🔧 Using the API
+
+**Getting Your API Key**
+
+1. Navigate to **API Management**
+2. Click "Generate API Key"
+3. Name your key (e.g., "Production App")
+4. Copy and securely store the key (shown only once!)
+
+**Making API Calls**
+
+```bash
+curl -X POST https://your-domain.com/api/predict \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "churn_prediction",
+    "features": {
+      "usage_frequency": 85,
+      "support_tickets": 0,
+      "tenure_months": 45,
+      "monthly_spend": 300,
+      "feature_usage_pct": 90
+    }
+  }'
+```
+
+**Monitoring Usage**
+
+- View API usage statistics in **API Management**
+- Track requests per day/month
+- Monitor rate limits
+- Review error logs
+
+---
+
+## 🚀 Quick Start (For Developers)
 
 ### Prerequisites
 
