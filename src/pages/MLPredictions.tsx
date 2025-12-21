@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useBrowserML } from '@/hooks/useBrowserML';
 import { Loader2, Brain, TrendingUp, UserX, Info, BarChart3, Zap, CheckCircle2, History, Upload, Package } from 'lucide-react';
-import { FeatureBadge } from '@/components/ui/FeatureBadge';
 import { ModelTrainingPanel } from '@/components/ml/ModelTrainingPanel';
 import { PredictionHistory } from '@/components/ml/PredictionHistory';
 import { CSVUploadPanel } from '@/components/ml/CSVUploadPanel';
@@ -45,6 +44,7 @@ const MODEL_FEATURES = {
 };
 
 export function MLPredictions() {
+    const { createDemoModels } = useBrowserML();
     const [selectedModel, setSelectedModel] = useState<string>('churn_model');
     const [features, setFeatures] = useState<Record<string, string>>({});
     const [prediction, setPrediction] = useState<any>(null);
@@ -58,18 +58,14 @@ export function MLPredictions() {
     useEffect(() => {
         const initModels = async () => {
             if (!modelsCreated) {
-                // Import the centralized model creation function
-                const { createDemoModels } = await import('@/hooks/useBrowserML').then(m => ({ createDemoModels: m.useBrowserML().createDemoModels }));
-
                 // This will create 'churn_model_advanced' and 'revenue_model_advanced'
                 await createDemoModels();
-
                 setModelsCreated(true);
                 console.log('✅ Advanced demo models ready for predictions');
             }
         };
         initModels();
-    }, [modelsCreated]);
+    }, [modelsCreated, createDemoModels]);
 
     const handleFeatureChange = (name: string, value: string) => {
         setFeatures(prev => ({ ...prev, [name]: value }));
@@ -189,7 +185,6 @@ export function MLPredictions() {
                         <Brain className="h-8 w-8 text-primary" />
                         ML Predictions
                     </h2>
-                    <FeatureBadge variant="production" size="md" />
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                         <Zap className="h-3 w-3 mr-1" />
                         Browser-Powered
@@ -198,13 +193,6 @@ export function MLPredictions() {
                 <p className="text-muted-foreground mb-3">
                     Make instant predictions with TensorFlow.js models running entirely in your browser - 100% FREE!
                 </p>
-                <Alert className="bg-blue-50 border-blue-200">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertDescription className="text-blue-800">
-                        <strong>Production Feature:</strong> Browser-based ML predictions using TensorFlow.js.
-                        Models run locally - your data never leaves your browser. Unlimited predictions at zero cost!
-                    </AlertDescription>
-                </Alert>
             </div>
 
             <Tabs defaultValue="predict" className="space-y-6">

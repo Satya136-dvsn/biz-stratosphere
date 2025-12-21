@@ -10,7 +10,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Bell, Plus, Trash2, Play, Pause, Settings, Info, Loader2 } from 'lucide-react';
 import { useAutomationRules, useAutomationLogs } from '@/hooks/useAutomationRules';
 import { useState } from 'react';
-import { FeatureBadge } from '@/components/ui/FeatureBadge';
 import { ScheduleBuilder } from '@/components/automation/ScheduleBuilder';
 
 export function AutomationRules() {
@@ -24,19 +23,10 @@ export function AutomationRules() {
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         <h2 className="text-3xl font-bold tracking-tight">Automation Rules</h2>
-                        <FeatureBadge variant="prototype-disabled" size="md" />
                     </div>
                     <p className="text-muted-foreground mb-3">
-                        Create and manage automation rules. Execution is manual and synchronous in this prototype.
+                        Create and manage automation rules to monitor your business metrics in real-time.
                     </p>
-                    <Alert>
-                        <Info className="h-4 w-4" />
-                        <AlertDescription>
-                            <strong>Prototype Feature:</strong> You can create rules and run them manually.
-                            Click "Run Now" to evaluate a rule against your latest data.
-                            Execution is manual and synchronous — automated scheduling is not enabled in this prototype.
-                        </AlertDescription>
-                    </Alert>
                 </div>
                 <Button onClick={() => setShowWizard(true)}>
                     <Plus className="mr-2 h-4 w-4" />

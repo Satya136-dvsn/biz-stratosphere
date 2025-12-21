@@ -29,7 +29,7 @@ export default function PlatformStatus() {
                         </h1>
 
                         <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                            Transparent visibility into what's production-ready, what's evolving, and what's on the roadmap
+                            A comprehensive overview of Biz Stratosphere's core capabilities and upcoming enhancements
                         </p>
                     </div>
 
@@ -39,8 +39,8 @@ export default function PlatformStatus() {
                             <div className="flex items-center gap-3">
                                 <CheckCircle2 className="h-8 w-8 text-green-600" />
                                 <div>
-                                    <CardTitle className="text-2xl">Production-Ready</CardTitle>
-                                    <CardDescription>Battle-tested, stable, and fully functional</CardDescription>
+                                    <CardTitle className="text-2xl">Core Features</CardTitle>
+                                    <CardDescription>Stable and fully functional platform components</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
@@ -50,49 +50,42 @@ export default function PlatformStatus() {
                                     icon={<Shield className="h-5 w-5" />}
                                     title="Authentication & Workspaces"
                                     description="User authentication, multi-workspace support, role-based access control (RBAC), row-level security (RLS)"
-                                    badge={<FeatureBadge variant="production" size="sm" />}
                                 />
 
                                 <FeatureItem
                                     icon={<Database className="h-5 w-5" />}
                                     title="Data Upload & ETL"
                                     description="CSV and Excel file upload, automatic ETL processing, dual storage strategy (raw + transformed)"
-                                    badge={<FeatureBadge variant="production" size="sm" />}
                                 />
 
                                 <FeatureItem
                                     icon={<BarChart3 className="h-5 w-5" />}
                                     title="Dashboards & KPIs"
                                     description="Real-time analytics dashboard, KPI monitoring, time-series visualization, export capabilities"
-                                    badge={<FeatureBadge variant="production" size="sm" />}
                                 />
 
                                 <FeatureItem
                                     icon={<Zap className="h-5 w-5" />}
                                     title="Advanced Charts"
                                     description="8 chart types (bar, line, area, pie, scatter, radar, treemap, funnel), full CSV column access, customization options"
-                                    badge={<FeatureBadge variant="production" size="sm" />}
                                 />
 
                                 <FeatureItem
                                     icon={<Shield className="h-5 w-5" />}
                                     title="Security Foundations"
                                     description="Row-Level Security (RLS), Multi-Factor Authentication (MFA), AES-256 encryption, GDPR compliance principles"
-                                    badge={<FeatureBadge variant="production" size="sm" />}
                                 />
 
                                 <FeatureItem
                                     icon={<Sparkles className="h-5 w-5" />}
                                     title="AI Assistant (RAG Chat)"
-                                    description="Production-ready conversational AI with context management, markdown rendering, code highlighting, and export capabilities. Powered by Google Gemini API."
-                                    badge={<FeatureBadge variant="production" size="sm" />}
+                                    description="Conversational AI with context management, markdown rendering, code highlighting, and export capabilities. Powered by Google Gemini API."
                                 />
 
                                 <FeatureItem
                                     icon={<Zap className="h-5 w-5" />}
                                     title="Automation Rules Engine"
-                                    description="Production-grade automation with scheduled execution, advanced triggers (trend/anomaly detection), action chaining, webhook support, email alerts, and 10+ pre-configured templates."
-                                    badge={<FeatureBadge variant="production" size="sm" />}
+                                    description="Intelligent automation with scheduled execution, advanced triggers, action chaining, and webhook support."
                                 />
                             </div>
                         </CardContent>
@@ -104,8 +97,8 @@ export default function PlatformStatus() {
                             <div className="flex items-center gap-3">
                                 <Beaker className="h-8 w-8 text-amber-600" />
                                 <div>
-                                    <CardTitle className="text-2xl">Prototype Features</CardTitle>
-                                    <CardDescription>Evolving capabilities with ongoing development</CardDescription>
+                                    <CardTitle className="text-2xl">Advanced Analytics</CardTitle>
+                                    <CardDescription>Deep learning and predictive modeling capabilities</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
@@ -114,8 +107,7 @@ export default function PlatformStatus() {
                                 <FeatureItem
                                     icon={<BarChart3 className="h-5 w-5" />}
                                     title="ML Model Training & Predictions"
-                                    description="Machine learning model serving with SHAP explainability. Prototype implementation with MLflow tracking."
-                                    badge={<FeatureBadge variant="prototype" size="sm" />}
+                                    description="Advanced Machine Learning with 6-layer Deep Neural Networks for churn prediction and revenue forecasting."
                                 />
                             </div>
                         </CardContent>
@@ -136,23 +128,20 @@ export default function PlatformStatus() {
                             <div className="grid md:grid-cols-2 gap-6">
                                 <FeatureItem
                                     icon={<Zap className="h-5 w-5" />}
-                                    title="AI Chatbot with RAG"
-                                    description="Retrieval-Augmented Generation for context-aware business intelligence queries"
-                                    badge={<FeatureBadge variant="planned" size="sm" />}
+                                    title="Predictive RAG"
+                                    description="Retrieval-Augmented Generation for predictive business intelligence queries"
                                 />
 
                                 <FeatureItem
                                     icon={<BarChart3 className="h-5 w-5" />}
-                                    title="Observability & Monitoring Dashboard"
-                                    description="System health metrics, performance monitoring, and operational insights"
-                                    badge={<FeatureBadge variant="planned" size="sm" />}
+                                    title="Observability Suite"
+                                    description="Advanced system health metrics and performance monitoring"
                                 />
 
                                 <FeatureItem
                                     icon={<Shield className="h-5 w-5" />}
-                                    title="Data Retention & Compliance Tools"
-                                    description="Automated data lifecycle management, compliance reporting, and audit trails"
-                                    badge={<FeatureBadge variant="planned" size="sm" />}
+                                    title="Governance Tools"
+                                    description="Automated data retention and advanced compliance reporting"
                                 />
                             </div>
                         </CardContent>
@@ -226,16 +215,10 @@ export default function PlatformStatus() {
 
                     {/* Disclaimer */}
                     <Card className="border-2 bg-primary/5 border-primary/20">
-                        <CardContent className="pt-6">
-                            <div className="space-y-4 text-center">
-                                <p className="text-lg font-medium leading-relaxed">
-                                    "Biz Stratosphere is a production-ready BI core with advanced visualization.
-                                    AI and automation features are evolving incrementally."
-                                </p>
-                                <p className="text-muted-foreground">
-                                    "The platform is intentionally optimized for analytical clarity over raw data volume at this stage."
-                                </p>
-                            </div>
+                        <CardContent className="pt-6 text-center">
+                            <p className="text-lg font-medium leading-relaxed">
+                                Biz Stratosphere provides a robust analytical core optimized for clarity and intelligence.
+                            </p>
                         </CardContent>
                     </Card>
 
@@ -266,10 +249,9 @@ interface FeatureItemProps {
     icon: React.ReactNode;
     title: string;
     description: string;
-    badge: React.ReactNode;
 }
 
-function FeatureItem({ icon, title, description, badge }: FeatureItemProps) {
+function FeatureItem({ icon, title, description }: FeatureItemProps) {
     return (
         <div className="space-y-2">
             <div className="flex items-start gap-3">
@@ -277,7 +259,6 @@ function FeatureItem({ icon, title, description, badge }: FeatureItemProps) {
                 <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                         <h3 className="font-semibold">{title}</h3>
-                        {badge}
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
                 </div>

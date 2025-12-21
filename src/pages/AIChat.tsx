@@ -13,7 +13,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2 } from 'lucide-react';
-import { FeatureBadge } from '@/components/ui/FeatureBadge';
 import { ConversationSettings } from '@/components/ai/ConversationSettings';
 import { ExportConversation } from '@/components/ai/ExportConversation';
 
@@ -96,19 +95,10 @@ export function AIChat() {
                         <Sparkles className="h-8 w-8 text-primary" />
                         AI Assistant
                     </h2>
-                    <FeatureBadge variant="production" size="md" />
                 </div>
                 <p className="text-muted-foreground mb-3">
-                    Ask questions about your data using AI-powered RAG search with advanced context management
+                    Analyze your data using AI-powered RAG search with advanced context management and export capabilities.
                 </p>
-                <Alert>
-                    <Sparkles className="h-4 w-4" />
-                    <AlertDescription>
-                        <strong>Production Feature:</strong> AI-powered data analysis with customizable settings,
-                        markdown rendering, and export capabilities. Configure conversation context, temperature,
-                        and response length via the settings panel.
-                    </AlertDescription>
-                </Alert>
             </div>
 
             {/* Settings Bar */}

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Key, Plus, Copy, Trash2, Shield, CheckCircle2, BarChart3, Activity, TrendingUp } from 'lucide-react';
+import { Key, Plus, Copy, Trash2, Shield, CheckCircle2, BarChart3, Activity, TrendingUp, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAPIKeys } from '@/hooks/useAPIKeys';
 import { useToast } from '@/hooks/use-toast';
@@ -36,8 +36,15 @@ function APIManagement({ workspaceId }: { workspaceId?: string }) {
     if (!activeWorkspaceId) {
         return (
             <PageLayout>
-                <div className="p-8 text-center text-muted-foreground">
-                    No workspace found. Please create a workspace first.
+                <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8">
+                    <Building2 className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">Workspace Required</h3>
+                    <p className="text-muted-foreground max-w-sm mb-6">
+                        An active workspace is required to manage API keys. It looks like you haven't created one yet.
+                    </p>
+                    <Button onClick={() => window.location.href = '/settings'}>
+                        Create Workspace
+                    </Button>
                 </div>
             </PageLayout>
         );
