@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Download, Upload, Trash2, CheckCircle2, Info, Package } from 'lucide-react';
+import { Loader2, Download, Upload, Trash2, CheckCircle2, Info, Package, Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
     exportModel,
@@ -14,6 +14,7 @@ import {
     getModelInfo,
     ModelMetadata
 } from '@/lib/modelExporter';
+import { useAdvancedML } from '@/hooks/useAdvancedML';
 
 export function ModelManager() {
     const { toast } = useToast();
@@ -21,6 +22,7 @@ export function ModelManager() {
     const [isLoading, setIsLoading] = useState(true);
     const [isExporting, setIsExporting] = useState<string | null>(null);
     const [isImporting, setIsImporting] = useState(false);
+    const { metrics, isLoadingMetrics } = useAdvancedML();
 
     useEffect(() => {
         loadModels();
@@ -169,6 +171,23 @@ export function ModelManager() {
         return modelName.includes('_advanced');
     };
 
+    const getModelVersion = (modelName: string) => {
+        const parts = modelName.split('_v');
+        if (parts.length > 1) {
+            return parts[parts.length - 1].replace(/_/g, '.');
+        }
+        return '1.0.0';
+    };
+
+    const getModelMetrics = (modelName: string) => {
+        const baseName = modelName.split('_v')[0].replace('_trained', '');
+        const version = getModelVersion(modelName);
+        return metrics.find(m =>
+            (m.model_name === baseName || m.model_name + '_trained' === baseName) &&
+            m.version === version
+        );
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -240,66 +259,92 @@ export function ModelManager() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Model Name</TableHead>
+                                    <TableHead>Version</TableHead>
                                     <TableHead>Type</TableHead>
+                                    <TableHead>Performance</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {models.map((modelName) => (
-                                    <TableRow key={modelName}>
-                                        <TableCell className="font-medium">
-                                            {modelName}
-                                        </TableCell>
-                                        <TableCell>
-                                            {getModelBadge(modelName)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isTrainedModel(modelName) ? (
-                                                <div className="flex items-center gap-1 text-sm text-green-600">
-                                                    <CheckCircle2 className="h-3 w-3" />
-                                                    Custom Trained
-                                                </div>
-                                            ) : isAdvancedModel(modelName) ? (
-                                                <div className="flex items-center gap-1 text-sm text-purple-600">
-                                                    <Brain className="h-3 w-3" />
-                                                    Advanced DNN
-                                                </div>
-                                            ) : (
-                                                <span className="text-sm text-muted-foreground">
-                                                    Legacy Base
-                                                </span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleExport(modelName)}
-                                                    disabled={isExporting === modelName}
-                                                >
-                                                    {isExporting === modelName ? (
-                                                        <>
+                                {models.map((modelName) => {
+                                    const modelMetrics = getModelMetrics(modelName);
+                                    const version = getModelVersion(modelName);
+
+                                    return (
+                                        <TableRow key={modelName}>
+                                            <TableCell className="font-medium">
+                                                {modelName.split('_v')[0]}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant="outline">v{version}</Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {getModelBadge(modelName)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {modelMetrics ? (
+                                                    <div className="text-xs">
+                                                        {modelMetrics.accuracy !== undefined && (
+                                                            <span className="text-green-600 font-medium">
+                                                                Acc: {(modelMetrics.accuracy * 100).toFixed(1)}%
+                                                            </span>
+                                                        )}
+                                                        {modelMetrics.r2 !== undefined && (
+                                                            <span className="text-blue-600 font-medium">
+                                                                R²: {(modelMetrics.r2 * 100).toFixed(1)}%
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">-</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {isTrainedModel(modelName) ? (
+                                                    <div className="flex items-center gap-1 text-sm text-green-600">
+                                                        <CheckCircle2 className="h-3 w-3" />
+                                                        Custom Trained
+                                                    </div>
+                                                ) : isAdvancedModel(modelName) ? (
+                                                    <div className="flex items-center gap-1 text-sm text-purple-600">
+                                                        <Brain className="h-3 w-3" />
+                                                        Advanced DNN
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-sm text-muted-foreground">
+                                                        Legacy Base
+                                                    </span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleExport(modelName)}
+                                                        disabled={isExporting === modelName}
+                                                        title="Export Model"
+                                                    >
+                                                        {isExporting === modelName ? (
                                                             <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </>
-                                                    ) : (
-                                                        <>
+                                                        ) : (
                                                             <Download className="h-4 w-4" />
-                                                        </>
-                                                    )}
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(modelName)}
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                                        )}
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(modelName)}
+                                                        title="Delete Model"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </div>

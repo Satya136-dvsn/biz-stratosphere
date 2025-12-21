@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRAGChat } from '@/hooks/useRAGChat';
 import { useEmbeddings } from '@/hooks/useEmbeddings';
@@ -12,14 +11,16 @@ import { ChatMessageComponent } from '@/components/ai/ChatMessage';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2 } from 'lucide-react';
+import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2, Zap } from 'lucide-react';
 import { ConversationSettings } from '@/components/ai/ConversationSettings';
 import { ExportConversation } from '@/components/ai/ExportConversation';
 
 export function AIChat() {
     const { user } = useAuth();
     const [selectedConversationId, setSelectedConversationId] = useState<string>();
-    const [selectedDatasetId, setSelectedDatasetId] = useState<string>();
+    const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
+    const [similarityThreshold, setSimilarityThreshold] = useState(0.5);
+    const [contextLimit, setContextLimit] = useState(5);
     const [inputMessage, setInputMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +31,9 @@ export function AIChat() {
         deleteConversation,
         sendMessage,
         isSending,
+        isSearching,
         isCreating,
+        refreshConversations
     } = useRAGChat(selectedConversationId);
 
     const { generateDatasetEmbeddings, isGenerating, embeddingsCount } = useEmbeddings();
@@ -72,7 +75,9 @@ export function AIChat() {
         sendMessage({
             convId: selectedConversationId,
             message: inputMessage,
-            datasetId: selectedDatasetId,
+            datasetId: selectedDataset,
+            similarityThreshold,
+            contextLimit,
         });
 
         setInputMessage('');
@@ -86,208 +91,236 @@ export function AIChat() {
         }
     };
 
+    const currentConversation = conversations.find(c => c.id === selectedConversationId);
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 flex flex-col h-[calc(100vh-140px)]">
             {/* Header */}
-            <div>
-                <div className="flex items-center gap-3 mb-2">
-                    <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                        <Sparkles className="h-8 w-8 text-primary" />
-                        AI Assistant
-                    </h2>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                        <Sparkles className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">AI Assistant</h1>
+                        <p className="text-muted-foreground">Advanced RAG-powered chatbot with custom datasets</p>
+                    </div>
                 </div>
-                <p className="text-muted-foreground mb-3">
-                    Analyze your data using AI-powered RAG search with advanced context management and export capabilities.
-                </p>
             </div>
 
-            {/* Settings Bar */}
+            {/* Config Card */}
             <Card>
-                <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                            <label className="text-sm font-medium mb-2 block">Dataset (Optional)</label>
-                            <Select value={selectedDatasetId} onValueChange={setSelectedDatasetId}>
+                <CardHeader className="py-3">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Database className="h-4 w-4" />
+                        RAG Configuration
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="pb-3">
+                    <div className="flex flex-col md:flex-row gap-4 items-end">
+                        <div className="flex-1 w-full">
+                            <label className="text-sm font-medium mb-1.5 block">Active Dataset</label>
+                            <Select
+                                value={selectedDataset || 'none'}
+                                onValueChange={(val) => setSelectedDataset(val === 'none' ? null : val)}
+                            >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="All datasets" />
+                                    <SelectValue placeholder="Select a dataset for context" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All datasets</SelectItem>
+                                    <SelectItem value="none">No Context</SelectItem>
                                     {datasets.map((dataset) => (
                                         <SelectItem key={dataset.id} value={dataset.id}>
-                                            {dataset.name || dataset.file_name}
+                                            {dataset.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="flex items-end gap-2">
-                            <Button
-                                variant="outline"
-                                onClick={() => selectedDatasetId && generateDatasetEmbeddings({ datasetId: selectedDatasetId })}
-                                disabled={!selectedDatasetId || isGenerating}
-                            >
-                                {isGenerating ? (
-                                    <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Generating...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Database className="h-4 w-4 mr-2" />
-                                        Generate Embeddings
-                                    </>
-                                )}
-                            </Button>
-                            <div className="text-sm text-muted-foreground">
-                                {embeddingsCount} embeddings
-                            </div>
-                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => selectedDataset && generateDatasetEmbeddings({ datasetId: selectedDataset })}
+                            disabled={!selectedDataset || isGenerating}
+                            className="w-full md:w-auto"
+                        >
+                            {isGenerating ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Embedding...
+                                </>
+                            ) : (
+                                <>
+                                    <Zap className="h-4 w-4 mr-2" />
+                                    Process Dataset
+                                </>
+                            )}
+                        </Button>
                     </div>
+                    {embeddingsCount > 0 && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                            {embeddingsCount} vectors available for similarity search
+                        </p>
+                    )}
                 </CardContent>
             </Card>
 
-            {/* Main Chat Interface */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
                 {/* Conversations Sidebar */}
-                <div className="lg:col-span-1">
-                    <Card className="h-[600px] flex flex-col">
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="text-lg">Conversations</CardTitle>
-                                <Button onClick={handleNewConversation} size="sm" disabled={isCreating}>
-                                    <Plus className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="flex-1 overflow-hidden p-0">
-                            <ScrollArea className="h-full">
-                                <div className="space-y-2 p-4">
-                                    {conversations.length === 0 ? (
-                                        <div className="text-center text-sm text-muted-foreground py-8">
-                                            <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                            <p>No conversations yet</p>
-                                            <p className="text-xs mt-1">Click + to start</p>
+                <Card className="lg:col-span-1 flex flex-col min-h-0">
+                    <CardHeader className="py-4 border-b">
+                        <Button onClick={handleNewConversation} disabled={isCreating} className="w-full">
+                            <Plus className="h-4 w-4 mr-2" />
+                            New Chat
+                        </Button>
+                    </CardHeader>
+                    <CardContent className="p-0 flex-1 overflow-hidden">
+                        <ScrollArea className="h-full">
+                            <div className="p-2 space-y-1">
+                                {conversations.map((conv) => (
+                                    <div
+                                        key={conv.id}
+                                        className={`group flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedConversationId === conv.id
+                                            ? 'bg-primary/10 text-primary'
+                                            : 'hover:bg-muted'
+                                            }`}
+                                        onClick={() => setSelectedConversationId(conv.id)}
+                                    >
+                                        <div className="flex items-center gap-2 overflow-hidden">
+                                            <MessageSquare className="h-4 w-4 flex-shrink-0" />
+                                            <span className="text-sm truncate">{conv.title || 'Untitled Chat'}</span>
                                         </div>
-                                    ) : (
-                                        conversations.map((conv) => (
-                                            <div
-                                                key={conv.id}
-                                                className={`p-3 rounded-lg cursor-pointer transition-colors group ${selectedConversationId === conv.id
-                                                    ? 'bg-primary text-primary-foreground'
-                                                    : 'hover:bg-muted'
-                                                    }`}
-                                                onClick={() => setSelectedConversationId(conv.id)}
-                                            >
-                                                <div className="flex items-start justify-between">
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-medium truncate">{conv.title}</p>
-                                                        <p className="text-xs opacity-70 mt-1">
-                                                            {new Date(conv.updated_at).toLocaleDateString()}
-                                                        </p>
-                                                    </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            deleteConversation(conv.id);
-                                                            if (selectedConversationId === conv.id) {
-                                                                setSelectedConversationId(undefined);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Chat Area */}
-                <div className="lg:col-span-3">
-                    <Card className="h-[600px] flex flex-col">
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="text-lg">
-                                    {selectedConversationId
-                                        ? conversations.find(c => c.id === selectedConversationId)?.title || 'Chat'
-                                        : 'Select or create a conversation'}
-                                </CardTitle>
-                                {selectedConversationId && (
-                                    <div className="flex items-center gap-2">
-                                        <ExportConversation
-                                            conversation={conversations.find(c => c.id === selectedConversationId)!}
-                                            messages={messages}
-                                        />
-                                        <ConversationSettings
-                                            conversation={conversations.find(c => c.id === selectedConversationId) || null}
-                                        />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteConversation(conv.id);
+                                            }}
+                                        >
+                                            <Trash2 className="h-3 w-3" />
+                                        </Button>
                                     </div>
+                                ))}
+                                {conversations.length === 0 && (
+                                    <p className="text-center text-xs text-muted-foreground py-8">No conversations</p>
                                 )}
                             </div>
-                        </CardHeader>
-                        <Separator />
-                        <CardContent className="flex-1 flex flex-col p-0">
-                            {/* Messages */}
-                            <ScrollArea className="flex-1 p-4">
-                                <div className="space-y-4">
-                                    {!selectedConversationId ? (
-                                        <Alert>
-                                            <Sparkles className="h-4 w-4" />
-                                            <AlertDescription>
-                                                Create a new conversation or select an existing one to start chatting with your data.
-                                            </AlertDescription>
-                                        </Alert>
-                                    ) : messages.length === 0 ? (
-                                        <Alert>
-                                            <MessageSquare className="h-4 w-4" />
-                                            <AlertDescription>
-                                                Ask me anything about your data! I'll search through your datasets and provide relevant answers.
-                                            </AlertDescription>
-                                        </Alert>
-                                    ) : (
-                                        messages.map((message) => (
-                                            <ChatMessageComponent key={message.id} message={message} />
-                                        ))
-                                    )}
-                                    {isSending && (
-                                        <div className="flex items-center gap-2 text-muted-foreground">
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            <span className="text-sm">Thinking...</span>
-                                        </div>
-                                    )}
-                                    <div ref={messagesEndRef} />
-                                </div>
-                            </ScrollArea>
+                        </ScrollArea>
+                    </CardContent>
+                </Card>
 
-                            {/* Input */}
-                            <div className="p-4 border-t">
-                                <div className="flex gap-2">
-                                    <Input
-                                        value={inputMessage}
-                                        onChange={(e) => setInputMessage(e.target.value)}
-                                        onKeyDown={handleKeyPress}
-                                        placeholder="Ask a question about your data..."
-                                        disabled={!selectedConversationId || isSending}
+                {/* Chat Area */}
+                <Card className="lg:col-span-3 flex flex-col min-h-0">
+                    <CardHeader className="py-3 border-b flex flex-row items-center justify-between">
+                        <CardTitle className="text-lg truncate">
+                            {selectedConversationId
+                                ? conversations.find((c) => c.id === selectedConversationId)?.title || 'Chat'
+                                : 'Select or create a conversation'}
+                        </CardTitle>
+                        {selectedConversationId && (
+                            <div className="flex flex-wrap items-center gap-2">
+                                <div className="hidden md:flex items-center gap-2 px-2 py-1 bg-muted rounded-md text-xs">
+                                    <Database className="h-3 w-3" />
+                                    Threshold:
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={similarityThreshold * 100}
+                                        onChange={(e) => setSimilarityThreshold(Number(e.target.value) / 100)}
+                                        className="w-16 h-1.5"
                                     />
-                                    <Button
-                                        onClick={handleSendMessage}
-                                        disabled={!selectedConversationId || !inputMessage.trim() || isSending}
-                                    >
-                                        <Send className="h-4 w-4" />
-                                    </Button>
+                                    <span>{(similarityThreshold * 100).toFixed(0)}%</span>
                                 </div>
+
+                                <div className="hidden md:flex items-center gap-2 px-2 py-1 bg-muted rounded-md text-xs">
+                                    <MessageSquare className="h-3 w-3" />
+                                    Context:
+                                    <select
+                                        value={contextLimit}
+                                        onChange={(e) => setContextLimit(Number(e.target.value))}
+                                        className="bg-transparent border-none focus:ring-0 p-0 h-4 text-xs"
+                                    >
+                                        <option value={3}>3</option>
+                                        <option value={5}>5</option>
+                                        <option value={10}>10</option>
+                                    </select>
+                                </div>
+
+                                <ConversationSettings
+                                    conversation={currentConversation || null}
+                                    onUpdate={refreshConversations}
+                                />
+
+                                <ExportConversation
+                                    conversation={currentConversation!}
+                                    messages={messages}
+                                />
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                        )}
+                    </CardHeader>
+
+                    <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
+                        <ScrollArea className="flex-1 p-4">
+                            <div className="space-y-4 pb-4">
+                                {!selectedConversationId ? (
+                                    <Alert>
+                                        <Sparkles className="h-4 w-4" />
+                                        <AlertDescription>
+                                            Create a new conversation or select an existing one to start chatting with your data.
+                                        </AlertDescription>
+                                    </Alert>
+                                ) : messages.length === 0 ? (
+                                    <Alert>
+                                        <MessageSquare className="h-4 w-4" />
+                                        <AlertDescription>
+                                            Ask me anything about your data! I'll search through your datasets and provide relevant answers.
+                                        </AlertDescription>
+                                    </Alert>
+                                ) : (
+                                    messages.map((message) => (
+                                        <ChatMessageComponent key={message.id} message={message} />
+                                    ))
+                                )}
+                                {isSending && (
+                                    <div className="flex items-center gap-2 text-muted-foreground ml-4">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <span className="text-sm">Thinking...</span>
+                                    </div>
+                                )}
+                                {isSearching && (
+                                    <div className="flex items-center gap-2 text-muted-foreground ml-4">
+                                        <Database className="h-4 w-4 animate-spin" />
+                                        <span className="text-sm">Searching knowledge base...</span>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+                        </ScrollArea>
+
+                        {/* Input */}
+                        <div className="p-4 border-t bg-background">
+                            <div className="flex gap-2">
+                                <Input
+                                    value={inputMessage}
+                                    onChange={(e) => setInputMessage(e.target.value)}
+                                    onKeyDown={handleKeyPress}
+                                    placeholder={selectedConversationId ? "Ask a question about your data..." : "Select a conversation to start"}
+                                    disabled={!selectedConversationId || isSending}
+                                    className="flex-1"
+                                />
+                                <Button
+                                    onClick={handleSendMessage}
+                                    disabled={!selectedConversationId || !inputMessage.trim() || isSending}
+                                    size="icon"
+                                >
+                                    <Send className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );

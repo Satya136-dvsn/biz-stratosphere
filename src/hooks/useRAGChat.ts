@@ -38,6 +38,7 @@ export function useRAGChat(conversationId?: string) {
     const { searchSimilar } = useEmbeddings();
     const { checkLimit, incrementUsage } = useAIUsageLimit();
     const [isStreaming, setIsStreaming] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
 
     // Fetch conversations
     const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
@@ -135,10 +136,14 @@ export function useRAGChat(conversationId?: string) {
             convId,
             message,
             datasetId,
+            similarityThreshold = 0.5,
+            contextLimit = 5,
         }: {
             convId: string;
             message: string;
             datasetId?: string;
+            similarityThreshold?: number;
+            contextLimit?: number;
         }) => {
             if (!user) throw new Error('Not authenticated');
 
@@ -165,7 +170,15 @@ export function useRAGChat(conversationId?: string) {
                 if (userMsgError) throw userMsgError;
 
                 // 2. Search for similar embeddings
-                const searchResults = await searchSimilar(message, 5, datasetId);
+                setIsSearching(true);
+                let searchResults = [];
+                try {
+                    searchResults = await searchSimilar(message, contextLimit, datasetId, similarityThreshold);
+                } catch (searchError) {
+                    console.error('Search error:', searchError);
+                } finally {
+                    setIsSearching(false);
+                }
 
                 // 3. Build context from search results
                 const context = searchResults
@@ -320,7 +333,9 @@ Cite sources using [Source 1], [Source 2] format.`;
         deleteConversation: deleteConversation.mutate,
         sendMessage: sendMessage.mutate,
         isSending: sendMessage.isPending || isStreaming,
+        isSearching,
         isCreating: createConversation.isPending,
         isDeleting: deleteConversation.isPending,
+        refreshConversations: () => queryClient.invalidateQueries({ queryKey: ['chat-conversations'] }),
     };
 }

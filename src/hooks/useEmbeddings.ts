@@ -73,21 +73,22 @@ export function useEmbeddings() {
         const data = await response.json();
         const embeddingVector = data.embedding.values;
 
-        // Cache the embedding if workspace provided
         if (workspaceId) {
             const contentHash = await hashContent(text);
 
-            supabase.from('embedding_cache').insert({
-                content_hash: contentHash,
-                content_text: text.substring(0, 1000), // Store truncated text
-                embedding: embeddingVector,
-                workspace_id: workspaceId
-            }).then(() => {
-                // Cache inserted successfully
-            }).catch((err) => {
-                // Ignore cache insert errors (might be duplicate)
-                console.warn('Cache insert failed:', err);
-            });
+            // Execute in background
+            (async () => {
+                try {
+                    await supabase.from('embedding_cache').insert({
+                        content_hash: contentHash,
+                        content_text: text.substring(0, 1000), // Store truncated text
+                        embedding: embeddingVector,
+                        workspace_id: workspaceId
+                    });
+                } catch (err) {
+                    console.warn('Cache insert failed:', err);
+                }
+            })();
         }
 
         return embeddingVector;
@@ -138,6 +139,7 @@ export function useEmbeddings() {
                             metric_name: point.metric_name,
                             metric_value: point.metric_value,
                             date_recorded: point.date_recorded,
+                            chunk_index: i,
                         },
                         embedding: embeddingVector,
                     });
@@ -176,7 +178,8 @@ export function useEmbeddings() {
     const searchSimilar = async (
         query: string,
         limit: number = 5,
-        datasetId?: string
+        datasetId?: string,
+        threshold: number = 0.5
     ): Promise<SearchResult[]> => {
         if (!user) throw new Error('Not authenticated');
 
@@ -186,7 +189,7 @@ export function useEmbeddings() {
         // Use RPC function for vector similarity search
         const { data, error } = await supabase.rpc('search_embeddings', {
             query_embedding: queryEmbedding,
-            match_threshold: 0.5,
+            match_threshold: threshold,
             match_count: limit,
             filter_dataset_id: datasetId || null,
         });

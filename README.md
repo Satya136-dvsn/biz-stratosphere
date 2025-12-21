@@ -303,13 +303,13 @@ git clone <your-repo-url>
 cd biz-stratosphere
 ```
 
-2. **Install dependencies**
+1. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-3. **Set up environment variables**
+1. **Set up environment variables**
 
 ```bash
 cp .env.example .env.local
@@ -324,20 +324,22 @@ VITE_GEMINI_API_KEY=your_gemini_api_key
 VITE_ML_SERVICE_URL=http://localhost:8000
 ```
 
-4. **Run database migrations**
+1. **Run database migrations**
 
 ```bash
 # Set up Supabase tables
 supabase db push
 ```
 
-5. **Start development server**
+1. **Start development server**
 
 ```bash
 npm run dev
 ```
 
+```text
 The app will be available at `http://localhost:8080`
+```
 
 ### ML Service Setup (Optional)
 
@@ -347,13 +349,13 @@ The app will be available at `http://localhost:8080`
 cd ml-service
 ```
 
-2. **Install Python dependencies**
+1. **Install Python dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Start ML service**
+1. **Start ML service**
 
 ```bash
 uvicorn main:app --reload --port 8000
@@ -429,7 +431,7 @@ See `/supabase/migrations/` for complete schema.
 npm run build
 ```
 
-2. **Deploy to Vercel**
+1. **Deploy to Vercel**
 
 ```bash
 vercel --prod
@@ -551,11 +553,10 @@ For support and questions:
 - [x] API key management & usage tracking
 - [x] Real-time training progress visualization
 
-### 🔄 In Progress
-
-- [ ] Advanced model comparison UI & accuracy tracking
-- [ ] Automated model versioning
-- [ ] Fine-tuning for custom embedding models
+- [x] Advanced model comparison UI & accuracy tracking
+- [x] Automated model versioning
+- [x] RAG tuning settings & custom context management
+- [x] Automated training metrics & leaderboard
 
 ### 📋 Future
 

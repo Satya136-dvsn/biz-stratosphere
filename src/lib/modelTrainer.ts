@@ -22,6 +22,7 @@ export interface TrainingResult {
  */
 export async function trainChurnModel(
     trainingData: { features: number[]; label: number }[],
+    version: string = '1.0.0',
     onProgress?: (progress: TrainingProgress) => void
 ): Promise<TrainingResult> {
     const startTime = Date.now();
@@ -64,9 +65,11 @@ export async function trainChurnModel(
             },
         });
 
-        // Save trained model to IndexedDB
+        // Save trained model to IndexedDB with version
+        await model.save(`indexeddb://churn_model_v${version.replace(/\./g, '_')}`);
+        // Also save as the generic 'trained' for backward compatibility or active use
         await model.save('indexeddb://churn_model_trained');
-        console.log('✅ Churn model trained and saved');
+        console.log(`✅ Churn model trained and saved as v${version}`);
 
     } finally {
         // Cleanup tensors
@@ -89,6 +92,7 @@ export async function trainChurnModel(
  */
 export async function trainRevenueModel(
     trainingData: { features: number[]; label: number }[],
+    version: string = '1.0.0',
     onProgress?: (progress: TrainingProgress) => void
 ): Promise<TrainingResult> {
     const startTime = Date.now();
@@ -127,9 +131,11 @@ export async function trainRevenueModel(
             },
         });
 
-        // Save trained model to IndexedDB
+        // Save trained model to IndexedDB with version
+        await model.save(`indexeddb://revenue_model_v${version.replace(/\./g, '_')}`);
+        // Also save as the generic 'trained' for backward compatibility or active use
         await model.save('indexeddb://revenue_model_trained');
-        console.log('✅ Revenue model trained and saved');
+        console.log(`✅ Revenue model trained and saved as v${version}`);
 
     } finally {
         // Cleanup tensors
@@ -204,17 +210,18 @@ export async function evaluateModel(
 export async function trainBothModels(
     churnData: { features: number[]; label: number }[],
     revenueData: { features: number[]; label: number }[],
+    version: string = '1.0.0',
     onProgress?: (modelName: string, progress: TrainingProgress) => void
 ): Promise<{ churn: TrainingResult; revenue: TrainingResult }> {
-    console.log('🚀 Starting model training...');
+    console.log(`🚀 Starting model training for version ${version}...`);
 
     // Train churn model
-    const churnResult = await trainChurnModel(churnData, (progress) => {
+    const churnResult = await trainChurnModel(churnData, version, (progress) => {
         if (onProgress) onProgress('Churn Model', progress);
     });
 
     // Train revenue model
-    const revenueResult = await trainRevenueModel(revenueData, (progress) => {
+    const revenueResult = await trainRevenueModel(revenueData, version, (progress) => {
         if (onProgress) onProgress('Revenue Model', progress);
     });
 

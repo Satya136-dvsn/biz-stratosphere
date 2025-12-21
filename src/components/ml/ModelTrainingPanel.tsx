@@ -8,12 +8,15 @@ import { Loader2, Zap, CheckCircle2, Info, TrendingUp } from 'lucide-react';
 import { generateChurnTrainingData, generateRevenueTrainingData, splitTrainTest } from '@/lib/trainingDataGenerator';
 import { trainBothModels, evaluateModel, TrainingProgress } from '@/lib/modelTrainer';
 import { useToast } from '@/hooks/use-toast';
+import { useAdvancedML } from '@/hooks/useAdvancedML';
 
 export function ModelTrainingPanel() {
     const { toast } = useToast();
+    const { metrics, saveMetrics, getNextVersion } = useAdvancedML();
     const [isTraining, setIsTraining] = useState(false);
     const [trainingComplete, setTrainingComplete] = useState(false);
     const [currentModel, setCurrentModel] = useState('');
+    const [version, setVersion] = useState('1.0.0');
     const [progress, setProgress] = useState<TrainingProgress | null>(null);
     const [results, setResults] = useState<{
         churnAccuracy?: number;
@@ -43,11 +46,16 @@ export function ModelTrainingPanel() {
 
             console.log(`✅ Data generated: ${churnData.length} churn samples, ${revenueData.length} revenue samples`);
 
+            // Determine next version
+            const nextVersion = await getNextVersion('churn_model');
+            setVersion(nextVersion);
+
             // Train both models
             const startTime = Date.now();
             await trainBothModels(
                 churnSplit.train,
                 revenueSplit.train,
+                nextVersion,
                 (modelName, prog) => {
                     setCurrentModel(modelName);
                     setProgress(prog);
@@ -76,8 +84,26 @@ export function ModelTrainingPanel() {
 
             setTrainingComplete(true);
 
+            // Save metrics to Supabase for historical tracking
+            await Promise.all([
+                saveMetrics({
+                    model_name: 'churn_model',
+                    version: nextVersion,
+                    accuracy: churnEval.accuracy,
+                    training_time_ms: totalTime / 2, // Approx
+                    dataset_size: 1000
+                }),
+                saveMetrics({
+                    model_name: 'revenue_model',
+                    version: nextVersion,
+                    r2: revenueEval.r2,
+                    training_time_ms: totalTime / 2, // Approx
+                    dataset_size: 1000
+                })
+            ]);
+
             toast({
-                title: 'Training Complete! 🎉',
+                title: `Training v${nextVersion} Complete! 🎉`,
                 description: `Models trained successfully in ${(totalTime / 1000).toFixed(1)}s. Churn accuracy: ${(churnEval.accuracy! * 100).toFixed(1)}%`,
             });
 

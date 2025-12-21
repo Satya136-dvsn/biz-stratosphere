@@ -1,18 +1,18 @@
 # Design Document
 
-> **📊 IMPLEMENTATION STATUS: 60-65% Complete** | **Last Updated: December 4, 2025**
+> **📊 IMPLEMENTATION STATUS: 85-90% Complete** | **Last Updated: December 21, 2025**
 >
 > **Current Architecture Implemented:**
 >
 > - ✅ Next.js 14+ frontend with TypeScript, Tailwind CSS, Shadcn UI (49 components)
-> - ✅ Supabase backend (Auth, PostgreSQL, Storage, Edge Functions - 15 functions deployed)
-> - ✅ Database: 13 migrations, 18+ tables with RLS policies
-> - ✅ Components: 74 component directories, 9 pages (Auth, Dashboard, Upload, etc.)
-> - ⚠️ AI Integration: Lovable AI (Gemini 2.5) basic implementation, OpenAI planned
-> - ⚠️ ML Pipeline: Python training scripts with MLflow, FastAPI serving not deployed
-> - ❌ Vector embeddings (pgvector) planned but not implemented
+> - ✅ Supabase backend (Auth, PostgreSQL, Storage, Edge Functions - 16 functions deployed)
+> - ✅ Database: 14 migrations, 20+ tables with RLS policies
+> - ✅ Components: 80+ component directories, 10 pages (Auth, Dashboard, Upload, ML, Chat, etc.)
+> - ✅ AI Integration: RAG system with `pgvector`, Gemini 2.5, tuning controls
+> - ✅ ML Pipeline: TensorFlow.js in-browser training, automated versioning, metrics tracking
+> - ✅ Vector embeddings (pgvector) fully implemented
 > - ❌ Rate limiting (Upstash Redis) not implemented
-> - ❌ Comprehensive testing suite not implemented (20-30% coverage)
+> - ⚠️ Comprehensive testing suite (40% coverage)
 >
 > **Architectural Simplifications from Original Plan:**
 >
@@ -519,21 +519,29 @@ CREATE TABLE ai_queries (
 );
 
 
--- ML Models (P2)
+-- ML Models
 CREATE TABLE ml_models (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dataset_id UUID REFERENCES datasets(id) ON DELETE CASCADE,
   workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
   created_by UUID REFERENCES auth.users(id) NOT NULL,
   name TEXT NOT NULL,
-  model_type TEXT CHECK (model_type IN ('classification', 'regression')) NOT NULL,
+  model_type TEXT CHECK (model_type IN ('classification', 'regression', 'churn', 'sales')) NOT NULL,
   target_column TEXT NOT NULL,
-  artifact_url TEXT NOT NULL, -- Supabase Storage URL
-  metrics JSONB, -- {accuracy, rmse, auc, etc.}
-  feature_importance JSONB,
-  version INTEGER DEFAULT 1,
+  artifact_url TEXT, -- Used for exports/backups
+  version TEXT DEFAULT '1.0.0',
   status TEXT CHECK (status IN ('training', 'ready', 'failed')) DEFAULT 'training',
   created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ML Model Metrics (Historical performance)
+CREATE TABLE ml_model_metrics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_id UUID REFERENCES ml_models(id) ON DELETE CASCADE,
+  metrics JSONB NOT NULL, -- {accuracy, loss, r2, etc.}
+  version TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  trained_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Predictions (P2)

@@ -14,6 +14,7 @@ import { ModelTrainingPanel } from '@/components/ml/ModelTrainingPanel';
 import { PredictionHistory } from '@/components/ml/PredictionHistory';
 import { CSVUploadPanel } from '@/components/ml/CSVUploadPanel';
 import { ModelManager } from '@/components/ml/ModelManager';
+import { ModelComparison } from '@/components/ml/ModelComparison';
 import { BatchPredictionPanel } from '@/components/ml/BatchPredictionPanel';
 
 const MODEL_FEATURES = {
@@ -196,35 +197,15 @@ export function MLPredictions() {
             </div>
 
             <Tabs defaultValue="predict" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-7 text-sm">
-                    <TabsTrigger value="predict" className="gap-1.5">
-                        <Brain className="h-4 w-4" />
-                        Predict
-                    </TabsTrigger>
-                    <TabsTrigger value="train" className="gap-1.5">
-                        <Zap className="h-4 w-4" />
-                        Train
-                    </TabsTrigger>
-                    <TabsTrigger value="upload" className="gap-1.5">
-                        <Upload className="h-4 w-4" />
-                        CSV
-                    </TabsTrigger>
-                    <TabsTrigger value="batch" className="gap-1.5">
-                        <Zap className="h-4 w-4" />
-                        Batch
-                    </TabsTrigger>
-                    <TabsTrigger value="history" className="gap-1.5">
-                        <History className="h-4 w-4" />
-                        History
-                    </TabsTrigger>
-                    <TabsTrigger value="models" className="gap-1.5">
-                        <Package className="h-4 w-4" />
-                        Models
-                    </TabsTrigger>
-                    <TabsTrigger value="info" className="gap-1.5">
-                        <BarChart3 className="h-4 w-4" />
-                        Info
-                    </TabsTrigger>
+                <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 h-auto">
+                    <TabsTrigger value="predict" className="py-2">Predict</TabsTrigger>
+                    <TabsTrigger value="batch" className="py-2">Batch</TabsTrigger>
+                    <TabsTrigger value="train" className="py-2">Train</TabsTrigger>
+                    <TabsTrigger value="upload" className="py-2">Upload</TabsTrigger>
+                    <TabsTrigger value="history" className="py-2">History</TabsTrigger>
+                    <TabsTrigger value="compare" className="py-2">Compare</TabsTrigger>
+                    <TabsTrigger value="models" className="py-2">Models</TabsTrigger>
+                    <TabsTrigger value="info" className="py-2">Info</TabsTrigger>
                 </TabsList>
 
                 {/* Predict Tab */}
@@ -410,6 +391,10 @@ export function MLPredictions() {
                 {/* Models Tab */}
                 <TabsContent value="models">
                     <ModelManager />
+                </TabsContent>
+
+                <TabsContent value="compare">
+                    <ModelComparison />
                 </TabsContent>
 
                 {/* Info Tab */}
