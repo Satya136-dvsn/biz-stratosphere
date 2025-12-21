@@ -21,6 +21,8 @@ export function AIChat() {
     const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
     const [similarityThreshold, setSimilarityThreshold] = useState(0.5);
     const [contextLimit, setContextLimit] = useState(5);
+    const [chunkSize, setChunkSize] = useState(1);
+    const [chunkOverlap, setChunkOverlap] = useState(0);
     const [inputMessage, setInputMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -116,7 +118,59 @@ export function AIChat() {
                         RAG Configuration
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="pb-3">
+                <CardContent className="pb-3 space-y-4">
+                    {/* Settings Row 1: Retrieval Params */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-muted-foreground">Similarity Threshold: {similarityThreshold}</label>
+                            <Input
+                                type="number"
+                                min={0.1}
+                                max={0.9}
+                                step={0.1}
+                                value={similarityThreshold}
+                                onChange={(e) => setSimilarityThreshold(parseFloat(e.target.value))}
+                                className="h-8"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-muted-foreground">Context Limit: {contextLimit}</label>
+                            <Input
+                                type="number"
+                                min={1}
+                                max={20}
+                                step={1}
+                                value={contextLimit}
+                                onChange={(e) => setContextLimit(parseInt(e.target.value))}
+                                className="h-8"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-muted-foreground">Chunk Size: {chunkSize}</label>
+                            <Input
+                                type="number"
+                                min={1}
+                                max={100}
+                                step={1}
+                                value={chunkSize}
+                                onChange={(e) => setChunkSize(parseInt(e.target.value))}
+                                className="h-8"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-muted-foreground">Chunk Overlap: {chunkOverlap}</label>
+                            <Input
+                                type="number"
+                                min={0}
+                                max={50}
+                                step={1}
+                                value={chunkOverlap}
+                                onChange={(e) => setChunkOverlap(parseInt(e.target.value))}
+                                className="h-8"
+                            />
+                        </div>
+                    </div>
+
                     <div className="flex flex-col md:flex-row gap-4 items-end">
                         <div className="flex-1 w-full">
                             <label className="text-sm font-medium mb-1.5 block">Active Dataset</label>
@@ -139,7 +193,11 @@ export function AIChat() {
                         </div>
                         <Button
                             variant="outline"
-                            onClick={() => selectedDataset && generateDatasetEmbeddings({ datasetId: selectedDataset })}
+                            onClick={() => selectedDataset && generateDatasetEmbeddings({
+                                datasetId: selectedDataset,
+                                chunkSize,
+                                chunkOverlap
+                            })}
                             disabled={!selectedDataset || isGenerating}
                             className="w-full md:w-auto"
                         >

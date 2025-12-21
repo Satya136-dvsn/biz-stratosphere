@@ -96,7 +96,7 @@ export function useEmbeddings() {
 
     // Generate embeddings for dataset
     const generateDatasetEmbeddings = useMutation({
-        mutationFn: async ({ datasetId }: { datasetId: string }) => {
+        mutationFn: async ({ datasetId, chunkSize = 1, chunkOverlap = 0 }: { datasetId: string, chunkSize?: number, chunkOverlap?: number }) => {
             if (!user) throw new Error('Not authenticated');
 
             // Fetch data points
@@ -104,7 +104,8 @@ export function useEmbeddings() {
                 .from('data_points')
                 .select('*')
                 .eq('dataset_id', datasetId)
-                .limit(100); // Limit for now
+                .order('date_recorded', { ascending: true }) // Ensure orderly chunking
+                .limit(1000); // Increased limit for better context
 
             if (fetchError) throw fetchError;
             if (!dataPoints || dataPoints.length === 0) {
@@ -117,36 +118,57 @@ export function useEmbeddings() {
                 .delete()
                 .eq('dataset_id', datasetId);
 
-            // Process in batches
-            const batchSize = 10;
+            // Create chunks based on sliding window
+            const chunks: { content: string, metadata: any }[] = [];
+            const step = Math.max(1, chunkSize - chunkOverlap);
+
+            for (let i = 0; i < dataPoints.length; i += step) {
+                const chunkEnd = Math.min(i + chunkSize, dataPoints.length);
+                const chunkPoints = dataPoints.slice(i, chunkEnd);
+
+                if (chunkPoints.length === 0) break;
+
+                // Create content from chunk
+                const content = chunkPoints.map(point =>
+                    `${point.metric_name}: ${point.metric_value} (recorded on ${point.date_recorded})`
+                ).join('\n');
+
+                chunks.push({
+                    content,
+                    metadata: {
+                        chunk_index: chunks.length,
+                        start_record_idx: i,
+                        end_record_idx: chunkEnd - 1,
+                        record_count: chunkPoints.length,
+                        // Store first/last metric info for context
+                        start_date: chunkPoints[0].date_recorded,
+                        end_date: chunkPoints[chunkPoints.length - 1].date_recorded
+                    }
+                });
+            }
+
+            // Process chunks in batches to respect rate limits
+            const batchSize = 5; // Reduced batch size for larger chunks
             const embeddings = [];
 
-            for (let i = 0; i < dataPoints.length; i += batchSize) {
-                const batch = dataPoints.slice(i, i + batchSize);
+            for (let i = 0; i < chunks.length; i += batchSize) {
+                const batch = chunks.slice(i, i + batchSize);
 
-                for (const point of batch) {
-                    // Create content from data point
-                    const content = `${point.metric_name}: ${point.metric_value} (recorded on ${point.date_recorded})`;
-
+                for (const chunk of batch) {
                     // Generate embedding
-                    const embeddingVector = await generateEmbedding(content);
+                    const embeddingVector = await generateEmbedding(chunk.content);
 
                     embeddings.push({
                         user_id: user.id,
                         dataset_id: datasetId,
-                        content,
-                        metadata: {
-                            metric_name: point.metric_name,
-                            metric_value: point.metric_value,
-                            date_recorded: point.date_recorded,
-                            chunk_index: i,
-                        },
+                        content: chunk.content,
+                        metadata: chunk.metadata,
                         embedding: embeddingVector,
                     });
                 }
 
                 // Small delay to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 200));
             }
 
             // Insert embeddings
