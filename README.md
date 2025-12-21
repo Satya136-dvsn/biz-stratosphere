@@ -549,18 +549,18 @@ For support and questions:
 - [x] Advanced model management & badges
 - [x] Real-time AI chat with RAG
 - [x] API key management & usage tracking
+- [x] Real-time training progress visualization
 
 ### 🔄 In Progress
 
 - [ ] Advanced model comparison UI & accuracy tracking
-- [ ] Real-time training progress visualization
 - [ ] Automated model versioning
+- [ ] Fine-tuning for custom embedding models
 
 ### 📋 Future
 
 - [ ] Real-time collaboration
 - [ ] Mobile app (React Native)
-- [ ] Custom embedding models
 - [ ] Scheduled reports
 - [ ] Data warehouse integration
 - [ ] Custom dashboards builder
