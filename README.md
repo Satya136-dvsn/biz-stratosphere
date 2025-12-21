@@ -1,6 +1,6 @@
 # 🚀 Biz Stratosphere
 
-**AI-Powered Business Intelligence & Analytics Platform**
+## AI-Powered Business Intelligence & Analytics Platform
 
 A modern, serverless analytics platform that empowers businesses with AI-driven insights, real-time predictions, and comprehensive data visualization - all at **$0/month operational cost**.
 
@@ -143,14 +143,14 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 
 ### 📊 Using the Analytics Dashboard
 
-**Step 1: Upload Your Data**
+#### Step 1: Upload Your Data
 
 - Navigate to **Data Upload** from the sidebar
 - Click "Upload File" and select your CSV or Excel file
 - The system automatically analyzes data quality and detects any issues
 - Your data is now available across all features
 
-**Step 2: Create Visualizations**
+#### Step 2: Create Visualizations
 
 - Go to **Analytics Dashboard**
 - Click "Create Chart" and choose from 8 chart types:
@@ -165,7 +165,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 - Configure your chart with drag-and-drop fields
 - Save and share your insights
 
-**Step 3: Generate Reports**
+#### Step 3: Generate Reports
 
 - Click "Generate Report" on the dashboard
 - Choose format: PDF (presentation-ready), Excel (data analysis), or CSV (raw data)
@@ -174,7 +174,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 
 ### 🤖 Using ML Predictions (100% Free, Browser-Based)
 
-**Customer Churn Prediction**
+#### Customer Churn Prediction
 
 1. Navigate to **ML Predictions** → **Predict** tab
 2. Select "Customer Churn Predictor"
@@ -188,7 +188,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 5. View results: "Will Churn" or "Will Stay" with confidence score
 6. Review feature importance to understand key drivers
 
-**Revenue Forecasting**
+#### Revenue Forecasting
 
 1. Select "Revenue Forecaster" from the model dropdown
 2. Input business metrics:
@@ -200,7 +200,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 3. Get instant revenue forecast in dollars
 4. Use for budgeting and planning
 
-**Training Custom Models**
+#### Training Custom Models
 
 1. Go to **ML Predictions** → **Train** tab
 2. Click "Download Template" for your model type
@@ -209,14 +209,14 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 5. Click "Train Model" - training happens in your browser (1-2 minutes)
 6. Your custom model is now available for predictions!
 
-**Viewing Prediction History**
+#### Viewing Prediction History
 
 - Navigate to **ML Predictions** → **History** tab
 - Filter by model type, date range, or prediction value
 - Click any prediction to see detailed breakdown
 - Export history to CSV for analysis
 
-**Managing Models**
+#### Managing Models
 
 - Go to **ML Predictions** → **Models** tab
 - See all available models (Advanced DNN, Custom Trained, Legacy)
@@ -226,7 +226,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 
 ### 💬 Using the AI Assistant
 
-**Starting a Conversation**
+#### Starting a Conversation
 
 1. Click the chat icon in the bottom-right corner (or navigate to AI Chat)
 2. Type your question in plain English, e.g.:
@@ -235,7 +235,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
    - "Which products have the highest profit margin?"
 3. The AI uses RAG (Retrieval-Augmented Generation) to provide accurate answers based on your data
 
-**Optimizing AI Responses**
+#### Optimizing AI Responses
 
 - Go to **Settings** (gear icon in chat)
 - Adjust context window (5-20 messages) for longer conversations
@@ -243,7 +243,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 - Set max tokens to control response length
 - Configure rate limits for your usage patterns
 
-**Exporting Conversations**
+#### Exporting Conversations
 
 - Click the download icon in chat header
 - Choose format: Markdown (readable), JSON (structured), or Text (simple)
@@ -251,14 +251,14 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 
 ### 🔧 Using the API
 
-**Getting Your API Key**
+#### Getting Your API Key
 
 1. Navigate to **API Management**
 2. Click "Generate API Key"
 3. Name your key (e.g., "Production App")
 4. Copy and securely store the key (shown only once!)
 
-**Making API Calls**
+#### Making API Calls
 
 ```bash
 curl -X POST https://your-domain.com/api/predict \
@@ -276,7 +276,7 @@ curl -X POST https://your-domain.com/api/predict \
   }'
 ```
 
-**Monitoring Usage**
+#### Monitoring Usage
 
 - View API usage statistics in **API Management**
 - Track requests per day/month
@@ -363,7 +363,7 @@ uvicorn main:app --reload --port 8000
 
 ## 📁 Project Structure
 
-```
+```text
 biz-stratosphere/
 ├── src/
 │   ├── components/        # React components
@@ -541,15 +541,20 @@ For support and questions:
 ### ✅ Completed
 
 - [x] Browser-based ML predictions (TensorFlow.js)
+- [x] Advanced 6-layer Deep Neural Networks (DNN)
 - [x] Custom model training with CSV upload
-- [x] Prediction history tracking
+- [x] Model export/import functionality (.bizml format)
+- [x] Batch predictions from CSV
+- [x] Prediction history tracking with export
+- [x] Advanced model management & badges
 - [x] Real-time AI chat with RAG
+- [x] API key management & usage tracking
 
 ### 🔄 In Progress
 
-- [ ] Model export/import functionality
-- [ ] Batch predictions from CSV
-- [ ] Advanced model comparison UI
+- [ ] Advanced model comparison UI & accuracy tracking
+- [ ] Real-time training progress visualization
+- [ ] Automated model versioning
 
 ### 📋 Future
 
@@ -563,6 +568,6 @@ For support and questions:
 
 ---
 
-**Built with ❤️ by the Biz Stratosphere Team**
+Built with ❤️ by the Biz Stratosphere Team
 
 *Transform your data into insights with AI-powered analytics.*
