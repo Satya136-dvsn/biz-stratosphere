@@ -27,8 +27,6 @@ interface NavItem {
     title: string;
     href: string;
     icon: React.ElementType;
-    badge?: string;
-    badgeComponent?: React.ReactNode;
 }
 
 const navItems: NavItem[] = [
@@ -51,43 +49,36 @@ const navItems: NavItem[] = [
         title: "Workspaces",
         href: "/workspaces",
         icon: Users,
-        badge: "NEW",
     },
     {
         title: "API Management",
         href: "/api-management",
         icon: Key,
-        badge: "NEW",
     },
     {
         title: "Advanced Charts",
         href: "/advanced-charts",
         icon: LineChart,
-        badge: "NEW",
     },
     {
         title: "AI Chat",
         href: "/ai-chat",
         icon: Sparkles,
-        badgeComponent: <FeatureBadge variant="production" size="sm" />,
     },
     {
         title: "AI Analytics",
         href: "/ai-analytics",
         icon: Activity,
-        badge: "NEW",
     },
     {
         title: "ML Predictions",
         href: "/ml-predictions",
         icon: Brain,
-        badgeComponent: <FeatureBadge variant="production" size="sm" />,
     },
     {
         title: "Automation Rules",
         href: "/automation-rules",
         icon: Workflow,
-        badgeComponent: <FeatureBadge variant="production" size="sm" />,
     },
     {
         title: "Profile",
@@ -176,16 +167,6 @@ export function Sidebar() {
                                 {!collapsed && (
                                     <>
                                         <span className="text-sm font-medium truncate flex-1">{item.title}</span>
-                                        {item.badge && (
-                                            <span className="ml-2 text-[10px] bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-full flex-shrink-0">
-                                                {item.badge}
-                                            </span>
-                                        )}
-                                        {item.badgeComponent && (
-                                            <span className="ml-2 flex-shrink-0">
-                                                {item.badgeComponent}
-                                            </span>
-                                        )}
                                     </>
                                 )}
                             </Button>

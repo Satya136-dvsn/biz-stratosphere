@@ -30,8 +30,6 @@ interface NavItem {
     title: string;
     href: string;
     icon: React.ElementType;
-    badge?: string;
-    badgeComponent?: React.ReactNode;
 }
 
 const navItems: NavItem[] = [
@@ -54,7 +52,6 @@ const navItems: NavItem[] = [
         title: "Advanced Charts",
         href: "/advanced-charts",
         icon: LineChart,
-        badge: "NEW",
     },
     {
         title: "Workspaces",
@@ -70,19 +67,16 @@ const navItems: NavItem[] = [
         title: "AI Chat",
         href: "/ai-chat",
         icon: Sparkles,
-        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
     },
     {
         title: "ML Predictions",
         href: "/ml-predictions",
         icon: Brain,
-        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
     },
     {
         title: "Automation Rules",
         href: "/automation-rules",
         icon: Workflow,
-        badgeComponent: <FeatureBadge variant="prototype" size="sm" />,
     },
     {
         title: "Profile",
@@ -148,16 +142,6 @@ export function MobileNav() {
                                 >
                                     <Icon className="h-5 w-5 flex-shrink-0" />
                                     <span className="flex-1">{item.title}</span>
-                                    {item.badge && (
-                                        <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/20 text-primary">
-                                            {item.badge}
-                                        </span>
-                                    )}
-                                    {item.badgeComponent && (
-                                        <span className="ml-auto">
-                                            {item.badgeComponent}
-                                        </span>
-                                    )}
                                 </Link>
                             );
                         })}
