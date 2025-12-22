@@ -14,6 +14,8 @@ import { MobileNav } from "./components/layout/MobileNav";
 // Lazy load all page components for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Landing = lazy(() => import("./pages/Landing"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Enterprise = lazy(() => import("./pages/Enterprise").then(m => ({ default: m.Enterprise })));
@@ -84,6 +86,8 @@ const App = () => (
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/" element={<Landing />} />
               <Route path="/platform-status" element={<PlatformStatus />} />
               <Route

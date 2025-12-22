@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { loginSchema, emailSchema, passwordSchema } from "@/lib/validation";
 import { validatePasswordStrength } from "@/lib/passwordSecurity";
@@ -253,6 +253,11 @@ export default function Auth() {
                       />
                     </div>
                   </div>
+                  <div className="flex justify-end">
+                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                      Forgot password?
+                    </Link>
+                  </div>
                   <Button
                     type="submit"
                     className="w-full bg-gradient-primary hover:opacity-90"
@@ -324,6 +329,6 @@ export default function Auth() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </div >
   );
 }
