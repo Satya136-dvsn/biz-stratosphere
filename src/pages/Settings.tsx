@@ -8,12 +8,16 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UsageQuotas } from "@/components/settings/UsageQuotas";
 import { useAuth } from "@/hooks/useAuth";
-import { User, Bell, Shield, Database, Save, Palette, Moon, Sun } from "lucide-react";
+import { User, Bell, Shield, Database, Save, Palette, Moon, Sun, Download, FileText, Trash2, Lock } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export function Settings() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [isExporting, setIsExporting] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
   const [notifications, setNotifications] = useState({
     email: true,
@@ -49,6 +53,40 @@ export function Settings() {
     }
   };
 
+  const handleExportData = async () => {
+    try {
+      setIsExporting(true);
+      const { data, error } = await supabase.functions.invoke('gdpr-export');
+
+      if (error) throw error;
+
+      // Trigger download
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `biz-stratosphere-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Export Complete",
+        description: "Your personal data has been securely exported.",
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: "Could not generate functionality export. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <PageLayout>
       <div>
@@ -75,6 +113,10 @@ export function Settings() {
           <TabsTrigger value="security" className="gap-2">
             <Shield className="h-4 w-4" />
             <span className="hidden sm:inline">Security</span>
+          </TabsTrigger>
+          <TabsTrigger value="privacy" className="gap-2">
+            <Lock className="h-4 w-4" />
+            <span className="hidden sm:inline">Privacy & Data</span>
           </TabsTrigger>
           <TabsTrigger value="usage" className="gap-2">
             <Database className="h-4 w-4" />
@@ -311,6 +353,63 @@ export function Settings() {
                   You are currently signed in on 1 device
                 </p>
                 <Button variant="outline">View All Sessions</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Privacy Settings */}
+        <TabsContent value="privacy" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Data Privacy & Portability</CardTitle>
+              <CardDescription>
+                Manage your personal data and retention settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      GDPR Data Export
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Download a copy of all your personal data, including profile info, logs, and automation rules.
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={handleExportData} disabled={isExporting}>
+                    {isExporting ? (
+                      <span className="flex items-center gap-2">Generating...</span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Download className="h-4 w-4" />
+                        Export Data
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Trash2 className="h-4 w-4 text-muted-foreground" />
+                    Data Retention Policy
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Biz Stratosphere automatically retains system logs (automations, notifications, alerts) for <strong>90 days</strong>.
+                    Old logs are securely deleted permanently.
+                  </p>
+
+                  <div className="mt-4 p-4 bg-muted/50 rounded-lg text-sm border">
+                    <p>Current Policy: <strong>90 Days</strong></p>
+                    <p className="text-xs text-muted-foreground mt-1">Logs created before {new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toLocaleDateString()} will be removed during the next scheduled cleanup.</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
