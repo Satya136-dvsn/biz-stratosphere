@@ -207,56 +207,21 @@ async function createNotification(
 /**
  * Run automation rule
  */
+/**
+ * Run automation rule via Edge Function
+ */
 export async function runAutomationRule(ruleId: string): Promise<void> {
-    // Fetch rule
-    const { data: rule } = await supabase
-        .from('automation_rules')
-        .select('*')
-        .eq('id', ruleId)
-        .single();
+    const { data, error } = await supabase.functions.invoke('automation-evaluator', {
+        body: { ruleId }
+    });
 
-    if (!rule || !rule.enabled) return;
-
-    // Evaluate condition
-    const { result, currentValue } = await evaluateCondition(
-        rule.condition,
-        rule.user_id
-    );
-
-    if (!result) {
-        // Log skip
-        await supabase.from('automation_logs').insert({
-            rule_id: ruleId,
-            user_id: rule.user_id,
-            status: 'skipped',
-            condition_result: { matched: false, currentValue },
-        });
-        return;
+    if (error) {
+        console.error('Failed to invoke automation-evaluator:', error);
+        throw error;
     }
 
-    // Execute action
-    const actionResult = await executeAction(rule.action_type, rule.action_config, {
-        userId: rule.user_id,
-        ruleName: rule.name,
-        currentValue,
-        threshold: rule.condition.threshold,
-    });
-
-    // Log execution
-    await supabase.from('automation_logs').insert({
-        rule_id: ruleId,
-        user_id: rule.user_id,
-        status: actionResult.success ? 'success' : 'failure',
-        condition_result: { matched: true, currentValue },
-        action_result: actionResult.result,
-        error_message: actionResult.error,
-    });
-
-    // Update last triggered
-    if (actionResult.success) {
-        await supabase
-            .from('automation_rules')
-            .update({ last_triggered: new Date().toISOString() })
-            .eq('id', ruleId);
+    if (!data.success) {
+        console.error('Automation evaluator returned failure:', data);
+        throw new Error(data.error || 'Automation evaluation failed');
     }
 }
