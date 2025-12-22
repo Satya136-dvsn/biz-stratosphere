@@ -47,9 +47,37 @@ serve(async (req) => {
       .order('date_recorded', { ascending: false })
       .limit(50);
 
+    // ---------------------------------------------------------
+    // Rate Limiting (Phase 2)
+    // ---------------------------------------------------------
+    // Limit: 20 requests per minute per user
+    const LIMIT = 20;
+    const WINDOW = 60;
+
+    const { data: isAllowed, error: rateError } = await supabase
+      .rpc('check_rate_limit', {
+        limit_key: `ai_chat:${user.id}`,
+        max_requests: LIMIT,
+        window_seconds: WINDOW
+      });
+
+    if (rateError) {
+      console.error('Rate limit check failed:', rateError);
+      // Fail open or closed? Let's fail open for now but log it, or fail closed if safe.
+      // Failing closed is safer for abuse.
+    }
+
+    if (isAllowed === false) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    // ---------------------------------------------------------
+
     // Create context from data
-    const dataContext = dataPoints ? 
-      `Recent business metrics: ${JSON.stringify(dataPoints.slice(0, 10))}` : 
+    const dataContext = dataPoints ?
+      `Recent business metrics: ${JSON.stringify(dataPoints.slice(0, 10))}` :
       'No recent data available';
 
     console.log('Making OpenAI request for user:', user.id);
