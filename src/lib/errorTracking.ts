@@ -3,6 +3,8 @@
  * Can be integrated with Sentry, LogRocket, or similar services
  */
 
+import * as Sentry from '@sentry/react';
+
 export interface ErrorContext {
     user?: {
         id: string;
@@ -20,17 +22,25 @@ export const initializeErrorTracking = (dsn?: string) => {
     const SENTRY_DSN = dsn || import.meta.env.VITE_SENTRY_DSN;
 
     if (!SENTRY_DSN) {
-        console.warn('Error tracking DSN not configured');
+        console.warn('Error tracking DSN not configured - Sentry disabled');
         return;
     }
 
-    // TODO: Initialize Sentry or your preferred error tracking service
-    // Example for Sentry:
-    // Sentry.init({
-    //   dsn: SENTRY_DSN,
-    //   integrations: [new BrowserTracing()],
-    //   tracesSampleRate: 1.0,
-    // });
+    try {
+        Sentry.init({
+            dsn: SENTRY_DSN,
+            integrations: [
+                Sentry.browserTracingIntegration(),
+                Sentry.replayIntegration(),
+            ],
+            tracesSampleRate: 1.0,
+            replaysSessionSampleRate: 0.1,
+            replaysOnErrorSampleRate: 1.0,
+        });
+        console.log('Sentry initialized successfully');
+    } catch (e) {
+        console.error('Failed to initialize Sentry:', e);
+    }
 };
 
 // Capture exception
@@ -40,14 +50,17 @@ export const captureException = (error: Error, context?: ErrorContext) => {
         console.error('Error captured:', error, context);
     }
 
-    // TODO: Send to error tracking service
-    // Example for Sentry:
-    // Sentry.captureException(error, {
-    //   user: context?.user,
-    //   extra: context?.extra,
-    //   tags: context?.tags,
-    //   level: context?.level,
-    // });
+    if (context) {
+        Sentry.withScope((scope) => {
+            if (context.user) scope.setUser(context.user);
+            if (context.tags) scope.setTags(context.tags);
+            if (context.extra) scope.setExtras(context.extra);
+            if (context.level) scope.setLevel(context.level);
+            Sentry.captureException(error);
+        });
+    } else {
+        Sentry.captureException(error);
+    }
 
     // Fallback: Track with analytics
     if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -64,16 +77,13 @@ export const captureMessage = (message: string, context?: ErrorContext) => {
         console.log('Message captured:', message, context);
     }
 
-    // TODO: Send to error tracking service
-    // Example for Sentry:
-    // Sentry.captureMessage(message, context?.level || 'info');
+    const level = context?.level || 'info';
+    Sentry.captureMessage(message, level);
 };
 
 // Set user context
 export const setUserContext = (user: { id: string; email?: string; username?: string }) => {
-    // TODO: Set user context in error tracking service
-    // Example for Sentry:
-    // Sentry.setUser(user);
+    Sentry.setUser(user);
 };
 
 // Add breadcrumb (for debugging trail)
@@ -82,14 +92,12 @@ export const addBreadcrumb = (message: string, category?: string, data?: Record<
         console.log('Breadcrumb:', { message, category, data });
     }
 
-    // TODO: Add breadcrumb to error tracking service
-    // Example for Sentry:
-    // Sentry.addBreadcrumb({
-    //   message,
-    //   category,
-    //   data,
-    //   timestamp: Date.now(),
-    // });
+    Sentry.addBreadcrumb({
+        message,
+        category,
+        data,
+        timestamp: Date.now(),
+    });
 };
 
 // Error boundary helper

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { trackLatency } from '@/lib/performance';
 import { useAuth } from './useAuth';
 import { useDataContext, buildAIContext } from './useDataContext';
 
@@ -56,118 +57,123 @@ export function useAIConversation(conversationId?: string) {
     // Send message mutation
     const sendMessageMutation = useMutation({
         mutationFn: async ({ message, newConversation }: { message: string; newConversation?: boolean }) => {
-            if (!user) throw new Error('User not authenticated');
+            return trackLatency('AI Query', async () => {
+                if (!user) throw new Error('User not authenticated');
 
-            setIsTyping(true);
+                setIsTyping(true);
 
-            try {
-                // Build context from user's data
-                const context = dataContext ? buildAIContext(dataContext) : '';
+                try {
+                    // Build context from user's data
+                    const context = dataContext ? buildAIContext(dataContext) : '';
 
-                // Build conversation history for Gemini
-                const conversationHistory = conversation?.messages.map(msg => ({
-                    role: msg.role === 'user' ? 'user' : 'model',
-                    parts: [{ text: msg.content }]
-                })) || [];
+                    // Build conversation history for Gemini
+                    const conversationHistory = conversation?.messages.map(msg => ({
+                        role: msg.role === 'user' ? 'user' : 'model',
+                        parts: [{ text: msg.content }]
+                    })) || [];
 
-                // Prepare Gemini API request
-                const systemInstruction = `You are an AI business analyst assistant. You help users analyze their business data and provide insights.
+                    // Prepare Gemini API request
+                    const systemInstruction = `You are an AI business analyst assistant. You help users analyze their business data and provide insights.
+    
+    ${context}
+    
+    Provide concise, actionable insights based on the user's data. When referencing data, be specific. If the user hasn't uploaded data yet, guide them to upload their business data first.`;
 
-${context}
-
-Provide concise, actionable insights based on the user's data. When referencing data, be specific. If the user hasn't uploaded data yet, guide them to upload their business data first.`;
-
-                // Call Gemini API
-                const response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            contents: [
-                                ...conversationHistory,
-                                {
-                                    role: 'user',
-                                    parts: [{ text: message }]
-                                }
-                            ],
-                            systemInstruction: {
-                                parts: [{ text: systemInstruction }]
+                    // Call Gemini API
+                    const response = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
                             },
-                            generationConfig: {
-                                temperature: 0.7,
-                                maxOutputTokens: 1000,
-                            }
-                        }),
+                            body: JSON.stringify({
+                                contents: [
+                                    ...conversationHistory,
+                                    {
+                                        role: 'user',
+                                        parts: [{ text: message }]
+                                    }
+                                ],
+                                systemInstruction: {
+                                    parts: [{ text: systemInstruction }]
+                                },
+                                generationConfig: {
+                                    temperature: 0.7,
+                                    maxOutputTokens: 1000,
+                                }
+                            }),
+                        }
+                    );
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
                     }
-                );
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
+                    const data = await response.json();
+                    const assistantMessage = data.candidates[0].content.parts[0].text;
+
+                    // Estimate token usage (Gemini doesn't provide exact counts in free tier)
+                    const estimatedPromptTokens = Math.ceil((systemInstruction.length + message.length) / 4);
+                    const estimatedCompletionTokens = Math.ceil(assistantMessage.length / 4);
+
+                    // Update token usage
+                    setTokenUsage({
+                        prompt: estimatedPromptTokens,
+                        completion: estimatedCompletionTokens,
+                        total: estimatedPromptTokens + estimatedCompletionTokens,
+                    });
+
+                    // Create or update conversation in database
+                    const newMessages: Message[] = [
+                        ...(conversation?.messages || []),
+                        {
+                            id: crypto.randomUUID(),
+                            role: 'user',
+                            content: message,
+                            timestamp: new Date(),
+                        },
+                        {
+                            id: crypto.randomUUID(),
+                            role: 'assistant',
+                            content: assistantMessage,
+                            timestamp: new Date(),
+                        },
+                    ];
+
+                    if (newConversation || !conversationId) {
+                        // Create new conversation
+                        const { data: newConv } = await supabase
+                            .from('ai_conversations')
+                            .insert({
+                                user_id: user.id,
+                                title: message.slice(0, 50) + (message.length > 50 ? '...' : ''),
+                                messages: newMessages,
+                            })
+                            .select()
+                            .single();
+
+                        return { conversation: newConv, messages: newMessages };
+                    } else {
+                        // Update existing conversation
+                        await supabase
+                            .from('ai_conversations')
+                            .update({
+                                messages: newMessages,
+                                updated_at: new Date().toISOString(),
+                            })
+                            .eq('id', conversationId);
+
+                        return { conversation: { ...conversation, messages: newMessages }, messages: newMessages };
+                    }
+                } finally {
+                    setIsTyping(false);
                 }
-
-                const data = await response.json();
-                const assistantMessage = data.candidates[0].content.parts[0].text;
-
-                // Estimate token usage (Gemini doesn't provide exact counts in free tier)
-                const estimatedPromptTokens = Math.ceil((systemInstruction.length + message.length) / 4);
-                const estimatedCompletionTokens = Math.ceil(assistantMessage.length / 4);
-
-                // Update token usage
-                setTokenUsage({
-                    prompt: estimatedPromptTokens,
-                    completion: estimatedCompletionTokens,
-                    total: estimatedPromptTokens + estimatedCompletionTokens,
-                });
-
-                // Create or update conversation in database
-                const newMessages: Message[] = [
-                    ...(conversation?.messages || []),
-                    {
-                        id: crypto.randomUUID(),
-                        role: 'user',
-                        content: message,
-                        timestamp: new Date(),
-                    },
-                    {
-                        id: crypto.randomUUID(),
-                        role: 'assistant',
-                        content: assistantMessage,
-                        timestamp: new Date(),
-                    },
-                ];
-
-                if (newConversation || !conversationId) {
-                    // Create new conversation
-                    const { data: newConv } = await supabase
-                        .from('ai_conversations')
-                        .insert({
-                            user_id: user.id,
-                            title: message.slice(0, 50) + (message.length > 50 ? '...' : ''),
-                            messages: newMessages,
-                        })
-                        .select()
-                        .single();
-
-                    return { conversation: newConv, messages: newMessages };
-                } else {
-                    // Update existing conversation
-                    await supabase
-                        .from('ai_conversations')
-                        .update({
-                            messages: newMessages,
-                            updated_at: new Date().toISOString(),
-                        })
-                        .eq('id', conversationId);
-
-                    return { conversation: { ...conversation, messages: newMessages }, messages: newMessages };
-                }
-            } finally {
-                setIsTyping(false);
-            }
+            }, {
+                model: GEMINI_MODEL,
+                messageLength: message.length
+            });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['ai-conversation'] });
