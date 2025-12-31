@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
+import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +23,7 @@ serve(async (req) => {
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!; // Use service key for rate limit RPC
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Get user from auth header
@@ -39,6 +40,20 @@ serve(async (req) => {
       throw new Error('Invalid authentication');
     }
 
+    // ---------------------------------------------------------
+    // Rate Limiting
+    // ---------------------------------------------------------
+    // Limit: 50 requests per hour per user
+    const { allowed, remaining } = await checkRateLimit(supabase, user.id, 'ai-chat', 50, 3600);
+
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: `Rate limit exceeded. Remaining: ${remaining}` }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    // ---------------------------------------------------------
+
     // Fetch user's recent data for context
     const { data: dataPoints } = await supabase
       .from('data_points')
@@ -46,34 +61,6 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .order('date_recorded', { ascending: false })
       .limit(50);
-
-    // ---------------------------------------------------------
-    // Rate Limiting (Phase 2)
-    // ---------------------------------------------------------
-    // Limit: 20 requests per minute per user
-    const LIMIT = 20;
-    const WINDOW = 60;
-
-    const { data: isAllowed, error: rateError } = await supabase
-      .rpc('check_rate_limit', {
-        limit_key: `ai_chat:${user.id}`,
-        max_requests: LIMIT,
-        window_seconds: WINDOW
-      });
-
-    if (rateError) {
-      console.error('Rate limit check failed:', rateError);
-      // Fail open or closed? Let's fail open for now but log it, or fail closed if safe.
-      // Failing closed is safer for abuse.
-    }
-
-    if (isAllowed === false) {
-      return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    // ---------------------------------------------------------
 
     // Create context from data
     const dataContext = dataPoints ?
@@ -127,10 +114,10 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in ai-chat function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || 'Internal Server Error' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
