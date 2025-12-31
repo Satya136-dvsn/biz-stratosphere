@@ -12,13 +12,22 @@ import { User, Bell, Shield, Database, Save, Palette, Moon, Sun, Download, FileT
 import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { passwordSchema } from "@/lib/validation";
+import { z } from "zod";
 
 export function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+
+  // Password Change State
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
@@ -29,6 +38,68 @@ export function Settings() {
   const handleSaveProfile = () => {
     // TODO: Implement profile update
     console.log('Saving profile...');
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      if (newPassword !== confirmPassword) {
+        toast({
+          title: "Passwords do not match",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate password strength
+      try {
+        passwordSchema.parse(newPassword);
+      } catch (error: any) {
+        toast({
+          title: "Weak Password",
+          description: error.issues?.[0]?.message || "Password does not meet requirements",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPasswordLoading(true);
+
+      // Verify current password by signing in (re-authentication)
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        throw new Error("Incorrect current password");
+      }
+
+      // Update password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Password Updated",
+        description: "Your password has been changed successfully.",
+      });
+
+      // Clear form
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update password",
+        variant: "destructive",
+      });
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   const handleSaveNotifications = () => {
@@ -321,17 +392,41 @@ export function Settings() {
                 <h3 className="font-semibold">Change Password</h3>
                 <div className="space-y-2">
                   <Label htmlFor="current-password">Current Password</Label>
-                  <Input id="current-password" type="password" />
+                  <Input
+                    id="current-password"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="new-password">New Password</Label>
-                  <Input id="new-password" type="password" />
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Must be at least 8 characters with uppercase, lowercase, number, and special char.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password">Confirm New Password</Label>
-                  <Input id="confirm-password" type="password" />
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
                 </div>
-                <Button className="w-full sm:w-auto">Update Password</Button>
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={handleChangePassword}
+                  disabled={passwordLoading || !currentPassword || !newPassword}
+                >
+                  {passwordLoading ? "Updating..." : "Update Password"}
+                </Button>
               </div>
               <Separator />
               <div className="space-y-4">
