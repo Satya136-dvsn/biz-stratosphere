@@ -16,6 +16,8 @@ import { CSVUploadPanel } from '@/components/ml/CSVUploadPanel';
 import { ModelManager } from '@/components/ml/ModelManager';
 import { ModelComparison } from '@/components/ml/ModelComparison';
 import { BatchPredictionPanel } from '@/components/ml/BatchPredictionPanel';
+import { aiOrchestrator } from '@/lib/ai/orchestrator';
+import { Sparkles } from 'lucide-react';
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -70,6 +72,37 @@ export function MLPredictions() {
 
     const handleFeatureChange = (name: string, value: string) => {
         setFeatures(prev => ({ ...prev, [name]: value }));
+    };
+
+    const [explanation, setExplanation] = useState<string | null>(null);
+    const [isExplaining, setIsExplaining] = useState(false);
+
+    const handleExplain = async () => {
+        if (!prediction) return;
+
+        setIsExplaining(true);
+        try {
+            const label = selectedModel === 'churn_model'
+                ? (prediction.prediction > 0.5 ? 'High Churn Risk' : 'Low Churn Risk')
+                : `Predicted Revenue: $${(prediction.prediction * 1000).toFixed(0)}`;
+
+            const response = await aiOrchestrator.explainPrediction(
+                {
+                    label,
+                    score: prediction.prediction,
+                    confidence: prediction.confidence || 0
+                },
+                features,
+                prediction.feature_importance || {}
+            );
+
+            setExplanation(response.content);
+        } catch (error) {
+            console.error('Explanation failed:', error);
+            setExplanation("Sorry, I couldn't generate an explanation right now.");
+        } finally {
+            setIsExplaining(false);
+        }
     };
 
     const handlePredict = async () => {
@@ -354,6 +387,48 @@ export function MLPredictions() {
                                                 <span>Loaded from cache (instant!)</span>
                                             </div>
                                         )}
+
+                                        {/* AI Explanation Section */}
+                                        <div className="pt-4 border-t">
+                                            {!explanation ? (
+                                                <Button
+                                                    onClick={handleExplain}
+                                                    disabled={isExplaining}
+                                                    variant="outline"
+                                                    className="w-full border-purple-200 hover:bg-purple-50 hover:text-purple-700"
+                                                >
+                                                    {isExplaining ? (
+                                                        <>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Analyzing factors...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Sparkles className="mr-2 h-4 w-4 text-purple-600" />
+                                                            Explain with AI
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            ) : (
+                                                <div className="bg-purple-50 rounded-lg p-3 border border-purple-100 text-sm">
+                                                    <div className="flex items-center gap-2 font-semibold text-purple-800 mb-2">
+                                                        <Sparkles className="h-4 w-4" />
+                                                        AI Analysis
+                                                    </div>
+                                                    <p className="text-purple-900 leading-relaxed">
+                                                        {explanation}
+                                                    </p>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="mt-2 h-auto p-0 text-purple-600 hover:text-purple-800"
+                                                        onClick={() => setExplanation(null)}
+                                                    >
+                                                        Close Explanation
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="text-center py-12">

@@ -130,10 +130,14 @@ serve(async (req) => {
                         .update({ last_triggered: new Date().toISOString() })
                         .eq('id', rule_id);
 
-                    // C. Send Notification (Stub for email/slack)
-                    if (rule.action_type === 'email') {
-                        console.log(`[Mock Email] To User ${user_id}: Alert ${name} triggered!`);
-                    }
+                    // C. Send Notification
+                    await sendNotification(supabase, rule, {
+                        userId: user_id,
+                        ruleName: name,
+                        value: currentValue,
+                        threshold: condition.threshold,
+                        operator: condition.operator
+                    });
 
                     results.push({ rule_id, triggered: true, value: currentValue });
                 } else {
@@ -157,3 +161,42 @@ serve(async (req) => {
         });
     }
 });
+
+/**
+ * Helper to handle multi-channel notifications
+ */
+async function sendNotification(supabase: any, rule: any, context: any) {
+    const { action_type, action_config } = rule;
+    const message = `Alert: ${context.ruleName} triggered! Value ${context.value} ${context.operator} ${context.threshold}`;
+
+    try {
+        switch (action_type) {
+            case 'email':
+                // In production, integrate Resend/SendGrid here
+                console.log(`[Email] Sending to ${action_config?.email || 'admin@example.com'}: ${message}`);
+                break;
+
+            case 'slack':
+                if (action_config?.webhook_url) {
+                    await fetch(action_config.webhook_url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: message })
+                    });
+                }
+                break;
+
+            case 'in_app':
+            default:
+                await supabase.from('notifications').insert({
+                    user_id: context.userId,
+                    title: `Automation Alert: ${context.ruleName}`,
+                    message: message,
+                    type: 'alert'
+                });
+                break;
+        }
+    } catch (err) {
+        console.error(`Failed to send ${action_type} notification:`, err);
+    }
+}

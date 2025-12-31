@@ -3,9 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
-import { useEmbeddings } from './useEmbeddings';
-import { prepareContextForAI, estimateTokenCount } from '@/lib/conversationUtils';
 import { useAIUsageLimit } from './useAIUsageLimit';
+import { aiOrchestrator } from '@/lib/ai/orchestrator';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
@@ -35,7 +34,6 @@ export function useRAGChat(conversationId?: string) {
     const { user } = useAuth();
     const { toast } = useToast();
     const queryClient = useQueryClient();
-    const { searchSimilar } = useEmbeddings();
     const { checkLimit, incrementUsage } = useAIUsageLimit();
     const [isStreaming, setIsStreaming] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -154,6 +152,7 @@ export function useRAGChat(conversationId?: string) {
             }
 
             setIsStreaming(true);
+            setIsSearching(true); // Technically handled on server now, but keep state for UI feedback if needed
 
             try {
                 // 1. Save user message
@@ -169,133 +168,73 @@ export function useRAGChat(conversationId?: string) {
 
                 if (userMsgError) throw userMsgError;
 
-                // 2. Search for similar embeddings
-                setIsSearching(true);
-                let searchResults = [];
-                try {
-                    searchResults = await searchSimilar(message, contextLimit, datasetId, similarityThreshold);
-                } catch (searchError) {
-                    console.error('Search error:', searchError);
-                } finally {
-                    setIsSearching(false);
-                }
+                // 2. Prepare Context & History
+                // Get conversation settings
+                const { data: conversationData } = await supabase
+                    .from('chat_conversations')
+                    .select('context_window, temperature, max_tokens')
+                    .eq('id', convId)
+                    .single();
 
-                // 3. Build context from search results
-                const context = searchResults
-                    .map((result, idx) => `[Source ${idx + 1}]: ${result.content}`)
-                    .join('\n\n');
+                const contextWindow = conversationData?.context_window || 10;
 
-                // 4. Build prompt
+                // Get recent history
+                const { data: historyData } = await supabase
+                    .from('chat_messages')
+                    .select('*')
+                    .eq('conversation_id', convId)
+                    .order('created_at', { ascending: true }) // Oldest first for context
+                    .limit(contextWindow); // Simple limit for now, ideally token based
+
+                const history = (historyData || []).map(msg => ({
+                    role: (msg.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+                    content: msg.content
+                }));
+
+                // 3. Call AI Orchestrator
+                // Note: We pass context='auto' to let the Edge Function handle RAG
+                // But Orchestrator logic in client might need update to handle 'auto' or we just don't pass context 
+                // and let Orchestrator's default behavior (which calls edge function) take over.
+                // The prompt logic in Edge Function handles RAG if context is NOT provided or 'auto'.
+
+                // We define a system prompt that encourages RAG usage
                 const systemPrompt = `You are a helpful AI assistant analyzing business data. 
 Answer questions based ONLY on the provided context from the user's data.
 If the answer isn't in the context, say so clearly.
 Cite sources using [Source 1], [Source 2] format.`;
 
-                const userPrompt = context
-                    ? `Context from data:\n${context}\n\nQuestion: ${message}`
-                    : `Question: ${message}\n\nNote: No relevant data found in the database.`;
+                const response = await aiOrchestrator.generateResponse({
+                    provider: 'gemini', // Default
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        ...history,
+                        { role: 'user', content: message } // Current message
+                    ],
+                    context: 'auto', // Signal to Edge Function to perform RAG
+                    temperature: conversationData?.temperature || 0.7,
+                    maxTokens: conversationData?.max_tokens || 1000
+                });
 
-                // 5. Call Gemini API with comprehensive error handling
-                let assistantMessage: string;
-
-                try {
-                    // Check if API key is configured
-                    if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === '') {
-                        throw new Error('MISSING_API_KEY');
-                    }
-
-                    // Get conversation settings
-                    const { data: conversation } = await supabase
-                        .from('chat_conversations')
-                        .select('context_window, temperature, max_tokens')
-                        .eq('id', convId)
-                        .single();
-
-                    const contextWindow = conversation?.context_window || 10;
-                    const temperature = conversation?.temperature || 0.7;
-                    const maxTokens = conversation?.max_tokens || 2000;
-
-                    // Prepare context with sliding window
-                    const currentMessages = await supabase
-                        .from('chat_messages')
-                        .select('*')
-                        .eq('conversation_id', convId)
-                        .order('created_at', { ascending: true });
-
-                    const allMessages = currentMessages.data || [];
-                    const contextMessages = prepareContextForAI(allMessages as ChatMessage[], contextWindow);
-
-                    // Build enhanced prompt with conversation history
-                    const conversationHistory = contextMessages;
-
-                    const response = await fetch(`${GEMINI_CHAT_URL}?key=${GEMINI_API_KEY}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [
-                                ...conversationHistory,
-                                {
-                                    role: 'user',
-                                    parts: [{ text: systemPrompt + '\n\n' + userPrompt }]
-                                }
-                            ],
-                            generationConfig: {
-                                temperature: temperature,
-                                maxOutputTokens: maxTokens,
-                            }
-                        })
-                    });
-
-                    if (!response.ok) {
-                        // Handle specific HTTP status codes
-                        if (response.status === 429) {
-                            throw new Error('RATE_LIMIT');
-                        } else if (response.status === 401 || response.status === 403) {
-                            throw new Error('INVALID_API_KEY');
-                        } else {
-                            throw new Error('API_ERROR');
-                        }
-                    }
-
-                    const data = await response.json();
-
-                    // Validate response structure
-                    if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        throw new Error('MALFORMED_RESPONSE');
-                    }
-
-                    assistantMessage = data.candidates[0].content.parts[0].text;
-                } catch (error: any) {
-                    // Log error for debugging but don't expose to user
-                    console.error('[useRAGChat] AI error:', error);
-
-                    // Return friendly fallback message based on error type
-                    if (error.message === 'MISSING_API_KEY' || error.message === 'INVALID_API_KEY') {
-                        assistantMessage = 'AI insights are currently unavailable due to configuration. Please contact support.';
-                    } else if (error.message === 'RATE_LIMIT') {
-                        assistantMessage = 'AI insights are temporarily unavailable due to high demand. Please try again in a moment.';
-                    } else if (error.message === 'MALFORMED_RESPONSE') {
-                        assistantMessage = 'AI insights are currently unavailable. The response was incomplete. Please try again later.';
-                    } else if (error.name === 'TypeError' || error.message.includes('fetch')) {
-                        // Network error
-                        assistantMessage = 'AI insights are currently unavailable due to network issues. Please check your connection and try again.';
-                    } else {
-                        // Generic fallback
-                        assistantMessage = 'AI insights are currently unavailable. Please try again later.';
-                    }
+                if (response.error) {
+                    throw new Error(response.error);
                 }
 
-                // 6. Save assistant message
+                const assistantMessageContent = response.content;
+                const sources = response.metadata?.sources || [];
+
+                setIsSearching(false); // Done
+
+                // 4. Save assistant message
                 const { data: aiMessage, error: aiMsgError } = await supabase
                     .from('chat_messages')
                     .insert([{
                         conversation_id: convId,
                         role: 'assistant',
-                        content: assistantMessage,
-                        sources: searchResults.map(r => ({
+                        content: assistantMessageContent,
+                        sources: sources.map((r: any) => ({
                             content: r.content,
                             metadata: r.metadata,
-                            similarity: r.similarity,
+                            similarity: r.similarity || 0,
                         })),
                     }])
                     .select()
@@ -303,12 +242,14 @@ Cite sources using [Source 1], [Source 2] format.`;
 
                 if (aiMsgError) throw aiMsgError;
 
-                // 7. Increment usage counter
+                // 5. Increment usage counter
                 await incrementUsage();
 
                 return { userMessage, aiMessage };
+
             } finally {
                 setIsStreaming(false);
+                setIsSearching(false);
             }
         },
         onSuccess: () => {

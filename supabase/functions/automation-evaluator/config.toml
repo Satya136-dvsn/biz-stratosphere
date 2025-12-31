@@ -1,0 +1,7 @@
+project_id = "your-project-id"
+
+[functions.automation-evaluator]
+verify_jwt = true
+
+[[functions.automation-evaluator.schedule]]
+cron = "*/15 * * * *"

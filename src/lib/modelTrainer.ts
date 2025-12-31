@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import { createChurnModel, createRevenueModel } from './browserML';
+import { MLMonitor } from './ml/monitor';
 
 export interface TrainingProgress {
     epoch: number;
@@ -38,18 +39,22 @@ export async function trainChurnModel(
     const epochs = 100;
     let finalLoss = 0;
     let finalAccuracy = 0;
+    let finalValLoss = 0;
+    let finalValAccuracy = 0;
 
     try {
         // Train the model
         await model.fit(xs, ys, {
             epochs,
             batchSize: 32,
-            validationSplit: 0.2,
+            validationSplit: 0.2, // 20% for validation
             shuffle: true,
             callbacks: {
                 onEpochEnd: (epoch, logs) => {
                     finalLoss = logs?.loss || 0;
                     finalAccuracy = logs?.acc || 0;
+                    finalValLoss = logs?.val_loss || 0;
+                    finalValAccuracy = logs?.val_acc || 0;
 
                     if (onProgress) {
                         onProgress({
@@ -57,19 +62,41 @@ export async function trainChurnModel(
                             totalEpochs: epochs,
                             loss: finalLoss,
                             accuracy: finalAccuracy,
-                            valLoss: logs?.val_loss,
-                            valAccuracy: logs?.val_acc,
+                            valLoss: finalValLoss,
+                            valAccuracy: finalValAccuracy,
                         });
                     }
                 },
             },
         });
 
+        // --- STRICT GATEWAY CHECK ---
+        // 1. Minimum Accuracy Threshold (0.80)
+        // 2. Minimum F1 Score (Calculated manually on validation set if possible, 
+        //    but here we rely on val_acc for speed in browser)
+
+        if (finalValAccuracy < 0.80) {
+            console.error(`❌ Training Rejected: Model Accuracy (${(finalValAccuracy * 100).toFixed(1)}%) below threshold (80%)`);
+            throw new Error(`Model validation failed! Accuracy ${(finalValAccuracy * 100).toFixed(1)}% is too low (target > 80%). Training rolled back.`);
+        }
+
+        // --- ADVANCED METRICS & MONITORING ---
+        // Log to Supabase for discipline
+        await MLMonitor.logTrainingMetrics('churn_model', version, {
+            accuracy: finalAccuracy,
+            // In a real scenario, we would calculate F1 on a holdout set here.
+            // valid_loss is a proxy for generalization capability.
+            val_loss: finalValLoss,
+            loss: finalLoss,
+            training_time_ms: Date.now() - startTime,
+            dataset_size: trainingData.length
+        });
+
         // Save trained model to IndexedDB with version
         await model.save(`indexeddb://churn_model_v${version.replace(/\./g, '_')}`);
         // Also save as the generic 'trained' for backward compatibility or active use
         await model.save('indexeddb://churn_model_trained');
-        console.log(`✅ Churn model trained and saved as v${version}`);
+        console.log(`✅ Churn model trained, validated (Acc: ${(finalValAccuracy * 100).toFixed(1)}%), and saved as v${version}`);
 
     } finally {
         // Cleanup tensors
@@ -104,38 +131,59 @@ export async function trainRevenueModel(
     const xs = tf.tensor2d(trainingData.map(d => d.features));
     const ys = tf.tensor2d(trainingData.map(d => [d.label]));
 
-    // Training configuration - increased epochs for advanced model
+    // Training configuration
     const epochs = 100;
     let finalLoss = 0;
+    let finalValLoss = 0;
 
     try {
         // Train the model
         await model.fit(xs, ys, {
             epochs,
             batchSize: 32,
-            validationSplit: 0.2,
+            validationSplit: 0.2, // 20% for validation
             shuffle: true,
             callbacks: {
                 onEpochEnd: (epoch, logs) => {
                     finalLoss = logs?.loss || 0;
+                    finalValLoss = logs?.val_loss || 0;
 
                     if (onProgress) {
                         onProgress({
                             epoch: epoch + 1,
                             totalEpochs: epochs,
                             loss: finalLoss,
-                            valLoss: logs?.val_loss,
+                            valLoss: finalValLoss,
                         });
                     }
                 },
             },
         });
 
+        // --- STRICT GATEWAY CHECK (Regression) ---
+        // For revenue, we check if the validation loss has converged to a reasonable range.
+        // Assuming normalized inputs/outputs, MSE should be low.
+        // Let's enforce that val_loss is not exploding.
+
+        if (Number.isNaN(finalValLoss) || finalValLoss > 1.0) {
+            console.error(`❌ Training Rejected: Model Loss (${finalValLoss.toFixed(4)}) is too high or NaN.`);
+            throw new Error(`Model validation failed! Loss is too high. Training rolled back.`);
+        }
+
+        // --- MONITORING ---
+        await MLMonitor.logTrainingMetrics('revenue_model', version, {
+            loss: finalLoss,
+            val_loss: finalValLoss,
+            // R2 would be calculated on holdout set
+            training_time_ms: Date.now() - startTime,
+            dataset_size: trainingData.length
+        });
+
         // Save trained model to IndexedDB with version
         await model.save(`indexeddb://revenue_model_v${version.replace(/\./g, '_')}`);
         // Also save as the generic 'trained' for backward compatibility or active use
         await model.save('indexeddb://revenue_model_trained');
-        console.log(`✅ Revenue model trained and saved as v${version}`);
+        console.log(`✅ Revenue model trained, validated (Loss: ${finalValLoss.toFixed(4)}), and saved as v${version}`);
 
     } finally {
         // Cleanup tensors

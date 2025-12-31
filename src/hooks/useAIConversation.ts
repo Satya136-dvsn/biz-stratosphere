@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { trackLatency } from '@/lib/performance';
 import { useAuth } from './useAuth';
 import { useDataContext, buildAIContext } from './useDataContext';
+import { aiOrchestrator } from '@/lib/ai/orchestrator';
 
 interface Message {
     id: string;
@@ -66,63 +67,40 @@ export function useAIConversation(conversationId?: string) {
                     // Build context from user's data
                     const context = dataContext ? buildAIContext(dataContext) : '';
 
-                    // Build conversation history for Gemini
-                    const conversationHistory = conversation?.messages.map(msg => ({
-                        role: msg.role === 'user' ? 'user' : 'model',
-                        parts: [{ text: msg.content }]
+                    // Build conversation history for Orchestrator
+                    const prevMessages = conversation?.messages.map(msg => ({
+                        role: (msg.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+                        content: msg.content
                     })) || [];
 
-                    // Prepare Gemini API request
+                    // Add System Prompt
                     const systemInstruction = `You are an AI business analyst assistant. You help users analyze their business data and provide insights.
-    
     ${context}
-    
-    Provide concise, actionable insights based on the user's data. When referencing data, be specific. If the user hasn't uploaded data yet, guide them to upload their business data first.`;
+    Provide concise, actionable insights based on the user's data.`;
 
-                    // Call Gemini API
-                    const response = await fetch(
-                        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                contents: [
-                                    ...conversationHistory,
-                                    {
-                                        role: 'user',
-                                        parts: [{ text: message }]
-                                    }
-                                ],
-                                systemInstruction: {
-                                    parts: [{ text: systemInstruction }]
-                                },
-                                generationConfig: {
-                                    temperature: 0.7,
-                                    maxOutputTokens: 1000,
-                                }
-                            }),
-                        }
-                    );
+                    // Call AI Orchestrator
+                    const response = await aiOrchestrator.generateResponse({
+                        provider: 'gemini', // Default to Gemini (Free)
+                        messages: [
+                            { role: 'system', content: systemInstruction },
+                            ...prevMessages,
+                            { role: 'user', content: message }
+                        ],
+                        context: context // Pass explicit context if available locally
+                    });
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
+                    if (response.error) {
+                        throw new Error(response.error);
                     }
 
-                    const data = await response.json();
-                    const assistantMessage = data.candidates[0].content.parts[0].text;
+                    const assistantMessage = response.content;
 
-                    // Estimate token usage (Gemini doesn't provide exact counts in free tier)
-                    const estimatedPromptTokens = Math.ceil((systemInstruction.length + message.length) / 4);
-                    const estimatedCompletionTokens = Math.ceil(assistantMessage.length / 4);
-
-                    // Update token usage
+                    // Update token usage (from response or estimate)
+                    const usedTokens = response.tokensUsed || 0;
                     setTokenUsage({
-                        prompt: estimatedPromptTokens,
-                        completion: estimatedCompletionTokens,
-                        total: estimatedPromptTokens + estimatedCompletionTokens,
+                        prompt: 0, // Orchestrator might not return split yet
+                        completion: 0,
+                        total: usedTokens,
                     });
 
                     // Create or update conversation in database
@@ -170,9 +148,6 @@ export function useAIConversation(conversationId?: string) {
                 } finally {
                     setIsTyping(false);
                 }
-            }, {
-                model: GEMINI_MODEL,
-                messageLength: message.length
             });
         },
         onSuccess: () => {
@@ -181,8 +156,7 @@ export function useAIConversation(conversationId?: string) {
         },
     });
 
-    // Gemini is FREE, so cost is $0!
-    const estimatedCost = 0;
+    const estimatedCost = 0; // Gemini Flash is free
 
     return {
         conversation,

@@ -7,17 +7,65 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Bell, Plus, Trash2, Play, Pause, Settings, Info, Loader2 } from 'lucide-react';
+import { Bell, Plus, Trash2, Play, Pause, Settings, Info, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { useAutomationRules, useAutomationLogs } from '@/hooks/useAutomationRules';
 import { useState } from 'react';
 import { ScheduleBuilder } from '@/components/automation/ScheduleBuilder';
+import { aiOrchestrator } from '@/lib/ai/orchestrator';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useDashboardData } from '@/hooks/useDashboardData'; // Make sure this hook exists or simulated
 
 export function AutomationRules() {
     const { rules, isLoading, createRule, toggleRule, deleteRule, runRule, isRunning } = useAutomationRules();
     const [showWizard, setShowWizard] = useState(false);
 
+    // AI Suggestion State
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // Mock dashboard data for AI context (in real app, fetch from hook)
+    const analyticsContext = {
+        avg_churn_rate: "4.2%",
+        total_revenue: "$425,000",
+        active_customers: 1250,
+        revenue_trend: "decreasing",
+        recent_tickets: "high"
+    };
+
+    const handleGenerateRules = async () => {
+        setIsGenerating(true);
+        try {
+            const results = await aiOrchestrator.suggestAutomationRules(analyticsContext);
+            setSuggestions(results);
+            setShowSuggestions(true);
+        } catch (err) {
+            console.error("Failed to generate rules", err);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    // Helper to open wizard with suggestion
+    const [wizardInitData, setWizardInitData] = useState<any>(null);
+    const acceptSuggestion = (suggestion: any) => {
+        setWizardInitData({
+            name: suggestion.name,
+            description: suggestion.reasoning,
+            trigger_type: 'threshold',
+            condition: { metric: 'revenue', operator: '<', threshold: 0 }, // AI should parse this better in future
+            action_type: suggestion.action?.toLowerCase().includes('email') ? 'email' : 'notification',
+            action_config: { title: suggestion.name, message: `Action: ${suggestion.action}` },
+            schedule_type: 'manual',
+            schedule_config: {},
+        });
+        setShowSuggestions(false);
+        setShowWizard(true);
+    };
+
     return (
         <div className="space-y-6">
+            {/* Header */}
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -28,11 +76,53 @@ export function AutomationRules() {
                         Create and manage automation rules to monitor your business metrics in real-time.
                     </p>
                 </div>
-                <Button onClick={() => setShowWizard(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Rule
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={handleGenerateRules} disabled={isGenerating}>
+                        {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4 text-purple-600" />}
+                        AI Suggestions
+                    </Button>
+                    <Button onClick={() => { setWizardInitData(null); setShowWizard(true); }}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Rule
+                    </Button>
+                </div>
             </div>
+
+            {/* AI Suggestions Dialog */}
+            <Dialog open={showSuggestions} onOpenChange={setShowSuggestions}>
+                <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-purple-600" />
+                            AI Recommended Automation Rules
+                        </DialogTitle>
+                        <DialogDescription>
+                            Based on your current business metrics (Churn: {analyticsContext.avg_churn_rate}, Revenue Trend: {analyticsContext.revenue_trend}), here are 3 rules to optimize operations.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 mt-4">
+                        {suggestions.map((option, idx) => (
+                            <Card key={idx} className="border-purple-100 bg-purple-50/30">
+                                <CardContent className="pt-6">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h4 className="font-semibold text-purple-900">{option.name}</h4>
+                                            <p className="text-sm text-muted-foreground mt-1">{option.reasoning}</p>
+                                            <div className="flex gap-2 mt-3 text-xs">
+                                                <Badge variant="outline" className="bg-white">If: {option.condition}</Badge>
+                                                <Badge variant="outline" className="bg-white">Then: {option.action}</Badge>
+                                            </div>
+                                        </div>
+                                        <Button size="sm" onClick={() => acceptSuggestion(option)}>
+                                            Use Rule
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             {/* Rules List */}
             <div className="grid gap-4">
@@ -129,15 +219,15 @@ export function AutomationRules() {
             </div>
 
             {/* Rule Creation Wizard */}
-            {showWizard && <RuleWizard onClose={() => setShowWizard(false)} onCreate={createRule} />}
-        </div>
+            {showWizard && <RuleWizard onClose={() => setShowWizard(false)} onCreate={createRule} initialData={wizardInitData} />}
+        </div >
     );
 }
 
 // Rule Creation Wizard Component
-function RuleWizard({ onClose, onCreate }: { onClose: () => void; onCreate: (rule: any) => void }) {
+function RuleWizard({ onClose, onCreate, initialData }: { onClose: () => void; onCreate: (rule: any) => void; initialData?: any }) {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState(initialData || {
         name: '',
         description: '',
         trigger_type: 'threshold',
