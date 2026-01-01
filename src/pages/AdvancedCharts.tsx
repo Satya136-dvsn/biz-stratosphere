@@ -391,12 +391,11 @@ export default function AdvancedCharts() {
             case 'treemap':
                 const treemapItems = getTopItems(transformedData, 50);
                 const treemapData = treemapItems.map((item, index) => {
-                    // Generate a monochromatic gradient (dark to light)
-                    const opacity = Math.max(0.3, 1 - (index / treemapItems.length) * 0.7);
+                    // Use vibrant rainbow colors for better distinctness requested by user
                     return {
                         ...item,
-                        fill: customization.primaryColor,
-                        fillOpacity: opacity,
+                        fill: COLORS[index % COLORS.length],
+                        fillOpacity: 1,
                     };
                 });
 
@@ -433,8 +432,8 @@ export default function AdvancedCharts() {
                                 dataKey="value"
                                 data={funnelData.map((item, idx) => ({
                                     ...item,
-                                    fill: customization.primaryColor,
-                                    fillOpacity: Math.max(0.3, 1 - (idx / funnelData.length) * 0.6),
+                                    fill: COLORS[idx % COLORS.length],
+                                    fillOpacity: 1,
                                 }))}
                                 isAnimationActive
                             >
