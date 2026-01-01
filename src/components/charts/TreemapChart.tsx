@@ -64,24 +64,17 @@ export function TreemapChart({
     };
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                    <Treemap
-                        data={treemapData}
-                        dataKey="value"
-                        nameKey="name"
-                        stroke="#fff"
-                        fill="#8884d8"
-                        content={<CustomContent />}
-                    >
-                        {showTooltip && <Tooltip />}
-                    </Treemap>
-                </ResponsiveContainer>
-            </CardContent>
-        </Card>
+        <ResponsiveContainer width="100%" height={400}>
+            <Treemap
+                data={treemapData}
+                dataKey="value"
+                nameKey="name"
+                stroke="#fff"
+                fill="#8884d8"
+                content={<CustomContent />}
+            >
+                {showTooltip && <Tooltip />}
+            </Treemap>
+        </ResponsiveContainer>
     );
 }

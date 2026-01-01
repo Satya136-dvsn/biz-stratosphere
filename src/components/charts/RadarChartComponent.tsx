@@ -30,28 +30,21 @@ export function RadarChartComponent({
     showTooltip = true,
 }: RadarChartComponentProps) {
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                    <RadarChart data={data}>
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey={nameKey} />
-                        <PolarRadiusAxis />
-                        {showTooltip && <Tooltip />}
-                        {showLegend && <Legend />}
-                        <Radar
-                            name={dataKey}
-                            dataKey={dataKey}
-                            stroke={color}
-                            fill={color}
-                            fillOpacity={0.6}
-                        />
-                    </RadarChart>
-                </ResponsiveContainer>
-            </CardContent>
-        </Card>
+        <ResponsiveContainer width="100%" height={400}>
+            <RadarChart data={data}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey={nameKey} />
+                <PolarRadiusAxis />
+                {showTooltip && <Tooltip />}
+                {showLegend && <Legend />}
+                <Radar
+                    name={dataKey}
+                    dataKey={dataKey}
+                    stroke={color}
+                    fill={color}
+                    fillOpacity={0.6}
+                />
+            </RadarChart>
+        </ResponsiveContainer>
     );
 }

@@ -142,12 +142,41 @@ export default function AdvancedCharts() {
     }, [chartData, availableColumns]);
 
     // Transform data for charts
-    const transformedData = chartData.map(point => ({
-        name: point.metric_name || 'Unknown',
-        value: parseFloat(point.metric_value) || 0,
-        [xColumn || 'x']: point[xColumn || 'metric_name'],
-        [yColumn || 'y']: parseFloat(point[yColumn || 'metric_value']) || 0,
-    }));
+    const transformedData = chartData.map(point => {
+        const xVal = xColumn ? point[xColumn] : point.metric_name;
+        const yVal = yColumn ? point[yColumn] : point.metric_value;
+
+        return {
+            ...point, // Keep original data accessible
+            name: xVal || 'Unknown',
+            value: parseFloat(String(yVal)) || 0,
+            // Also keep dynamic keys if needed for scatter plots specific logic
+            [xColumn || 'x']: xVal,
+            [yColumn || 'y']: parseFloat(String(yVal)) || 0,
+        };
+    });
+
+    // Aggregation helper for circular/limited charts
+    const getAggregatedData = (data: typeof transformedData, limit = 10) => {
+        if (data.length <= limit) return data;
+
+        const sorted = [...data].sort((a, b) => b.value - a.value);
+        const top = sorted.slice(0, limit);
+        const others = sorted.slice(limit);
+
+        if (others.length > 0) {
+            const otherSum = others.reduce((sum, item) => sum + item.value, 0);
+            top.push({
+                name: 'Others',
+                value: otherSum,
+                x: 'Others',
+                y: otherSum,
+                metric_name: 'Others',
+                metric_value: String(otherSum)
+            } as any);
+        }
+        return top;
+    };
 
     // Handle save configuration
     const handleSave = () => {
@@ -213,6 +242,7 @@ export default function AdvancedCharts() {
 
     // Render the appropriate chart
     const renderChart = () => {
+
         if (dataLoading) {
             return (
                 <div className="flex items-center justify-center h-96">
@@ -226,7 +256,7 @@ export default function AdvancedCharts() {
                 <div className="flex flex-col items-center justify-center h-96 text-center p-8">
                     <div className="w-24 h-24 mb-6 rounded-full bg-primary/10 flex items-center justify-center">
                         <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                     </div>
                     <h3 className="text-xl font-semibold mb-2">Create Your First Chart</h3>
@@ -247,17 +277,26 @@ export default function AdvancedCharts() {
             height: customization.height,
         };
 
+        const aggregatedData = getAggregatedData(transformedData);
+
         switch (chartType) {
             case 'line':
+                // Note: Line/Bar/Area usually better with full time-series data, so NOT using aggregatedData effectively unless user wants "Top 10 Categories"
+                // For now, let's keep them full for Time Series capability.
+                // We only aggregate for Pie/Radar/Funnel which are Snapshot charts.
                 return (
                     <ResponsiveContainer {...commonProps}>
                         <LineChart data={transformedData}>
                             {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
-                            <XAxis dataKey="name" />
+                            <XAxis
+                                dataKey="name"
+                                minTickGap={30}
+                                tick={{ fontSize: 12 }}
+                            />
                             <YAxis />
                             {customization.showTooltip && <Tooltip />}
                             {customization.showLegend && <Legend />}
-                            <Line type="monotone" dataKey="value" stroke={customization.primaryColor} />
+                            <Line type="monotone" dataKey="value" stroke={customization.primaryColor} dot={false} />
                         </LineChart>
                     </ResponsiveContainer>
                 );
@@ -267,7 +306,11 @@ export default function AdvancedCharts() {
                     <ResponsiveContainer {...commonProps}>
                         <BarChart data={transformedData}>
                             {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
-                            <XAxis dataKey="name" />
+                            <XAxis
+                                dataKey="name"
+                                minTickGap={30}
+                                tick={{ fontSize: 12 }}
+                            />
                             <YAxis />
                             {customization.showTooltip && <Tooltip />}
                             {customization.showLegend && <Legend />}
@@ -281,7 +324,11 @@ export default function AdvancedCharts() {
                     <ResponsiveContainer {...commonProps}>
                         <AreaChart data={transformedData}>
                             {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
-                            <XAxis dataKey="name" />
+                            <XAxis
+                                dataKey="name"
+                                minTickGap={30}
+                                tick={{ fontSize: 12 }}
+                            />
                             <YAxis />
                             {customization.showTooltip && <Tooltip />}
                             {customization.showLegend && <Legend />}
@@ -294,8 +341,8 @@ export default function AdvancedCharts() {
                 return (
                     <ResponsiveContainer {...commonProps}>
                         <PieChart>
-                            <Pie data={transformedData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                                {transformedData.map((entry, index) => (
+                            <Pie data={aggregatedData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={false}>
+                                {aggregatedData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
@@ -310,8 +357,16 @@ export default function AdvancedCharts() {
                     <ResponsiveContainer {...commonProps}>
                         <ScatterChart>
                             {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
-                            <XAxis dataKey={xColumn || 'x'} name={xColumn || 'X'} />
-                            <YAxis dataKey={yColumn || 'y'} name={yColumn || 'Y'} />
+                            <XAxis
+                                dataKey={xColumn || 'x'}
+                                name={xColumn || 'X'}
+                                minTickGap={30}
+                                tick={{ fontSize: 12 }}
+                            />
+                            <YAxis
+                                dataKey={yColumn || 'y'}
+                                name={yColumn || 'Y'}
+                            />
                             {customization.showTooltip && <Tooltip cursor={{ strokeDasharray: '3 3' }} />}
                             {customization.showLegend && <Legend />}
                             <Scatter name="Data" data={transformedData} fill={customization.primaryColor} />
@@ -322,7 +377,7 @@ export default function AdvancedCharts() {
             case 'radar':
                 return (
                     <RadarChartComponent
-                        data={transformedData.slice(0, 8)}
+                        data={aggregatedData}
                         dataKey="value"
                         nameKey="name"
                         title={customization.title}
@@ -333,9 +388,10 @@ export default function AdvancedCharts() {
                 );
 
             case 'treemap':
+                // Treemap can handle more data, maybe 50?
                 return (
                     <TreemapChart
-                        data={transformedData}
+                        data={getAggregatedData(transformedData, 30)}
                         title={customization.title}
                         showTooltip={customization.showTooltip}
                     />
@@ -343,10 +399,13 @@ export default function AdvancedCharts() {
 
             case 'gauge':
                 const gaugeValue = transformedData.length > 0 ? transformedData[0].value : 0;
+                // Auto-calculate appropriate max scale if value > 100
+                const dynamicMax = Math.max(100, Math.ceil(gaugeValue * 1.2));
+
                 return (
                     <GaugeChart
                         value={gaugeValue}
-                        maxValue={100}
+                        maxValue={dynamicMax}
                         title={customization.title}
                         color={customization.primaryColor}
                         showLegend={customization.showLegend}
@@ -360,7 +419,7 @@ export default function AdvancedCharts() {
                             {customization.showTooltip && <Tooltip />}
                             <Funnel
                                 dataKey="value"
-                                data={transformedData.map((item, idx) => ({
+                                data={aggregatedData.map((item, idx) => ({
                                     ...item,
                                     fill: COLORS[idx % COLORS.length],
                                 }))}
@@ -373,7 +432,7 @@ export default function AdvancedCharts() {
                 );
 
             default:
-                return <div>Unsupported chart type</div>;
+                return <div>Unsupported chart type: {chartType}</div>;
         }
     };
 
