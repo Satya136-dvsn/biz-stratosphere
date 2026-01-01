@@ -21,8 +21,8 @@ export function TreemapChart({
     const CustomContent = (props: any) => {
         const { x, y, width, height, name, value, fill, fillOpacity = 1 } = props;
 
-        // Hide text for small boxes to prevent overlap
-        if (width < 60 || height < 40) {
+        // Hide text only for very small boxes
+        if (width < 40 || height < 25) {
             return (
                 <g>
                     <rect
