@@ -60,7 +60,7 @@ export function TreemapChart({
                     fontWeight="bold"
                     style={{ pointerEvents: 'none' }}
                 >
-                    {name.length > 10 ? `${name.substring(0, 10)}..` : name}
+                    {(name || '').length > 10 ? `${(name || '').substring(0, 10)}..` : name}
                 </text>
                 <text
                     x={x + width / 2}
