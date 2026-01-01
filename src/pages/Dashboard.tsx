@@ -189,6 +189,7 @@ export default function Dashboard() {
                 variant={revenueChartType}
                 data={chartData}
                 isLoading={isChartLoading}
+                metric="revenue"
               />
             </div>
 
@@ -203,6 +204,7 @@ export default function Dashboard() {
                 variant={customerChartType}
                 data={chartData}
                 isLoading={isChartLoading}
+                metric="customers"
               />
             </div>
           </div>
