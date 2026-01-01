@@ -557,6 +557,9 @@ For support and questions:
 - [x] Automated model versioning
 - [x] RAG tuning settings & custom context management
 - [x] Automated training metrics & leaderboard
+- [x] **Automation Engine** (Rule-based triggers, Scheduling)
+- [x] **Health Monitoring** & Rate Limiting (Security Hardening)
+- [x] **AI Rule Suggestions** (Orchestrated Intelligence)
 
 ### 📋 Future
 

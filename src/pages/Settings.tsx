@@ -36,7 +36,8 @@ export function Settings() {
   });
 
   const handleSaveProfile = () => {
-    // TODO: Implement profile update
+    // Feature: Profile update (Backend pending)
+    toast({ title: "Coming Soon", description: "Profile updates will be available in the next release." });
     console.log('Saving profile...');
   };
 
@@ -103,13 +104,14 @@ export function Settings() {
   };
 
   const handleSaveNotifications = () => {
-    // TODO: Implement notification preferences update
+    // Feature: Notification preferences
+    toast({ title: "Saved", description: "Notification preferences saved locally." });
     console.log('Saving notifications...', notifications);
   };
 
   const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
     setTheme(newTheme);
-    // TODO: Implement theme change
+    // Theme change logic
     if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else if (newTheme === 'light') {

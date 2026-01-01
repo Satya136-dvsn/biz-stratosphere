@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from '@supabase/supabase-js';
 
-export type UserRole = 'super_admin' | 'company_admin' | 'analyst' | 'viewer';
+export type UserRole = 'admin' | 'user' | 'super_admin';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -42,15 +42,16 @@ export function useAuth() {
   }, []);
 
   const fetchUserRole = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
+    // Phase 1: Fetch role from profiles (Single Source of Truth)
+    const { data, error } = await supabase
+      .from('profiles')
       .select('role')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
+      .eq('id', userId)
       .single();
 
-    if (data) {
+    if (data && data.role) {
+      // Map DB role 'admin' to Frontend 'super_admin' or just use 'admin'
+      // For simplicity and matching migration, we use 'admin'
       setUserRole(data.role as UserRole);
     }
   };
@@ -99,7 +100,7 @@ export function useAuth() {
 
   const hasRole = (role: UserRole) => userRole === role;
 
-  const isAdmin = () => userRole === 'super_admin' || userRole === 'company_admin';
+  const isAdmin = () => userRole === 'admin' || userRole === 'super_admin';
 
   return {
     user,

@@ -32,6 +32,11 @@ const AutomationRules = lazy(() => import("./pages/AutomationRules"));
 const AIComparison = lazy(() => import("./pages/AIComparison").then(m => ({ default: m.AIComparison })));
 const Help = lazy(() => import("./pages/Help"));
 const PlatformStatus = lazy(() => import("./pages/PlatformStatus"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const UserManagement = lazy(() => import("./pages/admin/UserManagement").then(m => ({ default: m.UserManagement })));
+const AIControl = lazy(() => import("./pages/admin/AIControl").then(m => ({ default: m.AIControl })));
+const AuditLogs = lazy(() => import("./pages/admin/AuditLogs").then(m => ({ default: m.AuditLogs })));
+import { AdminRoute } from "./components/AdminRoute";
 
 // Loading fallback component
 const PageLoader = () => (
@@ -210,6 +215,42 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+
+
+              {/* Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <AdminRoute>
+                    <UserManagement />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/ai"
+                element={
+                  <AdminRoute>
+                    <AIControl />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/security"
+                element={
+                  <AdminRoute>
+                    <AuditLogs />
+                  </AdminRoute>
+                }
+              />
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
