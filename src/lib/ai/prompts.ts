@@ -1,4 +1,4 @@
-export const SYSTEM_PROMPTS = {
+export const AI_PROMPTS = {
   // General Business Analyst Persona
   ANALYST: `You are an expert AI Business Analyst for the "Biz Stratosphere" platform.
   Your goal is to provide accurate, data-driven insights based on the provided context.

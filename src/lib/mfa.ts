@@ -15,8 +15,30 @@
 
 import * as OTPAuth from 'otpauth';
 import QRCode from 'qrcode';
-import { randomBytes } from '@noble/ciphers/webcrypto/utils';
-import { bytesToHex } from '@noble/hashes/utils';
+// import { randomBytes } from '@noble/ciphers/webcrypto/utils';
+// import { bytesToHex } from '@noble/hashes/utils';
+
+function randomBytes(length: number): Uint8Array {
+    const bytes = new Uint8Array(length);
+    if (typeof crypto !== 'undefined') {
+        crypto.getRandomValues(bytes);
+    } else if (typeof window !== 'undefined' && window.crypto) {
+        window.crypto.getRandomValues(bytes);
+    } else {
+        // Fallback for Node test env if global crypto is missing
+        // (But jsdom usually has it, or we use require('crypto'))
+        const nodeCrypto = require('crypto');
+        const buf = nodeCrypto.randomBytes(length);
+        bytes.set(buf);
+    }
+    return bytes;
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
 
 /**
  * MFA configuration constants

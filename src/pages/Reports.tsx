@@ -84,6 +84,8 @@ export function Reports() {
     enabled: !!user,
   });
 
+  const [activeTab, setActiveTab] = useState("builder");
+
   // Handle generate report
   const handleGenerateReport = async () => {
     if (!reportConfig.report_type) {
@@ -99,6 +101,7 @@ export function Reports() {
     try {
       const report = await generateReport(reportConfig);
       setGeneratedReport(report);
+      setActiveTab("preview"); // Auto-switch to preview
       toast({
         title: 'Success',
         description: `Report generated with ${report.data.length} records`,
@@ -170,7 +173,7 @@ export function Reports() {
         </Button>
       </div>
 
-      <Tabs defaultValue="builder" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="builder">Report Builder</TabsTrigger>
           <TabsTrigger value="saved">Saved Reports ({savedReports.length})</TabsTrigger>
@@ -477,31 +480,55 @@ export function Reports() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        {generatedReport.data.length > 0 &&
-                          Object.keys(generatedReport.data[0]).slice(0, 6).map(key => (
-                            <TableHead key={key}>{key}</TableHead>
-                          ))}
+                        {(() => {
+                          // Helper to process data for display
+                          const processedData = generatedReport.data.reduce((acc: any[], item: any) => {
+                            // If we have raw row data, use that (primary source of truth for tables)
+                            if (item.metric_name === 'raw_csv_row' && item.metadata?.row_data) {
+                              acc.push(item.metadata.row_data);
+                            }
+                            return acc;
+                          }, []);
+
+                          // Fallback to raw data if no raw_rows found (e.g. if filtering by specific metrics)
+                          const displayData = processedData.length > 0 ? processedData : generatedReport.data;
+
+                          // Safe check for empty data
+                          if (displayData.length === 0) return <TableHead>No Data</TableHead>;
+
+                          // Get headers from first item
+                          return Object.keys(displayData[0]).slice(0, 8).map(key => (
+                            <TableHead key={key} className="capitalize">{key.replace(/_/g, ' ')}</TableHead>
+                          ));
+                        })()}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {generatedReport.data.slice(0, 10).map((row: any, idx: number) => (
-                        <TableRow key={idx}>
-                          {Object.values(row)
-                            .slice(0, 6)
-                            .map((value: any, vidx: number) => (
-                              <TableCell key={vidx} className="text-sm">
-                                {String(value).substring(0, 50)}
-                              </TableCell>
-                            ))}
-                        </TableRow>
-                      ))}
+                      {(() => {
+                        const processedData = generatedReport.data.reduce((acc: any[], item: any) => {
+                          if (item.metric_name === 'raw_csv_row' && item.metadata?.row_data) {
+                            acc.push(item.metadata.row_data);
+                          }
+                          return acc;
+                        }, []);
+
+                        // Show all data (limited by backend query to 1000 currently)
+                        const displayData = processedData.length > 0 ? processedData : generatedReport.data;
+
+                        return displayData.map((row: any, idx: number) => (
+                          <TableRow key={idx}>
+                            {Object.values(row)
+                              .slice(0, 8)
+                              .map((value: any, vidx: number) => (
+                                <TableCell key={vidx} className="text-sm">
+                                  {typeof value === 'object' ? JSON.stringify(value) : String(value).substring(0, 50)}
+                                </TableCell>
+                              ))}
+                          </TableRow>
+                        ));
+                      })()}
                     </TableBody>
                   </Table>
-                  {generatedReport.data.length > 10 && (
-                    <p className="text-center text-sm text-muted-foreground py-4">
-                      ... and {generatedReport.data.length - 10} more rows
-                    </p>
-                  )}
                 </div>
               </CardContent>
             </Card>

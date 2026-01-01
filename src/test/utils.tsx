@@ -50,6 +50,10 @@ export * from '@testing-library/react'
 // Override render method
 export { customRender as render }
 
+// Export wrapper for hooks
+export { AllTheProviders as createWrapper }
+export { AllTheProviders as wrapper }
+
 // Helper to wait for async updates
 export const waitForLoadingToFinish = () => {
     return new Promise(resolve => setTimeout(resolve, 0))

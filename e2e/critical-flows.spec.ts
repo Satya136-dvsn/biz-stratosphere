@@ -9,8 +9,9 @@ test.describe('Critical Public Flows', () => {
 
     test('should navigate to login page', async ({ page }) => {
         await page.goto('/auth');
-        // Check for common login elements (might vary by implementation)
-        await expect(page.getByRole('button', { name: /sign in|login|continue/i })).toBeVisible();
+        // Check for common login elements
+        await expect(page.getByRole('heading', { name: 'Welcome' })).toBeVisible();
+        await expect(page.getByText('Sign in to your account')).toBeVisible();
     });
 
     test('should redirect unauthenticated dashboard access', async ({ page }) => {

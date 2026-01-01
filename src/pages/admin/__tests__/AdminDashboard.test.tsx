@@ -36,6 +36,7 @@ vi.mock('lucide-react', () => ({
     Database: () => <div data-testid="icon-database" />,
     AlertCircle: () => <div data-testid="icon-alert" />,
     Braille: () => <div data-testid="icon-braille" />,
+    Building: () => <div data-testid="icon-building" />,
 }));
 
 
@@ -74,7 +75,7 @@ describe('Admin Security', () => {
         );
 
         expect(screen.getByText('Admin Control Plane')).toBeInTheDocument();
-        expect(screen.getByText('Total Users')).toBeInTheDocument();
+        expect(screen.getByText('Active Users')).toBeInTheDocument();
         expect(screen.getByText('100')).toBeInTheDocument();
     });
 

@@ -155,7 +155,18 @@ export function EnhancedDataUpload() {
   };
 
   const handleUpload = async () => {
+    console.log('Starting upload. Parsed data length:', parsedData.length);
+
     if (!file || !analysis) return;
+
+    if (!parsedData.length) {
+      toast({
+        title: "Error",
+        description: "No data found to upload. Please try analyzing again.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Validate PII consent
     if (piiScan?.hasPII && !piiConsent) {
@@ -173,8 +184,8 @@ export function EnhancedDataUpload() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Create dataset record
-      const { error: datasetError } = await supabase
+      // 1. Create dataset record
+      const { data: dataset, error: datasetError } = await supabase
         .from('datasets')
         .insert([{
           user_id: user.id,
@@ -182,20 +193,99 @@ export function EnhancedDataUpload() {
           file_name: file.name,
           file_type: 'csv',
           file_size: file.size,
-          status: 'completed' as const,
+          status: 'processing' as const, // Set to processing initially
           metadata: {
             quality: analysis,
             pii_scan: piiScan,
             pii_consent_given: piiConsent,
             uploaded_at: new Date().toISOString()
           }
-        }] as any);
+        }] as any)
+        .select()
+        .single();
 
-      if (datasetError) throw datasetError;
+      if (datasetError || !dataset) throw datasetError;
+
+      // 2. Prepare Data Points (Batch Processing)
+      const BATCH_SIZE = 100; // conservative batch size
+      const pointsToInsert: any[] = [];
+      const timestamp = new Date().toISOString();
+
+      // Helper to try parsing date
+      const parseDate = (row: any) => {
+        // Try common date fields
+        const dateField = Object.keys(row).find(k => k.toLowerCase().includes('date') || k.toLowerCase().includes('time'));
+        if (dateField && row[dateField]) {
+          const d = new Date(row[dateField]);
+          if (!isNaN(d.getTime())) return d.toISOString();
+        }
+        return timestamp; // Fallback to upload time
+      };
+
+      parsedData.forEach(row => {
+        const rowDate = parseDate(row);
+
+        // A. Insert Raw Row (for Table Views / Advanced Charts)
+        pointsToInsert.push({
+          user_id: user.id,
+          dataset_id: dataset.id,
+          metric_name: 'raw_csv_row',
+          metric_value: 0, // Placeholder
+          date_recorded: rowDate,
+          metadata: { row_data: row }
+        });
+
+        // B. Insert Individual Numeric Metrics (for Aggregation Reports)
+        // Auto-detect numeric fields from the row
+        Object.entries(row).forEach(([key, val]) => {
+          // Skip IDs, dates, and non-numeric
+          if (key.toLowerCase().includes('date') || key.toLowerCase().includes('id')) return;
+
+          const numVal = parseFloat(val as string);
+          if (!isNaN(numVal)) {
+            pointsToInsert.push({
+              user_id: user.id,
+              dataset_id: dataset.id,
+              metric_name: key.toLowerCase().trim(), // Normalize metric name
+              metric_value: numVal,
+              date_recorded: rowDate,
+              metadata: { original_key: key }
+            });
+          }
+        });
+      });
+
+      // 3. Perform Batched Inserts
+      console.log(`Uploading ${pointsToInsert.length} data points...`);
+
+      for (let i = 0; i < pointsToInsert.length; i += BATCH_SIZE) {
+        const batch = pointsToInsert.slice(i, i + BATCH_SIZE);
+        const { error: batchError } = await supabase
+          .from('data_points')
+          .insert(batch);
+
+        if (batchError) {
+          console.error('Batch upload error:', batchError);
+          // We continue trying best effort, but log critical failure
+          toast({
+            title: "Batch Upload Issue",
+            description: `Some records failed to upload: ${batchError.message}`,
+            variant: "destructive"
+          });
+        }
+
+        // Optional: Update progress UI here if we had one
+      }
+
+      // 4. Update Dataset Status to Completed
+      await supabase
+        .from('datasets')
+        .update({ status: 'completed' } as any)
+        .eq('id', dataset.id);
 
       toast({
         title: "Upload Successful",
-        description: `${file.name} has been uploaded and analyzed`,
+        description: `${file.name} has been processed. ${pointsToInsert.length} data points created.`,
       });
 
       setFile(null);
@@ -203,6 +293,7 @@ export function EnhancedDataUpload() {
       setPiiScan(null);
       setPiiConsent(false);
       setParsedData([]);
+
     } catch (error) {
       console.error('Upload error:', error);
       toast({

@@ -47,7 +47,7 @@ export function useAuth() {
       .from('profiles')
       .select('role')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (data && data.role) {
       // Map DB role 'admin' to Frontend 'super_admin' or just use 'admin'

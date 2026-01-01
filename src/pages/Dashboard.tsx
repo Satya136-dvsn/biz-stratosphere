@@ -30,11 +30,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Dashboard() {
   const { user } = useAuth();
-
-  const { kpiData, isLoading } = useKPIData();
+  // Fix: Destructure 'data' as 'kpiData' because useQuery returns 'data'
+  const { data: kpiData, isLoading } = useKPIData();
   const { realtimeData } = useRealtimeKPIs();
 
   // Chart filters state

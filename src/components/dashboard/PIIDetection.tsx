@@ -93,12 +93,12 @@ export function PIIDetection({ data, columns }: PIIDetectionProps) {
                         <div className="space-y-4">
                             {Object.entries(piiDetection).map(([column, info]) => (
                                 <div key={column} className="p-4 border rounded-lg">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <AlertTriangle className="h-4 w-4 text-destructive" />
-                                                <h4 className="font-semibold">{column}</h4>
-                                                <Badge variant="outline" className="text-xs">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+                                                <h4 className="font-semibold truncate">{column}</h4>
+                                                <Badge variant="outline" className="text-xs shrink-0">
                                                     {info.type.replace('_', ' ')}
                                                 </Badge>
                                             </div>
@@ -109,6 +109,7 @@ export function PIIDetection({ data, columns }: PIIDetectionProps) {
                                         <Button
                                             size="sm"
                                             variant="outline"
+                                            className="shrink-0"
                                             onClick={() => toggleMask(column)}
                                         >
                                             {maskedColumns.has(column) ? (
