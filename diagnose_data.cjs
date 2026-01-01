@@ -37,10 +37,20 @@ async function diagnose() {
         }
     }
 
-    // 3. Check Overall Stats
-    const { count: totalPoints } = await supabase.from('data_points').select('*', { count: 'exact', head: true });
-    console.log('---');
-    console.log(`Total Data Points in System: ${totalPoints}`);
+    // 3. Inspect Embeddings Table Schema
+    const { data: embeddings, error: embError } = await supabase
+        .from('embeddings')
+        .select('*')
+        .limit(1);
+
+    if (embError) {
+        console.error('Error fetching embeddings:', embError);
+    } else if (embeddings.length > 0) {
+        console.log('Embeddings table columns:', Object.keys(embeddings[0]).join(', '));
+    } else {
+        console.log('Embeddings table is empty, cannot inspect columns directly.');
+    }
+
     console.log('--- DIAGNOSTIC SCRIPT END ---');
 }
 

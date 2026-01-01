@@ -5,13 +5,21 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
 import { useRAGChat } from '@/hooks/useRAGChat';
 import { useEmbeddings } from '@/hooks/useEmbeddings';
 import { ChatMessageComponent } from '@/components/ai/ChatMessage';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2, Zap } from 'lucide-react';
+import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2, Zap, ChevronDown, ChevronUp, Settings2, Sliders } from 'lucide-react';
 import { ConversationSettings } from '@/components/ai/ConversationSettings';
 import { ExportConversation } from '@/components/ai/ExportConversation';
 
@@ -45,11 +53,17 @@ export function AIChat() {
         queryKey: ['datasets', user?.id],
         queryFn: async () => {
             if (!user) return [];
+            console.log('[AIChat] Fetching datasets for user:', user.id);
             const { data, error } = await supabase
                 .from('datasets')
-                .select('id, name, file_name')
+                .select('id, name')
                 .eq('user_id', user.id);
-            if (error) throw error;
+
+            if (error) {
+                console.error('[AIChat] Error fetching datasets:', error);
+                throw error;
+            }
+            console.log('[AIChat] Fetched datasets:', data);
             return data;
         },
         enabled: !!user,
@@ -94,174 +108,218 @@ export function AIChat() {
     };
 
     const currentConversation = conversations.find(c => c.id === selectedConversationId);
+    const activeDatasetName = datasets.find(d => d.id === selectedDataset)?.name;
 
     return (
-        <div className="space-y-6 flex flex-col h-[calc(100vh-140px)]">
+        <div className="space-y-4 flex flex-col h-[calc(100vh-120px)]">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-none px-1">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                         <Sparkles className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">AI Assistant</h1>
-                        <p className="text-muted-foreground">Advanced RAG-powered chatbot with custom datasets</p>
+                        <h1 className="text-2xl font-bold tracking-tight">AI Assistant</h1>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span>Knowledge Base:</span>
+                            {activeDatasetName ? (
+                                <span className="flex items-center gap-1 font-medium text-primary">
+                                    <Database className="h-3 w-3" />
+                                    {activeDatasetName}
+                                </span>
+                            ) : (
+                                <span className="text-muted-foreground/70 italic">No dataset selected</span>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Config Card */}
-            <Card>
-                <CardHeader className="py-3">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Database className="h-4 w-4" />
-                        RAG Configuration
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="pb-3 space-y-4">
-                    {/* Settings Row 1: Retrieval Params */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Similarity Threshold: {similarityThreshold}</label>
-                            <Input
-                                type="number"
-                                min={0.1}
-                                max={0.9}
-                                step={0.1}
-                                value={similarityThreshold}
-                                onChange={(e) => setSimilarityThreshold(parseFloat(e.target.value))}
-                                className="h-8"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Context Limit: {contextLimit}</label>
-                            <Input
-                                type="number"
-                                min={1}
-                                max={20}
-                                step={1}
-                                value={contextLimit}
-                                onChange={(e) => setContextLimit(parseInt(e.target.value))}
-                                className="h-8"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Chunk Size: {chunkSize}</label>
-                            <Input
-                                type="number"
-                                min={1}
-                                max={100}
-                                step={1}
-                                value={chunkSize}
-                                onChange={(e) => setChunkSize(parseInt(e.target.value))}
-                                className="h-8"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Chunk Overlap: {chunkOverlap}</label>
-                            <Input
-                                type="number"
-                                min={0}
-                                max={50}
-                                step={1}
-                                value={chunkOverlap}
-                                onChange={(e) => setChunkOverlap(parseInt(e.target.value))}
-                                className="h-8"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col md:flex-row gap-4 items-end">
-                        <div className="flex-1 w-full">
-                            <label className="text-sm font-medium mb-1.5 block">Active Dataset</label>
-                            <Select
-                                value={selectedDataset || 'none'}
-                                onValueChange={(val) => setSelectedDataset(val === 'none' ? null : val)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a dataset for context" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">No Context</SelectItem>
-                                    {datasets.map((dataset) => (
-                                        <SelectItem key={dataset.id} value={dataset.id}>
-                                            {dataset.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <Button
-                            variant="outline"
-                            onClick={() => selectedDataset && generateDatasetEmbeddings({
-                                datasetId: selectedDataset,
-                                chunkSize,
-                                chunkOverlap
-                            })}
-                            disabled={!selectedDataset || isGenerating}
-                            className="w-full md:w-auto"
-                        >
-                            {isGenerating ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Embedding...
-                                </>
-                            ) : (
-                                <>
-                                    <Zap className="h-4 w-4 mr-2" />
-                                    Process Dataset
-                                </>
-                            )}
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2">
+                            <Settings2 className="h-4 w-4" />
+                            <span className="hidden sm:inline">RAG Configuration</span>
                         </Button>
-                    </div>
-                    {embeddingsCount > 0 && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                            {embeddingsCount} vectors available for similarity search
-                        </p>
-                    )}
-                </CardContent>
-            </Card>
+                    </SheetTrigger>
+                    <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                        <SheetHeader>
+                            <SheetTitle>RAG Configuration</SheetTitle>
+                            <SheetDescription>
+                                Configure the retrieval strategy and manage your knowledge base context.
+                            </SheetDescription>
+                        </SheetHeader>
+
+                        <div className="py-6 space-y-6">
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-medium flex items-center gap-2 text-primary">
+                                    <Database className="h-4 w-4" />
+                                    Active Context
+                                </h3>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-muted-foreground">Selected Dataset</label>
+                                    <Select
+                                        value={selectedDataset || 'none'}
+                                        onValueChange={(val) => setSelectedDataset(val === 'none' ? null : val)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a dataset..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">No Context (General Chat)</SelectItem>
+                                            {datasets.map((dataset) => (
+                                                <SelectItem key={dataset.id} value={dataset.id}>
+                                                    {dataset.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Button
+                                    className="w-full"
+                                    variant="secondary"
+                                    onClick={() => selectedDataset && generateDatasetEmbeddings({
+                                        datasetId: selectedDataset,
+                                        chunkSize,
+                                        chunkOverlap
+                                    })}
+                                    disabled={!selectedDataset || isGenerating}
+                                >
+                                    {isGenerating ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            Processing Embeddings...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Zap className="h-4 w-4 mr-2" />
+                                            Process & Refresh Embeddings
+                                        </>
+                                    )}
+                                </Button>
+                                {embeddingsCount > 0 && (
+                                    <div className="p-2 bg-muted rounded text-xs text-center text-muted-foreground">
+                                        ✓ {embeddingsCount} vectors indexed and ready
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-4">
+                                <h3 className="text-sm font-medium flex items-center gap-2 text-primary">
+                                    <Sliders className="h-4 w-4" />
+                                    Retrieval Parameters
+                                </h3>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div className="space-y-1.5">
+                                        <div className="flex justify-between">
+                                            <label className="text-xs font-medium">Similarity Threshold</label>
+                                            <span className="text-xs text-muted-foreground">{similarityThreshold}</span>
+                                        </div>
+                                        <Input
+                                            type="number"
+                                            min={0.1}
+                                            max={0.9}
+                                            step={0.1}
+                                            value={similarityThreshold}
+                                            onChange={(e) => setSimilarityThreshold(parseFloat(e.target.value))}
+                                        />
+                                        <p className="text-[10px] text-muted-foreground">Minimum similarity score (0-1) for a chunk to be included.</p>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <div className="flex justify-between">
+                                            <label className="text-xs font-medium">Context Limit</label>
+                                            <span className="text-xs text-muted-foreground">{contextLimit} chunks</span>
+                                        </div>
+                                        <Input
+                                            type="number"
+                                            min={1}
+                                            max={20}
+                                            step={1}
+                                            value={contextLimit}
+                                            onChange={(e) => setContextLimit(parseInt(e.target.value))}
+                                        />
+                                        <p className="text-[10px] text-muted-foreground">Number of relevant chunks to retrieve.</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 pt-2">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-medium">Chunk Size</label>
+                                            <Input
+                                                type="number"
+                                                min={1}
+                                                max={100}
+                                                value={chunkSize}
+                                                onChange={(e) => setChunkSize(parseInt(e.target.value))}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-medium">Chunk Overlap</label>
+                                            <Input
+                                                type="number"
+                                                min={0}
+                                                max={50}
+                                                value={chunkOverlap}
+                                                onChange={(e) => setChunkOverlap(parseInt(e.target.value))}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </SheetContent>
+                </Sheet>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
                 {/* Conversations Sidebar */}
-                <Card className="lg:col-span-1 flex flex-col min-h-0">
-                    <CardHeader className="py-4 border-b">
-                        <Button onClick={handleNewConversation} disabled={isCreating} className="w-full">
+                <Card className="lg:col-span-1 flex flex-col min-h-0 h-full border-muted/60 shadow-sm">
+                    <CardHeader className="py-4 border-b flex-none">
+                        <Button onClick={handleNewConversation} disabled={isCreating} className="w-full shadow-sm">
                             <Plus className="h-4 w-4 mr-2" />
                             New Chat
                         </Button>
                     </CardHeader>
-                    <CardContent className="p-0 flex-1 overflow-hidden">
+                    <CardContent className="p-0 flex-1 overflow-hidden bg-muted/5">
                         <ScrollArea className="h-full">
-                            <div className="p-2 space-y-1">
+                            <div className="p-3 space-y-3 pb-6">
                                 {conversations.map((conv) => (
                                     <div
                                         key={conv.id}
-                                        className={`group flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedConversationId === conv.id
-                                            ? 'bg-primary/10 text-primary'
-                                            : 'hover:bg-muted'
+                                        className={`group relative flex flex-col gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-200 ${selectedConversationId === conv.id
+                                            ? 'bg-background border-primary/40 shadow-sm ring-1 ring-primary/10'
+                                            : 'bg-background hover:bg-muted/50 hover:border-primary/20 hover:shadow-sm'
                                             }`}
                                         onClick={() => setSelectedConversationId(conv.id)}
                                     >
-                                        <div className="flex items-center gap-2 overflow-hidden">
-                                            <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                                            <span className="text-sm truncate">{conv.title || 'Untitled Chat'}</span>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="flex items-center gap-2.5 overflow-hidden">
+                                                <div className={`p-1.5 rounded-lg ${selectedConversationId === conv.id ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                                                    <MessageSquare className="h-3.5 w-3.5" />
+                                                </div>
+                                                <span className="text-sm font-medium truncate text-foreground">{conv.title || 'Untitled Chat'}</span>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity -mr-1 hover:bg-destructive/10 hover:text-destructive"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteConversation(conv.id);
+                                                }}
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </Button>
                                         </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                deleteConversation(conv.id);
-                                            }}
-                                        >
-                                            <Trash2 className="h-3 w-3" />
-                                        </Button>
+                                        <div className="text-[10px] text-muted-foreground pl-9">
+                                            {new Date(conv.created_at || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        </div>
                                     </div>
                                 ))}
                                 {conversations.length === 0 && (
-                                    <p className="text-center text-xs text-muted-foreground py-8">No conversations</p>
+                                    <div className="text-center py-10 px-4">
+                                        <div className="bg-muted/30 p-3 rounded-full w-fit mx-auto mb-3">
+                                            <MessageSquare className="h-6 w-6 text-muted-foreground/50" />
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">No conversations yet</p>
+                                    </div>
                                 )}
                             </div>
                         </ScrollArea>
@@ -269,48 +327,24 @@ export function AIChat() {
                 </Card>
 
                 {/* Chat Area */}
-                <Card className="lg:col-span-3 flex flex-col min-h-0">
-                    <CardHeader className="py-3 border-b flex flex-row items-center justify-between">
-                        <CardTitle className="text-lg truncate">
-                            {selectedConversationId
-                                ? conversations.find((c) => c.id === selectedConversationId)?.title || 'Chat'
-                                : 'Select or create a conversation'}
+                <Card className="lg:col-span-3 flex flex-col min-h-0 h-full bg-background/50 backdrop-blur-sm border-border/60 shadow-md">
+                    <CardHeader className="py-3 border-b bg-muted/5 flex flex-row items-center justify-between flex-none h-14">
+                        <CardTitle className="text-base font-medium truncate flex items-center gap-2">
+                            {selectedConversationId ? (
+                                <>
+                                    <Sparkles className="h-4 w-4 text-primary" />
+                                    {conversations.find((c) => c.id === selectedConversationId)?.title || 'Chat'}
+                                </>
+                            ) : (
+                                <span className="text-muted-foreground font-normal">Select a conversation</span>
+                            )}
                         </CardTitle>
                         {selectedConversationId && (
                             <div className="flex flex-wrap items-center gap-2">
-                                <div className="hidden md:flex items-center gap-2 px-2 py-1 bg-muted rounded-md text-xs">
-                                    <Database className="h-3 w-3" />
-                                    Threshold:
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="100"
-                                        value={similarityThreshold * 100}
-                                        onChange={(e) => setSimilarityThreshold(Number(e.target.value) / 100)}
-                                        className="w-16 h-1.5"
-                                    />
-                                    <span>{(similarityThreshold * 100).toFixed(0)}%</span>
-                                </div>
-
-                                <div className="hidden md:flex items-center gap-2 px-2 py-1 bg-muted rounded-md text-xs">
-                                    <MessageSquare className="h-3 w-3" />
-                                    Context:
-                                    <select
-                                        value={contextLimit}
-                                        onChange={(e) => setContextLimit(Number(e.target.value))}
-                                        className="bg-transparent border-none focus:ring-0 p-0 h-4 text-xs"
-                                    >
-                                        <option value={3}>3</option>
-                                        <option value={5}>5</option>
-                                        <option value={10}>10</option>
-                                    </select>
-                                </div>
-
                                 <ConversationSettings
                                     conversation={currentConversation || null}
                                     onUpdate={refreshConversations}
                                 />
-
                                 <ExportConversation
                                     conversation={currentConversation!}
                                     messages={messages}
@@ -319,36 +353,57 @@ export function AIChat() {
                         )}
                     </CardHeader>
 
-                    <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
-                        <ScrollArea className="flex-1 p-4">
-                            <div className="space-y-4 pb-4">
+                    <CardContent className="flex-1 overflow-hidden p-0 flex flex-col relative h-full">
+                        <ScrollArea className="flex-1 p-6 h-full">
+                            <div className="min-h-full flex flex-col justify-end pb-4 max-w-4xl mx-auto">
                                 {!selectedConversationId ? (
-                                    <Alert>
-                                        <Sparkles className="h-4 w-4" />
-                                        <AlertDescription>
-                                            Create a new conversation or select an existing one to start chatting with your data.
-                                        </AlertDescription>
-                                    </Alert>
+                                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8 animate-in fade-in zoom-in duration-500 py-12 px-4">
+                                        <div className="relative group">
+                                            <div className="absolute -inset-4 rounded-full bg-gradient-to-tr from-primary/20 to-purple-500/20 blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                                            <div className="relative p-8 bg-background rounded-3xl border shadow-lg">
+                                                <Sparkles className="h-16 w-16 text-primary" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4 max-w-lg">
+                                            <h2 className="text-2xl font-bold tracking-tight">AI Knowledge Assistant</h2>
+                                            <p className="text-muted-foreground text-md">
+                                                Unlock insights from your data. Connect a dataset in <span className="font-semibold text-primary">RAG Configuration</span> and start chatting.
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            <Button size="lg" onClick={handleNewConversation} className="shadow-lg hover:shadow-primary/20 transition-all gap-2">
+                                                <Plus className="h-5 w-5" />
+                                                Start New Chat
+                                            </Button>
+                                        </div>
+                                    </div>
                                 ) : messages.length === 0 ? (
-                                    <Alert>
-                                        <MessageSquare className="h-4 w-4" />
-                                        <AlertDescription>
-                                            Ask me anything about your data! I'll search through your datasets and provide relevant answers.
-                                        </AlertDescription>
-                                    </Alert>
+                                    <div className="flex-1 flex flex-col items-center justify-center py-20 text-center space-y-4 opacity-80">
+                                        <div className="p-4 bg-primary/5 rounded-full ring-1 ring-primary/10">
+                                            <MessageSquare className="h-8 w-8 text-primary/60" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <h3 className="font-semibold text-lg">Empty Conversation</h3>
+                                            <p className="text-sm text-muted-foreground">
+                                                Ask questions about "{datasets.find(d => d.id === selectedDataset)?.name || 'your data'}"
+                                            </p>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    messages.map((message) => (
-                                        <ChatMessageComponent key={message.id} message={message} />
-                                    ))
+                                    <div className="space-y-6">
+                                        {messages.map((message) => (
+                                            <ChatMessageComponent key={message.id} message={message} />
+                                        ))}
+                                    </div>
                                 )}
                                 {isSending && (
-                                    <div className="flex items-center gap-2 text-muted-foreground ml-4">
+                                    <div className="flex items-center gap-2 text-muted-foreground ml-4 my-2">
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                         <span className="text-sm">Thinking...</span>
                                     </div>
                                 )}
                                 {isSearching && (
-                                    <div className="flex items-center gap-2 text-muted-foreground ml-4">
+                                    <div className="flex items-center gap-2 text-muted-foreground ml-4 my-2">
                                         <Database className="h-4 w-4 animate-spin" />
                                         <span className="text-sm">Searching knowledge base...</span>
                                     </div>
@@ -357,21 +412,22 @@ export function AIChat() {
                             </div>
                         </ScrollArea>
 
-                        {/* Input */}
-                        <div className="p-4 border-t bg-background">
-                            <div className="flex gap-2">
+                        {/* Input Area */}
+                        <div className="p-4 border-t bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                            <div className="flex gap-2 max-w-4xl mx-auto w-full">
                                 <Input
                                     value={inputMessage}
                                     onChange={(e) => setInputMessage(e.target.value)}
                                     onKeyDown={handleKeyPress}
                                     placeholder={selectedConversationId ? "Ask a question about your data..." : "Select a conversation to start"}
                                     disabled={!selectedConversationId || isSending}
-                                    className="flex-1"
+                                    className="flex-1 shadow-sm focus-visible:ring-primary/20"
                                 />
                                 <Button
                                     onClick={handleSendMessage}
                                     disabled={!selectedConversationId || !inputMessage.trim() || isSending}
                                     size="icon"
+                                    className="shadow-sm"
                                 >
                                     <Send className="h-4 w-4" />
                                 </Button>

@@ -5,7 +5,7 @@ import { AI_PROMPTS } from './prompts';
 const DEFAULT_CONFIG: AIConfig = {
     localUrl: 'http://localhost:11434/api/chat',
     preferredProvider: 'gemini', // Default to FREE/Cheap option
-    fallbackEnabled: true
+    fallbackEnabled: false
 };
 
 export class AIOrchestrator {
@@ -30,9 +30,11 @@ export class AIOrchestrator {
 
             if (provider === 'local') {
                 response = await this.callLocalLLM(request);
+            } else if (provider === 'gemini') {
+                // Use client-side direct call for Gemini to avoid Edge Function dependency
+                response = await this.callGeminiDirect(request);
             } else {
-                // Cloud providers (OpenAI, Gemini) are handled via Supabase Edge Function
-                // to keep keys secure and handle RAG logic on server
+                // OpenAI still uses Edge Function (optional, or could be direct too if key exposed)
                 response = await this.callEdgeFunction(request, provider);
             }
 
@@ -49,12 +51,79 @@ export class AIOrchestrator {
             }
 
             return {
-                content: "I apologize, but I'm having trouble processing your request right now.",
+                content: "I apologize, but I'm having trouble processing your request right now. Please check your connection or API keys.",
                 provider: provider,
                 latencyMs: performance.now() - startTime,
                 error: error instanceof Error ? error.message : 'Unknown error'
             };
         }
+    }
+
+    /**
+     * Calls Google Gemini API directly from client.
+     */
+    private async callGeminiDirect(request: AIRequest): Promise<AIResponse> {
+        const startTime = performance.now();
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+        if (!apiKey) {
+            throw new Error('Missing VITE_GEMINI_API_KEY environment variable');
+        }
+
+        const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+        // Construct Prompt with Context
+        let systemInstruction = "";
+        if (request.messages.length > 0 && request.messages[0].role === 'system') {
+            systemInstruction = request.messages[0].content;
+        }
+
+        // Inject Context if provided
+        if (request.context && request.context !== 'auto') {
+            systemInstruction += `\n\nCONTEXT DATA:\n${request.context}\n\nAnswer based on this context if relevant.`;
+        }
+
+        const contents = request.messages
+            .filter(m => m.role !== 'system')
+            .map(m => ({
+                role: m.role === 'user' ? 'user' : 'model',
+                parts: [{ text: m.content }]
+            }));
+
+        const payload = {
+            contents: contents,
+            generationConfig: {
+                temperature: request.temperature || 0.7,
+                maxOutputTokens: request.maxTokens || 2000,
+            }
+            // System instruction support depends on model version, usually simpler to prepend to first user message or handle above
+        };
+
+        // Prepend system instruction to first message if present (Gemini Pro doesn't always support system_instruction field in all versions yet)
+        if (systemInstruction && payload.contents.length > 0) {
+            payload.contents[0].parts[0].text = `System Prompt: ${systemInstruction}\n\nUser Message: ${payload.contents[0].parts[0].text}`;
+        }
+
+        const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(`Gemini API Error: ${res.statusText} ${JSON.stringify(errData)}`);
+        }
+
+        const data = await res.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+
+        return {
+            content: content,
+            provider: 'gemini',
+            latencyMs: performance.now() - startTime,
+            metadata: { model: 'gemini-pro' }
+        };
     }
 
     /**
@@ -160,11 +229,13 @@ export class AIOrchestrator {
         ${importanceStr}
         `;
 
-        return this.generateResponse(
-            prompt,
-            { role: 'system', content: AI_PROMPTS.PREDICTION_EXPLAINER },
-            'gemini' // Use Gemini for reasoning 
-        );
+        return this.generateResponse({
+            messages: [
+                { role: 'system', content: AI_PROMPTS.PREDICTION_EXPLAINER },
+                { role: 'user', content: prompt }
+            ],
+            provider: 'gemini'
+        });
     }
     async suggestAutomationRules(
         analyticsData: Record<string, any>
@@ -180,12 +251,14 @@ export class AIOrchestrator {
         Suggest 3 high-impact automation rules.
         `;
 
-        const response = await this.generateResponse(
-            prompt,
-            { role: 'system', content: AI_PROMPTS.AUTOMATION_SUGGESTER },
-            'gemini',
-            { jsonMode: true }
-        );
+        const response = await this.generateResponse({
+            messages: [
+                { role: 'system', content: AI_PROMPTS.AUTOMATION_SUGGESTER },
+                { role: 'user', content: prompt }
+            ],
+            provider: 'gemini',
+            jsonMode: true
+        });
 
         try {
             // Attempt to parse JSON from content

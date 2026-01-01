@@ -5,6 +5,7 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { useAIUsageLimit } from './useAIUsageLimit';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
+import { useEmbeddings } from '@/hooks/useEmbeddings';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
@@ -37,6 +38,7 @@ export function useRAGChat(conversationId?: string) {
     const { checkLimit, incrementUsage } = useAIUsageLimit();
     const [isStreaming, setIsStreaming] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
+    const { searchSimilar } = useEmbeddings();
 
     // Fetch conversations
     const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
@@ -152,7 +154,7 @@ export function useRAGChat(conversationId?: string) {
             }
 
             setIsStreaming(true);
-            setIsSearching(true); // Technically handled on server now, but keep state for UI feedback if needed
+            setIsSearching(true);
 
             try {
                 // 1. Save user message
@@ -169,6 +171,30 @@ export function useRAGChat(conversationId?: string) {
                 if (userMsgError) throw userMsgError;
 
                 // 2. Prepare Context & History
+                let contextText = '';
+                let searchSources: any[] = [];
+
+                // Perform Client-Side retrieval if dataset selected
+                if (datasetId && datasetId !== 'none') {
+                    try {
+                        const results = await searchSimilar(message, contextLimit, datasetId, similarityThreshold);
+                        if (results && results.length > 0) {
+                            contextText = results.map(r => `[Source ID: ${r.id}]\n${r.content}`).join('\n\n');
+                            searchSources = results.map(r => ({
+                                content: r.content,
+                                metadata: r.metadata,
+                                similarity: r.similarity
+                            }));
+                            console.log(`[RAG] Found ${results.length} context chunks.`);
+                        } else {
+                            console.log('[RAG] No relevant context found above threshold.');
+                        }
+                    } catch (searchErr) {
+                        console.error('Vector search failed:', searchErr);
+                        // Continue without context rather than failing completely
+                    }
+                }
+
                 // Get conversation settings
                 const { data: conversationData } = await supabase
                     .from('chat_conversations')
@@ -184,33 +210,27 @@ export function useRAGChat(conversationId?: string) {
                     .select('*')
                     .eq('conversation_id', convId)
                     .order('created_at', { ascending: true }) // Oldest first for context
-                    .limit(contextWindow); // Simple limit for now, ideally token based
+                    .limit(contextWindow);
 
                 const history = (historyData || []).map(msg => ({
                     role: (msg.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
                     content: msg.content
                 }));
 
-                // 3. Call AI Orchestrator
-                // Note: We pass context='auto' to let the Edge Function handle RAG
-                // But Orchestrator logic in client might need update to handle 'auto' or we just don't pass context 
-                // and let Orchestrator's default behavior (which calls edge function) take over.
-                // The prompt logic in Edge Function handles RAG if context is NOT provided or 'auto'.
-
-                // We define a system prompt that encourages RAG usage
+                // 3. Call AI Orchestrator (Client-Side)
                 const systemPrompt = `You are a helpful AI assistant analyzing business data. 
-Answer questions based ONLY on the provided context from the user's data.
-If the answer isn't in the context, say so clearly.
-Cite sources using [Source 1], [Source 2] format.`;
+Answer questions based on the provided context if available.
+If the answer isn't in the context, say so clearly but try to be helpful with general knowledge.
+Cite sources using [Source ID] format if referenced.`;
 
                 const response = await aiOrchestrator.generateResponse({
-                    provider: 'gemini', // Default
+                    provider: 'gemini', // Default to Gemini Client-Side
                     messages: [
                         { role: 'system', content: systemPrompt },
                         ...history,
                         { role: 'user', content: message } // Current message
                     ],
-                    context: 'auto', // Signal to Edge Function to perform RAG
+                    context: contextText || undefined, // Pass retrieved text directly
                     temperature: conversationData?.temperature || 0.7,
                     maxTokens: conversationData?.max_tokens || 1000
                 });

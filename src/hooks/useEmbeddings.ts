@@ -56,7 +56,8 @@ export function useEmbeddings() {
             }
         }
 
-        // Generate new embedding
+        console.log(`[Embeddings] Generating embedding for text length: ${text.length}`);
+
         const response = await fetch(`${GEMINI_EMBEDDING_URL}?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -67,7 +68,9 @@ export function useEmbeddings() {
         });
 
         if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.statusText}`);
+            const errBody = await response.text();
+            console.error(`[Embeddings] API Error: ${response.status} - ${errBody}`);
+            throw new Error(`Gemini API error: ${response.statusText} ${errBody}`);
         }
 
         const data = await response.json();
@@ -99,26 +102,31 @@ export function useEmbeddings() {
         mutationFn: async ({ datasetId, chunkSize = 1, chunkOverlap = 0 }: { datasetId: string, chunkSize?: number, chunkOverlap?: number }) => {
             if (!user) throw new Error('Not authenticated');
 
+            console.log(`[Embeddings] Starting generation for dataset ${datasetId}`);
+
             // Fetch data points
             const { data: dataPoints, error: fetchError } = await supabase
                 .from('data_points')
                 .select('*')
                 .eq('dataset_id', datasetId)
-                .order('date_recorded', { ascending: true }) // Ensure orderly chunking
-                .limit(1000); // Increased limit for better context
+                .order('date_recorded', { ascending: true })
+                .limit(1000);
 
             if (fetchError) throw fetchError;
             if (!dataPoints || dataPoints.length === 0) {
                 throw new Error('No data found in dataset');
             }
 
+            console.log(`[Embeddings] Found ${dataPoints.length} data points.`);
+
             // Delete existing embeddings for this dataset
+            // Use filter on metadata since dataset_id column is missing
             await supabase
                 .from('embeddings')
                 .delete()
-                .eq('dataset_id', datasetId);
+                .filter('metadata->>dataset_id', 'eq', datasetId);
 
-            // Create chunks based on sliding window
+            // Create chunks
             const chunks: { content: string, metadata: any }[] = [];
             const step = Math.max(1, chunkSize - chunkOverlap);
 
@@ -128,7 +136,6 @@ export function useEmbeddings() {
 
                 if (chunkPoints.length === 0) break;
 
-                // Create content from chunk
                 const content = chunkPoints.map(point =>
                     `${point.metric_name}: ${point.metric_value} (recorded on ${point.date_recorded})`
                 ).join('\n');
@@ -136,58 +143,84 @@ export function useEmbeddings() {
                 chunks.push({
                     content,
                     metadata: {
+                        dataset_id: datasetId,
                         chunk_index: chunks.length,
                         start_record_idx: i,
                         end_record_idx: chunkEnd - 1,
                         record_count: chunkPoints.length,
-                        // Store first/last metric info for context
                         start_date: chunkPoints[0].date_recorded,
                         end_date: chunkPoints[chunkPoints.length - 1].date_recorded
                     }
                 });
             }
 
-            // Process chunks in batches to respect rate limits
-            const batchSize = 5; // Reduced batch size for larger chunks
-            const embeddings = [];
+            console.log(`[Embeddings] Created ${chunks.length} chunks to embed.`);
+
+            const batchSize = 5;
+            let successCount = 0;
+            let failedCount = 0;
 
             for (let i = 0; i < chunks.length; i += batchSize) {
                 const batch = chunks.slice(i, i + batchSize);
 
-                for (const chunk of batch) {
-                    // Generate embedding
-                    const embeddingVector = await generateEmbedding(chunk.content);
+                // Process batch in parallel
+                const promises = batch.map(async (chunk) => {
+                    try {
+                        const embeddingVector = await generateEmbedding(chunk.content);
+                        return {
+                            user_id: user.id,
+                            // dataset_id: datasetId, // Removed to avoid schema error
+                            content: chunk.content,
+                            metadata: chunk.metadata,
+                            embedding: embeddingVector,
+                        };
+                    } catch (err) {
+                        console.error(`[Embeddings] Chunk failed:`, err);
+                        return null;
+                    }
+                });
 
-                    embeddings.push({
-                        user_id: user.id,
-                        dataset_id: datasetId,
-                        content: chunk.content,
-                        metadata: chunk.metadata,
-                        embedding: embeddingVector,
-                    });
+                const results = await Promise.all(promises);
+                const successfulEmbeddings = results.filter(r => r !== null);
+
+                if (successfulEmbeddings.length > 0) {
+                    // Incremental Insert to avoid payload size limits (400 Bad Request)
+                    const { error: insertError } = await supabase
+                        .from('embeddings')
+                        .insert(successfulEmbeddings);
+
+                    if (insertError) {
+                        console.error('[Embeddings] Batch insert failed:', insertError);
+                        failedCount += successfulEmbeddings.length;
+                    } else {
+                        successCount += successfulEmbeddings.length;
+                    }
                 }
 
-                // Small delay to avoid rate limiting
+                failedCount += (results.length - successfulEmbeddings.length);
+
+                console.log(`[Embeddings] Batch ${i / batchSize + 1} complete. Saved: ${successfulEmbeddings.length}`);
+
                 await new Promise(resolve => setTimeout(resolve, 200));
             }
 
-            // Insert embeddings
-            const { error: insertError } = await supabase
-                .from('embeddings')
-                .insert(embeddings);
+            if (successCount === 0 && failedCount > 0) {
+                throw new Error('All embedding generation attempts failed.');
+            }
 
-            if (insertError) throw insertError;
+            console.log(`[Embeddings] Finished. Success: ${successCount}, Failed: ${failedCount}`);
 
-            return { count: embeddings.length };
+            return { count: successCount, failed: failedCount };
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['embeddings'] });
             toast({
                 title: 'Success',
-                description: `Generated ${data.count} embeddings`,
+                description: `Generated ${data.count} embeddings.${data.failed > 0 ? ` (${data.failed} failed)` : ''}`,
             });
         },
         onError: (error) => {
+            console.error('[Embeddings] Fatal Error:', error);
             toast({
                 title: 'Error',
                 description: `Failed to generate embeddings: ${error.message}`,
@@ -205,35 +238,31 @@ export function useEmbeddings() {
     ): Promise<SearchResult[]> => {
         if (!user) throw new Error('Not authenticated');
 
-        // Generate query embedding
         const queryEmbedding = await generateEmbedding(query);
 
-        // Use RPC function for vector similarity search
-        const { data, error } = await supabase.rpc('search_embeddings', {
+        const { data, error } = await supabase.rpc('match_embeddings', {
             query_embedding: queryEmbedding,
             match_threshold: threshold,
             match_count: limit,
             filter_dataset_id: datasetId || null,
         });
 
-        if (error) {
-            // If RPC doesn't exist, fall back to manual search
-            console.warn('RPC search failed, using fallback:', error);
+        if (error || !data) {
+            if (error) console.warn('RPC search failed, using fallback:', error);
 
-            let query = supabase
+            let queryBuilder = supabase
                 .from('embeddings')
                 .select('*')
                 .eq('user_id', user.id);
 
             if (datasetId) {
-                query = query.eq('dataset_id', datasetId);
+                queryBuilder = queryBuilder.filter('metadata->>dataset_id', 'eq', datasetId);
             }
 
-            const { data: embeddings, error: fetchError } = await query.limit(100);
+            const { data: embeddings, error: fetchError } = await queryBuilder.limit(100);
 
             if (fetchError) throw fetchError;
 
-            // Calculate cosine similarity manually
             const results = embeddings?.map(emb => {
                 const similarity = cosineSimilarity(queryEmbedding, emb.embedding);
                 return {
@@ -253,17 +282,14 @@ export function useEmbeddings() {
         return data || [];
     };
 
-    // Get embeddings count
     const { data: embeddingsCount = 0 } = useQuery({
         queryKey: ['embeddings-count', user?.id],
         queryFn: async () => {
             if (!user) return 0;
-
             const { count, error } = await supabase
                 .from('embeddings')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', user.id);
-
             if (error) throw error;
             return count || 0;
         },
@@ -278,19 +304,15 @@ export function useEmbeddings() {
     };
 }
 
-// Cosine similarity helper
 function cosineSimilarity(a: number[], b: number[]): number {
     if (a.length !== b.length) return 0;
-
     let dotProduct = 0;
     let normA = 0;
     let normB = 0;
-
     for (let i = 0; i < a.length; i++) {
         dotProduct += a[i] * b[i];
         normA += a[i] * a[i];
         normB += b[i] * b[i];
     }
-
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
