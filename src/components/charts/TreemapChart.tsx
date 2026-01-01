@@ -33,11 +33,25 @@ export function TreemapChart({
                         fill={fill}
                         fillOpacity={fillOpacity}
                         stroke="#fff"
-                        strokeWidth={2}
+                        strokeWidth={1}
                     />
                 </g>
             );
         }
+
+        const formatName = (str: string) => {
+            if (!str) return '';
+            // Check if it looks like a date (YYYY-MM-DD)
+            if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+                try {
+                    const date = new Date(str);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }); // "Aug 20, 23"
+                } catch (e) {
+                    return str;
+                }
+            }
+            return str.length > 10 ? `${str.substring(0, 10)}..` : str;
+        };
 
         return (
             <g>
@@ -49,26 +63,26 @@ export function TreemapChart({
                     fill={fill}
                     fillOpacity={fillOpacity}
                     stroke="#fff"
-                    strokeWidth={2}
+                    strokeWidth={1}
                 />
                 <text
                     x={x + width / 2}
                     y={y + height / 2 - 7}
                     textAnchor="middle"
                     fill="#fff"
-                    fontSize={12}
-                    fontWeight="bold"
-                    style={{ pointerEvents: 'none' }}
+                    fontSize={11}
+                    fontWeight="500"
+                    style={{ pointerEvents: 'none', textShadow: '0px 1px 2px rgba(0,0,0,0.3)' }}
                 >
-                    {(name || '').length > 10 ? `${(name || '').substring(0, 10)}..` : name}
+                    {formatName(name)}
                 </text>
                 <text
                     x={x + width / 2}
                     y={y + height / 2 + 10}
                     textAnchor="middle"
                     fill="#fff"
-                    fontSize={11}
-                    style={{ pointerEvents: 'none' }}
+                    fontSize={10}
+                    style={{ pointerEvents: 'none', textShadow: '0px 1px 2px rgba(0,0,0,0.3)' }}
                 >
                     {value}
                 </text>
