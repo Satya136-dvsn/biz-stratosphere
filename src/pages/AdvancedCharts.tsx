@@ -437,7 +437,7 @@ export default function AdvancedCharts() {
                                 }))}
                                 isAnimationActive
                             >
-                                <LabelList position="right" fill="#000" stroke="none" dataKey="name" />
+                                <LabelList position="right" fill="#fff" stroke="none" dataKey="name" />
                                 <LabelList position="inside" fill="#fff" stroke="none" dataKey="value" />
                             </Funnel>
                         </FunnelChart>

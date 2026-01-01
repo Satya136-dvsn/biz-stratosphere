@@ -21,7 +21,23 @@ export function TreemapChart({
     const CustomContent = (props: any) => {
         const { x, y, width, height, name, value, fill, fillOpacity = 1 } = props;
 
-        if (width < 30 || height < 30) return null;
+        // Hide text for small boxes to prevent overlap
+        if (width < 60 || height < 40) {
+            return (
+                <g>
+                    <rect
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        fill={fill}
+                        fillOpacity={fillOpacity}
+                        stroke="#fff"
+                        strokeWidth={2}
+                    />
+                </g>
+            );
+        }
 
         return (
             <g>
@@ -40,17 +56,19 @@ export function TreemapChart({
                     y={y + height / 2 - 7}
                     textAnchor="middle"
                     fill="#fff"
-                    fontSize={Math.min(14, width / 5)} // Auto-scale font
+                    fontSize={12}
                     fontWeight="bold"
+                    style={{ pointerEvents: 'none' }}
                 >
-                    {name}
+                    {name.length > 10 ? `${name.substring(0, 10)}..` : name}
                 </text>
                 <text
                     x={x + width / 2}
                     y={y + height / 2 + 10}
                     textAnchor="middle"
                     fill="#fff"
-                    fontSize={Math.min(12, width / 6)}
+                    fontSize={11}
+                    style={{ pointerEvents: 'none' }}
                 >
                     {value}
                 </text>
