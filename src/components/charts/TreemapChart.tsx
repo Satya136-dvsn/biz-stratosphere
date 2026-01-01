@@ -18,14 +18,8 @@ export function TreemapChart({
     title = 'Treemap Chart',
     showTooltip = true,
 }: TreemapChartProps) {
-    // Transform data for treemap
-    const treemapData = data.map((item, index) => ({
-        ...item,
-        fill: COLORS[index % COLORS.length],
-    }));
-
     const CustomContent = (props: any) => {
-        const { x, y, width, height, name, value, fill } = props;
+        const { x, y, width, height, name, value, fill, fillOpacity = 1 } = props;
 
         if (width < 30 || height < 30) return null;
 
@@ -37,6 +31,7 @@ export function TreemapChart({
                     width={width}
                     height={height}
                     fill={fill}
+                    fillOpacity={fillOpacity}
                     stroke="#fff"
                     strokeWidth={2}
                 />
@@ -45,7 +40,7 @@ export function TreemapChart({
                     y={y + height / 2 - 7}
                     textAnchor="middle"
                     fill="#fff"
-                    fontSize={14}
+                    fontSize={Math.min(14, width / 5)} // Auto-scale font
                     fontWeight="bold"
                 >
                     {name}
@@ -55,7 +50,7 @@ export function TreemapChart({
                     y={y + height / 2 + 10}
                     textAnchor="middle"
                     fill="#fff"
-                    fontSize={12}
+                    fontSize={Math.min(12, width / 6)}
                 >
                     {value}
                 </text>
@@ -66,7 +61,7 @@ export function TreemapChart({
     return (
         <ResponsiveContainer width="100%" height={400}>
             <Treemap
-                data={treemapData}
+                data={data}
                 dataKey="value"
                 nameKey="name"
                 stroke="#fff"

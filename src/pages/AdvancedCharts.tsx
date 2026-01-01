@@ -76,16 +76,6 @@ export default function AdvancedCharts() {
 
             const { data, error } = await query;
 
-            // Debug logging
-            console.log('🔍 Advanced Charts Query Debug:', {
-                dataset_id: selectedDatasetId,
-                raw_data_count: data?.length || 0,
-                has_error: !!error,
-                error_message: error?.message,
-                sample_raw_point: data?.[0],
-                metric_names: data?.map(d => d.metric_name).slice(0, 5)
-            });
-
             if (error) {
                 console.error('❌ Query error:', error);
                 throw error;
@@ -176,6 +166,14 @@ export default function AdvancedCharts() {
             } as any);
         }
         return top;
+    };
+
+    // Helper to get simple Top N items without "Others" aggregation
+    // Best for Treemap/Funnel where a massive "Others" block destroys the scale
+    const getTopItems = (data: typeof transformedData, limit = 50) => {
+        return [...data]
+            .sort((a, b) => b.value - a.value)
+            .slice(0, limit);
     };
 
     // Handle save configuration
@@ -343,7 +341,10 @@ export default function AdvancedCharts() {
                         <PieChart>
                             <Pie data={aggregatedData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={false}>
                                 {aggregatedData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={entry.name === 'Others' ? '#9ca3af' : COLORS[index % COLORS.length]}
+                                    />
                                 ))}
                             </Pie>
                             {customization.showTooltip && <Tooltip />}
@@ -388,10 +389,20 @@ export default function AdvancedCharts() {
                 );
 
             case 'treemap':
-                // Treemap can handle more data, maybe 50?
+                const treemapItems = getTopItems(transformedData, 50);
+                const treemapData = treemapItems.map((item, index) => {
+                    // Generate a monochromatic gradient (dark to light)
+                    const opacity = Math.max(0.3, 1 - (index / treemapItems.length) * 0.7);
+                    return {
+                        ...item,
+                        fill: customization.primaryColor,
+                        fillOpacity: opacity,
+                    };
+                });
+
                 return (
                     <TreemapChart
-                        data={getAggregatedData(transformedData, 30)}
+                        data={treemapData}
                         title={customization.title}
                         showTooltip={customization.showTooltip}
                     />
@@ -413,19 +424,22 @@ export default function AdvancedCharts() {
                 );
 
             case 'funnel':
+                const funnelData = getTopItems(transformedData, 20);
                 return (
                     <ResponsiveContainer {...commonProps}>
                         <FunnelChart>
                             {customization.showTooltip && <Tooltip />}
                             <Funnel
                                 dataKey="value"
-                                data={aggregatedData.map((item, idx) => ({
+                                data={funnelData.map((item, idx) => ({
                                     ...item,
-                                    fill: COLORS[idx % COLORS.length],
+                                    fill: customization.primaryColor,
+                                    fillOpacity: Math.max(0.3, 1 - (idx / funnelData.length) * 0.6),
                                 }))}
                                 isAnimationActive
                             >
                                 <LabelList position="right" fill="#000" stroke="none" dataKey="name" />
+                                <LabelList position="inside" fill="#fff" stroke="none" dataKey="value" />
                             </Funnel>
                         </FunnelChart>
                     </ResponsiveContainer>
