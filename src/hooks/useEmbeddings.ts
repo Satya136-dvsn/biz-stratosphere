@@ -260,7 +260,16 @@ export function useEmbeddings() {
         }
 
         if (error || !data) {
-            if (error) console.warn('RPC search failed, using fallback:', error);
+            if (error) {
+                console.error('[RAG Debug] RPC Error Details:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code,
+                    fullError: error
+                });
+                console.warn('RPC search failed, using fallback:', error);
+            }
 
             let queryBuilder = supabase
                 .from('embeddings')

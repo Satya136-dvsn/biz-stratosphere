@@ -6,8 +6,47 @@ import { Footer } from '@/components/layout/Footer';
 export default function LandingPage() {
     return (
         <div className="min-h-screen bg-gradient-bg">
+            {/* Navigation Header */}
+            <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border/40">
+                <div className="container mx-auto px-4">
+                    <div className="flex items-center justify-between h-16">
+                        {/* Logo */}
+                        <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                            <img
+                                src="/logo-orbit.png"
+                                alt="Biz Stratosphere"
+                                className="h-10 w-10 rounded-full object-contain drop-shadow-lg"
+                            />
+                            <div className="hidden sm:block">
+                                <h2 className="text-xl font-bold text-foreground">Biz Stratosphere</h2>
+                            </div>
+                        </Link>
+
+                        {/* Auth Buttons */}
+                        <div className="flex items-center gap-4">
+                            <Link to="/auth">
+                                <Button
+                                    variant="ghost"
+                                    className="text-sm font-medium hover:text-primary transition-colors"
+                                >
+                                    Sign In
+                                </Button>
+                            </Link>
+                            <Link to="/auth">
+                                <Button
+                                    size="sm"
+                                    className="shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                                >
+                                    Sign Up
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
             {/* Hero Section */}
-            <section className="container mx-auto px-4 pt-24 pb-40">
+            <section className="container mx-auto px-4 pt-32 pb-40">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center space-y-10 animate-fade-in-up">
                         {/* Logo - Matching Sidebar Design */}

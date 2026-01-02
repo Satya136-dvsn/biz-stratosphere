@@ -32,9 +32,6 @@ BEGIN
     AND (
       filter_dataset_id IS NULL 
       OR 
-      -- Check both the column (if populated) and metadata (fallback)
-      embeddings.dataset_id = filter_dataset_id 
-      OR 
       (embeddings.metadata->>'dataset_id')::uuid = filter_dataset_id
     )
   ORDER BY embeddings.embedding <=> query_embedding

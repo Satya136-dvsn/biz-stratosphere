@@ -65,27 +65,57 @@ export function AIChat() {
     const { generateDatasetEmbeddings, isGenerating, embeddingsCount } = useEmbeddings();
 
     // Fetch datasets
-    const { data: datasets = [] } = useQuery({
+    const { data: datasets = [], error: datasetsError, isLoading: datasetsLoading } = useQuery({
         queryKey: ['datasets', user?.id],
         queryFn: async () => {
             if (!user) return [];
             console.log('[AIChat] Fetching datasets for user:', user.id);
             const { data, error } = await supabase
                 .from('datasets')
-                .select('id, name')
+                .select('id, file_name')
                 .eq('user_id', user.id);
 
             if (error) {
                 console.error('[AIChat] Error fetching datasets:', error);
+                toast({
+                    title: "Error loading datasets",
+                    description: error.message,
+                    variant: "destructive"
+                });
                 throw error;
             }
             console.log('[AIChat] Fetched datasets:', data);
-            return data;
+            console.log('[AIChat] Number of datasets:', data?.length || 0);
+            return data || [];
         },
         enabled: !!user,
         staleTime: 1000 * 60 * 5, // 5 minutes cache
         refetchOnWindowFocus: false, // Prevent disappearing on tab switch
     });
+
+    // Log datasets state changes
+    useEffect(() => {
+        console.log('[AIChat] Datasets state updated:', {
+            count: datasets?.length || 0,
+            datasets,
+            error: datasetsError,
+            loading: datasetsLoading
+        });
+
+        // Log each dataset individually to see the file_name field
+        if (datasets && datasets.length > 0) {
+            console.log('[AIChat] Individual datasets:');
+            datasets.forEach((ds, idx) => {
+                console.log(`  Dataset ${idx}:`, {
+                    id: ds.id,
+                    file_name: ds.file_name,
+                    nameType: typeof ds.file_name,
+                    nameLength: ds.file_name?.length,
+                    fullObject: ds
+                });
+            });
+        }
+    }, [datasets, datasetsError, datasetsLoading]);
 
     // Recover orphaned datasets (Fix for visibility issues)
     const recoverOrphanedDatasets = async () => {
@@ -102,41 +132,57 @@ export function AIChat() {
 
             if (embError) throw embError;
 
-            const distinctDatasetIds = new Set<string>();
+            // Collect dataset IDs and names from metadata
+            const datasetInfo = new Map<string, string>();
             embeddings?.forEach(e => {
                 const meta = e.metadata as any;
                 if (meta?.dataset_id) {
-                    distinctDatasetIds.add(meta.dataset_id);
+                    // Try to extract filename from metadata
+                    const filename = meta?.filename || meta?.source || meta?.name;
+                    if (!datasetInfo.has(meta.dataset_id) && filename) {
+                        datasetInfo.set(meta.dataset_id, filename);
+                    } else if (!datasetInfo.has(meta.dataset_id)) {
+                        datasetInfo.set(meta.dataset_id, `Dataset ${meta.dataset_id.substring(0, 8)}`);
+                    }
                 }
             });
 
-            console.log('[Recovery] Found distinct IDs:', Array.from(distinctDatasetIds));
+            console.log('[Recovery] Found distinct IDs:', Array.from(datasetInfo.keys()));
+            console.log('[Recovery] Dataset names from metadata:', Object.fromEntries(datasetInfo));
 
-            if (distinctDatasetIds.size === 0) {
+            if (datasetInfo.size === 0) {
                 toast({ title: 'No Data Found', description: 'No embeddings found to recover.' });
                 return;
             }
 
-            // Check which are missing
-            const existingIds = new Set(datasets.map(d => d.id));
-            const missingIds = Array.from(distinctDatasetIds).filter(id => !existingIds.has(id));
+            // Check which datasets need to be created or updated
+            const existingDatasets = new Map(datasets.map(d => [d.id, d.file_name]));
+            const toUpsert: any[] = [];
 
-            if (missingIds.length === 0) {
-                toast({ title: 'All Good', description: 'All datasets are already visible.' });
+            datasetInfo.forEach((fileName, id) => {
+                const existingFileName = existingDatasets.get(id);
+                // Add if missing OR if file_name is null/empty
+                if (!existingDatasets.has(id) || !existingFileName || existingFileName.trim() === '') {
+                    toUpsert.push({
+                        id,
+                        user_id: user.id,
+                        file_name: fileName,
+                        created_at: new Date().toISOString()
+                    });
+                }
+            });
+
+            if (toUpsert.length === 0) {
+                toast({ title: 'All Good', description: 'All datasets have valid names.' });
                 return;
             }
 
-            console.log('[Recovery] Restoring missing IDs:', missingIds);
+            console.log('[Recovery] Upserting datasets:', toUpsert);
 
-            // Restore them
+            // Restore/Update them
             const { error: insertError } = await supabase
                 .from('datasets')
-                .upsert(missingIds.map(id => ({
-                    id,
-                    user_id: user.id,
-                    name: `Restored Dataset ${id.substring(0, 8)}`,
-                    created_at: new Date().toISOString()
-                })));
+                .upsert(toUpsert);
 
             if (insertError) throw insertError;
 
@@ -144,7 +190,7 @@ export function AIChat() {
 
             toast({
                 title: 'Recovery Successful',
-                description: `Restored ${missingIds.length} dataset(s) found in embeddings.`
+                description: `Fixed ${toUpsert.length} dataset(s) with proper names from metadata.`
             });
 
         } catch (error: any) {
@@ -259,22 +305,39 @@ export function AIChat() {
                                             {isRecovering ? 'Restoring...' : 'Find Missing Data'}
                                         </Button>
                                     </div>
-                                    <Select
-                                        value={selectedDataset || 'none'}
-                                        onValueChange={(val) => setSelectedDataset(val === 'none' ? null : val)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a dataset..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">No Context (General Chat)</SelectItem>
-                                            {datasets.map((dataset) => (
-                                                <SelectItem key={dataset.id} value={dataset.id}>
-                                                    {dataset.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    {datasetsError && (
+                                        <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
+                                            Error: {datasetsError.message}
+                                        </div>
+                                    )}
+                                    {datasetsLoading ? (
+                                        <div className="flex items-center gap-2 p-2 bg-muted rounded text-xs">
+                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                            Loading datasets...
+                                        </div>
+                                    ) : (
+                                        <Select
+                                            value={selectedDataset || 'none'}
+                                            onValueChange={(val) => setSelectedDataset(val === 'none' ? null : val)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a dataset..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">No Context (General Chat)</SelectItem>
+                                                {datasets.map((dataset) => (
+                                                    <SelectItem key={dataset.id} value={dataset.id}>
+                                                        {dataset.file_name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                    {!datasetsLoading && !datasetsError && datasets.length === 0 && (
+                                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                                            No datasets found. Click "Find Missing Data" to scan for orphaned datasets.
+                                        </div>
+                                    )}
                                 </div>
                                 <Button
                                     className="w-full"
@@ -411,37 +474,46 @@ export function AIChat() {
                     </CardHeader>
                     <CardContent className="p-0 flex-1 overflow-hidden bg-muted/5">
                         <ScrollArea className="h-full">
-                            <div className="p-3 space-y-3 pb-6">
+                            <div className="p-2 space-y-1.5">
                                 {conversations.map((conv) => (
                                     <div
                                         key={conv.id}
-                                        className={`group relative flex flex-col gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-200 ${selectedConversationId === conv.id
-                                            ? 'bg-background border-primary/40 shadow-sm ring-1 ring-primary/10'
-                                            : 'bg-background hover:bg-muted/50 hover:border-primary/20 hover:shadow-sm'
+                                        className={`group relative flex flex-col gap-1.5 p-2.5 rounded-lg border cursor-pointer transition-all duration-200 ${selectedConversationId === conv.id
+                                            ? 'bg-primary/5 border-primary/30 shadow-sm'
+                                            : 'bg-card hover:bg-muted/50 hover:border-border hover:shadow-sm'
                                             }`}
                                         onClick={() => setSelectedConversationId(conv.id)}
                                     >
-                                        <div className="flex items-center justify-between gap-2">
-                                            <div className="flex items-center gap-2.5 overflow-hidden">
-                                                <div className={`p-1.5 rounded-lg ${selectedConversationId === conv.id ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="flex items-start gap-2 flex-1 min-w-0">
+                                                <div className={`p-1 rounded-md flex-shrink-0 ${selectedConversationId === conv.id ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
                                                     <MessageSquare className="h-3.5 w-3.5" />
                                                 </div>
-                                                <span className="text-sm font-medium truncate text-foreground">{conv.title || 'Untitled Chat'}</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-medium truncate text-foreground">
+                                                        {conv.title || 'Untitled Chat'}
+                                                    </p>
+                                                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                                                        {new Date(conv.created_at || Date.now()).toLocaleDateString(undefined, {
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity -mr-1 hover:bg-destructive/10 hover:text-destructive"
+                                                className="h-7 w-7 opacity-60 group-hover:opacity-100 transition-opacity flex-shrink-0 hover:bg-destructive/10 hover:text-destructive"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     deleteConversation(conv.id);
                                                 }}
                                             >
-                                                <Trash2 className="h-3 w-3" />
+                                                <Trash2 className="h-3.5 w-3.5" />
                                             </Button>
-                                        </div>
-                                        <div className="text-[10px] text-muted-foreground pl-9">
-                                            {new Date(conv.created_at || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                     </div>
                                 ))}
