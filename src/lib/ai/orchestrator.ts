@@ -70,7 +70,7 @@ export class AIOrchestrator {
             throw new Error('Missing VITE_GEMINI_API_KEY environment variable');
         }
 
-        const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
         // Construct Prompt with Context
         let systemInstruction = "";
@@ -96,10 +96,9 @@ export class AIOrchestrator {
                 temperature: request.temperature || 0.7,
                 maxOutputTokens: request.maxTokens || 2000,
             }
-            // System instruction support depends on model version, usually simpler to prepend to first user message or handle above
         };
 
-        // Prepend system instruction to first message if present (Gemini Pro doesn't always support system_instruction field in all versions yet)
+        // Prepend system instruction to first message if present
         if (systemInstruction && payload.contents.length > 0) {
             payload.contents[0].parts[0].text = `System Prompt: ${systemInstruction}\n\nUser Message: ${payload.contents[0].parts[0].text}`;
         }
@@ -122,7 +121,7 @@ export class AIOrchestrator {
             content: content,
             provider: 'gemini',
             latencyMs: performance.now() - startTime,
-            metadata: { model: 'gemini-pro' }
+            metadata: { model: 'gemini-2.5-flash' }
         };
     }
 

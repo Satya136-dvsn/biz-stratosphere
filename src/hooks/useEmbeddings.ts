@@ -238,14 +238,26 @@ export function useEmbeddings() {
     ): Promise<SearchResult[]> => {
         if (!user) throw new Error('Not authenticated');
 
+        console.log(`[RAG Debug] Searching similar for: "${query}"`, { limit, datasetId, threshold });
+
         const queryEmbedding = await generateEmbedding(query);
 
-        const { data, error } = await supabase.rpc('match_embeddings', {
+        const rpcParams = {
             query_embedding: queryEmbedding,
             match_threshold: threshold,
             match_count: limit,
             filter_dataset_id: datasetId || null,
-        });
+        };
+        console.log('[RAG Debug] Invoking RPC match_embeddings with:', rpcParams);
+
+        const { data, error } = await supabase.rpc('match_embeddings', rpcParams);
+
+        if (data) {
+            console.log(`[RAG Debug] RPC returned ${data.length} matches.`);
+            if (data.length > 0) {
+                console.log('[RAG Debug] First match score:', data[0].similarity);
+            }
+        }
 
         if (error || !data) {
             if (error) console.warn('RPC search failed, using fallback:', error);

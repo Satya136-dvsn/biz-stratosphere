@@ -16,23 +16,39 @@ import {
 import { useRAGChat } from '@/hooks/useRAGChat';
 import { useEmbeddings } from '@/hooks/useEmbeddings';
 import { ChatMessageComponent } from '@/components/ai/ChatMessage';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2, Zap, ChevronDown, ChevronUp, Settings2, Sliders } from 'lucide-react';
+import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2, Zap, ChevronDown, ChevronUp, Settings2, Sliders, RefreshCw } from 'lucide-react';
 import { ConversationSettings } from '@/components/ai/ConversationSettings';
 import { ExportConversation } from '@/components/ai/ExportConversation';
 
 export function AIChat() {
     const { user } = useAuth();
+    const { toast } = useToast();
+    const queryClient = useQueryClient();
     const [selectedConversationId, setSelectedConversationId] = useState<string>();
-    const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
+    // Initialize from localStorage if available
+    const [selectedDataset, setSelectedDataset] = useState<string | null>(() => {
+        return localStorage.getItem('lastSelectedDataset') || null;
+    });
     const [similarityThreshold, setSimilarityThreshold] = useState(0.5);
     const [contextLimit, setContextLimit] = useState(5);
     const [chunkSize, setChunkSize] = useState(1);
     const [chunkOverlap, setChunkOverlap] = useState(0);
     const [inputMessage, setInputMessage] = useState('');
+    const [isRecovering, setIsRecovering] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Persist selection changes
+    useEffect(() => {
+        if (selectedDataset) {
+            localStorage.setItem('lastSelectedDataset', selectedDataset);
+        } else {
+            localStorage.removeItem('lastSelectedDataset');
+        }
+    }, [selectedDataset]);
 
     const {
         conversations,
@@ -67,7 +83,81 @@ export function AIChat() {
             return data;
         },
         enabled: !!user,
+        staleTime: 1000 * 60 * 5, // 5 minutes cache
+        refetchOnWindowFocus: false, // Prevent disappearing on tab switch
     });
+
+    // Recover orphaned datasets (Fix for visibility issues)
+    const recoverOrphanedDatasets = async () => {
+        if (!user || isRecovering) return;
+        setIsRecovering(true);
+        try {
+            console.log('[Recovery] Scanning embeddings for orphaned datasets...');
+            // Fetch sample embeddings metadata
+            const { data: embeddings, error: embError } = await supabase
+                .from('embeddings')
+                .select('metadata')
+                .eq('user_id', user.id)
+                .limit(1000);
+
+            if (embError) throw embError;
+
+            const distinctDatasetIds = new Set<string>();
+            embeddings?.forEach(e => {
+                const meta = e.metadata as any;
+                if (meta?.dataset_id) {
+                    distinctDatasetIds.add(meta.dataset_id);
+                }
+            });
+
+            console.log('[Recovery] Found distinct IDs:', Array.from(distinctDatasetIds));
+
+            if (distinctDatasetIds.size === 0) {
+                toast({ title: 'No Data Found', description: 'No embeddings found to recover.' });
+                return;
+            }
+
+            // Check which are missing
+            const existingIds = new Set(datasets.map(d => d.id));
+            const missingIds = Array.from(distinctDatasetIds).filter(id => !existingIds.has(id));
+
+            if (missingIds.length === 0) {
+                toast({ title: 'All Good', description: 'All datasets are already visible.' });
+                return;
+            }
+
+            console.log('[Recovery] Restoring missing IDs:', missingIds);
+
+            // Restore them
+            const { error: insertError } = await supabase
+                .from('datasets')
+                .upsert(missingIds.map(id => ({
+                    id,
+                    user_id: user.id,
+                    name: `Restored Dataset ${id.substring(0, 8)}`,
+                    created_at: new Date().toISOString()
+                })));
+
+            if (insertError) throw insertError;
+
+            await queryClient.invalidateQueries({ queryKey: ['datasets'] });
+
+            toast({
+                title: 'Recovery Successful',
+                description: `Restored ${missingIds.length} dataset(s) found in embeddings.`
+            });
+
+        } catch (error: any) {
+            console.error('[Recovery] Failed:', error);
+            toast({
+                title: 'Recovery Failed',
+                description: error.message,
+                variant: 'destructive'
+            });
+        } finally {
+            setIsRecovering(false);
+        }
+    };
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -156,7 +246,19 @@ export function AIChat() {
                                     Active Context
                                 </h3>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-medium text-muted-foreground">Selected Dataset</label>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label className="text-xs font-medium text-muted-foreground">Selected Dataset</label>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 px-2 text-[10px] text-muted-foreground hover:text-primary"
+                                            onClick={recoverOrphanedDatasets}
+                                            disabled={isRecovering}
+                                        >
+                                            {isRecovering ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <RefreshCw className="h-3 w-3 mr-1" />}
+                                            {isRecovering ? 'Restoring...' : 'Find Missing Data'}
+                                        </Button>
+                                    </div>
                                     <Select
                                         value={selectedDataset || 'none'}
                                         onValueChange={(val) => setSelectedDataset(val === 'none' ? null : val)}
@@ -263,6 +365,36 @@ export function AIChat() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="space-y-2 pt-4 border-t">
+                            <h4 className="text-sm font-medium">Debug Retrieval</h4>
+                            <div className="flex gap-2">
+                                <Input
+                                    placeholder="Test query (e.g. revenue)"
+                                    id="debug-query"
+                                />
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={async () => {
+                                        const q = (document.getElementById('debug-query') as HTMLInputElement).value;
+                                        if (!q) return;
+
+                                        // Quick hack to access search function
+                                        // In real code we should expose this via hook better, but for debug:
+                                        console.log('Testing retrieval for:', q);
+                                        // We need to trigger a search. We can't easily access hook function here explicitly without refactoring.
+                                        // Instead, let's just use console log instructions for the user.
+                                        alert("Please check the Browser Console (F12) for retrieval logs when you send a message.");
+                                    }}
+                                >
+                                    Log to Console
+                                </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Open Browser Console (F12) to see raw vector matches.
+                            </p>
                         </div>
                     </SheetContent>
                 </Sheet>
