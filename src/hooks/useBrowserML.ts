@@ -284,15 +284,116 @@ export function useBrowserML() {
     // Create demo models (for first-time setup)
     const createDemoModels = async () => {
         try {
-            // Create churn model
+            console.log('🔄 Creating and training demo models...');
+
+            // ===== CHURN MODEL TRAINING =====
             const churnModel = createChurnModel();
+
+            // Generate realistic synthetic training data for churn
+            const churnTrainingData = [];
+            const churnLabels = [];
+
+            for (let i = 0; i < 200; i++) {
+                // Generate varied scenarios
+                const scenario = Math.random();
+
+                if (scenario < 0.5) {
+                    // High churn risk customers (will churn = 1)
+                    churnTrainingData.push([
+                        Math.random() * 30 + 10,  // Low usage: 10-40
+                        Math.random() * 10 + 5,   // Many tickets: 5-15
+                        Math.random() * 6 + 1,    // Short tenure: 1-7 months
+                        Math.random() * 50 + 20,  // Low spend: 20-70
+                        Math.random() * 40 + 10   // Low feature usage: 10-50%
+                    ]);
+                    churnLabels.push(1);
+                } else {
+                    // Low churn risk customers (will stay = 0)
+                    churnTrainingData.push([
+                        Math.random() * 30 + 70,  // High usage: 70-100
+                        Math.random() * 3,        // Few tickets: 0-3
+                        Math.random() * 36 + 12,  // Long tenure: 12-48 months
+                        Math.random() * 250 + 150, // High spend: 150-400
+                        Math.random() * 30 + 70   // High feature usage: 70-100%
+                    ]);
+                    churnLabels.push(0);
+                }
+            }
+
+            // Normalize and train
+            const xTrainChurn = tf.tensor2d(churnTrainingData.map(row =>
+                row.map(val => val / 100)  // Normalize 0-1
+            ));
+            const yTrainChurn = tf.tensor2d(churnLabels.map(l => [l]));
+
+            await churnModel.fit(xTrainChurn, yTrainChurn, {
+                epochs: 100,
+                batchSize: 32,
+                verbose: 0,
+                shuffle: true,
+                validationSplit: 0.2
+            });
+
             await churnModel.save('indexeddb://churn_model_advanced');
+            console.log('✅ Churn model trained and saved');
 
-            // Create revenue model
+            // Cleanup
+            xTrainChurn.dispose();
+            yTrainChurn.dispose();
+
+            // ===== REVENUE MODEL TRAINING =====
             const revenueModel = createRevenueModel();
-            await revenueModel.save('indexeddb://revenue_model_advanced');
 
-            console.log('✅ Demo models created and saved locally');
+            // Generate realistic synthetic training data for revenue
+            const revenueTrainingData = [];
+            const revenueLabels = [];
+
+            for (let i = 0; i < 200; i++) {
+                // Generate business metrics
+                const customers = Math.random() * 900 + 100;     // 100-1000
+                const dealSize = Math.random() * 9000 + 1000;    // 1000-10000
+                const marketing = Math.random() * 45000 + 5000;  // 5000-50000
+                const salesTeam = Math.random() * 45 + 5;        // 5-50
+                const growth = Math.random() * 35 - 5;           // -5 to 30%
+
+                // Realistic revenue formula
+                const baseRevenue = (customers * dealSize) / 1000;
+                const marketingImpact = (marketing / 10000) * 100;
+                const teamImpact = salesTeam * 50;
+                const growthImpact = growth * 20;
+
+                const revenue = (baseRevenue + marketingImpact + teamImpact + growthImpact) / 1000;
+
+                revenueTrainingData.push([customers, dealSize, marketing, salesTeam, growth]);
+                revenueLabels.push(revenue);
+            }
+
+            // Normalize training data
+            const xTrainRevenue = tf.tensor2d(revenueTrainingData.map(row => [
+                row[0] / 1000,   // Customers
+                row[1] / 10000,  // Deal size
+                row[2] / 50000,  // Marketing
+                row[3] / 50,     // Sales team
+                row[4] / 30      // Growth %
+            ]));
+            const yTrainRevenue = tf.tensor2d(revenueLabels.map(r => [r]));
+
+            await revenueModel.fit(xTrainRevenue, yTrainRevenue, {
+                epochs: 150,
+                batchSize: 32,
+                verbose: 0,
+                shuffle: true,
+                validationSplit: 0.2
+            });
+
+            await revenueModel.save('indexeddb://revenue_model_advanced');
+            console.log('✅ Revenue model trained and saved');
+
+            // Cleanup
+            xTrainRevenue.dispose();
+            yTrainRevenue.dispose();
+
+            console.log('✅ All demo models created, trained, and saved locally');
         } catch (err: any) {
             console.error('❌ Error creating demo models:', err);
         }

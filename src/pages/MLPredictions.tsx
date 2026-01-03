@@ -117,6 +117,7 @@ export function MLPredictions() {
 
         setIsPredicting(true);
         setPrediction(null);
+        setExplanation(null); // Clear old explanation when generating new prediction
 
         try {
             // Import TensorFlow.js
@@ -153,14 +154,18 @@ export function MLPredictions() {
             // Convert features to number array in correct order
             const featureValues = modelConfig.features.map(f => parseFloat(features[f.name]) || 0);
 
+            // Determine model type for proper normalization
+            const modelType = selectedModel === 'churn_model' ? 'churn' : 'revenue';
+
             // Make prediction using browser ML
-            const result = await tfPredict(model, featureValues);
+            const result = await tfPredict(model, featureValues, modelType);
 
             // Get feature importance
             const importance = await getFeatureImportance(
                 model,
                 featureValues,
-                modelConfig.features.map(f => f.name)
+                modelConfig.features.map(f => f.name),
+                modelType
             );
 
             const predictionResult = {
@@ -410,22 +415,26 @@ export function MLPredictions() {
                                                     )}
                                                 </Button>
                                             ) : (
-                                                <div className="bg-purple-50 rounded-lg p-3 border border-purple-100 text-sm">
-                                                    <div className="flex items-center gap-2 font-semibold text-purple-800 mb-2">
-                                                        <Sparkles className="h-4 w-4" />
-                                                        AI Analysis
+                                                <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <div className="flex items-center gap-2 font-semibold text-purple-800">
+                                                            <Sparkles className="h-4 w-4" />
+                                                            AI Analysis
+                                                        </div>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-7 text-purple-600 hover:text-purple-800 hover:bg-purple-100"
+                                                            onClick={() => setExplanation(null)}
+                                                        >
+                                                            Close
+                                                        </Button>
                                                     </div>
-                                                    <p className="text-purple-900 leading-relaxed">
-                                                        {explanation}
-                                                    </p>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="mt-2 h-auto p-0 text-purple-600 hover:text-purple-800"
-                                                        onClick={() => setExplanation(null)}
-                                                    >
-                                                        Close Explanation
-                                                    </Button>
+                                                    <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                                        <p className="text-purple-900 leading-relaxed text-sm">
+                                                            {explanation}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

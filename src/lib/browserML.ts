@@ -61,13 +61,24 @@ export async function loadModel(modelPath: string): Promise<tf.LayersModel | nul
 export async function predict(
     model: tf.LayersModel,
     inputs: number[],
-    normalize: boolean = true
+    modelType: 'churn' | 'revenue' = 'churn'
 ): Promise<{ prediction: number; confidence?: number }> {
     try {
-        // Normalize inputs if needed (simple min-max scaling)
-        let processedInputs = inputs;
-        if (normalize) {
-            processedInputs = inputs.map(val => val / 100); // Simple normalization
+        // Normalize inputs based on model type
+        let processedInputs: number[];
+
+        if (modelType === 'churn') {
+            // Churn model normalization (all features 0-100 range)
+            processedInputs = inputs.map(val => val / 100);
+        } else {
+            // Revenue model normalization (field-specific)
+            processedInputs = [
+                inputs[0] / 1000,   // Customers (0-1000)
+                inputs[1] / 10000,  // Deal size (0-10000)
+                inputs[2] / 50000,  // Marketing (0-50000)
+                inputs[3] / 50,     // Sales team (0-50)
+                inputs[4] / 30      // Growth % (-10 to 30)
+            ];
         }
 
         // Create tensor from inputs
@@ -82,7 +93,7 @@ export async function predict(
         // Calculate confidence differently for classification vs regression
         let confidence: number;
 
-        if (prediction >= 0 && prediction <= 1) {
+        if (modelType === 'churn') {
             // Classification model (sigmoid output 0-1)
             // Confidence is how far from 0.5 (uncertain)
             confidence = Math.abs(prediction - 0.5) * 2; // 0 to 1 scale
@@ -152,11 +163,12 @@ export async function batchPredict(
 export async function getFeatureImportance(
     model: tf.LayersModel,
     baseInputs: number[],
-    featureNames: string[]
+    featureNames: string[],
+    modelType: 'churn' | 'revenue' = 'churn'
 ): Promise<Record<string, number>> {
     try {
-        // Get base prediction (without normalization for importance)
-        const basePred = await predict(model, baseInputs, false);
+        // Get base prediction
+        const basePred = await predict(model, baseInputs, modelType);
 
         const importance: Record<string, number> = {};
 
@@ -167,7 +179,7 @@ export async function getFeatureImportance(
             // Use larger perturbation (50% increase) for better sensitivity
             perturbedInputs[i] = perturbedInputs[i] * 1.5;
 
-            const perturbedPred = await predict(model, perturbedInputs, false);
+            const perturbedPred = await predict(model, perturbedInputs, modelType);
 
             // Calculate absolute impact (always positive)
             const impact = Math.abs(perturbedPred.prediction - basePred.prediction);
