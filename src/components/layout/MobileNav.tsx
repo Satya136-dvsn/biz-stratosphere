@@ -23,6 +23,8 @@ import {
     Workflow,
     User,
     Settings,
+    FolderOpen,
+    Activity,
 } from "lucide-react";
 import { FeatureBadge } from "@/components/ui/FeatureBadge";
 
@@ -54,6 +56,11 @@ const navItems: NavItem[] = [
         icon: LineChart,
     },
     {
+        title: "Upload History",
+        href: "/upload-history",
+        icon: FolderOpen,
+    },
+    {
         title: "Workspaces",
         href: "/workspaces",
         icon: Users,
@@ -67,6 +74,11 @@ const navItems: NavItem[] = [
         title: "AI Chat",
         href: "/ai-chat",
         icon: Sparkles,
+    },
+    {
+        title: "AI Analytics",
+        href: "/ai-analytics",
+        icon: Activity,
     },
     {
         title: "ML Predictions",

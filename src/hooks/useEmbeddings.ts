@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { hashContent } from '@/lib/conversationUtils';
+import { useUserUploads } from './useUserUploads';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_EMBEDDING_URL = 'https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent';
@@ -28,6 +29,7 @@ export function useEmbeddings() {
     const { user } = useAuth();
     const { toast } = useToast();
     const queryClient = useQueryClient();
+    const { logUpload } = useUserUploads();
 
     // Generate embedding for text using Gemini with caching
     const generateEmbedding = async (text: string, workspaceId?: string): Promise<number[]> => {
@@ -212,12 +214,45 @@ export function useEmbeddings() {
 
             return { count: successCount, failed: failedCount };
         },
-        onSuccess: (data) => {
+        onSuccess: async (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['embeddings'] });
             toast({
                 title: 'Success',
                 description: `Generated ${data.count} embeddings.${data.failed > 0 ? ` (${data.failed} failed)` : ''}`,
             });
+
+            // Log the upload to Upload History
+            try {
+                const { data: dataset } = await supabase
+                    .from('datasets')
+                    .select('file_name, created_at')
+                    .eq('id', variables.datasetId)
+                    .single();
+
+                if (dataset) {
+                    logUpload({
+                        filename: variables.datasetId,
+                        original_filename: dataset.file_name || 'dataset.csv',
+                        file_size_bytes: data.count * 1024, // Approximate size
+                        file_type: 'csv',
+                        mime_type: 'text/csv',
+                        storage_path: `datasets/${variables.datasetId}`,
+                        upload_source: 'ai_chat',
+                        upload_context: {
+                            feature: 'rag_knowledge_base',
+                            dataset_name: dataset.file_name,
+                            embeddings_generated: data.count,
+                            chunk_size: variables.chunkSize,
+                            chunk_overlap: variables.chunkOverlap,
+                        },
+                        row_count: data.count,
+                        dataset_id: variables.datasetId,
+                        status: 'active',
+                    });
+                }
+            } catch (error) {
+                console.warn('Failed to log upload:', error);
+            }
         },
         onError: (error) => {
             console.error('[Embeddings] Fatal Error:', error);

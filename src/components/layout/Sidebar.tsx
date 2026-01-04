@@ -17,6 +17,7 @@ import {
     Brain,
     Workflow,
     Activity,
+    FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +30,7 @@ interface NavItem {
     icon: React.ElementType;
 }
 
+// Navigation items for desktop sidebar
 const navItems: NavItem[] = [
     {
         title: "Dashboard",
@@ -59,6 +61,11 @@ const navItems: NavItem[] = [
         title: "Advanced Charts",
         href: "/advanced-charts",
         icon: LineChart,
+    },
+    {
+        title: "Upload History",
+        href: "/upload-history",
+        icon: FolderOpen,
     },
     {
         title: "AI Chat",
@@ -148,7 +155,7 @@ export function Sidebar() {
             </div>
 
             {/* Navigation Items */}
-            <nav className="flex-1 p-2 space-y-1 overflow-y-auto overflow-x-hidden">
+            <nav className="flex-1 p-2 space-y-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent hover:scrollbar-thumb-muted-foreground/20">
                 {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = location.pathname === item.href;
