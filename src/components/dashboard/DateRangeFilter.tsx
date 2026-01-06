@@ -42,7 +42,7 @@ export function DateRangeFilter({
     onEndDateChange,
     onPresetChange,
 }: DateRangeFilterProps) {
-    const [selectedPreset, setSelectedPreset] = useState('30d');
+    const [selectedPreset, setSelectedPreset] = useState('6m');
 
     const handlePresetChange = (value: string) => {
         setSelectedPreset(value);

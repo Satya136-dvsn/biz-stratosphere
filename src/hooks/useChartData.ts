@@ -20,12 +20,18 @@ interface ChartFilters {
 export function useChartData(filters: ChartFilters) {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFiltering, setIsFiltering] = useState(false);
   const { user } = useAuth();
 
-  const fetchChartData = async () => {
+  const fetchChartData = async (isFilterChange = false) => {
     if (!user) return;
 
-    setIsLoading(true);
+    // Set appropriate loading state
+    if (isFilterChange) {
+      setIsFiltering(true);
+    } else {
+      setIsLoading(true);
+    }
 
     try {
       const { data: dataPoints, error } = await supabase
@@ -105,13 +111,26 @@ export function useChartData(filters: ChartFilters) {
       setChartData([]);
     } finally {
       setIsLoading(false);
+      setIsFiltering(false);
     }
   };
 
+  // Initial fetch
   useEffect(() => {
-    fetchChartData();
+    fetchChartData(false);
+  }, [user]);
 
-    // Set up real-time subscription
+  // Filter change detection - refetch with filter flag
+  useEffect(() => {
+    if (!isLoading) {
+      fetchChartData(true);
+    }
+  }, [filters.startDate, filters.endDate, filters.period]);
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!user?.id) return;
+
     const channel = supabase
       .channel('chart-data-changes')
       .on(
@@ -120,17 +139,17 @@ export function useChartData(filters: ChartFilters) {
           event: '*',
           schema: 'public',
           table: 'data_points',
-          filter: `user_id=eq.${user?.id}`
+          filter: `user_id=eq.${user.id}`
         },
         () => {
-          fetchChartData();
+          fetchChartData(false);
         }
       )
       .subscribe();
 
     // Listen for data upload events
     const handleDataUploaded = () => {
-      fetchChartData();
+      fetchChartData(false);
     };
 
     window.addEventListener('dataUploaded', handleDataUploaded);
@@ -139,7 +158,7 @@ export function useChartData(filters: ChartFilters) {
       supabase.removeChannel(channel);
       window.removeEventListener('dataUploaded', handleDataUploaded);
     };
-  }, [user, filters.startDate, filters.endDate, filters.period]);
+  }, [user?.id]);
 
-  return { chartData, isLoading, refreshData: fetchChartData };
+  return { chartData, isLoading, isFiltering, refreshData: () => fetchChartData(false) };
 }

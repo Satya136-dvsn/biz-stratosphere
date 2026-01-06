@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2 } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -33,11 +34,64 @@ interface ChartProps {
   className?: string;
   data: ChartDataPoint[];
   isLoading?: boolean;
+  isFiltering?: boolean;
   metric?: 'revenue' | 'customers';
 }
 
-export function RevenueChart({ variant, title, className, data, isLoading, metric = 'revenue' }: ChartProps) {
-  // ... (loading/empty states same) ...
+// Animation configuration for smooth transitions
+const ANIMATION_DURATION = 800;
+const ANIMATION_EASING = 'ease-out';
+
+export function RevenueChart({ variant, title, className, data, isLoading, isFiltering = false, metric = 'revenue' }: ChartProps) {
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [displayData, setDisplayData] = useState<ChartDataPoint[]>(data);
+  const prevDataRef = useRef<ChartDataPoint[]>(data);
+
+  // Smooth transition when data changes
+  useEffect(() => {
+    if (JSON.stringify(data) !== JSON.stringify(prevDataRef.current)) {
+      setIsTransitioning(true);
+      const timer = setTimeout(() => {
+        setDisplayData(data);
+        setIsTransitioning(false);
+      }, 150); // Small delay for smooth visual transition
+      prevDataRef.current = data;
+      return () => clearTimeout(timer);
+    }
+  }, [data]);
+
+  // Loading skeleton with pulse animation
+  if (isLoading) {
+    return (
+      <Card className={`border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent ${className}`}>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+            {title}
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <div className="w-full space-y-4 animate-pulse">
+              <div className="flex items-end justify-around h-[250px] gap-2">
+                {[60, 80, 45, 90, 70, 85, 55].map((h, i) => (
+                  <Skeleton
+                    key={i}
+                    className="w-full rounded-t-md"
+                    style={{
+                      height: `${h}%`,
+                      animationDelay: `${i * 100}ms`
+                    }}
+                  />
+                ))}
+              </div>
+              <Skeleton className="h-4 w-3/4 mx-auto" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const colors = [
     'hsl(var(--primary))',
@@ -51,7 +105,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
     switch (variant) {
       case 'line':
         return (
-          <LineChart data={data}>
+          <LineChart data={displayData}>
             <XAxis
               dataKey="month"
               className="text-muted-foreground"
@@ -84,6 +138,9 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                   strokeWidth={3}
                   dot={{ fill: 'hsl(var(--revenue))', strokeWidth: 2, r: 4 }}
                   name="Revenue"
+                  animationBegin={0}
+                  animationDuration={ANIMATION_DURATION}
+                  animationEasing="ease-out"
                 />
                 <Line
                   type="monotone"
@@ -93,6 +150,9 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                   strokeDasharray="5 5"
                   dot={{ fill: 'hsl(var(--warning))', strokeWidth: 2, r: 3 }}
                   name="Target"
+                  animationBegin={100}
+                  animationDuration={ANIMATION_DURATION}
+                  animationEasing="ease-out"
                 />
               </>
             ) : (
@@ -103,6 +163,9 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                 strokeWidth={3}
                 dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
                 name="Customers"
+                animationBegin={0}
+                animationDuration={ANIMATION_DURATION}
+                animationEasing="ease-out"
               />
             )}
           </LineChart>
@@ -110,7 +173,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
 
       case 'bar':
         return (
-          <BarChart data={data}>
+          <BarChart data={displayData}>
             <XAxis
               dataKey="month"
               className="text-muted-foreground"
@@ -139,13 +202,16 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
               fill={metric === 'revenue' ? "hsl(var(--revenue))" : "hsl(var(--primary))"}
               radius={[4, 4, 0, 0]}
               name={metric === 'revenue' ? "Revenue" : "Customers"}
+              animationBegin={0}
+              animationDuration={ANIMATION_DURATION}
+              animationEasing="ease-out"
             />
           </BarChart>
         );
 
       case 'area':
         return (
-          <AreaChart data={data}>
+          <AreaChart data={displayData}>
             <XAxis
               dataKey="month"
               className="text-muted-foreground"
@@ -179,6 +245,9 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                   fill="hsl(var(--revenue))"
                   fillOpacity={0.6}
                   name="Revenue"
+                  animationBegin={0}
+                  animationDuration={ANIMATION_DURATION}
+                  animationEasing="ease-out"
                 />
                 <Area
                   type="monotone"
@@ -188,6 +257,9 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                   fill="hsl(var(--warning))"
                   fillOpacity={0.4}
                   name="Target"
+                  animationBegin={100}
+                  animationDuration={ANIMATION_DURATION}
+                  animationEasing="ease-out"
                 />
               </>
             ) : (
@@ -199,13 +271,16 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                 fill="hsl(var(--primary))"
                 fillOpacity={0.6}
                 name="Customers"
+                animationBegin={0}
+                animationDuration={ANIMATION_DURATION}
+                animationEasing="ease-out"
               />
             )}
           </AreaChart>
         );
 
       case 'pie':
-        const pieData = data.slice(0, 6).map((item, index) => ({
+        const pieData = displayData.slice(0, 6).map((item, index) => ({
           name: item.month,
           value: metric === 'revenue' ? item.revenue : item.customers,
           fill: colors[index % colors.length]
@@ -222,6 +297,9 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
               outerRadius={100}
               fill="#8884d8"
               dataKey="value"
+              animationBegin={0}
+              animationDuration={ANIMATION_DURATION}
+              animationEasing="ease-out"
             >
               {pieData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -248,14 +326,23 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
   };
 
   return (
-    <Card className={`border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent ${className}`}>
+    <Card className={`border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent transition-all duration-300 ${className}`}>
       <CardHeader>
-        <CardTitle className="text-xl font-semibold text-foreground">{title}</CardTitle>
+        <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+          {title}
+          {(isTransitioning || isFiltering) && (
+            <Loader2 className="h-4 w-4 animate-spin text-primary/60" />
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          {renderChart()}
-        </ResponsiveContainer>
+        <div
+          className={`transition-opacity duration-300 ${(isTransitioning || isFiltering) ? 'opacity-60' : 'opacity-100'}`}
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            {renderChart()}
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

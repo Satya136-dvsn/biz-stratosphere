@@ -54,7 +54,7 @@ export default function Dashboard() {
     { label: 'Operations', value: 'operations' },
   ];
 
-  const { chartData, isLoading: isChartLoading } = useChartData({
+  const { chartData, isLoading: isChartLoading, isFiltering } = useChartData({
     startDate,
     endDate,
     period
@@ -189,6 +189,7 @@ export default function Dashboard() {
                 variant={revenueChartType}
                 data={chartData}
                 isLoading={isChartLoading}
+                isFiltering={isFiltering}
                 metric="revenue"
               />
             </div>
@@ -204,6 +205,7 @@ export default function Dashboard() {
                 variant={customerChartType}
                 data={chartData}
                 isLoading={isChartLoading}
+                isFiltering={isFiltering}
                 metric="customers"
               />
             </div>
