@@ -94,15 +94,35 @@ export function useUserUploads(filters?: UploadFilters) {
         queryKey: ['storage-usage'],
         queryFn: async () => {
             const { data: userData } = await supabase.auth.getUser();
-            if (!userData.user) throw new Error('Not authenticated');
+            if (!userData.user) {
+                // Return default empty storage usage if not authenticated
+                return { total_files: 0, total_size_bytes: 0, by_source: {} } as StorageUsage;
+            }
 
-            const { data, error } = await supabase.rpc('get_user_storage_usage', {
-                target_user_id: userData.user.id,
-            });
+            try {
+                const { data, error } = await supabase.rpc('get_user_storage_usage', {
+                    target_user_id: userData.user.id,
+                });
 
-            if (error) throw error;
-            return data[0] as StorageUsage;
+                if (error) {
+                    console.warn('Storage usage RPC error:', error.message);
+                    // Return default values on error
+                    return { total_files: 0, total_size_bytes: 0, by_source: {} } as StorageUsage;
+                }
+
+                // Handle empty or null data
+                if (!data || data.length === 0) {
+                    return { total_files: 0, total_size_bytes: 0, by_source: {} } as StorageUsage;
+                }
+
+                return data[0] as StorageUsage;
+            } catch (err) {
+                console.warn('Storage usage fetch failed:', err);
+                return { total_files: 0, total_size_bytes: 0, by_source: {} } as StorageUsage;
+            }
         },
+        // Don't throw errors, just return default values
+        retry: false,
     });
 
     // Log upload mutation

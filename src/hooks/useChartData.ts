@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { format, subMonths, subYears } from 'date-fns';
 
 interface ChartDataPoint {
   month: string;
@@ -12,8 +12,8 @@ interface ChartDataPoint {
 }
 
 interface ChartFilters {
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   period: 'monthly' | 'weekly' | 'daily';
 }
 
@@ -22,9 +22,17 @@ export function useChartData(filters: ChartFilters) {
   const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
   const { user } = useAuth();
+  const hasInitiallyLoaded = useRef(false);
 
-  const fetchChartData = async (isFilterChange = false) => {
+  const fetchChartData = useCallback(async (isFilterChange = false) => {
     if (!user) return;
+
+    console.log('[useChartData] Fetching data...', {
+      isFilterChange,
+      startDate: filters.startDate?.toISOString(),
+      endDate: filters.endDate?.toISOString(),
+      period: filters.period
+    });
 
     // Set appropriate loading state
     if (isFilterChange) {
@@ -34,13 +42,19 @@ export function useChartData(filters: ChartFilters) {
     }
 
     try {
-      const { data: dataPoints, error } = await supabase
+      // Handle undefined dates - default to last 5 years for "All time"
+      const effectiveStartDate = filters.startDate || subYears(new Date(), 5);
+      const effectiveEndDate = filters.endDate || new Date();
+
+      let query = supabase
         .from('data_points')
         .select('*')
         .eq('user_id', user.id)
-        .gte('date_recorded', filters.startDate.toISOString())
-        .lte('date_recorded', filters.endDate.toISOString())
+        .gte('date_recorded', effectiveStartDate.toISOString())
+        .lte('date_recorded', effectiveEndDate.toISOString())
         .order('date_recorded', { ascending: true });
+
+      const { data: dataPoints, error } = await query;
 
       if (error) throw error;
 
@@ -78,12 +92,50 @@ export function useChartData(filters: ChartFilters) {
 
         const group = groupedData.get(key)!;
 
-        // Categorize metrics
-        const metricName = dp.metric_name.toLowerCase();
-        if (metricName.includes('revenue') || metricName.includes('sales') || metricName.includes('income')) {
-          group.revenue.push(dp.metric_value);
-        } else if (metricName.includes('customer') || metricName.includes('user') || metricName.includes('client')) {
-          group.customers.push(dp.metric_value);
+        // Categorize metrics based on metric_name patterns
+        const metricName = dp.metric_name?.toLowerCase() || '';
+        const metricValue = dp.metric_value || 0;
+
+        // Revenue-related patterns
+        const isRevenue = metricName.includes('revenue') ||
+          metricName.includes('sales') ||
+          metricName.includes('income') ||
+          metricName.includes('earnings') ||
+          metricName.includes('profit') ||
+          metricName.includes('amount') ||
+          metricName.includes('total') ||
+          metricName.includes('gross');
+
+        // Customer-related patterns
+        const isCustomer = metricName.includes('customer') ||
+          metricName.includes('user') ||
+          metricName.includes('client') ||
+          metricName.includes('subscriber') ||
+          metricName.includes('member') ||
+          metricName.includes('count') ||
+          metricName.includes('active');
+
+        // Categorize with priority: explicit match > value-based guess
+        if (isRevenue && !isCustomer) {
+          group.revenue.push(metricValue);
+        } else if (isCustomer && !isRevenue) {
+          group.customers.push(metricValue);
+        } else if (isRevenue && isCustomer) {
+          // Both patterns match - use value magnitude to guess
+          // Revenue values are typically larger (e.g., in dollars)
+          if (metricValue > 10000) {
+            group.revenue.push(metricValue);
+          } else {
+            group.customers.push(metricValue);
+          }
+        } else {
+          // Neither pattern matches - use value-based heuristic
+          // Large values (> 10000) are likely revenue, smaller are likely counts
+          if (metricValue > 10000) {
+            group.revenue.push(metricValue);
+          } else {
+            group.customers.push(metricValue);
+          }
         }
       });
 
@@ -105,6 +157,7 @@ export function useChartData(filters: ChartFilters) {
       chartPoints.sort((a, b) => a.date.getTime() - b.date.getTime());
 
       setChartData(chartPoints);
+      console.log('[useChartData] Chart data set:', chartPoints.length, 'points');
 
     } catch (error) {
       console.error('Error fetching chart data:', error);
@@ -112,20 +165,30 @@ export function useChartData(filters: ChartFilters) {
     } finally {
       setIsLoading(false);
       setIsFiltering(false);
+      hasInitiallyLoaded.current = true;
     }
-  };
+  }, [user, filters.startDate?.getTime(), filters.endDate?.getTime(), filters.period]);
 
-  // Initial fetch
+  // Initial fetch when user changes
   useEffect(() => {
-    fetchChartData(false);
-  }, [user]);
+    if (user) {
+      console.log('[useChartData] Initial load for user');
+      fetchChartData(false);
+    }
+  }, [user?.id]);
 
   // Filter change detection - refetch with filter flag
+  // Use primitive values in dependency array to ensure proper change detection
+  const startTimestamp = filters.startDate?.getTime() || 0;
+  const endTimestamp = filters.endDate?.getTime() || 0;
+
   useEffect(() => {
-    if (!isLoading) {
+    // Only fetch on filter changes after initial load
+    if (hasInitiallyLoaded.current && user) {
+      console.log('[useChartData] Filter changed, refetching...');
       fetchChartData(true);
     }
-  }, [filters.startDate, filters.endDate, filters.period]);
+  }, [startTimestamp, endTimestamp, filters.period]);
 
   // Set up real-time subscription
   useEffect(() => {

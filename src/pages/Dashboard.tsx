@@ -38,9 +38,9 @@ export default function Dashboard() {
   const { data: kpiData, isLoading } = useKPIData();
   const { realtimeData } = useRealtimeKPIs();
 
-  // Chart filters state
-  const [startDate, setStartDate] = useState(() => subMonths(new Date(), 6));
-  const [endDate, setEndDate] = useState(() => new Date());
+  // Chart filters state - allow undefined for "All time"
+  const [startDate, setStartDate] = useState<Date | undefined>(() => subMonths(new Date(), 6));
+  const [endDate, setEndDate] = useState<Date | undefined>(() => new Date());
   const [period, setPeriod] = useState<'monthly' | 'weekly' | 'daily'>('monthly');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [revenueChartType, setRevenueChartType] = useState<ChartType>('line');
