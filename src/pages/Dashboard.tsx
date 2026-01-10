@@ -57,7 +57,8 @@ export default function Dashboard() {
   const { chartData, isLoading: isChartLoading, isFiltering } = useChartData({
     startDate,
     endDate,
-    period
+    period,
+    categories: selectedCategories
   });
 
   return (

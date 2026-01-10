@@ -15,6 +15,7 @@ interface ChartFilters {
   startDate?: Date;
   endDate?: Date;
   period: 'monthly' | 'weekly' | 'daily';
+  categories?: string[];
 }
 
 export function useChartData(filters: ChartFilters) {
@@ -31,7 +32,8 @@ export function useChartData(filters: ChartFilters) {
       isFilterChange,
       startDate: filters.startDate?.toISOString(),
       endDate: filters.endDate?.toISOString(),
-      period: filters.period
+      period: filters.period,
+      categories: filters.categories
     });
 
     // Set appropriate loading state
@@ -54,11 +56,30 @@ export function useChartData(filters: ChartFilters) {
         .lte('date_recorded', effectiveEndDate.toISOString())
         .order('date_recorded', { ascending: true });
 
-      const { data: dataPoints, error } = await query;
+      const { data: rawDataPoints, error } = await query;
 
       if (error) throw error;
 
-      if (!dataPoints || dataPoints.length === 0) {
+      if (!rawDataPoints || rawDataPoints.length === 0) {
+        setChartData([]);
+        return;
+      }
+
+      // Filter by categories if selected
+      const dataPoints = filters.categories && filters.categories.length > 0
+        ? rawDataPoints.filter(dp => {
+          const metricName = dp.metric_name?.toLowerCase() || '';
+          // Check if metric name contains any of the selected categories
+          return filters.categories!.some(category =>
+            metricName.includes(category.toLowerCase()) ||
+            (category === 'revenue' && (metricName.includes('income') || metricName.includes('sales'))) ||
+            (category === 'customers' && (metricName.includes('user') || metricName.includes('client')))
+          );
+        })
+        : rawDataPoints;
+
+      if (dataPoints.length === 0 && rawDataPoints.length > 0) {
+        // If filter results in no data, but we have raw data, show empty state or filtered state
         setChartData([]);
         return;
       }
@@ -157,7 +178,7 @@ export function useChartData(filters: ChartFilters) {
       chartPoints.sort((a, b) => a.date.getTime() - b.date.getTime());
 
       setChartData(chartPoints);
-      console.log('[useChartData] Chart data set:', chartPoints.length, 'points');
+      console.log('[useChartData] Chart data filtered and set:', chartPoints.length, 'points');
 
     } catch (error) {
       console.error('Error fetching chart data:', error);
@@ -167,7 +188,7 @@ export function useChartData(filters: ChartFilters) {
       setIsFiltering(false);
       hasInitiallyLoaded.current = true;
     }
-  }, [user, filters.startDate?.getTime(), filters.endDate?.getTime(), filters.period]);
+  }, [user, filters.startDate?.getTime(), filters.endDate?.getTime(), filters.period, JSON.stringify(filters.categories)]);
 
   // Initial fetch when user changes
   useEffect(() => {
@@ -188,7 +209,7 @@ export function useChartData(filters: ChartFilters) {
       console.log('[useChartData] Filter changed, refetching...');
       fetchChartData(true);
     }
-  }, [startTimestamp, endTimestamp, filters.period]);
+  }, [startTimestamp, endTimestamp, filters.period, JSON.stringify(filters.categories)]);
 
   // Set up real-time subscription
   useEffect(() => {
