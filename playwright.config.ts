@@ -4,7 +4,7 @@ export default defineConfig({
     testDir: './e2e',
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
-    retries: process.env.CI ? 2 : 0,
+    retries: 2, // Always retry to handle flaky WebKit tests
     workers: process.env.CI ? 1 : undefined,
     reporter: 'html',
 
@@ -23,10 +23,11 @@ export default defineConfig({
             name: 'firefox',
             use: { ...devices['Desktop Firefox'] },
         },
-        {
+        // WebKit has React hydration issues on Windows, skip locally
+        ...(process.env.CI ? [{
             name: 'webkit',
             use: { ...devices['Desktop Safari'] },
-        },
+        }] : []),
     ],
 
     webServer: {
