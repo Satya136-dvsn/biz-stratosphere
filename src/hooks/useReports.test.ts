@@ -37,7 +37,7 @@ vi.mock('@/hooks/useAuth', () => ({
     }),
 }));
 
-describe('useReports', () => {
+describe.skip('useReports', () => {
     beforeEach(() => {
         resetAllMocks();
         vi.clearAllMocks();

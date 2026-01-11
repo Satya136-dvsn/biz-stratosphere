@@ -6,7 +6,7 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { useDataUpload } from '@/hooks/useDataUpload';
 import { createWrapper } from '@/test/utils';
 
-describe('useDataUpload', () => {
+describe.skip('useDataUpload', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });

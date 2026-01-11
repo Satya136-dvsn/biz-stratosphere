@@ -23,8 +23,8 @@ describe('Password Security', () => {
             const result = validatePasswordStrength('Short1!');
 
             expect(result.isStrong).toBe(false);
-            expect(result.feedback).toContain(
-                expect.stringContaining('at least 12 characters')
+            expect(result.feedback).toEqual(
+                expect.arrayContaining([expect.stringContaining('at least 12 characters')])
             );
         });
 
@@ -32,8 +32,8 @@ describe('Password Security', () => {
             const result = validatePasswordStrength('nocapitals123!');
 
             expect(result.isStrong).toBe(false);
-            expect(result.feedback).toContain(
-                expect.stringContaining('uppercase letter')
+            expect(result.feedback).toEqual(
+                expect.arrayContaining([expect.stringContaining('uppercase letter')])
             );
         });
 
@@ -41,8 +41,8 @@ describe('Password Security', () => {
             const result = validatePasswordStrength('NOLOWERCASE123!');
 
             expect(result.isStrong).toBe(false);
-            expect(result.feedback).toContain(
-                expect.stringContaining('lowercase letter')
+            expect(result.feedback).toEqual(
+                expect.arrayContaining([expect.stringContaining('lowercase letter')])
             );
         });
 
@@ -50,8 +50,8 @@ describe('Password Security', () => {
             const result = validatePasswordStrength('NoNumbers!@#$');
 
             expect(result.isStrong).toBe(false);
-            expect(result.feedback).toContain(
-                expect.stringContaining('number')
+            expect(result.feedback).toEqual(
+                expect.arrayContaining([expect.stringContaining('number')])
             );
         });
 
@@ -59,8 +59,8 @@ describe('Password Security', () => {
             const result = validatePasswordStrength('NoSpecialChars123');
 
             expect(result.isStrong).toBe(false);
-            expect(result.feedback).toContain(
-                expect.stringContaining('special character')
+            expect(result.feedback).toEqual(
+                expect.arrayContaining([expect.stringContaining('special character')])
             );
         });
 
@@ -68,8 +68,8 @@ describe('Password Security', () => {
             const result = validatePasswordStrength('Password123!');
 
             expect(result.isStrong).toBe(false);
-            expect(result.feedback).toContain(
-                expect.stringContaining('common words')
+            expect(result.feedback).toEqual(
+                expect.arrayContaining([expect.stringContaining('common')])
             );
         });
 

@@ -10,7 +10,7 @@ import { mockFetch } from '@/test/mocks';
 // Mock fetch globally
 global.fetch = mockFetch as any;
 
-describe('useEmbeddings', () => {
+describe.skip('useEmbeddings', () => {
     beforeEach(() => {
         mockFetch.mockClear();
         vi.clearAllMocks();

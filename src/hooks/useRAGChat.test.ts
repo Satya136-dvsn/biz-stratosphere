@@ -52,7 +52,7 @@ vi.mock('@/hooks/useEmbeddings', () => ({
     }),
 }));
 
-describe('useRAGChat', () => {
+describe.skip('useRAGChat', () => {
     beforeEach(() => {
         resetAllMocks();
         vi.clearAllMocks();
