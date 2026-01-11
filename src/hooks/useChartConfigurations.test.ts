@@ -5,41 +5,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useChartConfigurations } from '@/hooks/useChartConfigurations';
 import { createWrapper } from '@/test/utils';
-import { resetAllMocks } from '@/test/mocks';
-import { createMockChartConfiguration } from '@/test/factories';
-
-// Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-    supabase: {
-        from: (table: string) => ({
-            select: vi.fn().mockReturnThis(),
-            insert: vi.fn().mockReturnThis(),
-            update: vi.fn().mockReturnThis(),
-            delete: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockReturnThis(),
-            order: vi.fn().mockReturnThis(),
-            single: vi.fn().mockResolvedValue({
-                data: createMockChartConfiguration(),
-                error: null,
-            }),
-            then: vi.fn((cb) => cb({
-                data: [createMockChartConfiguration()],
-                error: null
-            })),
-        }),
-    },
-}));
-
-// Mock useAuth
-vi.mock('@/hooks/useAuth', () => ({
-    useAuth: () => ({
-        user: { id: 'user-123', email: 'test@example.com' },
-    }),
-}));
 
 describe('useChartConfigurations', () => {
     beforeEach(() => {
-        resetAllMocks();
         vi.clearAllMocks();
     });
 

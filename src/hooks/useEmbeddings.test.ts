@@ -5,40 +5,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useEmbeddings } from '@/hooks/useEmbeddings';
 import { createWrapper } from '@/test/utils';
-import { mockFetch, resetAllMocks } from '@/test/mocks';
-import { createMockDataset, createMockDataPoint } from '@/test/factories';
+import { mockFetch } from '@/test/mocks';
 
 // Mock fetch globally
 global.fetch = mockFetch as any;
 
-// Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-    supabase: {
-        from: (table: string) => ({
-            select: vi.fn().mockReturnThis(),
-            insert: vi.fn().mockReturnThis(),
-            delete: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockReturnThis(),
-            limit: vi.fn().mockResolvedValue({
-                data: table === 'data_points'
-                    ? [createMockDataPoint(), createMockDataPoint()]
-                    : [],
-                error: null,
-            }),
-        }),
-    },
-}));
-
-// Mock useAuth
-vi.mock('@/hooks/useAuth', () => ({
-    useAuth: () => ({
-        user: { id: 'user-123', email: 'test@example.com' },
-    }),
-}));
-
 describe('useEmbeddings', () => {
     beforeEach(() => {
-        resetAllMocks();
+        mockFetch.mockClear();
         vi.clearAllMocks();
     });
 

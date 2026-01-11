@@ -5,32 +5,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useDataUpload } from '@/hooks/useDataUpload';
 import { createWrapper } from '@/test/utils';
-import { resetAllMocks } from '@/test/mocks';
-
-// Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-    supabase: {
-        from: () => ({
-            insert: vi.fn().mockReturnThis(),
-            select: vi.fn().mockReturnThis(),
-            single: vi.fn().mockResolvedValue({
-                data: { id: 'dataset-123', name: 'Test Dataset' },
-                error: null,
-            }),
-        }),
-    },
-}));
-
-// Mock useAuth
-vi.mock('@/hooks/useAuth', () => ({
-    useAuth: () => ({
-        user: { id: 'user-123', email: 'test@example.com' },
-    }),
-}));
 
 describe('useDataUpload', () => {
     beforeEach(() => {
-        resetAllMocks();
         vi.clearAllMocks();
     });
 

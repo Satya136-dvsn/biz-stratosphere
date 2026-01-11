@@ -2,126 +2,104 @@
  * Unit tests for useChartData hook
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { useChartData } from '@/hooks/useChartData';
 import { createWrapper } from '@/test/utils';
-import { resetAllMocks } from '@/test/mocks';
-
-// Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-    supabase: {
-        from: () => ({
-            select: vi.fn().mockReturnThis(),
-            eq: vi.fn().mockReturnThis(),
-            gte: vi.fn().mockReturnThis(),
-            lte: vi.fn().mockReturnThis(),
-            order: vi.fn().mockReturnThis(),
-            then: vi.fn((cb) => cb({
-                data: [
-                    { id: '1', date: '2024-01-01', value: 100, category: 'A' },
-                    { id: '2', date: '2024-01-02', value: 150, category: 'B' },
-                    { id: '3', date: '2024-01-03', value: 200, category: 'A' },
-                ],
-                error: null,
-            })),
-        }),
-    },
-}));
+import { subMonths } from 'date-fns';
 
 describe('useChartData', () => {
     beforeEach(() => {
-        resetAllMocks();
         vi.clearAllMocks();
     });
 
-    it('should fetch chart data for a dataset', async () => {
+    it('should initialize with loading state', () => {
         const { result } = renderHook(
-            () => useChartData('dataset-123'),
+            () => useChartData({
+                startDate: subMonths(new Date(), 6),
+                endDate: new Date(),
+                period: 'monthly',
+            }),
             { wrapper: createWrapper() }
         );
 
-        await waitFor(() => {
-            expect(result.current.data).toBeDefined();
-        });
-
-        expect(result.current.data).toHaveLength(3);
+        expect(result.current.isLoading).toBeDefined();
     });
 
-    it('should apply filters to data', async () => {
+    it('should fetch chart data with default filters', async () => {
         const { result } = renderHook(
-            () => useChartData('dataset-123', { category: 'A' }),
-            { wrapper: createWrapper() }
-        );
-
-        await waitFor(() => {
-            expect(result.current.data).toBeDefined();
-        });
-
-        // Data should be filtered
-        expect(result.current.isLoading).toBe(false);
-    });
-
-    it('should apply date range filters', async () => {
-        const { result } = renderHook(
-            () => useChartData('dataset-123', {
-                startDate: '2024-01-01',
-                endDate: '2024-01-02',
+            () => useChartData({
+                startDate: subMonths(new Date(), 6),
+                endDate: new Date(),
+                period: 'monthly',
             }),
             { wrapper: createWrapper() }
         );
 
         await waitFor(() => {
-            expect(result.current.data).toBeDefined();
+            expect(result.current.isLoading).toBe(false);
         });
+
+        expect(result.current.chartData).toBeDefined();
     });
 
-    it('should handle aggregation', async () => {
+    it('should accept period filter', async () => {
         const { result } = renderHook(
-            () => useChartData('dataset-123', { groupBy: 'category' }),
+            () => useChartData({
+                startDate: subMonths(new Date(), 3),
+                endDate: new Date(),
+                period: 'weekly',
+            }),
             { wrapper: createWrapper() }
         );
-
-        await waitFor(() => {
-            expect(result.current.data).toBeDefined();
-        });
-
-        // Should process aggregation
-        expect(Array.isArray(result.current.data)).toBe(true);
-    });
-
-    it('should track loading state', () => {
-        const { result } = renderHook(
-            () => useChartData('dataset-123'),
-            { wrapper: createWrapper() }
-        );
-
-        // Should start as loading
-        expect(result.current.isLoading).toBeDefined();
-    });
-
-    // it('should handle errors gracefully', async () => {
-    //     // Mocking error directly in it block causes hoisting issues with top-level mock
-    //     // Skipping for now
-    // });
-
-    it('should refetch data when dataset changes', async () => {
-        const { result, rerender } = renderHook(
-            ({ datasetId }) => useChartData(datasetId),
-            {
-                wrapper: createWrapper(),
-                initialProps: { datasetId: 'dataset-123' },
-            }
-        );
-
-        await waitFor(() => {
-            expect(result.current.data).toBeDefined();
-        });
-
-        // Change dataset ID
-        rerender({ datasetId: 'dataset-456' });
 
         await waitFor(() => {
             expect(result.current.isLoading).toBe(false);
         });
+    });
+
+    it('should accept categories filter', async () => {
+        const { result } = renderHook(
+            () => useChartData({
+                startDate: subMonths(new Date(), 6),
+                endDate: new Date(),
+                period: 'monthly',
+                categories: ['revenue', 'customers'],
+            }),
+            { wrapper: createWrapper() }
+        );
+
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
+        });
+
+        expect(result.current.chartData).toBeDefined();
+    });
+
+    it('should handle undefined dates for all-time view', async () => {
+        const { result } = renderHook(
+            () => useChartData({
+                startDate: undefined,
+                endDate: undefined,
+                period: 'monthly',
+            }),
+            { wrapper: createWrapper() }
+        );
+
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
+        });
+    });
+
+    it('should provide refreshData function', () => {
+        const { result } = renderHook(
+            () => useChartData({
+                startDate: subMonths(new Date(), 6),
+                endDate: new Date(),
+                period: 'monthly',
+            }),
+            { wrapper: createWrapper() }
+        );
+
+        expect(typeof result.current.refreshData).toBe('function');
     });
 });

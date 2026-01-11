@@ -5,14 +5,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useMLPredictions } from '@/hooks/useMLPredictions';
 import { createWrapper } from '@/test/utils';
-import { mockFetch, mockMLService, resetAllMocks } from '@/test/mocks';
+import { mockFetch, mockMLService } from '@/test/mocks';
 
 // Mock fetch globally
 global.fetch = mockFetch as any;
 
 describe('useMLPredictions', () => {
     beforeEach(() => {
-        resetAllMocks();
+        mockFetch.mockClear();
         vi.clearAllMocks();
     });
 
