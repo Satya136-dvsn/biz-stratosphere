@@ -91,7 +91,7 @@ describe('Password Security', () => {
             const result = validatePasswordStrength('MyS3cur3P@ssw0rd!');
 
             expect(result.estimatedCrackTime).toBeDefined();
-            expect(typeof result.estimatedCrackTime).to('string');
+            expect(typeof result.estimatedCrackTime).toBe('string');
         });
 
         it('should score passwords from 0-4', () => {
@@ -172,7 +172,7 @@ describe('Password Security', () => {
             const isBreached = await checkPasswordPwned('password');
 
             expect(isBreached).toBe(true);
-        }, { timeout: 10000 }); // Longer timeout for API call
+        });
 
         it('should not falsely report strong unique password as breached', async () => {
             // Generate a unique password unlikely to be in breach databases
@@ -180,7 +180,7 @@ describe('Password Security', () => {
             const isBreached = await checkPasswordPwned(uniquePassword);
 
             expect(isBreached).toBe(false);
-        }, { timeout: 10000 });
+        });
 
         it('should handle API failures gracefully', async () => {
             // Mock fetch to simulate API failure
