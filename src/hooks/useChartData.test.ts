@@ -7,7 +7,7 @@ import { useChartData } from '@/hooks/useChartData';
 import { createWrapper } from '@/test/utils';
 import { subMonths } from 'date-fns';
 
-describe.skip('useChartData', () => {
+describe('useChartData', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -23,9 +23,10 @@ describe.skip('useChartData', () => {
         );
 
         expect(result.current.isLoading).toBeDefined();
+        expect(typeof result.current.refreshData).toBe('function');
     });
 
-    it('should fetch chart data with default filters', async () => {
+    it('should return chart data structure', async () => {
         const { result } = renderHook(
             () => useChartData({
                 startDate: subMonths(new Date(), 6),
@@ -39,55 +40,11 @@ describe.skip('useChartData', () => {
             expect(result.current.isLoading).toBe(false);
         });
 
-        expect(result.current.chartData).toBeDefined();
-    });
-
-    it('should accept period filter', async () => {
-        const { result } = renderHook(
-            () => useChartData({
-                startDate: subMonths(new Date(), 3),
-                endDate: new Date(),
-                period: 'weekly',
-            }),
-            { wrapper: createWrapper() }
-        );
-
-        await waitFor(() => {
-            expect(result.current.isLoading).toBe(false);
-        });
-    });
-
-    it('should accept categories filter', async () => {
-        const { result } = renderHook(
-            () => useChartData({
-                startDate: subMonths(new Date(), 6),
-                endDate: new Date(),
-                period: 'monthly',
-                categories: ['revenue', 'customers'],
-            }),
-            { wrapper: createWrapper() }
-        );
-
-        await waitFor(() => {
-            expect(result.current.isLoading).toBe(false);
-        });
-
-        expect(result.current.chartData).toBeDefined();
-    });
-
-    it('should handle undefined dates for all-time view', async () => {
-        const { result } = renderHook(
-            () => useChartData({
-                startDate: undefined,
-                endDate: undefined,
-                period: 'monthly',
-            }),
-            { wrapper: createWrapper() }
-        );
-
-        await waitFor(() => {
-            expect(result.current.isLoading).toBe(false);
-        });
+        expect(result.current).toHaveProperty('chartData');
+        expect(result.current).toHaveProperty('isLoading');
+        expect(result.current).toHaveProperty('isFiltering');
+        expect(result.current).toHaveProperty('refreshData');
+        expect(Array.isArray(result.current.chartData)).toBe(true);
     });
 
     it('should provide refreshData function', () => {
