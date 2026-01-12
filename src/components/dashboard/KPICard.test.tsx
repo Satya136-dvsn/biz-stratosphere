@@ -21,6 +21,7 @@ describe('KPICard', () => {
                 value={1000}
                 change={10}
                 trend="up"
+                format="currency"
                 icon={<span>📈</span>}
             />
         );

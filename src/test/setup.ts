@@ -1,6 +1,12 @@
 
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { Crypto } from '@peculiar/webcrypto';
+
+// Polyfill Web Crypto API for Node.js/jsdom environment
+if (!globalThis.crypto?.subtle) {
+    globalThis.crypto = new Crypto() as any;
+}
 
 // Mock ResizeObserver for Recharts
 class ResizeObserver {

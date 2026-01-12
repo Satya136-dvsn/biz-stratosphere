@@ -338,7 +338,7 @@ export function importKeyBundle(backupString: string): UserKeyBundle {
  * @returns True if valid
  */
 export function validateKeyBundle(keyBundle: any): keyBundle is UserKeyBundle {
-    return (
+    return !!(
         keyBundle &&
         typeof keyBundle.userId === 'string' &&
         keyBundle.encryptedDEK &&

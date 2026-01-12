@@ -64,6 +64,9 @@ export function generateKey(): Uint8Array {
     return crypto.getRandomValues(new Uint8Array(ENCRYPTION_CONFIG.keySize));
 }
 
+// Alias for backwards compatibility
+export { generateKey as generateEncryptionKey };
+
 /**
  * Generate a random initialization vector (IV)
  * @returns 12-byte (96-bit) random IV

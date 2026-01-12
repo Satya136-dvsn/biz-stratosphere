@@ -95,6 +95,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@peculiar/webcrypto": "^1.5.0",
     "@playwright/test": "^1.57.0",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.9.1",

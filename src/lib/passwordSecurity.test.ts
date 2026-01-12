@@ -167,15 +167,42 @@ describe('Password Security', () => {
     });
 
     describe('Password Breach Checking', () => {
+        const originalFetch = global.fetch;
+
+        beforeEach(() => {
+            // Default mock for most tests - return empty unless specified
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                text: () => Promise.resolve(''),
+            });
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
+        });
+
         it('should detect commonly breached password', async () => {
-            // 'password' is definitely in breach databases
+            // SHA-1 of 'password' is 5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8
+            // Prefix: 5BAA6, Suffix: 1E4C9B93F3F0682250B6CF8331B7EE68FD8
+
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                text: () => Promise.resolve('1E4C9B93F3F0682250B6CF8331B7EE68FD8:12345\n0000000000000000000000000000000000000000:1'),
+            });
+
             const isBreached = await checkPasswordPwned('password');
 
             expect(isBreached).toBe(true);
+            expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('5BAA6'));
         });
 
         it('should not falsely report strong unique password as breached', async () => {
-            // Generate a unique password unlikely to be in breach databases
+            // Mock empty response (no matches found)
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                text: () => Promise.resolve(''),
+            });
+
             const uniquePassword = `Unique${Date.now()}!@#$${Math.random()}`;
             const isBreached = await checkPasswordPwned(uniquePassword);
 
@@ -184,16 +211,12 @@ describe('Password Security', () => {
 
         it('should handle API failures gracefully', async () => {
             // Mock fetch to simulate API failure
-            const originalFetch = global.fetch;
             global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
             const isBreached = await checkPasswordPwned('testPassword123!');
 
             // Should return false on error, not throw
             expect(isBreached).toBe(false);
-
-            // Restore original fetch
-            global.fetch = originalFetch;
         });
     });
 
