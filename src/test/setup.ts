@@ -36,3 +36,9 @@ class IntersectionObserver {
     disconnect() { }
 }
 global.IntersectionObserver = IntersectionObserver as any;
+
+// Mock navigator.sendBeacon
+global.navigator.sendBeacon = vi.fn() as any;
+
+// Note: Supabase mocks are in __mocks__ directory
+// Note: useAuth mocks are in __mocks__ directory

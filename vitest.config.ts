@@ -1,9 +1,13 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react-swc'
+import tsconfigPaths from 'vite-tsconfig-paths'
 import path from 'path'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tsconfigPaths(),
+  ],
   test: {
     globals: true,
     environment: 'jsdom',
@@ -12,6 +16,15 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/e2e/**'],
     deps: {
       interopDefault: true,
+    },
+    mockReset: true,
+    server: {
+      deps: {
+        inline: ['@supabase/supabase-js'],
+      },
+    },
+    alias: {
+      '@/': path.resolve(__dirname, './src/'),
     },
     coverage: {
       provider: 'v8',
