@@ -235,6 +235,7 @@ export default function Auth() {
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-9"
                         required
+                        autoComplete="email"
                       />
                     </div>
                   </div>
@@ -250,6 +251,7 @@ export default function Auth() {
                         onChange={(e) => setPassword(e.target.value)}
                         className="pl-9"
                         required
+                        autoComplete="current-password"
                       />
                     </div>
                   </div>
@@ -282,6 +284,7 @@ export default function Auth() {
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         className="pl-9"
+                        autoComplete="name"
                       />
                     </div>
                   </div>
@@ -297,6 +300,7 @@ export default function Auth() {
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-9"
                         required
+                        autoComplete="email"
                       />
                     </div>
                   </div>
@@ -312,6 +316,7 @@ export default function Auth() {
                         onChange={(e) => setPassword(e.target.value)}
                         className="pl-9"
                         required
+                        autoComplete="new-password"
                       />
                     </div>
                   </div>
