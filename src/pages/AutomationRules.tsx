@@ -81,7 +81,7 @@ export function AutomationRules() {
                         {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4 text-purple-600" />}
                         AI Suggestions
                     </Button>
-                    <Button onClick={() => { setWizardInitData(null); setShowWizard(true); }}>
+                    <Button onClick={() => { setWizardInitData(null); setShowWizard(true); }} data-testid="create-rule-button">
                         <Plus className="mr-2 h-4 w-4" />
                         Create Rule
                     </Button>
@@ -247,7 +247,7 @@ function RuleWizard({ onClose, onCreate, initialData }: { onClose: () => void; o
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <CardHeader>
-                    <CardTitle>Create Automation Rule</CardTitle>
+                    <CardTitle data-testid="wizard-title">Create Automation Rule</CardTitle>
                     <CardDescription>Step {step} of 4</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -259,6 +259,7 @@ function RuleWizard({ onClose, onCreate, initialData }: { onClose: () => void; o
                                     placeholder="e.g., Revenue Alert"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    data-testid="rule-name-input"
                                 />
                             </div>
                             <div>
@@ -410,10 +411,10 @@ function RuleWizard({ onClose, onCreate, initialData }: { onClose: () => void; o
 
                     {/* Navigation */}
                     <div className="flex justify-between pt-4">
-                        <Button variant="outline" onClick={step === 1 ? onClose : () => setStep(step - 1)}>
+                        <Button variant="outline" onClick={step === 1 ? onClose : () => setStep(step - 1)} data-testid="wizard-back-button">
                             {step === 1 ? 'Cancel' : 'Back'}
                         </Button>
-                        <Button onClick={step === 4 ? handleCreate : () => setStep(step + 1)}>
+                        <Button onClick={step === 4 ? handleCreate : () => setStep(step + 1)} data-testid="wizard-next-button">
                             {step === 4 ? 'Create Rule' : 'Next'}
                         </Button>
                     </div>

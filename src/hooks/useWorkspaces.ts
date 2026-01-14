@@ -23,9 +23,21 @@ export interface WorkspaceMember {
     joined_at: string | null;
 }
 
+import { useState, useEffect, useCallback } from 'react';
+
+const CURRENT_WORKSPACE_KEY = 'biz-stratosphere-current-workspace';
+
 export function useWorkspaces() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
+
+    // Current workspace state with localStorage persistence
+    const [currentWorkspaceId, setCurrentWorkspaceId] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem(CURRENT_WORKSPACE_KEY);
+        }
+        return null;
+    });
 
     // Fetch user's workspaces
     const { data: workspaces = [], isLoading } = useQuery({
@@ -41,6 +53,34 @@ export function useWorkspaces() {
         },
         enabled: !!user,
     });
+
+    // Auto-select first workspace if none selected
+    useEffect(() => {
+        if (workspaces.length > 0 && !currentWorkspaceId) {
+            const firstWorkspace = workspaces[0];
+            setCurrentWorkspaceId(firstWorkspace.id);
+            localStorage.setItem(CURRENT_WORKSPACE_KEY, firstWorkspace.id);
+        }
+    }, [workspaces, currentWorkspaceId]);
+
+    // Current workspace object
+    const currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId) || null;
+
+    // Switch workspace function
+    const switchWorkspace = useCallback((workspaceId: string) => {
+        setCurrentWorkspaceId(workspaceId);
+        localStorage.setItem(CURRENT_WORKSPACE_KEY, workspaceId);
+        // Invalidate queries that depend on workspace
+        queryClient.invalidateQueries({ queryKey: ['datasets'] });
+        queryClient.invalidateQueries({ queryKey: ['data-points'] });
+        queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+    }, [queryClient]);
+
+    // Clear workspace (for logout)
+    const clearCurrentWorkspace = useCallback(() => {
+        setCurrentWorkspaceId(null);
+        localStorage.removeItem(CURRENT_WORKSPACE_KEY);
+    }, []);
 
     // Create workspace
     const createWorkspace = useMutation({
@@ -64,8 +104,12 @@ export function useWorkspaces() {
             if (error) throw error;
             return workspace;
         },
-        onSuccess: () => {
+        onSuccess: (newWorkspace) => {
             queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+            // Auto-switch to newly created workspace
+            if (newWorkspace) {
+                switchWorkspace(newWorkspace.id);
+            }
         },
     });
 
@@ -98,14 +142,27 @@ export function useWorkspaces() {
 
             if (error) throw error;
         },
-        onSuccess: () => {
+        onSuccess: (_, deletedWorkspaceId) => {
             queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+            // If deleted workspace was current, switch to first available
+            if (deletedWorkspaceId === currentWorkspaceId) {
+                const remaining = workspaces.filter(w => w.id !== deletedWorkspaceId);
+                if (remaining.length > 0) {
+                    switchWorkspace(remaining[0].id);
+                } else {
+                    clearCurrentWorkspace();
+                }
+            }
         },
     });
 
     return {
         workspaces,
         isLoading,
+        currentWorkspace,
+        currentWorkspaceId,
+        switchWorkspace,
+        clearCurrentWorkspace,
         createWorkspace,
         updateWorkspace,
         deleteWorkspace,

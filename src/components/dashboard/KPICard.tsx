@@ -51,10 +51,14 @@ export function KPICard({
   };
 
   return (
-    <Card className={cn(
-      "relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1",
-      getVariantStyles()
-    )}>
+    <Card
+      className={cn(
+        "relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1",
+        getVariantStyles()
+      )}
+      data-testid="kpi-card"
+      data-testid-title={title.toLowerCase().replace(/\s+/g, '-')}
+    >
       <CardContent className="p-7">
         <div className="flex items-center justify-between">
           <div className="space-y-3">

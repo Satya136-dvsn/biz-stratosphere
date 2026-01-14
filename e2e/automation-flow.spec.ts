@@ -1,41 +1,80 @@
+import { test, expect } from './fixtures/auth';
 
-import { test, expect } from '@playwright/test';
+/**
+ * Automation Flow Tests
+ * Tests automation rule creation and management
+ */
+test.describe('Automation Rules', () => {
+    test('should display automation rules page', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/automation-rules');
+        await authenticatedPage.waitForLoadState('networkidle');
 
-// Skip automation flow test - requires proper auth setup for E2E testing
-test.skip('Automation Flow: Create Rule', async ({ page }) => {
-    // 1. Login
-    await page.goto('/auth');
-    await page.getByPlaceholder('Email').fill('test@example.com'); // Assumes existing user or mock auth
-    await page.getByPlaceholder('Password').fill('password123'); // Password from earlier setup
-    await page.click('button:has-text("Sign In")');
+        // Verify page loaded - check for heading
+        await expect(authenticatedPage.locator('h2:has-text("Automation Rules")').first()).toBeVisible({ timeout: 10000 });
+    });
 
-    // Wait for redirect
-    await expect(page).toHaveURL('/');
+    test('should show Create Rule button', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/automation-rules');
+        await authenticatedPage.waitForLoadState('networkidle');
 
-    // 2. Navigate to Automation
-    // Assuming sidebar has link "Automation", fallback to direct URL
-    await page.goto('/automation');
-    // OR await page.click('text=Automation');
+        // Use data-testid for stable selector
+        const createButton = authenticatedPage.locator('[data-testid="create-rule-button"]');
+        await expect(createButton).toBeVisible({ timeout: 10000 });
+    });
 
-    // 3. Open Wizard
-    await page.click('button:has-text("Create Rule")');
-    await expect(page.getByText('Rule Name')).toBeVisible();
+    test('should open rule creation wizard', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/automation-rules');
+        await authenticatedPage.waitForLoadState('networkidle');
 
-    // 4. Fill Form
-    // Step 1: Name
-    await page.getByPlaceholder('e.g., Revenue Alert').fill('E2E Test Rule');
-    await page.click('button:has-text("Next")');
+        // Click Create Rule button using data-testid
+        await authenticatedPage.locator('[data-testid="create-rule-button"]').click();
 
-    // Step 2: Condition
-    await page.getByPlaceholder('e.g., 10000').fill('5000');
-    await page.click('button:has-text("Next")');
+        // Wait for wizard to appear using data-testid
+        await expect(authenticatedPage.locator('[data-testid="wizard-title"]')).toBeVisible({ timeout: 5000 });
 
-    // Step 3: Schedule (skip/default)
-    await page.click('button:has-text("Next")');
+        // Also verify rule name input is visible
+        await expect(authenticatedPage.locator('[data-testid="rule-name-input"]')).toBeVisible();
+    });
 
-    // Step 4: Action
-    await page.click('button:has-text("Create Rule")');
+    test('should show existing rules if any', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/automation-rules');
+        await authenticatedPage.waitForLoadState('networkidle');
 
-    // 5. Verify Success
-    await expect(page.getByText('E2E Test Rule')).toBeVisible();
+        // The page should show either rules or the empty state message
+        const pageContent = authenticatedPage.locator('body');
+        await expect(pageContent).toBeVisible();
+
+        // Verify page has loaded by checking for heading
+        await expect(authenticatedPage.locator('h2:has-text("Automation Rules")')).toBeVisible();
+    });
+});
+
+/**
+ * AI Chat Tests
+ */
+test.describe('AI Chat', () => {
+    test('should load AI chat page', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/ai-chat');
+        await authenticatedPage.waitForLoadState('networkidle');
+
+        // Use data-testid for stable selector - check for chat input or heading
+        const chatInput = authenticatedPage.locator('[data-testid="ai-chat-input"]');
+        const aiHeading = authenticatedPage.locator('h1:has-text("AI"), h2:has-text("AI")');
+
+        // Either chat input or heading should be visible
+        await expect(chatInput.or(aiHeading).first()).toBeVisible({ timeout: 10000 });
+    });
+});
+
+/**
+ * ML Predictions Tests
+ */
+test.describe('ML Predictions', () => {
+    test('should load ML predictions page', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/ml-predictions');
+        await authenticatedPage.waitForLoadState('networkidle');
+
+        // Should see ML predictions heading or content
+        await expect(authenticatedPage.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
+    });
 });

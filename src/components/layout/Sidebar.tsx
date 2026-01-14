@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FeatureBadge } from "@/components/ui/FeatureBadge";
+import { WorkspaceSelector } from "./WorkspaceSelector";
 
 interface NavItem {
     title: string;
@@ -153,6 +154,13 @@ export function Sidebar() {
                     )}
                 </Button>
             </div>
+
+            {/* Workspace Selector */}
+            {!collapsed && (
+                <div className="px-3 py-2 border-b border-border/50">
+                    <WorkspaceSelector />
+                </div>
+            )}
 
             {/* Navigation Items */}
             <nav className="flex-1 p-2 space-y-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent hover:scrollbar-thumb-muted-foreground/20">

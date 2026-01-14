@@ -162,9 +162,6 @@ serve(async (req) => {
     }
 });
 
-/**
- * Helper to handle multi-channel notifications
- */
 async function sendNotification(supabase: any, rule: any, context: any) {
     const { action_type, action_config } = rule;
     const message = `Alert: ${context.ruleName} triggered! Value ${context.value} ${context.operator} ${context.threshold}`;
@@ -172,8 +169,39 @@ async function sendNotification(supabase: any, rule: any, context: any) {
     try {
         switch (action_type) {
             case 'email':
-                // In production, integrate Resend/SendGrid here
-                console.log(`[Email] Sending to ${action_config?.email || 'admin@example.com'}: ${message}`);
+                // Call the email-sender edge function
+                const emailTo = action_config?.email || 'admin@example.com';
+                try {
+                    const { data: emailResult, error: emailError } = await supabase.functions.invoke('email-sender', {
+                        body: {
+                            to: emailTo,
+                            template: 'threshold_alert',
+                            templateVars: {
+                                rule_name: context.ruleName,
+                                metric: context.metric || 'Value',
+                                current_value: context.value,
+                                operator: context.operator,
+                                threshold: context.threshold,
+                                triggered_at: new Date().toISOString(),
+                            }
+                        }
+                    });
+
+                    if (emailError) {
+                        console.warn(`[Email] Failed to send to ${emailTo}:`, emailError);
+                        // Fallback to in-app notification
+                        await supabase.from('notifications').insert({
+                            user_id: context.userId,
+                            title: `Email Alert Failed: ${context.ruleName}`,
+                            message: `${message} (Email to ${emailTo} failed - check email configuration)`,
+                            type: 'alert'
+                        });
+                    } else {
+                        console.log(`[Email] Successfully sent to ${emailTo}:`, emailResult?.id);
+                    }
+                } catch (emailCatchError) {
+                    console.error(`[Email] Error calling email-sender:`, emailCatchError);
+                }
                 break;
 
             case 'slack':

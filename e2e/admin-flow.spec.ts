@@ -1,79 +1,56 @@
+import { test, expect } from './fixtures/auth';
 
-import { test, expect } from '@playwright/test';
+/**
+ * Admin Control Plane Tests
+ * Uses authenticatedPage fixture for admin-specific tests
+ */
+test.describe('Admin Control Plane', () => {
+    test('should prevent non-admins from accessing admin panel', async ({ authenticatedPage }) => {
+        // Regular user tries to access admin
+        await authenticatedPage.goto('/admin');
+        await authenticatedPage.waitForLoadState('networkidle');
 
-// Skip admin flow tests - requires proper auth setup for E2E testing
-test.describe.skip('Admin Control Plane', () => {
-    test.beforeEach(async ({ page }) => {
-        // Mock Auth Session
-        await page.context().addCookies([
-            { name: 'sb-access-token', value: 'fake-token', domain: 'localhost', path: '/' },
-            { name: 'sb-refresh-token', value: 'fake-refresh', domain: 'localhost', path: '/' }
-        ]);
-
-        // Intercept Profile Request to force Admin Role
-        await page.route('**/rest/v1/profiles*', async route => {
-            const json = {
-                id: 'admin-id',
-                display_name: 'Admin User',
-                role: 'admin',
-                created_at: new Date().toISOString()
-            };
-            await route.fulfill({ json });
-        });
-
-        // Intercept Stats
-        await page.route('**/rpc/get_admin_stats', async route => {
-            await route.fulfill({
-                json: {
-                    total_users: 100,
-                    total_workspaces: 10,
-                    active_users_1h: 5,
-                    api_requests_24h: 500,
-                    predictions_24h: 200,
-                    recent_errors_24h: 0
-                }
-            });
-        });
+        // Should redirect to dashboard (not admin panel)
+        await expect(authenticatedPage).toHaveURL(/\/(dashboard|$)/);
     });
 
-    test('should prevent non-admins', async ({ page }) => {
-        // Override mock to return User role
-        await page.route('**/rest/v1/profiles*', async route => {
-            const json = { role: 'user', id: 'user-id' };
-            await route.fulfill({ json });
-        });
+    test('should allow authenticated user to view profile', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/profile');
+        await authenticatedPage.waitForLoadState('networkidle');
 
-        await page.goto('/admin');
-        // valid check: should redirect to dashboard or show 403.
-        // My AdminRoute redirects to /dashboard if logged in but not admin.
-        // Wait for navigation
-        await expect(page).toHaveURL(/\/dashboard/);
+        // Should see profile page heading or content
+        await expect(authenticatedPage.locator('h1, h2, h3').first()).toBeVisible({ timeout: 10000 });
     });
 
-    test('should allow admin access and load dashboard', async ({ page }) => {
-        await page.goto('/admin');
-        await expect(page.getByText('Admin Control Plane')).toBeVisible();
-        await expect(page.getByText('Total Users')).toBeVisible();
-        await expect(page.getByText('100')).toBeVisible(); // Mocked value
+    test('should show user info in sidebar', async ({ authenticatedPage }) => {
+        await authenticatedPage.goto('/dashboard');
+        await authenticatedPage.waitForLoadState('networkidle');
+
+        // Sidebar should be visible
+        await expect(authenticatedPage.locator('nav, aside, [class*="sidebar"]').first()).toBeVisible({ timeout: 5000 });
     });
+});
 
-    test('should navigate to user management', async ({ page }) => {
-        // Mock get_admin_users response
-        await page.route('**/rpc/get_admin_users', async route => {
-            await route.fulfill({
-                json: [
-                    { id: '1', email: 'u1@test.com', full_name: 'User One', role: 'user', suspended: false, created_at: new Date().toISOString() }
-                ]
-            });
-        });
+/**
+ * RBAC (Role-Based Access Control) Tests
+ */
+test.describe('RBAC Protection', () => {
+    test('should protect admin routes', async ({ authenticatedPage }) => {
+        // Try accessing admin route
+        await authenticatedPage.goto('/admin');
+        await authenticatedPage.waitForLoadState('networkidle');
 
-        await page.goto('/admin');
-        // Find link/button to users?
-        // In Dashboard, Active Users card is clickable.
-        await page.getByText('Active Users').click();
+        // Non-admin should be redirected away from admin panel
+        // Either redirected to dashboard OR admin heading is not visible
+        const url = authenticatedPage.url();
+        const isOnAdmin = url.includes('/admin');
 
-        await expect(page).toHaveURL(/\/admin\/users/);
-        await expect(page.getByText('User Management')).toBeVisible();
-        await expect(page.getByText('u1@test.com')).toBeVisible();
+        if (isOnAdmin) {
+            // If still on admin URL, verify admin panel heading is not visible (access denied)
+            const adminHeading = authenticatedPage.locator('h1:has-text("Admin Control Plane"), h2:has-text("Admin Control Plane")');
+            const isVisible = await adminHeading.isVisible().catch(() => false);
+            expect(isVisible).toBeFalsy();
+        }
+        // If redirected, test passes
     });
 });

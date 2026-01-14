@@ -159,12 +159,33 @@ async function sendEmail(
     config: EmailAction,
     context: any
 ): Promise<{ success: boolean; result?: any }> {
-    // This would integrate with SendGrid/Resend
-    // For now, create a notification instead
-    return {
-        success: true,
-        result: { message: 'Email would be sent via SendGrid' },
-    };
+    // Call the email-sender edge function
+    const { data, error } = await supabase.functions.invoke('email-sender', {
+        body: {
+            to: config.recipients,
+            template: 'threshold_alert',
+            templateVars: {
+                rule_name: context.ruleName,
+                metric: context.metric || 'Metric',
+                current_value: context.currentValue,
+                operator: context.operator,
+                threshold: context.threshold,
+                triggered_at: new Date().toISOString(),
+            }
+        }
+    });
+
+    if (error) {
+        console.warn('Email send failed, falling back to notification:', error);
+        // Fallback to in-app notification
+        await createNotification({
+            title: 'Email Alert (delivery failed)',
+            message: `${context.ruleName} triggered - email delivery failed`
+        }, context);
+        return { success: false, result: { fallback: 'notification' } };
+    }
+
+    return { success: true, result: data };
 }
 
 async function callWebhook(

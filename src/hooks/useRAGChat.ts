@@ -6,6 +6,8 @@ import { useToast } from './use-toast';
 import { useAIUsageLimit } from './useAIUsageLimit';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
 import { useEmbeddings } from '@/hooks/useEmbeddings';
+import { calculateConfidenceFromResults, type ConfidenceScore } from '@/lib/ai/confidenceScoring';
+import { validateGrounding, type GroundingResult } from '@/lib/ai/groundingValidator';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
@@ -16,6 +18,8 @@ export interface ChatMessage {
     role: 'user' | 'assistant' | 'system';
     content: string;
     sources?: any[];
+    confidence?: ConfidenceScore;
+    grounding?: GroundingResult;
     created_at: string;
 }
 
@@ -244,14 +248,27 @@ Cite sources using [Source ID] format if referenced.`;
 
                 setIsSearching(false); // Done
 
-                // 4. Save assistant message
+                // 4. Calculate Confidence Score
+                const confidence = calculateConfidenceFromResults(
+                    searchSources,
+                    message,
+                    !!(datasetId && datasetId !== 'none')
+                );
+
+                // 5. Validate Grounding
+                const grounding = validateGrounding({
+                    response: assistantMessageContent,
+                    sources: searchSources,
+                });
+
+                // 6. Save assistant message with confidence metadata
                 const { data: aiMessage, error: aiMsgError } = await supabase
                     .from('chat_messages')
                     .insert([{
                         conversation_id: convId,
                         role: 'assistant',
                         content: assistantMessageContent,
-                        sources: sources.map((r: any) => ({
+                        sources: searchSources.map((r: any) => ({
                             content: r.content,
                             metadata: r.metadata,
                             similarity: r.similarity || 0,
@@ -262,10 +279,41 @@ Cite sources using [Source ID] format if referenced.`;
 
                 if (aiMsgError) throw aiMsgError;
 
-                // 5. Increment usage counter
+                // 7. Log to AI Response Audit table (non-blocking)
+                try {
+                    await supabase.from('ai_response_audits').insert([{
+                        user_id: user.id,
+                        conversation_id: convId,
+                        query: message,
+                        response_preview: assistantMessageContent.substring(0, 500),
+                        confidence_score: confidence.score,
+                        confidence_level: confidence.level,
+                        confidence_reasons: confidence.reasons,
+                        grounding_score: grounding.groundingScore,
+                        is_grounded: grounding.isGrounded,
+                        source_count: searchSources.length,
+                        dataset_id: datasetId && datasetId !== 'none' ? datasetId : null,
+                        average_similarity: searchSources.length > 0
+                            ? searchSources.reduce((a, b) => a + b.similarity, 0) / searchSources.length
+                            : null,
+                    }]);
+                } catch (auditError) {
+                    console.warn('[RAG] Audit logging failed:', auditError);
+                    // Don't fail the request if audit fails
+                }
+
+                // 8. Increment usage counter
                 await incrementUsage();
 
-                return { userMessage, aiMessage };
+                // Return message with confidence metadata attached
+                return {
+                    userMessage,
+                    aiMessage: {
+                        ...aiMessage,
+                        confidence,
+                        grounding,
+                    },
+                };
 
             } finally {
                 setIsStreaming(false);

@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
+import { ConfidenceBadge, SourceTransparency } from './ConfidenceBadge';
 
 interface ChatMessageProps {
     message: ChatMessage;
@@ -147,6 +148,24 @@ export function ChatMessageComponent({ message }: ChatMessageProps) {
                             </Badge>
                         ))}
                     </div>
+                )}
+
+                {/* Confidence Badge for AI responses */}
+                {!isUser && message.confidence && (
+                    <ConfidenceBadge
+                        confidence={message.confidence}
+                        showDetails={true}
+                        sourceCount={message.sources?.length || 0}
+                        className="mt-1"
+                    />
+                )}
+
+                {/* Source Transparency */}
+                {!isUser && (
+                    <SourceTransparency
+                        sourceCount={message.sources?.length || 0}
+                        isLimited={!message.sources || message.sources.length === 0}
+                    />
                 )}
 
                 {/* Timestamp */}

@@ -626,12 +626,14 @@ export function AIChat() {
                                     placeholder={selectedConversationId ? "Ask a question about your data..." : "Select a conversation to start"}
                                     disabled={!selectedConversationId || isSending}
                                     className="flex-1 shadow-sm focus-visible:ring-primary/20"
+                                    data-testid="ai-chat-input"
                                 />
                                 <Button
                                     onClick={handleSendMessage}
                                     disabled={!selectedConversationId || !inputMessage.trim() || isSending}
                                     size="icon"
                                     className="shadow-sm"
+                                    data-testid="ai-chat-send-button"
                                 >
                                     <Send className="h-4 w-4" />
                                 </Button>
