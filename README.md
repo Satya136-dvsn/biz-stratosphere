@@ -479,7 +479,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For support and questions:
 
-- 📧 Email: <support@bizstratosphere.com>
+- 📧 Email: <d.v.satyanarayana260@gmail.com>
 - 📖 Documentation: [docs.bizstratosphere.com](https://docs.bizstratosphere.com)
 - 🐛 Issues: [GitHub Issues](https://github.com/Satya136-dvsn/biz-stratosphere/issues)
 
