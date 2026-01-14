@@ -36,6 +36,7 @@ const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard").then(m 
 const UserManagement = lazy(() => import("./pages/admin/UserManagement").then(m => ({ default: m.UserManagement })));
 const AIControl = lazy(() => import("./pages/admin/AIControl").then(m => ({ default: m.AIControl })));
 const AuditLogs = lazy(() => import("./pages/admin/AuditLogs").then(m => ({ default: m.AuditLogs })));
+const AIDecisionAudit = lazy(() => import("./pages/admin/AIDecisionAudit"));
 const UploadHistory = lazy(() => import("./pages/UploadHistory").then(m => ({ default: m.UploadHistory })));
 import { AdminRoute } from "./components/AdminRoute";
 
@@ -257,6 +258,14 @@ const App = () => (
                 element={
                   <AdminRoute>
                     <AuditLogs />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/ai-audit"
+                element={
+                  <AdminRoute>
+                    <AIDecisionAudit />
                   </AdminRoute>
                 }
               />

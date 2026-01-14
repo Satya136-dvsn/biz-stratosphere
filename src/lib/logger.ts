@@ -2,60 +2,89 @@ import { captureException, captureMessage } from './errorTracking';
 
 /**
  * Structured Logger for Biz Stratosphere
- * Provides consistent log formatting for frontend and backend logic.
+ * P7: Enhanced with context support (userId, workspaceId, requestId)
  */
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+
+interface LogContext {
+    userId?: string;
+    workspaceId?: string;
+    requestId?: string;
+    component?: string;
+    action?: string;
+    [key: string]: any;
+}
 
 interface LogEntry {
     level: LogLevel;
     message: string;
     timestamp: string;
-    context?: Record<string, any>;
-    userId?: string;
+    context?: LogContext;
     environment: string;
 }
 
 const isDev = import.meta.env?.DEV || false;
 
 class Logger {
-    private log(level: LogLevel, message: string, context?: Record<string, any>, userId?: string) {
+    private defaultContext: LogContext = {};
+
+    /**
+     * Set default context for all log entries
+     */
+    setContext(context: Partial<LogContext>) {
+        this.defaultContext = { ...this.defaultContext, ...context };
+    }
+
+    /**
+     * Create a child logger with additional context
+     */
+    child(context: Partial<LogContext>): Logger {
+        const childLogger = new Logger();
+        childLogger.defaultContext = { ...this.defaultContext, ...context };
+        return childLogger;
+    }
+
+    private log(level: LogLevel, message: string, context?: LogContext) {
+        const mergedContext = { ...this.defaultContext, ...context };
         const entry: LogEntry = {
             level,
             message,
             timestamp: new Date().toISOString(),
-            context,
-            userId,
+            context: Object.keys(mergedContext).length > 0 ? mergedContext : undefined,
             environment: isDev ? 'development' : 'production',
         };
 
-        // In production, this would send to Sentry / Datadog / Supabase Logs
-        // For now, we print structured JSON to console for observability
-
         if (isDev) {
-            // Pretty print in Dev
             const style = this.getStyle(level);
-            console.log(`%c[${level.toUpperCase()}] ${message}`, style, context || '');
+            const prefix = this.formatPrefix(level, mergedContext);
+            console.log(`%c${prefix} ${message}`, style, mergedContext || '');
         } else {
-            // JSON Lines in Prod
             console.log(JSON.stringify(entry));
         }
 
-        // Send to Sentry if not debug
+        // Send to Sentry if error or warning
         if (level === 'error') {
-            const error = context?.error instanceof Error ? context.error : new Error(message);
+            const error = mergedContext?.error instanceof Error ? mergedContext.error : new Error(message);
             captureException(error, {
                 level: 'error',
-                extra: { ...context, userId },
-                user: userId ? { id: userId } : undefined
+                extra: mergedContext,
+                user: mergedContext?.userId ? { id: mergedContext.userId } : undefined
             });
         } else if (level === 'warn') {
             captureMessage(message, {
                 level: 'warning',
-                extra: { ...context, userId },
-                user: userId ? { id: userId } : undefined
+                extra: mergedContext,
+                user: mergedContext?.userId ? { id: mergedContext.userId } : undefined
             });
         }
+    }
+
+    private formatPrefix(level: LogLevel, context?: LogContext): string {
+        const parts = [`[${level.toUpperCase()}]`];
+        if (context?.component) parts.push(`[${context.component}]`);
+        if (context?.action) parts.push(`[${context.action}]`);
+        return parts.join('');
     }
 
     private getStyle(level: LogLevel): string {
@@ -68,21 +97,38 @@ class Logger {
         }
     }
 
-    public info(message: string, context?: Record<string, any>, userId?: string) {
-        this.log('info', message, context, userId);
+    public info(message: string, context?: LogContext) {
+        this.log('info', message, context);
     }
 
-    public warn(message: string, context?: Record<string, any>, userId?: string) {
-        this.log('warn', message, context, userId);
+    public warn(message: string, context?: LogContext) {
+        this.log('warn', message, context);
     }
 
-    public error(message: string, error?: any, context?: Record<string, any>, userId?: string) {
-        this.log('error', message, { ...context, error: error?.message || error, stack: error?.stack }, userId);
+    public error(message: string, error?: any, context?: LogContext) {
+        this.log('error', message, { ...context, error: error?.message || error, stack: error?.stack });
     }
 
-    public debug(message: string, context?: Record<string, any>, userId?: string) {
-        this.log('debug', message, context, userId);
+    public debug(message: string, context?: LogContext) {
+        this.log('debug', message, context);
     }
 }
 
 export const logger = new Logger();
+
+/**
+ * Create a logger with component context
+ */
+export function createLogger(component: string, context?: Partial<LogContext>): Logger {
+    return logger.child({ component, ...context });
+}
+
+/**
+ * Generate a unique request ID for tracing
+ */
+export function generateRequestId(): string {
+    return `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+
+export type { LogContext, LogLevel };
+
