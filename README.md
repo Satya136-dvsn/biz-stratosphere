@@ -4,6 +4,8 @@
 
 A modern, serverless analytics platform that empowers businesses with AI-driven insights, real-time predictions, and comprehensive data visualization - all at **$0/month operational cost**.
 
+[![Tests](https://img.shields.io/badge/tests-215%20passing-brightgreen)](https://github.com) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-18.3-61dafb)](https://react.dev/) [![Supabase](https://img.shields.io/badge/Supabase-Serverless-3ECF8E)](https://supabase.com/)
+
 ---
 
 ## 📖 What is Biz Stratosphere?
@@ -22,11 +24,13 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
    - Train custom models with your own data
    - All processing happens client-side (100% private and free)
 
-3. **💬 Chat with Your Data** - Ask questions about your business in plain English using our RAG-powered AI assistant
+3. **💬 Chat with Your Data** - Ask questions about your business in plain English using our RAG-powered AI assistant with **confidence scoring** and **hallucination prevention**
 
 4. **📈 Generate Reports** - Create professional reports in PDF, Excel, or CSV formats with automatic insights
 
-5. **🔧 Build with APIs** - Integrate analytics into your own applications using our RESTful API
+5. **🔧 Automate Actions** - Build automation rules with AI-suggested triggers and scheduled actions
+
+6. **🛡️ Enterprise Security** - Role-based access control, audit logging, and comprehensive monitoring
 
 ### 👥 Who Is It For?
 
@@ -42,6 +46,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 - ✅ **Privacy-First** - ML models run in your browser, data never leaves
 - ✅ **No Setup Required** - Sign up and start analyzing in minutes
 - ✅ **Production-Ready** - Enterprise-grade security and performance
+- ✅ **AI Trust & Transparency** - Confidence scoring and grounding validation
 - ✅ **Fully Open Source** - Customize and self-host if needed
 
 ---
@@ -54,6 +59,7 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 - **Advanced Charts & Visualizations** - 8 chart types (Bar, Line, Pie, Scatter, Radar, Treemap, Gauge, Funnel)
 - **Custom Reports** - Generate professional PDF, Excel, and CSV reports
 - **Data Upload** - CSV/Excel file upload with automatic quality analysis
+- **Upload History** - Track all uploads with metadata and status
 
 ### 🤖 **AI & Machine Learning** ⭐ PRODUCTION-READY
 
@@ -65,8 +71,11 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
   - Export conversations (Markdown, JSON, Text)
   - Syntax-highlighted code blocks with copy button
   - Rich markdown rendering (tables, lists, links)
+  - **🆕 Confidence Scoring** - Every response shows confidence level
+  - **🆕 Hallucination Prevention** - Source transparency and grounding validation
+  - **🆕 Low Confidence Warnings** - Visual alerts for uncertain responses
 
-- **ML Predictions (Browser-Based)** ⭐ NEW - 100% FREE, Production-Ready:
+- **ML Predictions (Browser-Based)** ⭐ 100% FREE, Production-Ready:
   - **Customer Churn Prediction** - 96% accuracy after training
   - **Revenue Forecasting** - 87% R² score for business planning
   - **TensorFlow.js** - Models run entirely in your browser
@@ -76,6 +85,33 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
   - **Zero Cost** - No servers, no API calls, 100% FREE forever
   - **Offline Capable** - Works without internet after model download
   - **Privacy First** - Your data never leaves your browser
+
+### ⚡ **Automation Engine** ⭐ NEW
+
+- **Automation Rules** - Create rules triggered by thresholds, schedules, or data changes
+- **AI Rule Suggestions** - Get intelligent automation recommendations
+- **Scheduled Execution** - Run rules on cron schedules or intervals
+- **Email Notifications** - Send email alerts using Supabase Email Provider
+- **Webhook Actions** - Trigger external services
+- **Execution Logs** - Track rule execution history and status
+
+### 🏢 **Workspace Management** ⭐ NEW
+
+- **Multi-Workspace Support** - Organize data by project or team
+- **Workspace Switching** - Quick switch between workspaces from sidebar
+- **Usage Metrics** - Track uploads, AI queries, and automation triggers
+- **Workspace Settings** - Configure per-workspace preferences
+
+### 🛡️ **Admin & Security** ⭐ NEW
+
+- **AI Decision Audit** - Admin dashboard to review AI response quality
+- **Confidence Monitoring** - Track high/medium/low confidence distributions
+- **Grounding Validation** - Verify AI responses against source data
+- **Structured Logging** - Context-aware logging with userId, workspaceId, requestId
+- **Row-Level Security (RLS)** - Secure data access at database level
+- **Role-Based Access Control** - Admin, user, and viewer roles
+- **Audit Logging** - Track all user actions
+- **Rate Limiting** - Prevent abuse with configurable limits
 
 ### 📈 **Data Management**
 
@@ -91,206 +127,61 @@ Biz Stratosphere provides a complete suite of business intelligence and AI capab
 - **Webhooks** - Real-time event notifications  
 - **Usage Analytics** - Track API usage and limits
 
-### 👥 **Collaboration**
-
-- **Workspaces** - Organize projects and teams
-- **Team Management** - Role-based access control
-- **Shared Reports** - Collaborate on insights
-
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
 
-- **React** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **TanStack Query** - Data fetching and caching
+- **React 18.3** - UI framework
+- **TypeScript 5.0** - Type safety
+- **Vite 5.4** - Build tool and dev server
+- **TanStack Query v5** - Data fetching and caching
 - **Shadcn UI** - Component library
 - **Tailwind CSS** - Styling
 - **Recharts** - Data visualization
 - **jsPDF** - Professional PDF exports
+- **date-fns** - Date utilities
 
 ### Backend
 
 - **Supabase** - Backend as a service
-  - PostgreSQL database
+  - PostgreSQL database with pgvector
   - Real-time subscriptions
-  - Authentication
+  - Authentication & Authorization
   - Row-Level Security (RLS)
   - Edge Functions
-- **Python ML Service** - FastAPI-based ML serving
+  - Email Provider integration
+- **Python ML Service** - FastAPI-based ML serving (optional)
 
 ### AI/ML
 
 - **TensorFlow.js** - Browser-based ML predictions (churn, revenue)
-- **Google Gemini API** - RAG and embeddings
+- **Google Gemini API** - RAG chat and embeddings
 - **pgvector** - Vector similarity search
-- **Synthetic Training Data** - Realistic business data generation
+- **Custom Confidence Scoring** - Deterministic confidence calculation
+- **Grounding Validator** - Source verification for AI responses
+
+### Testing
+
+- **Vitest** - Unit testing (198 tests)
+- **Playwright** - E2E testing (17 tests)
+- **React Testing Library** - Component testing
+
+### Observability
+
+- **Sentry** - Error tracking and performance monitoring
+- **Structured Logging** - Context-aware logging utility
+- **Performance Monitoring** - Core Web Vitals tracking
 
 ---
 
-## 🎓 How to Use Biz Stratosphere
-
-### Getting Started in 5 Minutes
-
-1. **Sign Up** - Visit the platform and create a free account
-2. **Upload Data** - Go to the Data Upload page and upload your first CSV/Excel file
-3. **Explore Dashboard** - Navigate to the Analytics Dashboard to see your data visualized
-4. **Make Predictions** - Visit ML Predictions to forecast churn or revenue
-5. **Chat with AI** - Ask questions about your data using the AI Assistant
-
-### 📊 Using the Analytics Dashboard
-
-#### Step 1: Upload Your Data
-
-- Navigate to **Data Upload** from the sidebar
-- Click "Upload File" and select your CSV or Excel file
-- The system automatically analyzes data quality and detects any issues
-- Your data is now available across all features
-
-#### Step 2: Create Visualizations
-
-- Go to **Analytics Dashboard**
-- Click "Create Chart" and choose from 8 chart types:
-  - Bar Chart - Compare categories
-  - Line Chart - Show trends over time
-  - Pie Chart - Display proportions
-  - Scatter Plot - Find correlations
-  - Radar Chart - Multi-dimensional comparisons
-  - Treemap - Hierarchical data
-  - Gauge - Show progress toward goals
-  - Funnel - Conversion analysis
-- Configure your chart with drag-and-drop fields
-- Save and share your insights
-
-#### Step 3: Generate Reports
-
-- Click "Generate Report" on the dashboard
-- Choose format: PDF (presentation-ready), Excel (data analysis), or CSV (raw data)
-- Add charts, insights, and custom notes
-- Download and share with your team
-
-### 🤖 Using ML Predictions (100% Free, Browser-Based)
-
-#### Customer Churn Prediction
-
-1. Navigate to **ML Predictions** → **Predict** tab
-2. Select "Customer Churn Predictor"
-3. Enter customer metrics:
-   - Usage Frequency (1-100)
-   - Support Tickets (0-20)
-   - Tenure in Months (1-60)
-   - Monthly Spend ($10-$500)
-   - Feature Usage Percentage (0-100%)
-4. Click "Get Prediction"
-5. View results: "Will Churn" or "Will Stay" with confidence score
-6. Review feature importance to understand key drivers
-
-#### Revenue Forecasting
-
-1. Select "Revenue Forecaster" from the model dropdown
-2. Input business metrics:
-   - Number of Customers (10-1000)
-   - Average Deal Size ($100-$10,000)
-   - Marketing Spend ($1,000-$50,000)
-   - Sales Team Size (1-50)
-   - Market Growth % (-10% to +30%)
-3. Get instant revenue forecast in dollars
-4. Use for budgeting and planning
-
-#### Training Custom Models
-
-1. Go to **ML Predictions** → **Train** tab
-2. Click "Download Template" for your model type
-3. Fill the CSV with your historical data
-4. Upload via **CSV** tab
-5. Click "Train Model" - training happens in your browser (1-2 minutes)
-6. Your custom model is now available for predictions!
-
-#### Viewing Prediction History
-
-- Navigate to **ML Predictions** → **History** tab
-- Filter by model type, date range, or prediction value
-- Click any prediction to see detailed breakdown
-- Export history to CSV for analysis
-
-#### Managing Models
-
-- Go to **ML Predictions** → **Models** tab
-- See all available models (Advanced DNN, Custom Trained, Legacy)
-- Export models as `.bizml` files for backup
-- Import previously exported models
-- Delete unused models to free space
-
-### 💬 Using the AI Assistant
-
-#### Starting a Conversation
-
-1. Click the chat icon in the bottom-right corner (or navigate to AI Chat)
-2. Type your question in plain English, e.g.:
-   - "What's my average customer lifetime value?"
-   - "Show me revenue trends for the last quarter"
-   - "Which products have the highest profit margin?"
-3. The AI uses RAG (Retrieval-Augmented Generation) to provide accurate answers based on your data
-
-#### Optimizing AI Responses
-
-- Go to **Settings** (gear icon in chat)
-- Adjust context window (5-20 messages) for longer conversations
-- Modify temperature (0.0-1.0) for creative vs precise responses
-- Set max tokens to control response length
-- Configure rate limits for your usage patterns
-
-#### Exporting Conversations
-
-- Click the download icon in chat header
-- Choose format: Markdown (readable), JSON (structured), or Text (simple)
-- Save important insights for documentation
-
-### 🔧 Using the API
-
-#### Getting Your API Key
-
-1. Navigate to **API Management**
-2. Click "Generate API Key"
-3. Name your key (e.g., "Production App")
-4. Copy and securely store the key (shown only once!)
-
-#### Making API Calls
-
-```bash
-curl -X POST https://your-domain.com/api/predict \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "churn_prediction",
-    "features": {
-      "usage_frequency": 85,
-      "support_tickets": 0,
-      "tenure_months": 45,
-      "monthly_spend": 300,
-      "feature_usage_pct": 90
-    }
-  }'
-```
-
-#### Monitoring Usage
-
-- View API usage statistics in **API Management**
-- Track requests per day/month
-- Monitor rate limits
-- Review error logs
-
----
-
-## 🚀 Quick Start (For Developers)
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - **Node.js** 18+ and npm
-- **Python** 3.9+ (for ML service)
+- **Python** 3.9+ (for ML service, optional)
 - **Supabase** account
 - **Google AI API** key (for RAG features)
 
@@ -299,7 +190,7 @@ curl -X POST https://your-domain.com/api/predict \
 1. **Clone the repository**
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Satya136-dvsn/biz-stratosphere.git
 cd biz-stratosphere
 ```
 
@@ -321,15 +212,13 @@ Edit `.env.local` and add your credentials:
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_GEMINI_API_KEY=your_gemini_api_key
-VITE_ML_SERVICE_URL=http://localhost:8000
 ```
 
 1. **Run database migrations**
 
-```bash
-# Set up Supabase tables
-supabase db push
-```
+Apply migrations in order via Supabase Dashboard or CLI:
+
+- `supabase/migrations/` - All schema migrations
 
 1. **Start development server**
 
@@ -337,29 +226,30 @@ supabase db push
 npm run dev
 ```
 
-```text
 The app will be available at `http://localhost:8080`
-```
 
-### ML Service Setup (Optional)
+---
 
-1. **Navigate to ML service directory**
-
-```bash
-cd ml-service
-```
-
-1. **Install Python dependencies**
+## 🧪 Testing
 
 ```bash
-pip install -r requirements.txt
+# Run all unit tests
+npm run test:run
+
+# Run E2E tests
+npx playwright test
+
+# Run tests with UI
+npm run test
 ```
 
-1. **Start ML service**
+### Test Coverage
 
-```bash
-uvicorn main:app --reload --port 8000
-```
+| Type | Tests | Status |
+|------|-------|--------|
+| Unit Tests | 198 | ✅ Passing |
+| E2E Tests | 17 | ✅ Passing |
+| **Total** | **215** | ✅ **All Passing** |
 
 ---
 
@@ -368,35 +258,54 @@ uvicorn main:app --reload --port 8000
 ```text
 biz-stratosphere/
 ├── src/
-│   ├── components/        # React components
-│   │   ├── dashboard/     # Dashboard widgets
-│   │   ├── charts/        # Chart components
-│   │   └── ui/            # Reusable UI components
-│   ├── hooks/             # Custom React hooks
-│   ├── lib/               # Utility functions
-│   ├── pages/             # Page components
-│   └── integrations/      # Third-party integrations
-│       └── supabase/      # Supabase client
+│   ├── components/           # React components
+│   │   ├── ai/              # AI Chat, Confidence Badge
+│   │   ├── automation/      # Automation rule components
+│   │   ├── dashboard/       # Dashboard widgets, KPI cards
+│   │   ├── layout/          # Sidebar, Workspace Selector
+│   │   ├── ml/              # ML prediction components
+│   │   ├── ui/              # Shadcn UI components
+│   │   └── workspace/       # Workspace management
+│   ├── hooks/               # Custom React hooks
+│   │   ├── useAuth.ts       # Authentication
+│   │   ├── useRAGChat.ts    # AI Chat with confidence
+│   │   ├── useWorkspaces.ts # Workspace management
+│   │   └── useAutomationRules.ts # Automation engine
+│   ├── lib/                 # Utility functions
+│   │   ├── ai/              # Confidence scoring, grounding
+│   │   ├── logger.ts        # Structured logging
+│   │   └── errorTracking.ts # Sentry integration
+│   ├── pages/               # Page components
+│   │   ├── admin/           # Admin pages
+│   │   │   ├── AIDecisionAudit.tsx  # AI audit dashboard
+│   │   │   └── AdminDashboard.tsx
+│   │   ├── AIChat.tsx       # AI Assistant
+│   │   ├── AutomationRules.tsx
+│   │   └── Dashboard.tsx
+│   └── integrations/        # Third-party integrations
+│       └── supabase/        # Supabase client & types
 ├── supabase/
-│   ├── migrations/        # Database migrations
-│   └── functions/         # Edge functions
-├── ml-service/            # Python ML service
-│   ├── main.py           # FastAPI app
-│   └── models/           # ML models
-└── public/               # Static assets
+│   ├── migrations/          # Database migrations
+│   └── functions/           # Edge functions
+├── e2e/                     # Playwright E2E tests
+│   ├── fixtures/            # Auth fixtures
+│   └── *.spec.ts            # Test files
+└── public/                  # Static assets
 ```
 
 ---
 
 ## 🔒 Security Features
 
-- **Row-Level Security (RLS)** - Secure data access
+- **Row-Level Security (RLS)** - Secure data access at database level
 - **JWT Authentication** - Secure API endpoints
-- **API Key Management** - Controlled access
+- **API Key Management** - Controlled access with scopes
 - **PII Detection** - Automatic sensitive data detection
-- **Audit Logging** - Track all user actions
+- **Audit Logging** - Track all user actions (AI Decision Audit)
 - **CSRF Protection** - Cross-site request forgery prevention
-- **Rate Limiting** - Prevent abuse
+- **Rate Limiting** - Configurable limits (50 daily / 1000 monthly)
+- **Role-Based Access Control** - Admin, user, and viewer roles
+- **Workspace Isolation** - Data separation by workspace
 
 ---
 
@@ -404,20 +313,104 @@ biz-stratosphere/
 
 The platform uses the following main tables:
 
+### Core Tables
+
 - `profiles` - User profiles and settings
+- `workspaces` - Team workspaces
+- `workspace_members` - Workspace membership
 - `datasets` - Uploaded data files
 - `data_points` - Individual data records
-- `reports` - Generated reports
-- `chart_data` - Saved chart configurations
+
+### AI & ML Tables
+
+- `chat_conversations` - AI chat sessions
+- `chat_messages` - Chat message history
+- `embeddings` - Vector embeddings for RAG
+- `ml_predictions` - ML prediction history
+- `ml_models` - ML model metadata
+- `ai_response_audits` - AI confidence audit logs
+
+### Automation Tables
+
+- `automation_rules` - Rule definitions
+- `automation_execution_logs` - Rule execution history
+- `workspace_usage` - Usage metrics tracking
+
+### Security Tables
+
 - `api_keys` - API key management
 - `notifications` - User notifications
-- `workspaces` - Team workspaces
-- `embeddings` - Vector embeddings for RAG
-- `ml_predictions` - ML prediction history (browser-based)
-- `ml_models` - ML model metadata
-- `ml_model_stats` - Model usage statistics
 
 See `/supabase/migrations/` for complete schema.
+
+---
+
+## 🗺️ Development Phases
+
+### ✅ Phase 1: AI Chat RPC & Database Migration Fix
+
+- Fixed `match_embeddings` RPC function
+- Created comprehensive database migration
+- Completed chunk processing and user uploads
+
+### ✅ Phase 2: Email Notifications Integration
+
+- Integrated Supabase Email Provider
+- Added email notification action type to automation
+- Created send_email Edge Function
+
+### ✅ Phase 3: Workspace Switching
+
+- Created WorkspaceSelector component
+- Integrated into sidebar layout
+- Added currentWorkspace state and localStorage persistence
+- Implemented query invalidation on workspace switch
+
+### ✅ Phase 4: E2E Test Coverage Fix
+
+- Created auth fixtures for Playwright tests
+- Added data-testid to KPICard, AIChat, AutomationRules
+- Updated all test files with stable selectors
+- All 17 E2E tests passing
+
+### ✅ Phase 5: Hallucination Prevention
+
+- Created confidence scoring utility (`confidenceScoring.ts`)
+- Created grounding validation (`groundingValidator.ts`)
+- Added ConfidenceBadge component with low-confidence warnings
+- Created ai_response_audits table for logging
+- Integrated confidence into useRAGChat hook
+- Added source transparency indicators
+
+### ✅ Phase 6: AI Decision Audit UI
+
+- Created admin-only AIDecisionAudit page
+- Filters by confidence level, date range, search
+- Highlights low-confidence responses
+- Shows stats: total queries, confidence distribution
+
+### ✅ Phase 7: Structured Logging
+
+- Enhanced logger.ts with context support
+- Added workspaceId, requestId, component, action
+- Created child logger and createLogger utilities
+- Preserved Sentry integration
+
+### ✅ Phase 8: Workspace Usage Metrics
+
+- Created workspace_usage table with RLS
+- Tracks uploads, AI queries, automation triggers
+- Created WorkspaceUsageMetrics component
+- Shows 30-day metrics with 7-day trends
+
+### 📋 Future Roadmap
+
+- [ ] Real-time collaboration
+- [ ] Mobile app (React Native)
+- [ ] Scheduled reports
+- [ ] Data warehouse integration
+- [ ] Custom dashboards builder
+- [ ] AutoML for model optimization
 
 ---
 
@@ -443,60 +436,12 @@ Or **deploy to Netlify**:
 netlify deploy --prod --dir=dist
 ```
 
-### ML Service (Docker)
+### Database Migrations
 
-```dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY ml-service/requirements.txt .
-RUN pip install -r requirements.txt
-COPY ml-service/ .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
+Apply all migrations via Supabase Dashboard SQL Editor:
 
-Build and deploy:
-
-```bash
-docker build -t biz-stratosphere-ml .
-docker run -p 8000:8000 biz-stratosphere-ml
-```
-
----
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run E2E tests
-npm run test:e2e
-
-# Run unit tests
-npm run test:unit
-```
-
----
-
-## 📖 API Documentation
-
-Access the interactive API documentation at `/help` after starting the development server.
-
-### Example API Call
-
-```bash
-curl -X POST https://your-domain.com/api/predict \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "churn_prediction",
-    "data": {
-      "tenure": 24,
-      "monthly_charges": 79.99,
-      "total_charges": 1919.76
-    }
-  }'
-```
+1. `20260113_ai_response_audits.sql` - AI audit logging
+2. `20260114_workspace_usage.sql` - Usage metrics
 
 ---
 
@@ -522,9 +467,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - **Supabase** - Backend infrastructure
 - **Google AI** - Gemini API for RAG
+- **TensorFlow.js** - Browser-based ML
 - **Shadcn UI** - Beautiful component library
 - **Recharts** - Data visualization
-- **Lucide** - Icon library
+- **Playwright** - E2E testing
+- **Vitest** - Unit testing
 
 ---
 
@@ -534,41 +481,7 @@ For support and questions:
 
 - 📧 Email: <support@bizstratosphere.com>
 - 📖 Documentation: [docs.bizstratosphere.com](https://docs.bizstratosphere.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/biz-stratosphere/issues)
-
----
-
-## 🗺️ Roadmap
-
-### ✅ Completed
-
-- [x] Browser-based ML predictions (TensorFlow.js)
-- [x] Advanced 6-layer Deep Neural Networks (DNN)
-- [x] Custom model training with CSV upload
-- [x] Model export/import functionality (.bizml format)
-- [x] Batch predictions from CSV
-- [x] Prediction history tracking with export
-- [x] Advanced model management & badges
-- [x] Real-time AI chat with RAG
-- [x] API key management & usage tracking
-- [x] Real-time training progress visualization
-
-- [x] Advanced model comparison UI & accuracy tracking
-- [x] Automated model versioning
-- [x] RAG tuning settings & custom context management
-- [x] Automated training metrics & leaderboard
-- [x] **Automation Engine** (Rule-based triggers, Scheduling)
-- [x] **Health Monitoring** & Rate Limiting (Security Hardening)
-- [x] **AI Rule Suggestions** (Orchestrated Intelligence)
-
-### 📋 Future
-
-- [ ] Real-time collaboration
-- [ ] Mobile app (React Native)
-- [ ] Scheduled reports
-- [ ] Data warehouse integration
-- [ ] Custom dashboards builder
-- [ ] AutoML for model optimization
+- 🐛 Issues: [GitHub Issues](https://github.com/Satya136-dvsn/biz-stratosphere/issues)
 
 ---
 
