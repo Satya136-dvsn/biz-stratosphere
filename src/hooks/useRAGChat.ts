@@ -296,6 +296,13 @@ Cite sources using [Source ID] format if referenced.`;
                         average_similarity: searchSources.length > 0
                             ? searchSources.reduce((a, b) => a + b.similarity, 0) / searchSources.length
                             : null,
+                        dataset_id: datasetId && datasetId !== 'none' ? datasetId : null,
+                        average_similarity: searchSources.length > 0
+                            ? searchSources.reduce((a, b) => a + b.similarity, 0) / searchSources.length
+                            : null,
+                        // Versioning Metadata
+                        model_version: 'gemini-1.5-flash',
+                        prompt_version: 'v2.1-rag-optimized',
                     }]);
                 } catch (auditError) {
                     console.warn('[RAG] Audit logging failed:', auditError);

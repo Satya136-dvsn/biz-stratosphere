@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
     LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie,
     ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -20,7 +21,7 @@ import { useChartConfigurations, exportChartAsImage, exportDataAsCSV } from '@/h
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Save, Download, FileDown, Loader2, Info, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Save, Download, FileDown, Loader2, Info, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PageLayout } from '@/components/layout/PageLayout';
@@ -618,7 +619,34 @@ export default function AdvancedCharts() {
                 <div className="space-y-6">
                     <Card className="shadow-lg border-2">
                         <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
-                            <CardTitle className="text-xl">{customization.title}</CardTitle>
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-xl">{customization.title}</CardTitle>
+                                {selectedDatasetId && (
+                                    <TooltipProvider>
+                                        <UITooltip>
+                                            <TooltipTrigger>
+                                                <div className="flex items-center gap-1 text-xs text-muted-foreground bg-background/50 px-2 py-1 rounded-full border">
+                                                    <Info className="h-3 w-3" />
+                                                    <span>Data Lineage</span>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-xs">
+                                                <div className="space-y-2">
+                                                    <p className="font-semibold text-sm">Source Metadata</p>
+                                                    <div className="text-xs space-y-1 text-muted-foreground">
+                                                        <p>Dataset ID: {selectedDatasetId.slice(0, 8)}...</p>
+                                                        <p>Total Records: {totalCount}</p>
+                                                        <p className="flex items-center gap-1">
+                                                            <CheckCircle className="h-3 w-3 text-green-500" />
+                                                            Cleaned & Processed
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </TooltipContent>
+                                        </UITooltip>
+                                    </TooltipProvider>
+                                )}
+                            </div>
                         </CardHeader>
                         <CardContent className="p-6">
                             <div ref={chartRef} className="min-h-[400px] flex items-center justify-center">
