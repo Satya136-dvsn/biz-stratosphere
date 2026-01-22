@@ -38,6 +38,8 @@ const AIControl = lazy(() => import("./pages/admin/AIControl").then(m => ({ defa
 const AuditLogs = lazy(() => import("./pages/admin/AuditLogs").then(m => ({ default: m.AuditLogs })));
 const AIDecisionAudit = lazy(() => import("./pages/admin/AIDecisionAudit"));
 const UploadHistory = lazy(() => import("./pages/UploadHistory").then(m => ({ default: m.UploadHistory })));
+const SystemMonitor = lazy(() => import("./pages/SystemMonitor"));
+const StreamingETL = lazy(() => import("./pages/StreamingETL"));
 import { AdminRoute } from "./components/AdminRoute";
 
 // Loading fallback component
@@ -222,6 +224,22 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <UploadHistory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-monitor"
+                element={
+                  <ProtectedRoute>
+                    <SystemMonitor />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/streaming-etl"
+                element={
+                  <ProtectedRoute>
+                    <StreamingETL />
                   </ProtectedRoute>
                 }
               />

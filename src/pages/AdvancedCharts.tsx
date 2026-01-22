@@ -20,12 +20,13 @@ import { useChartConfigurations, exportChartAsImage, exportDataAsCSV } from '@/h
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Save, Download, FileDown, Loader2, Info } from 'lucide-react';
+import { Save, Download, FileDown, Loader2, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PageLayout } from '@/components/layout/PageLayout';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F'];
+const PAGE_SIZE = 500;
 
 export default function AdvancedCharts() {
     const { user } = useAuth();
@@ -38,6 +39,8 @@ export default function AdvancedCharts() {
     const [xColumn, setXColumn] = useState<string>();
     const [yColumn, setYColumn] = useState<string>();
     const [filters, setFilters] = useState<ChartFiltersState>({ numericRanges: {} });
+    const [page, setPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
     const [customization, setCustomization] = useState<ChartCustomization>({
         title: 'My Chart',
         showLegend: true,
@@ -55,7 +58,7 @@ export default function AdvancedCharts() {
 
     // Fetch raw CSV data points for selected dataset
     const { data: chartData = [], isLoading: dataLoading } = useQuery({
-        queryKey: ['chart-raw-data', selectedDatasetId, filters],
+        queryKey: ['chart-raw-data', selectedDatasetId, filters, page],
         queryFn: async () => {
             if (!selectedDatasetId || !user) return [];
 
@@ -64,7 +67,18 @@ export default function AdvancedCharts() {
                 .select('*')
                 .eq('dataset_id', selectedDatasetId)
                 .eq('metric_name', 'raw_csv_row')  // Only fetch raw CSV rows for Advanced Charts
-                .limit(500);
+                .eq('dataset_id', selectedDatasetId)
+                .eq('metric_name', 'raw_csv_row')  // Only fetch raw CSV rows for Advanced Charts
+                .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+
+            // Get total count for pagination
+            const { count } = await supabase
+                .from('data_points')
+                .select('*', { count: 'exact', head: true })
+                .eq('dataset_id', selectedDatasetId)
+                .eq('metric_name', 'raw_csv_row');
+
+            if (count !== null) setTotalCount(count);
 
             // Apply date filter if set
             if (filters.dateRange?.start) {
@@ -108,7 +122,12 @@ export default function AdvancedCharts() {
             return extractedData;
         },
         enabled: !!selectedDatasetId && !!user,
-    });
+    }); // Filter changes also trigger refetch, but pagination needs page dependency
+
+    // reset page when dataset changes
+    useMemo(() => {
+        setPage(1);
+    }, [selectedDatasetId]);
 
     // Get available columns from raw data
     const availableColumns = useMemo(() => {
@@ -509,6 +528,36 @@ export default function AdvancedCharts() {
                     For best results, use datasets with 1-10K rows. Charts may slow with &gt;1000 data points.
                 </AlertDescription>
             </Alert>
+
+            {/* Pagination Controls */}
+            {selectedDatasetId && (
+                <div className="flex items-center justify-between bg-secondary/10 p-2 rounded-lg mb-4">
+                    <div className="text-sm text-muted-foreground">
+                        Showing {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} rows
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1 || dataLoading}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                            Prev
+                        </Button>
+                        <span className="flex items-center text-sm font-medium px-2">Page {page}</span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage(p => p + 1)}
+                            disabled={page * PAGE_SIZE >= totalCount || dataLoading}
+                        >
+                            Next
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
 
             {/* Main Layout - Compact Design */}
             <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-6">

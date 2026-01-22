@@ -18,6 +18,8 @@ import {
     Workflow,
     Activity,
     FolderOpen,
+    Zap,
+    Server,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -57,6 +59,16 @@ const navItems: NavItem[] = [
         title: "API Management",
         href: "/api-management",
         icon: Key,
+    },
+    {
+        title: "Streaming ETL",
+        href: "/streaming-etl",
+        icon: Zap,
+    },
+    {
+        title: "System Monitor",
+        href: "/system-monitor",
+        icon: Server,
     },
     {
         title: "Advanced Charts",

@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, FileText, CheckCircle2, AlertCircle, TrendingUp, Shield } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, AlertCircle, TrendingUp, Shield, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Papa from 'papaparse';
 import { scanDataForPII, type PIIScanResult } from '@/lib/piiDetection';
@@ -20,7 +21,20 @@ interface DataQuality {
   categoricalColumns: string[];
   dateColumns: string[];
   outliers: { column: string; count: number }[];
+  validationReport: ValidationError[];
 }
+
+interface ValidationError {
+  row: number;
+  column: string;
+  value: any;
+  issue: string;
+}
+
+outliers: { column: string; count: number } [];
+}
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export function EnhancedDataUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -29,6 +43,7 @@ export function EnhancedDataUpload() {
   const [piiScan, setPiiScan] = useState<PIIScanResult | null>(null);
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [piiConsent, setPiiConsent] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const { toast } = useToast();
 
   const analyzeCSV = (data: any[], fields: string[]) => {
@@ -36,6 +51,7 @@ export function EnhancedDataUpload() {
     const categoricalColumns: string[] = [];
     const dateColumns: string[] = [];
     let missingValues = 0;
+    const validationErrors: ValidationError[] = [];
 
     // Analyze columns
     fields.forEach(field => {
@@ -50,11 +66,32 @@ export function EnhancedDataUpload() {
       }
     });
 
-    // Count missing values
-    data.forEach(row => {
+    // Count missing values and validate types
+    data.forEach((row, index) => {
       fields.forEach(field => {
-        if (row[field] == null || row[field] === '') {
+        const value = row[field];
+
+        // Check for missing values
+        if (value == null || value === '') {
           missingValues++;
+          validationErrors.push({
+            row: index + 1,
+            column: field,
+            value: value,
+            issue: 'Missing Value'
+          });
+        }
+
+        // Type validation (basic)
+        if (value !== '' && value != null) {
+          if (numericColumns.includes(field) && isNaN(Number(value))) {
+            validationErrors.push({
+              row: index + 1,
+              column: field,
+              value: value,
+              issue: 'Invalid Numeric Value'
+            });
+          }
         }
       });
     });
@@ -82,7 +119,8 @@ export function EnhancedDataUpload() {
       numericColumns,
       categoricalColumns,
       dateColumns,
-      outliers
+      outliers,
+      validationReport: validationErrors
     };
   };
 
@@ -99,9 +137,36 @@ export function EnhancedDataUpload() {
         return;
       }
 
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File Too Large",
+          description: `File size exceeds the 50MB limit. Current size: ${(selectedFile.size / (1024 * 1024)).toFixed(2)}MB`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       setFile(selectedFile);
       setAnalysis(null);
+      setUploadProgress(0);
     }
+  };
+
+
+  const downloadValidationReport = () => {
+    if (!analysis?.validationReport.length) return;
+
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + "Row,Column,Value,Issue\n"
+      + analysis.validationReport.map(e => `${e.row},${e.column},"${e.value || ''}",${e.issue}`).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "validation_report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleAnalyze = async () => {
@@ -179,6 +244,7 @@ export function EnhancedDataUpload() {
     }
 
     setLoading(true);
+    setUploadProgress(0);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -274,7 +340,9 @@ export function EnhancedDataUpload() {
           });
         }
 
-        // Optional: Update progress UI here if we had one
+        // Update progress UI
+        const currentProgress = Math.round(((i + batch.length) / pointsToInsert.length) * 100);
+        setUploadProgress(currentProgress);
       }
 
       // 4. Update Dataset Status to Completed
@@ -380,6 +448,26 @@ export function EnhancedDataUpload() {
               </div>
             )}
 
+            {analysis.validationReport.length > 0 && (
+              <div className="flex items-center justify-between p-3 border border-destructive/20 bg-destructive/5 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                  <span className="text-sm font-medium text-destructive">
+                    {analysis.validationReport.length} Data Issues Found
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={downloadValidationReport}
+                  className="h-8 text-xs border-destructive/50 text-destructive hover:bg-destructive/10"
+                >
+                  <Download className="h-3 w-3 mr-1" />
+                  Download Report
+                </Button>
+              </div>
+            )}
+
             {/* PII Detection Results */}
             {piiScan && piiScan.hasPII && (
               <div className="space-y-4">
@@ -416,6 +504,16 @@ export function EnhancedDataUpload() {
               <Upload className="h-4 w-4 mr-2" />
               {piiScan?.hasPII && !piiConsent ? 'Consent Required to Upload' : 'Upload Dataset'}
             </Button>
+
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Uploading...</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <Progress value={uploadProgress} className="h-2" />
+              </div>
+            )}
           </div>
         )}
       </CardContent>
