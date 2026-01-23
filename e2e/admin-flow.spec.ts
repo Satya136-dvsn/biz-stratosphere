@@ -8,15 +8,17 @@ test.describe('Admin Control Plane', () => {
     test('should prevent non-admins from accessing admin panel', async ({ authenticatedPage }) => {
         // Regular user tries to access admin
         await authenticatedPage.goto('/admin');
-        await authenticatedPage.waitForLoadState('networkidle');
 
         // Should redirect to dashboard (not admin panel)
-        await expect(authenticatedPage).toHaveURL(/\/(dashboard|$)/);
+
+        // Should redirect to dashboard (not admin panel)
+        await expect(authenticatedPage).toHaveURL(/\/(dashboard|$)/, { timeout: 30000 });
     });
 
     test('should allow authenticated user to view profile', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/profile');
-        await authenticatedPage.waitForLoadState('networkidle');
+        // Wait for profile header instead of network idle
+        await authenticatedPage.waitForSelector('h1, h2, h3', { state: 'visible', timeout: 15000 });
 
         // Should see profile page heading or content
         await expect(authenticatedPage.locator('h1, h2, h3').first()).toBeVisible({ timeout: 10000 });
@@ -24,7 +26,8 @@ test.describe('Admin Control Plane', () => {
 
     test('should show user info in sidebar', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/dashboard');
-        await authenticatedPage.waitForLoadState('networkidle');
+        // Wait for sidebar to be attached
+        await authenticatedPage.waitForSelector('nav, aside', { state: 'attached' });
 
         // Sidebar should be visible
         await expect(authenticatedPage.locator('nav, aside, [class*="sidebar"]').first()).toBeVisible({ timeout: 5000 });

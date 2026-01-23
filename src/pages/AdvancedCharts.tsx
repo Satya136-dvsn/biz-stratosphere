@@ -68,8 +68,7 @@ export default function AdvancedCharts() {
                 .select('*')
                 .eq('dataset_id', selectedDatasetId)
                 .eq('metric_name', 'raw_csv_row')  // Only fetch raw CSV rows for Advanced Charts
-                .eq('dataset_id', selectedDatasetId)
-                .eq('metric_name', 'raw_csv_row')  // Only fetch raw CSV rows for Advanced Charts
+
                 .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
             // Get total count for pagination

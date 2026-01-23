@@ -16,9 +16,11 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
+  TooltipProps
 } from 'recharts';
 import { ChartType } from './ChartTypeSelector';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface ChartDataPoint {
   month: string;
@@ -41,6 +43,36 @@ interface ChartProps {
 // Animation configuration for smooth transitions
 const ANIMATION_DURATION = 800;
 const ANIMATION_EASING = 'ease-out';
+
+// Custom Tooltip Component for better styling control
+const CustomTooltip = ({ active, payload, label, metric }: TooltipProps<ValueType, NameType> & { metric: 'revenue' | 'customers' }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-card/95 border border-border/50 rounded-lg p-2 shadow-xl backdrop-blur-md text-xs">
+        <p className="text-foreground font-medium mb-1">{label}</p>
+        {payload.map((entry, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-muted-foreground capitalize">
+              {['revenue', 'target', 'customers'].includes(entry.name as string)
+                ? (entry.name === 'revenue' ? 'Revenue' : entry.name === 'target' ? 'Target' : 'Customers')
+                : (metric === 'revenue' ? 'Revenue' : 'Customers')}
+            </span>
+            <span className="text-foreground font-mono ml-auto pl-4">
+              {metric === 'revenue' && typeof entry.value === 'number'
+                ? `$${entry.value.toLocaleString()}`
+                : entry.value?.toLocaleString()}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 export function RevenueChart({ variant, title, className, data, isLoading, isFiltering = false, metric = 'revenue' }: ChartProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -117,17 +149,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, isFil
               fontSize={12}
               tickFormatter={(value) => metric === 'revenue' ? `$${(value / 1000).toFixed(0)}K` : `${(value / 1000).toFixed(0)}K`}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }}
-              formatter={(value: number, name: string) => [
-                metric === 'revenue' ? `$${value.toLocaleString()}` : value.toLocaleString(),
-                name === 'revenue' ? 'Revenue' : (name === 'target' ? 'Target' : 'Customers')
-              ]}
-            />
+            <Tooltip content={<CustomTooltip metric={metric} />} />
             <Legend />
             {metric === 'revenue' ? (
               <>
@@ -185,17 +207,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, isFil
               fontSize={12}
               tickFormatter={(value) => metric === 'revenue' ? `$${(value / 1000).toFixed(0)}K` : `${(value / 1000).toFixed(0)}K`}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }}
-              formatter={(value: number) => [
-                metric === 'revenue' ? `$${value.toLocaleString()}` : value.toLocaleString(),
-                metric === 'revenue' ? 'Revenue' : 'Customers'
-              ]}
-            />
+            <Tooltip content={<CustomTooltip metric={metric} />} />
             <Legend />
             <Bar
               dataKey={metric}
@@ -223,17 +235,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, isFil
               fontSize={12}
               tickFormatter={(value) => metric === 'revenue' ? `$${(value / 1000).toFixed(0)}K` : `${(value / 1000).toFixed(0)}K`}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }}
-              formatter={(value: number, name: string) => [
-                metric === 'revenue' ? `$${value.toLocaleString()}` : value.toLocaleString(),
-                name === 'revenue' ? 'Revenue' : (name === 'target' ? 'Target' : 'Customers')
-              ]}
-            />
+            <Tooltip content={<CustomTooltip metric={metric} />} />
             <Legend />
             {metric === 'revenue' ? (
               <>
@@ -305,17 +307,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, isFil
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }}
-              formatter={(value: number) => [
-                metric === 'revenue' ? `$${value.toLocaleString()}` : value.toLocaleString(),
-                metric === 'revenue' ? 'Revenue' : 'Customers'
-              ]}
-            />
+            <Tooltip content={<CustomTooltip metric={metric} />} />
             <Legend />
           </PieChart>
         );

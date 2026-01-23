@@ -7,7 +7,8 @@ import { test, expect } from './fixtures/auth';
 test.describe('Dashboard Functionality', () => {
     test('should load dashboard with KPI cards', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/dashboard');
-        await authenticatedPage.waitForLoadState('networkidle');
+        // Wait for header
+        await authenticatedPage.waitForSelector('h1, h2', { state: 'visible', timeout: 15000 });
 
         // Verify Dashboard heading exists
         await expect(authenticatedPage.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
@@ -18,7 +19,8 @@ test.describe('Dashboard Functionality', () => {
 
     test('should display chart components', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/dashboard');
-        await authenticatedPage.waitForLoadState('networkidle');
+        // Wait for header
+        await authenticatedPage.waitForSelector('h1, h2', { state: 'visible', timeout: 15000 });
 
         // Verify Chart containers exist (Recharts renders SVGs)
         const charts = authenticatedPage.locator('.recharts-wrapper, svg.recharts-surface, canvas, [class*="chart"]');
@@ -27,7 +29,8 @@ test.describe('Dashboard Functionality', () => {
 
     test('should navigate to other pages from sidebar', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/dashboard');
-        await authenticatedPage.waitForLoadState('networkidle');
+        // Wait for sidebar
+        await authenticatedPage.waitForSelector('nav, aside', { state: 'attached' });
 
         // Click on ML Predictions in sidebar
         await authenticatedPage.getByRole('link', { name: /ML Predictions/i }).click();
@@ -46,7 +49,8 @@ test.describe('Dashboard Functionality', () => {
 test.describe('Data Upload', () => {
     test('should have upload button visible on dashboard', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/dashboard');
-        await authenticatedPage.waitForLoadState('networkidle');
+        // Wait for page load
+        await authenticatedPage.waitForSelector('[data-testid="kpi-card"]', { state: 'visible', timeout: 30000 });
 
         // Dashboard should be loaded with content - verify KPI cards are visible
         await expect(authenticatedPage.locator('[data-testid="kpi-card"]').first()).toBeVisible({ timeout: 10000 });

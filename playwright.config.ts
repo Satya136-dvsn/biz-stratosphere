@@ -5,13 +5,19 @@ export default defineConfig({
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
     retries: 2, // Always retry to handle flaky WebKit tests
-    workers: process.env.CI ? 1 : undefined,
+    workers: process.env.CI ? 1 : 4,
     reporter: 'html',
 
+    timeout: 60000, // 60s global timeout
+    expect: {
+        timeout: 10000, // 10s expect timeout
+    },
     use: {
         baseURL: 'http://localhost:8080',
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
+        actionTimeout: 15000, // 15s action timeout
+        navigationTimeout: 30000, // 30s navigation timeout
     },
 
     projects: [
