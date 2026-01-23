@@ -106,7 +106,7 @@ CREATE POLICY "Admins can insert user roles" ON public.user_roles
 
 ALTER FUNCTION public.get_admin_stats() SET search_path = public;
 ALTER FUNCTION public.calculate_next_run(text, jsonb, timestamp with time zone) SET search_path = public;
-ALTER FUNCTION public.get_admin_users(integer, text) SET search_path = public;
+ALTER FUNCTION public.get_admin_users(integer, integer, text) SET search_path = public;
 ALTER FUNCTION public.check_and_update_quota(uuid, text, integer) SET search_path = public;
 ALTER FUNCTION public.refresh_ai_analytics() SET search_path = public;
 ALTER FUNCTION public.clean_old_embedding_cache() SET search_path = public;
@@ -117,32 +117,29 @@ ALTER FUNCTION public.reset_monthly_ai_limits() SET search_path = public;
 ALTER FUNCTION public.get_quota_status(uuid, text) SET search_path = public;
 ALTER FUNCTION public.get_daily_signups(integer) SET search_path = public;
 ALTER FUNCTION public.update_rule_execution(uuid, boolean) SET search_path = public;
-ALTER FUNCTION public.increment_workspace_usage(uuid, text, integer) SET search_path = public;
+ALTER FUNCTION public.increment_workspace_usage(uuid, uuid, text, integer, jsonb) SET search_path = public;
 ALTER FUNCTION public.create_default_workspace() SET search_path = public;
 ALTER FUNCTION public.update_conversation_timestamp() SET search_path = public;
 ALTER FUNCTION public.cleanup_expired_predictions() SET search_path = public;
-ALTER FUNCTION public.initialize_user_quotas() SET search_path = public;
-ALTER FUNCTION public.match_embeddings(vector, numeric, integer, text) SET search_path = public;
+ALTER FUNCTION public.match_embeddings(vector, double precision, integer, uuid) SET search_path = public;
 ALTER FUNCTION public.check_rate_limit(text, integer, integer) SET search_path = public;
 ALTER FUNCTION public.update_user_uploads_updated_at() SET search_path = public;
 ALTER FUNCTION public.get_rules_for_retry() SET search_path = public;
-ALTER FUNCTION public.execute_action_chain(uuid, jsonb) SET search_path = public;
+ALTER FUNCTION public.execute_action_chain(uuid, uuid, jsonb) SET search_path = public;
 ALTER FUNCTION public.validate_webhook_config(jsonb) SET search_path = public;
 ALTER FUNCTION public.get_user_storage_usage(uuid) SET search_path = public;
-ALTER FUNCTION public.create_rule_from_template(uuid, uuid, text) SET search_path = public;
+ALTER FUNCTION public.create_rule_from_template(uuid, uuid, text, jsonb) SET search_path = public;
 ALTER FUNCTION public.reset_daily_ai_limits() SET search_path = public;
-ALTER FUNCTION public.create_upload_notification() SET search_path = public;
 ALTER FUNCTION public.get_pending_automation_rules() SET search_path = public;
-ALTER FUNCTION public.admin_update_role(uuid, text) SET search_path = public;
+ALTER FUNCTION public.admin_update_role(uuid, app_role) SET search_path = public;
 ALTER FUNCTION public.update_automation_notifications_timestamp() SET search_path = public;
-ALTER FUNCTION public.log_admin_action(text, jsonb, text) SET search_path = public;
-ALTER FUNCTION public.evaluate_advanced_rule(uuid, jsonb) SET search_path = public;
+ALTER FUNCTION public.log_admin_action(text, text, text, jsonb) SET search_path = public;
+ALTER FUNCTION public.evaluate_advanced_rule(uuid) SET search_path = public;
 ALTER FUNCTION public.set_api_key_created_by() SET search_path = public;
-ALTER FUNCTION public.calculate_metric_trend(numeric, numeric) SET search_path = public;
+ALTER FUNCTION public.calculate_metric_trend(uuid, text, integer) SET search_path = public;
 ALTER FUNCTION public.update_api_keys_updated_at() SET search_path = public;
-ALTER FUNCTION public.detect_metric_anomaly(numeric[], numeric) SET search_path = public;
+ALTER FUNCTION public.detect_metric_anomaly(uuid, text, numeric, numeric) SET search_path = public;
 ALTER FUNCTION public.admin_toggle_suspend(uuid, boolean) SET search_path = public;
-ALTER FUNCTION public.set_updated_at() SET search_path = public;
 
 -- 4. Address Extensions in Public
 -- It is recommended to move extensions to a separate schema 'extensions', but this
