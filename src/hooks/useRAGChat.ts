@@ -10,7 +10,7 @@ import { calculateConfidenceFromResults, type ConfidenceScore } from '@/lib/ai/c
 import { validateGrounding, type GroundingResult } from '@/lib/ai/groundingValidator';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent';
 
 export interface ChatMessage {
     id: string;

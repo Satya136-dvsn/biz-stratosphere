@@ -10,6 +10,8 @@ const DEFAULT_CONFIG: AIConfig = {
 
 export class AIOrchestrator {
     private config: AIConfig;
+    private cache: Map<string, { content: string; timestamp: number; metadata?: any }> = new Map();
+    private readonly CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
     constructor(config: Partial<AIConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
@@ -21,6 +23,26 @@ export class AIOrchestrator {
      */
     async generateResponse(request: AIRequest): Promise<AIResponse> {
         const startTime = performance.now();
+
+        // Cache Key Generation (simple hash of messages + config)
+        const cacheKey = JSON.stringify({
+            msgs: request.messages.map(m => ({ r: m.role, c: m.content })),
+            model: request.provider || this.config.preferredProvider,
+            temp: request.temperature
+        });
+
+        // Check Cache
+        const cached = this.cache.get(cacheKey);
+        if (cached && (Date.now() - cached.timestamp < this.CACHE_TTL)) {
+            console.log('[AIOrchestrator] Cache Hit');
+            return {
+                content: cached.content,
+                provider: (request.provider || this.config.preferredProvider) + ' (cached)',
+                latencyMs: 0,
+                metadata: cached.metadata
+            };
+        }
+
         const provider = request.provider || this.config.preferredProvider;
 
         try {
@@ -36,6 +58,21 @@ export class AIOrchestrator {
             } else {
                 // OpenAI still uses Edge Function (optional, or could be direct too if key exposed)
                 response = await this.callEdgeFunction(request, provider);
+            }
+
+            // Save to Cache (if successful)
+            if (response.content && !response.error) {
+                this.cache.set(cacheKey, {
+                    content: response.content,
+                    timestamp: Date.now(),
+                    metadata: response.metadata
+                });
+
+                // Simple LRU-like cleanup: if too big, clear half
+                if (this.cache.size > 100) {
+                    const keys = Array.from(this.cache.keys());
+                    for (let i = 0; i < 50; i++) this.cache.delete(keys[i]);
+                }
             }
 
             return response;
@@ -70,7 +107,7 @@ export class AIOrchestrator {
             throw new Error('Missing VITE_GEMINI_API_KEY environment variable');
         }
 
-        const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+        const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent';
 
         // Construct Prompt with Context
         let systemInstruction = "";
@@ -103,26 +140,57 @@ export class AIOrchestrator {
             payload.contents[0].parts[0].text = `System Prompt: ${systemInstruction}\n\nUser Message: ${payload.contents[0].parts[0].text}`;
         }
 
-        const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        // Implementation of Exponential Backoff for Rate Limits (429)
+        let attempt = 0;
+        const maxRetries = 3;
+        const baseDelay = 1000; // 1 second
 
-        if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(`Gemini API Error: ${res.statusText} ${JSON.stringify(errData)}`);
+        while (attempt <= maxRetries) {
+            try {
+                const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.status === 429) {
+                    // Rate Limit Hit
+                    attempt++;
+                    if (attempt > maxRetries) {
+                        throw new Error(`Gemini Rate Limit Exceeded after ${maxRetries} retries.`);
+                    }
+                    const delay = baseDelay * Math.pow(2, attempt) + (Math.random() * 1000); // Backoff + Jitter
+                    console.warn(`[AIOrchestrator] Rate limit hit (429). Retrying in ${Math.round(delay)}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    continue; // Retry loop
+                }
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(`Gemini API Error: ${res.statusText} ${JSON.stringify(errData)}`);
+                }
+
+                const data = await res.json();
+                const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+
+                return {
+                    content: content,
+                    provider: 'gemini',
+                    latencyMs: performance.now() - startTime,
+                    metadata: { model: 'gemini-3.0-flash' }
+                };
+
+            } catch (error: any) {
+                // If it's a network error (fetch failed), we might also want to retry, 
+                // but for now we focus on the explicit 429 loop or throw for other errors.
+                // If we threw inside the loop (max retries), re-throw here.
+                if (attempt > maxRetries || !error.message.includes('Rate Limit')) {
+                    throw error;
+                }
+            }
         }
 
-        const data = await res.json();
-        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
-
-        return {
-            content: content,
-            provider: 'gemini',
-            latencyMs: performance.now() - startTime,
-            metadata: { model: 'gemini-2.5-flash' }
-        };
+        throw new Error('Unexpected retry loop exit');
     }
 
     /**
