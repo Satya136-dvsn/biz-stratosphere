@@ -282,17 +282,61 @@ export default function Auth() {
                     type="button"
                     variant="outline"
                     className="w-full border-primary/20 hover:bg-primary/5"
-                    onClick={() => {
-                      setEmail('demo@bizstratosphere.com');
-                      setPassword('demo123456');
-                      toast({
-                        title: "Demo Mode",
-                        description: "Credentials auto-filled. Click Sign In to proceed.",
-                      });
+                    disabled={loading}
+                    onClick={async () => {
+                      const demoEmail = 'demo@bizstratosphere.com';
+                      const demoPass = 'demo123456';
+
+                      setEmail(demoEmail);
+                      setPassword(demoPass);
+                      setLoading(true);
+
+                      try {
+                        // 1. Try to login
+                        const { error: signInError } = await signIn(demoEmail, demoPass);
+
+                        if (!signInError) {
+                          toast({ title: "Welcome back!", description: "Signed in to demo account" });
+                          navigate("/dashboard");
+                          return;
+                        }
+
+                        // 2. If login fails (likely user missing), try to register
+                        if (signInError.message.includes("Invalid login credentials")) {
+                          toast({ title: "Setting up demo...", description: "Creating demo account for you..." });
+
+                          const { error: signUpError } = await signUp(demoEmail, demoPass, "Demo User");
+
+                          if (signUpError) {
+                            throw signUpError;
+                          }
+
+                          // 3. Try login again after signup (sometimes needed to refresh session)
+                          const { error: reSignInError } = await signIn(demoEmail, demoPass);
+                          if (!reSignInError) {
+                            toast({ title: "Demo Ready", description: "Account created and signed in!" });
+                            navigate("/dashboard");
+                          } else {
+                            // If auto-login fails, maybe email confirmation is ON.
+                            toast({ title: "Account Created", description: "Please check if email confirmation is required, or try signing in again." });
+                            setLoading(false);
+                          }
+                        } else {
+                          // Real error (e.g. rate limit)
+                          throw signInError;
+                        }
+                      } catch (err: any) {
+                        toast({
+                          title: "Demo Login Failed",
+                          description: err.message,
+                          variant: "destructive"
+                        });
+                        setLoading(false);
+                      }
                     }}
                   >
                     <Sparkles className="mr-2 h-4 w-4 text-primary" />
-                    Try Public Demo (Read-Only)
+                    {loading && email === 'demo@bizstratosphere.com' ? "Setting up Demo..." : "Try Public Demo (One-Click)"}
                   </Button>
                 </form>
               </TabsContent>
