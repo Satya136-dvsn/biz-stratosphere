@@ -4,11 +4,13 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import type { AutomationRule } from '@/lib/automation';
 import { runAutomationRule } from '@/lib/automation';
+import { useDecisionMemory } from './useDecisionMemory';
 
 export function useAutomationRules() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const { toast } = useToast();
+    const { createDecision } = useDecisionMemory();
 
     // Fetch all rules
     const { data: rules = [], isLoading } = useQuery({
@@ -45,8 +47,16 @@ export function useAutomationRules() {
             if (error) throw error;
             return data;
         },
-        onSuccess: () => {
+        onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+            createDecision.mutate({
+                decision_type: 'automation',
+                input_context: { rule_name: variables.name, trigger: variables.trigger_type, action: variables.action_type },
+                expected_outcome: `Rule ${variables.name} will trigger on ${variables.trigger_type}`,
+                human_action: 'accepted',
+                ai_confidence_score: 1.0, // User created manually
+                ai_confidence_level: 'high'
+            });
         },
     });
 
@@ -60,8 +70,18 @@ export function useAutomationRules() {
 
             if (error) throw error;
         },
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+            if (variables.enabled) {
+                createDecision.mutate({
+                    decision_type: 'automation',
+                    input_context: { rule_id: variables.ruleId, action: 'enable' },
+                    expected_outcome: 'Rule execution enabled',
+                    human_action: 'accepted',
+                    ai_confidence_score: 1.0,
+                    ai_confidence_level: 'high'
+                });
+            }
         },
     });
 
@@ -85,11 +105,19 @@ export function useAutomationRules() {
         mutationFn: async (ruleId: string) => {
             await runAutomationRule(ruleId);
         },
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['automation-logs'] });
             toast({
                 title: 'Rule Executed',
                 description: 'Check the execution logs below to see the result.',
+            });
+            createDecision.mutate({
+                decision_type: 'automation',
+                input_context: { rule_id: variables, action: 'manual_run' },
+                expected_outcome: 'Rule executed manually',
+                human_action: 'accepted',
+                ai_confidence_score: 1.0,
+                ai_confidence_level: 'high'
             });
         },
         onError: (error: any) => {

@@ -10,6 +10,8 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Copy, TrendingUp, UserX, Calendar, Target, BarChart3 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useDecisionMemory } from '@/hooks/useDecisionMemory';
+import { CheckCircle } from 'lucide-react';
 
 interface PredictionRecord {
     id: string;
@@ -55,6 +57,7 @@ const MODEL_CONFIGS = {
 
 export function PredictionDetailsModal({ prediction, open, onClose }: PredictionDetailsModalProps) {
     const { toast } = useToast();
+    const { createDecision } = useDecisionMemory();
 
     // Determine model type
     const isChurn = prediction.inputs.length === 5 && prediction.prediction <= 1;
@@ -91,6 +94,23 @@ export function PredictionDetailsModal({ prediction, open, onClose }: Prediction
             title: 'Copied!',
             description: 'Input values copied to clipboard',
         });
+    };
+
+    const handleUsePrediction = () => {
+        createDecision.mutate({
+            decision_type: 'ml_prediction',
+            input_context: {
+                model_name: config.name,
+                inputs: prediction.inputs,
+                prediction_value: prediction.prediction,
+                features: config.features
+            },
+            expected_outcome: isChurn ? (prediction.prediction > 0.5 ? 'Prevent Churn' : 'Retain Customer') : 'Hit Revenue Target',
+            human_action: 'accepted',
+            ai_confidence_score: prediction.confidence,
+            ai_confidence_level: prediction.confidence > 0.8 ? 'high' : (prediction.confidence > 0.5 ? 'medium' : 'low')
+        });
+        onClose();
     };
 
     // Sort feature importance by value
@@ -216,6 +236,18 @@ export function PredictionDetailsModal({ prediction, open, onClose }: Prediction
                     <div className="pt-4 border-t text-xs text-muted-foreground space-y-1">
                         <div>Prediction ID: {prediction.id}</div>
                         <div>Cache hit: {prediction.cache_hit ? 'Yes' : 'No'}</div>
+                    </div>
+                    <div className="pt-4 border-t text-xs text-muted-foreground space-y-1">
+                        <div>Prediction ID: {prediction.id}</div>
+                        <div>Cache hit: {prediction.cache_hit ? 'Yes' : 'No'}</div>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button variant="outline" onClick={onClose}>Close</Button>
+                        <Button onClick={handleUsePrediction} className="gap-2">
+                            <CheckCircle className="h-4 w-4" />
+                            Use Prediction
+                        </Button>
                     </div>
                 </div>
             </DialogContent>

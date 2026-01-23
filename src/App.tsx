@@ -37,6 +37,7 @@ const UserManagement = lazy(() => import("./pages/admin/UserManagement").then(m 
 const AIControl = lazy(() => import("./pages/admin/AIControl").then(m => ({ default: m.AIControl })));
 const AuditLogs = lazy(() => import("./pages/admin/AuditLogs").then(m => ({ default: m.AuditLogs })));
 const AIDecisionAudit = lazy(() => import("./pages/admin/AIDecisionAudit"));
+const DecisionMemory = lazy(() => import("./pages/admin/DecisionMemory"));
 const UploadHistory = lazy(() => import("./pages/UploadHistory").then(m => ({ default: m.UploadHistory })));
 const SystemMonitor = lazy(() => import("./pages/SystemMonitor"));
 const StreamingETL = lazy(() => import("./pages/StreamingETL"));
@@ -284,6 +285,14 @@ const App = () => (
                 element={
                   <AdminRoute>
                     <AIDecisionAudit />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/decision-memory"
+                element={
+                  <AdminRoute>
+                    <DecisionMemory />
                   </AdminRoute>
                 }
               />

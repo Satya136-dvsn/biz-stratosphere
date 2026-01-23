@@ -10,6 +10,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import { ConfidenceBadge, SourceTransparency } from './ConfidenceBadge';
+import { useDecisionMemory } from '@/hooks/useDecisionMemory';
+import { BrainCircuit } from 'lucide-react';
 
 interface ChatMessageProps {
     message: ChatMessage;
@@ -18,11 +20,23 @@ interface ChatMessageProps {
 export function ChatMessageComponent({ message }: ChatMessageProps) {
     const isUser = message.role === 'user';
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
+    const { createDecision } = useDecisionMemory();
 
     const copyToClipboard = (code: string, language: string) => {
         navigator.clipboard.writeText(code);
         setCopiedCode(`${language}-${code.substring(0, 20)}`);
         setTimeout(() => setCopiedCode(null), 2000);
+    };
+
+    const handleUseInsight = () => {
+        createDecision.mutate({
+            decision_type: 'ai_chat',
+            input_context: { message_content: message.content, sources: message.sources },
+            expected_outcome: 'Insight applied to business context',
+            human_action: 'accepted',
+            ai_confidence_score: message.confidence?.score || 0.8,
+            ai_confidence_level: message.confidence?.level || 'high'
+        });
     };
 
     return (
@@ -166,6 +180,21 @@ export function ChatMessageComponent({ message }: ChatMessageProps) {
                         sourceCount={message.sources?.length || 0}
                         isLimited={!message.sources || message.sources.length === 0}
                     />
+                )}
+
+                {/* Decision Action */}
+                {!isUser && (
+                    <div className="flex gap-2 mt-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs gap-1.5"
+                            onClick={handleUseInsight}
+                        >
+                            <BrainCircuit className="h-3.5 w-3.5 text-primary" />
+                            Use Insight
+                        </Button>
+                    </div>
                 )}
 
                 {/* Timestamp */}
