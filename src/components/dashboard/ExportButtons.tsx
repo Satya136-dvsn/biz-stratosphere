@@ -252,7 +252,7 @@ export function ExportButtons({ kpiData, chartData, dashboardElementId }: Export
       doc.roundedRect(margin, currentY + 12, pageWidth - 2 * margin, 12, 2, 2, 'S');
       doc.setFontSize(7);
       doc.setTextColor(100, 100, 100);
-      doc.text('📧 For support or questions, contact: support@bizstratosphere.com', margin + 3, currentY + 18);
+      doc.text('📧 For support or questions, contact: d.v.satyanarayana260@gmail.com', margin + 3, currentY + 18);
 
       const filename = `dashboard-report-${new Date().toISOString().split('T')[0]}`;
       doc.save(`${filename}.pdf`);

@@ -196,7 +196,7 @@ export function useDataExport() {
             doc.setTextColor(100, 100, 100);
             doc.text('📊 Analytics Report', margin + 5, currentY + 7);
             doc.text(`This report contains ${data.length} records with ${Object.keys(data[0] || {}).length} fields.`, margin + 5, currentY + 13);
-            doc.text('For questions or support, contact: support@bizstratosphere.com', margin + 5, currentY + 19);
+            doc.text('For questions or support, contact: d.v.satyanarayana260@gmail.com', margin + 5, currentY + 19);
         }
 
         doc.save(`${filename}.pdf`);

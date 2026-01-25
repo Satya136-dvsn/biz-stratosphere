@@ -18,13 +18,13 @@ Biz Stratosphere implements enterprise-grade security with end-to-end encryption
 - **IV:** Unique random initialization vector for each encryption
 - **Authentication:** 128-bit authentication tag prevents tampering
 
-### Zero-Knowledge Architecture
+### Zero-Knowledge Inspired Architecture
 
 **We cannot read your data:**
 
-- Encryption/decryption happens entirely in your browser
-- Master keys are derived from your password and never stored
-- Server only stores encrypted blobs
+- Sensitive payloads are encrypted client-side before transmission.
+- Encryption keys are derived locally and never stored server-side.
+- The server processes only encrypted blobs for protected data fields.
 - Recovery requires your password or recovery key
 - **Lost password = lost data** (by design for maximum security)
 
@@ -62,10 +62,7 @@ Biz Stratosphere implements enterprise-grade security with end-to-end encryption
 
 **Storage:**
 
-- Passwords hashed with Bcrypt (10+ rounds)
-- Salted uniquely per user
-- Never stored in plaintext
-- Never transmitted in logs
+- Passwords are securely hashed and managed by Supabase Auth using industry-standard password security practices.
 
 ### Multi-Factor Authentication (MFA)
 
@@ -254,6 +251,8 @@ Recovery Key (optional)
 - ✅ SOC 2 Type II (in progress)
 - ✅ ISO 27001 principles
 
+Compliance readiness reflects architectural alignment with industry best practices; formal certifications are not yet completed.
+
 ### Data Subject Rights
 
 **GDPR rights supported:**
@@ -268,7 +267,7 @@ Recovery Key (optional)
 **How to exercise:**
 
 - Settings → Privacy → Data Rights
-- Email: <privacy@bizstratosphere.com>
+- Email: <d.v.satyanarayana260@gmail.com>
 - Response within 30 days
 
 ### Data Retention
@@ -290,7 +289,7 @@ Recovery Key (optional)
 **If you find a security vulnerability:**
 
 1. **DO NOT** publicly disclose it
-2. **Email:** <security@bizstratosphere.com>
+2. **Email:** <d.v.satyanarayana260@gmail.com>
 3. **Include:**
    - Description of vulnerability
    - Steps to reproduce
@@ -303,20 +302,6 @@ Recovery Key (optional)
 - Status update: 72 hours
 - Fix deployment: 7-14 days (critical issues: 24-48 hours)
 - Public disclosure: After fix deployed (coordinated)
-
-### Bug Bounty
-
-**Scope:**
-
-- In-scope: Platform security vulnerabilities
-- Out-of-scope: Social engineering, DoS, physical attacks
-
-**Rewards:**
-
-- Critical: Up to $5,000
-- High: Up to $2,000
-- Medium: Up to $500
-- Low: Up to $100
 
 ---
 
@@ -381,13 +366,13 @@ Recovery Key (optional)
 
 **Report security issues:**
 
-- Email: <security@bizstratosphere.com>
+- Email: <d.v.satyanarayana260@gmail.com>
 - PGP Key: [Download public key]
 - Response SLA: 24 hours
 
 **General inquiries:**
 
-- Email: <support@bizstratosphere.com>
+- Email: <d.v.satyanarayana260@gmail.com>
 - Documentation: docs.bizstratosphere.com/security
 
 ---
@@ -432,6 +417,6 @@ See [CHANGELOG.md](./CHANGELOG.md) for complete history.
 
 **Last Updated:** 2024-12-14  
 **Version:** 2.0.0  
-**Contact:** <security@bizstratosphere.com>
+**Contact:** <d.v.satyanarayana260@gmail.com>
 
 *Your security is our priority. We're committed to protecting your data with industry-leading security practices.*

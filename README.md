@@ -54,7 +54,7 @@ We are moving beyond static reporting into active intelligence.
 ## 🚫 What Biz Stratosphere Is NOT
 
 - **NOT a "wrapper"**: We own the full stack, from the ETL pipeline to the inference engine.
-- **NOT a student project**: This is a production-hardened platform with 99.9% reliability, comprehensive testing, and enterprise security.
+- **NOT a toy project**: This is a production-oriented platform built with strong architectural discipline, comprehensive testing, and security-first design principles.
 - **NOT a magic wand**: We provide tools for intelligence, not automated decision-making. Humans remain in the loop, always.
 
 ---
