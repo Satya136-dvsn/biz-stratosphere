@@ -35,3 +35,16 @@ dist-ssr
 test-results/
 playwright-report/
 blob-report/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.db
+
+# Test artifacts
+test_output.txt
+test-output.txt
+test_results.txt
+test_results_fixed.txt
+test_failures.log
