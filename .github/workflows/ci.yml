@@ -44,4 +44,16 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest tests/test_health.py -v --tb=long
+          set +e
+          output=$(pytest tests/test_health.py -v --tb=long 2>&1)
+          exit_code=$?
+          if [ $exit_code -ne 0 ]; then
+            echo "$output"
+            # Format for annotation: escape newlines
+            formatted_output="${output//'%'/'%25'}"
+            formatted_output="${formatted_output//$'\n'/'%0A'}"
+            formatted_output="${formatted_output//$'\r'/'%0D'}"
+            echo "::error::Pytest Failed:%0A$formatted_output"
+            exit $exit_code
+          fi
+          echo "$output"
