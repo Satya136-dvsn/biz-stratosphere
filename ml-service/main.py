@@ -7,7 +7,6 @@ from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.core.exceptions import http_exception_handler, global_exception_handler
 from app.api.v1.router import api_router
-from app.services.model_service import model_service
 
 settings = get_settings()
 
@@ -50,11 +49,13 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    from app.services.model_service import model_service
+
     health_status = {
         "status": "healthy",
         "services": {}
     }
-    
+
     # Check ML models
     try:
         models = model_service.list_models()
@@ -67,7 +68,7 @@ async def health_check():
             "status": "unhealthy",
             "error": str(e)
         }
-    
+
     # Check Ollama
     try:
         response = requests.get(f"{settings.OLLAMA_HOST}/api/tags", timeout=5)
@@ -80,7 +81,7 @@ async def health_check():
             "status": "unavailable",
             "error": str(e)
         }
-    
+
     return health_status
 
 if __name__ == "__main__":
