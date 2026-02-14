@@ -57,15 +57,15 @@ jobs:
 
       - name: Debug Pytest Collection
         run: |
-          # Check if pytest can even collect the tests
-          pytest tests/test_health.py --collect-only -v
+          # Use python -m pytest to be safe
+          python -m pytest tests/test_health.py --collect-only -v
 
       - name: Test with pytest
         run: |
           # Use proper bash error handling
           set +e
           # Run pytest and capture output
-          output=$(pytest tests/test_health.py -v --tb=long 2>&1)
+          output=$(python -m pytest tests/test_health.py -v --tb=long 2>&1)
           exit_code=$?
 
           echo "Pytest exit code: $exit_code"
@@ -73,8 +73,7 @@ jobs:
           echo "$output"
 
           if [ $exit_code -ne 0 ]; then
-            # Clean up output for annotation (remove ANSI colors maybe? handled by github automatically usually)
-            # Escape newlines for annotation
+            # Clean up output for annotation
             formatted_output="${output//$'\n'/'%0A'}"
             formatted_output="${formatted_output//$'\r'/'%0D'}"
             echo "::error::Pytest Failed (Exit $exit_code):%0A$formatted_output"
