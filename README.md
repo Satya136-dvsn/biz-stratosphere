@@ -47,6 +47,29 @@ In the era of big data, organizations drown in dashboards but starve for insight
 
 The platform follows a modern, containerized microservices architecture:
 
+```mermaid
+graph TD
+    User[User] -->|HTTPS| Frontend[React Frontend]
+    Frontend -->|REST API| Backend[FastAPI Backend]
+    Frontend -->|Supabase SDK| DB[(Supabase / PostgreSQL)]
+
+    subgraph "Backend Services"
+        Backend -->|Model Inference| MLEngine[ML Engine]
+        Backend -->|Explanations| SHAP[SHAP Service]
+        Backend -->|LLM Requests| Ollama[Ollama / Local LLM]
+    end
+
+    subgraph "Data Pipeline"
+        Airflow[Apache Airflow] -->|ETL Jobs| DB
+        Airflow -->|Model Training| MLEngine
+    end
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style Frontend fill:#bbf,stroke:#333,stroke-width:2px
+    style Backend fill:#bfb,stroke:#333,stroke-width:2px
+    style DB fill:#ff9,stroke:#333,stroke-width:2px
+```
+
 | Component | Technology Stack | Description |
 |-----------|------------------|-------------|
 | **Frontend** | React, TypeScript, Tailwind, Vite | Responsive SPA with real-time visualization |
