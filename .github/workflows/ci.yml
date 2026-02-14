@@ -34,29 +34,29 @@ jobs:
           ruff check . --select E9,F63,F7,F82 --target-version py311
           ruff check . --exit-zero --statistics
 
-      - name: Test with pytest
+      - name: Test Import (Debug)
         run: |
           python -c "
           import sys
+          import traceback
+
           print('Python:', sys.version)
           try:
+              print('Attempting to import app.main...')
               from main import app
               print('App import: SUCCESS')
           except Exception as e:
               print(f'App import: FAILED - {type(e).__name__}: {e}')
-              import traceback
-              traceback.print_exc()
-          " 2>&1 | tee /tmp/import_test.txt
-          pytest tests/ --ignore=models -v --tb=long 2>&1 | tee /tmp/pytest_output.txt
+              # Format traceback for annotation (replace newlines with %0A)
+              tb = traceback.format_exc().replace('\n', '%0A')
+              print(f'::error::Import Failure: {e}%0A{tb}')
+              sys.exit(1)
+          "
 
-      - name: Upload test output
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-output
-          path: |
-            /tmp/import_test.txt
-            /tmp/pytest_output.txt
+      - name: Test with pytest
+        if: success()
+        run: |
+          pytest tests/ --ignore=models -v --tb=long
 
   docker-build:
     name: Docker Build Verification
