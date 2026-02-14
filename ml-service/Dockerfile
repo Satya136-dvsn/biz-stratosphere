@@ -3,8 +3,13 @@ FROM python:3.11-slim as builder
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  gcc \
+  && rm -rf /var/lib/apt/lists/*
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+  PYTHONUNBUFFERED=1
 
 COPY requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
