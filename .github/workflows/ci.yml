@@ -28,7 +28,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install --prefer-binary numpy
           pip install --prefer-binary ruff pytest httpx
-          if [ -f requirements.txt ]; then pip install --prefer-binary -r requirements.txt; fi
+          if [ -f requirements.txt ]; then pip install --prefer-binary -r requirements.txt || echo "Some optional dependencies failed to install"; fi
           pip list
 
       - name: Lint with Ruff

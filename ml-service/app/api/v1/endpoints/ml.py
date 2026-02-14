@@ -4,7 +4,6 @@ from typing import List, Dict, Any
 from app.schemas.prediction import MLPredictionRequest
 from app.schemas.explanation import MLExplainRequest
 from app.services.model_service import model_service
-from app.services.shap_service import shap_service
 
 router = APIRouter()
 
@@ -69,6 +68,8 @@ async def ml_explain(request: MLExplainRequest):
     Generate SHAP explanations for predictions
     """
     try:
+        from app.services.shap_service import shap_service
+
         # Load model
         model = model_service.load_model(request.model_name)
         
@@ -107,3 +108,4 @@ async def ml_explain(request: MLExplainRequest):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Explanation error: {str(e)}")
+
