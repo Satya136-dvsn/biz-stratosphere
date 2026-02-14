@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Any
 
 class EndpointFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:

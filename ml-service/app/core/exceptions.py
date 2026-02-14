@@ -1,6 +1,5 @@
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
-from typing import Union
 
 async def http_exception_handler(request: Request, exc: HTTPException):
     """

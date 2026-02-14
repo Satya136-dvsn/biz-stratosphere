@@ -5,9 +5,8 @@ import joblib
 import mlflow
 import mlflow.sklearn
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import pandas as pd
-import numpy as np
 
 class ModelService:
     def __init__(self):
