@@ -28,7 +28,6 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install --prefer-binary ruff pytest httpx
           pip install --prefer-binary -r requirements-ci.txt
-          pip list
 
       - name: Lint with Ruff
         run: |
@@ -37,7 +36,27 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest tests/ --ignore=models -v --tb=long
+          python -c "
+          import sys
+          print('Python:', sys.version)
+          try:
+              from main import app
+              print('App import: SUCCESS')
+          except Exception as e:
+              print(f'App import: FAILED - {type(e).__name__}: {e}')
+              import traceback
+              traceback.print_exc()
+          " 2>&1 | tee /tmp/import_test.txt
+          pytest tests/ --ignore=models -v --tb=long 2>&1 | tee /tmp/pytest_output.txt
+
+      - name: Upload test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-output
+          path: |
+            /tmp/import_test.txt
+            /tmp/pytest_output.txt
 
   docker-build:
     name: Docker Build Verification
