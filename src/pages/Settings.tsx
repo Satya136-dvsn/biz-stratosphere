@@ -7,8 +7,9 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UsageQuotas } from "@/components/settings/UsageQuotas";
+import { SubscriptionSettings } from "@/components/settings/SubscriptionSettings";
 import { useAuth } from "@/hooks/useAuth";
-import { User, Bell, Shield, Database, Save, Palette, Moon, Sun, Download, FileText, Trash2, Lock } from "lucide-react";
+import { User, Bell, Shield, Database, Save, Palette, Moon, Sun, Download, FileText, Trash2, Lock, CreditCard } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -194,6 +195,10 @@ export function Settings() {
           <TabsTrigger value="usage" className="gap-2">
             <Database className="h-4 w-4" />
             <span className="hidden sm:inline">Usage</span>
+          </TabsTrigger>
+          <TabsTrigger value="subscription" className="gap-2">
+            <CreditCard className="h-4 w-4" />
+            <span className="hidden sm:inline">Subscription</span>
           </TabsTrigger>
         </TabsList>
 
@@ -515,6 +520,11 @@ export function Settings() {
         {/* Usage Settings */}
         <TabsContent value="usage" className="space-y-4">
           <UsageQuotas />
+        </TabsContent>
+
+        {/* Subscription Settings */}
+        <TabsContent value="subscription" className="space-y-4">
+          <SubscriptionSettings />
         </TabsContent>
       </Tabs>
     </PageLayout>

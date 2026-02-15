@@ -67,7 +67,8 @@ class ModelService:
                 "prediction": int(prediction),
                 "probability": float(probabilities[1]) if len(probabilities) > 1 else float(probabilities[0]),
                 "confidence": float(max(probabilities)),
-                "model": model_name
+                "model": model_name,
+                "model_version": "1.0.0"
             }
         else:
             # Regression model
@@ -75,7 +76,8 @@ class ModelService:
 
             return {
                 "prediction": float(prediction),
-                "model": model_name
+                "model": model_name,
+                "model_version": "1.0.0"  # Placeholder: In real implementation, fetch from MLflow
             }
 
     def get_model_info(self, model_name: str) -> Dict[str, Any]:
