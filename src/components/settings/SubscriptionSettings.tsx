@@ -5,13 +5,85 @@ import { Progress } from "@/components/ui/progress";
 import { Check, CreditCard, Zap } from "lucide-react";
 
 export function SubscriptionSettings() {
-    const currentPlan: string = "starter"; // This would come from DB/Context
-    const usage = {
-        predictions: 45,
+    const { session } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [currentPlan, setCurrentPlan] = useState<string>("starter");
+    const [usage, setUsage] = useState({
+        predictions: 0,
         predictionsLimit: 100,
-        seats: 2,
+        seats: 1,
         seatsLimit: 3
-    };
+    });
+
+    useEffect(() => {
+        async function fetchSubscription() {
+            if (!session?.user) return;
+
+            try {
+                // 1. Get Workspace (assuming single workspace for MVP)
+                const { data: members, error: memberError } = await supabase
+                    .from('workspace_members')
+                    .select('workspace_id')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (memberError || !members) {
+                    setLoading(false);
+                    return;
+                }
+
+                const workspaceId = members.workspace_id;
+
+                // 2. Get Subscription
+                const { data: sub } = await supabase
+                    .from('subscriptions')
+                    .select('plan_tier, seat_quantity')
+                    .eq('workspace_id', workspaceId)
+                    .single();
+
+                const plan = sub?.plan_tier || 'starter';
+                setCurrentPlan(plan);
+
+                // 3. Get Usage
+                const { data: usageData } = await supabase
+                    .from('usage_meters')
+                    .select('metric_name, current_usage')
+                    .eq('workspace_id', workspaceId);
+
+                // 4. Determine Limits based on Plan
+                const limits = {
+                    starter: { predictions: 100, seats: 3 },
+                    pro: { predictions: 10000, seats: 10 },
+                    enterprise: { predictions: 1000000, seats: 9999 }
+                };
+
+                // Safe lookup for plan limits
+                const planLimits = limits[plan as keyof typeof limits] || limits.starter;
+
+                const predictionsUsed = usageData?.find(m => m.metric_name === 'predictions')?.current_usage || 0;
+                // Seats used is typically count of workspace_members, but using usage_meter or sub seat_quantity for now
+                const seatsUsed = sub?.seat_quantity || 1; // Default to 1 (self)
+
+                setUsage({
+                    predictions: Number(predictionsUsed),
+                    predictionsLimit: planLimits.predictions,
+                    seats: seatsUsed,
+                    seatsLimit: planLimits.seats
+                });
+
+            } catch (error) {
+                console.error("Error fetching subscription:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchSubscription();
+    }, [session]);
+
+    if (loading) {
+        return <div className="p-8 text-center">Loading subscription details...</div>;
+    }
 
     return (
         <div className="space-y-6">

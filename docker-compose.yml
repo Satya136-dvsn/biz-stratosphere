@@ -12,7 +12,7 @@ services:
       - postgres-airflow
     environment:
       - OLLAMA_HOST=http://ollama:11434
-      - DATABASE_URL=postgresql://airflow:airflow@postgres-airflow:5432/airflow # Placeholder, adjust if needed for MLflow
+      - DATABASE_URL=${DATABASE_URL}
       - MLFLOW_TRACKING_URI=sqlite:///mlflow.db
     restart: unless-stopped
     volumes:
@@ -29,6 +29,8 @@ services:
       - backend
     environment:
       - NODE_ENV=production
+      - VITE_SUPABASE_URL=${SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
 
   # Ollama - Local LLM serving (Tier 3.3)
   ollama:
