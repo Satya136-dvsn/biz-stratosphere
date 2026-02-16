@@ -41,6 +41,15 @@ __pycache__/
 *.pyc
 *.pyo
 *.db
+.pytest_cache/
+.ruff_cache/
+.venv*/
+
+# MLflow & ML artifacts
+mlruns/
+
+# Bun (project uses npm)
+bun.lockb
 
 # Test artifacts
 test_output.txt
@@ -48,3 +57,7 @@ test-output.txt
 test_results.txt
 test_results_fixed.txt
 test_failures.log
+
+# Misc
+.blackboxrules
+.testing/
