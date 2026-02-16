@@ -57,6 +57,10 @@ class ModelService:
         # Convert features to DataFrame
         df = pd.DataFrame([features])
 
+        # Default values for metadata
+        version = "1.0.0" 
+        shap_values = None
+
         # Make prediction
         if hasattr(model, 'predict_proba'):
             # Classification model
@@ -71,6 +75,8 @@ class ModelService:
             # Regression model
             prediction = model.predict(df)[0]
             prediction_value = float(prediction)
+            probability = 1.0 # Default for regression
+            confidence = 1.0 # Default for regression
 
         # Log decision to Decision Memory
         try:
