@@ -13,6 +13,14 @@ settings = get_settings()
 # Setup logging
 setup_logging()
 
+# Initialize DB (Apply Schema)
+try:
+    from app.db.init_db import init_db
+    init_db()
+except Exception as e:
+    print(f"Warning: Failed to initialize DB on startup: {e}")
+
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
