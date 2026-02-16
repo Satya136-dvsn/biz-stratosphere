@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, toast } from "sonner"
 

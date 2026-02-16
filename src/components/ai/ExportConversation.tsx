@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

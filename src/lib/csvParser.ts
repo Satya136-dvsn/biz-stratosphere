@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 /**
  * CSV Parser for ML Training Data
  * Validates and converts CSV files to training data format

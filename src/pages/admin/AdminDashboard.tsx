@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

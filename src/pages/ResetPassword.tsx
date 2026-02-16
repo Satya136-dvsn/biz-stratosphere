@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";

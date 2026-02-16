@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { checkRateLimit, getRateLimitStatus, type LimitType } from './rateLimit'
 import { supabase } from '@/integrations/supabase/client'

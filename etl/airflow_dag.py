@@ -1,3 +1,7 @@
+# © 2026 VenkataSatyanarayana Duba
+# Biz Stratosphere - Proprietary Software
+# Unauthorized copying or distribution prohibited.
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta

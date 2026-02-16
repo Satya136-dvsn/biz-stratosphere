@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 
 import { test, expect } from '@playwright/test';
 // Remove import from fixtures if it causes issues, assume auth bypass or simple test

@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 /**
  * Playwright Auth Fixtures for Biz Stratosphere E2E Tests
  * 

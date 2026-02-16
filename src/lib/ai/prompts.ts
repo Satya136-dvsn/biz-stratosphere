@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 export const AI_PROMPTS = {
   // General Business Analyst Persona
   ANALYST: `You are an expert AI Business Analyst for the "Biz Stratosphere" platform.

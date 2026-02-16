@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

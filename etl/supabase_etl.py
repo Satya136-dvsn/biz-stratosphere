@@ -1,3 +1,7 @@
+# © 2026 VenkataSatyanarayana Duba
+# Biz Stratosphere - Proprietary Software
+# Unauthorized copying or distribution prohibited.
+
 """
 Enhanced ETL Pipeline with Supabase Integration
 Handles automated data cleaning and processing for uploaded datasets

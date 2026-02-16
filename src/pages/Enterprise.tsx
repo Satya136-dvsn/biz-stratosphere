@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { EnterpriseNavigation } from '@/components/enterprise/EnterpriseNavigation';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { ProtectedRoute } from '@/components/ProtectedRoute';

@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 /**
  * Analytics tracking utilities
  * Supports Google Analytics 4 and custom event tracking

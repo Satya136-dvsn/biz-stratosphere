@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';

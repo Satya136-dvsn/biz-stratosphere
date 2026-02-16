@@ -1,3 +1,7 @@
+# © 2026 VenkataSatyanarayana Duba
+# Biz Stratosphere - Proprietary Software
+# Unauthorized copying or distribution prohibited.
+
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 from typing import List

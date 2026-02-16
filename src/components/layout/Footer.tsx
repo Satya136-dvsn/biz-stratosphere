@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { Link } from "react-router-dom";
 import { Github, FileText, Info } from "lucide-react";
 

@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { useState, useEffect, useRef } from "react";
 import { Search, Bell, User, LogOut, Settings as SettingsIcon, FileUp, BarChart3, FileText, Building2, Command, CheckCheck, Info, AlertTriangle, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 
 import chalk from 'chalk';
 // Note: User might not have chalk installed, so using ANSI codes if fetch fails? 

@@ -1,3 +1,7 @@
+# © 2026 VenkataSatyanarayana Duba
+# Biz Stratosphere - Proprietary Software
+# Unauthorized copying or distribution prohibited.
+
 from fastapi import APIRouter, HTTPException
 import requests
 from app.core.config import get_settings

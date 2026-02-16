@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 /**
  * Unit tests for useAIConversation hook
  * Simplified tests - verify hook initializes without errors

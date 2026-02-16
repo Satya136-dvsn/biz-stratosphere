@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 /**
  * Error tracking and monitoring utilities
  * Can be integrated with Sentry, LogRocket, or similar services

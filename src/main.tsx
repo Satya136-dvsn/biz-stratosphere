@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';

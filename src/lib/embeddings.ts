@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { supabase } from '@/integrations/supabase/client';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;

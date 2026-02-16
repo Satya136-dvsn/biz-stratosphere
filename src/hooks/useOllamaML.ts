@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 import { useQuery, useMutation } from '@tanstack/react-query';
 
 const ML_API_URL = 'http://localhost:8000';

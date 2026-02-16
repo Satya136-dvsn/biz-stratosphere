@@ -1,3 +1,7 @@
+// © 2026 VenkataSatyanarayana Duba
+// Biz Stratosphere - Proprietary Software
+// Unauthorized copying or distribution prohibited.
+
 // Email Sender Edge Function for Biz Stratosphere
 // Sends emails via Resend API for automation alerts
 

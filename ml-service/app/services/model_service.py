@@ -1,3 +1,7 @@
+# © 2026 VenkataSatyanarayana Duba
+# Biz Stratosphere - Proprietary Software
+# Unauthorized copying or distribution prohibited.
+
 """
 Model service for loading and managing ML models
 """
