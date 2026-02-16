@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { captureException as sentryCaptureException } from '@/lib/errorTracking';
 
 interface Props {
     children: ReactNode;
@@ -53,6 +54,13 @@ export class ErrorBoundary extends Component<Props, State> {
         // Log to structured logger
         logger.error('ErrorBoundary caught error', error, {
             componentStack: errorInfo.componentStack
+        });
+
+        // Report to Sentry
+        sentryCaptureException(error, {
+            extra: { componentStack: errorInfo.componentStack },
+            level: 'error',
+            tags: { source: 'error_boundary' },
         });
     }
 

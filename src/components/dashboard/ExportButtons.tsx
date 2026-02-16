@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Download, FileText, Table, Image } from 'lucide-react';
+import { Download, FileText, Table, Image, Loader2 } from 'lucide-react';
 import { exportToCSV, exportToExcel, exportToPDF, formatDataForExport } from '@/utils/exportUtils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,6 +13,7 @@ interface ExportButtonsProps {
 
 export function ExportButtons({ kpiData, chartData, dashboardElementId }: ExportButtonsProps) {
   const { toast } = useToast();
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const handleExportKPI = async (format: 'csv' | 'excel') => {
     if (!kpiData) {
@@ -80,186 +81,233 @@ export function ExportButtons({ kpiData, chartData, dashboardElementId }: Export
     }
   };
 
+  /**
+   * Captures a DOM element as a canvas image for PDF embedding.
+   * Returns null if the element is not found or capture fails.
+   */
+  async function captureElement(selector: string): Promise<HTMLCanvasElement | null> {
+    try {
+      const element = document.querySelector(selector) as HTMLElement;
+      if (!element) return null;
+      const html2canvas = (await import('html2canvas')).default;
+      return await html2canvas(element, {
+        backgroundColor: '#1a1a2e',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+    } catch {
+      return null;
+    }
+  }
+
   const handleExportDashboard = async () => {
+    setPdfLoading(true);
     try {
       const jsPDF = (await import('jspdf')).jsPDF;
       const doc = new jsPDF('p', 'mm', 'a4');
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 20;
+      const margin = 15;
       let currentY = margin;
 
-      // Professional Header with Branding
-      doc.setFillColor(139, 92, 246); // Purple
-      doc.rect(0, 0, pageWidth, 25, 'F');
+      // ──────────── PAGE 1: Executive Summary ────────────
+
+      // Branded Header Bar
+      doc.setFillColor(99, 58, 212); // vibrant purple
+      doc.rect(0, 0, pageWidth, 28, 'F');
+      doc.setFillColor(56, 189, 248); // accent teal bar
+      doc.rect(0, 28, pageWidth, 2, 'F');
 
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(20);
+      doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
-      doc.text('Biz Stratosphere', margin, 12);
+      doc.text('Biz Stratosphere', margin, 14);
 
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
-      doc.text('Business Intelligence Dashboard Report', margin, 19);
+      doc.text('Business Intelligence Report', margin, 22);
+      doc.text(
+        new Date().toLocaleDateString('en-US', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        }),
+        pageWidth - margin,
+        22,
+        { align: 'right' }
+      );
 
-      doc.setFontSize(8);
-      doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - margin - 60, 19);
-
-      currentY = 35;
+      currentY = 40;
 
       // Report Title
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(18);
+      doc.setTextColor(30, 30, 50);
+      doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('Executive Summary Dashboard', margin, currentY);
-      currentY += 15;
+      doc.text('Executive Dashboard Summary', margin, currentY);
+      currentY += 12;
 
-      // KPI Section
+      // Divider
+      doc.setDrawColor(99, 58, 212);
+      doc.setLineWidth(0.8);
+      doc.line(margin, currentY, pageWidth - margin, currentY);
+      currentY += 10;
+
+      // ─── KPI Section ───
       if (kpiData) {
-        doc.setFontSize(14);
+        doc.setFontSize(13);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(139, 92, 246);
-        doc.text('📊 Key Performance Indicators', margin, currentY);
-        currentY += 10;
+        doc.setTextColor(99, 58, 212);
+        doc.text('Key Performance Indicators', margin, currentY);
+        currentY += 8;
 
-        // KPI Cards with styling
         const kpis = [
           { label: 'Total Revenue', value: `$${(kpiData.totalRevenue || 0).toLocaleString()}`, change: kpiData.revenueChange || 0 },
           { label: 'Active Customers', value: (kpiData.activeCustomers || 0).toLocaleString(), change: kpiData.customersChange || 0 },
-          { label: 'Churn Rate', value: `${(kpiData.churnRate || 0).toFixed(1)}%`, change: -kpiData.churnRate || 0 },
-          { label: 'Avg Deal Size', value: `$${(kpiData.averageDealSize || 0).toLocaleString()}`, change: kpiData.dealChange || 0 },
+          { label: 'Churn Rate', value: `${(kpiData.churnRate || 0).toFixed(1)}%`, change: -(kpiData.churnChange || 0) },
+          { label: 'Avg Deal Size', value: `$${(kpiData.averageDealSize || 0).toLocaleString()}`, change: kpiData.dealSizeChange || 0 },
+          { label: 'Conversion Rate', value: `${(kpiData.conversionRate || 0).toFixed(1)}%`, change: kpiData.conversionChange || 0 },
+          { label: 'Growth Rate', value: `${(kpiData.growthRate || 0).toFixed(1)}%`, change: kpiData.growthChange || 0 },
         ];
 
+        const cardW = (pageWidth - 2 * margin - 10) / 3;
+        const cardH = 24;
         kpis.forEach((kpi, index) => {
-          const x = margin + (index % 2) * 90;
-          const y = currentY + Math.floor(index / 2) * 25;
+          const col = index % 3;
+          const row = Math.floor(index / 3);
+          const x = margin + col * (cardW + 5);
+          const y = currentY + row * (cardH + 5);
 
-          // KPI Box
-          doc.setFillColor(250, 250, 250);
-          doc.roundedRect(x, y, 80, 20, 2, 2, 'F');
-          doc.setDrawColor(139, 92, 246);
+          // Card background
+          doc.setFillColor(245, 243, 255);
+          doc.roundedRect(x, y, cardW, cardH, 3, 3, 'F');
+          doc.setDrawColor(99, 58, 212);
           doc.setLineWidth(0.3);
-          doc.roundedRect(x, y, 80, 20, 2, 2, 'S');
+          doc.roundedRect(x, y, cardW, cardH, 3, 3, 'S');
 
-          // KPI Label
-          doc.setFontSize(8);
+          // Label
+          doc.setFontSize(7);
           doc.setFont('helvetica', 'normal');
-          doc.setTextColor(100, 100, 100);
-          doc.text(kpi.label, x + 5, y + 7);
+          doc.setTextColor(120, 120, 140);
+          doc.text(kpi.label.toUpperCase(), x + 4, y + 7);
 
-          // KPI Value
-          doc.setFontSize(14);
+          // Value
+          doc.setFontSize(15);
           doc.setFont('helvetica', 'bold');
-          doc.setTextColor(0, 0, 0);
-          doc.text(kpi.value, x + 5, y + 15);
+          doc.setTextColor(30, 30, 50);
+          doc.text(kpi.value, x + 4, y + 17);
 
           // Change indicator
           doc.setFontSize(7);
-          const changeColor = kpi.change >= 0 ? [34, 197, 94] : [239, 68, 68];
-          doc.setTextColor(changeColor[0], changeColor[1], changeColor[2]);
-          const arrow = kpi.change >= 0 ? '↑' : '↓';
-          doc.text(`${arrow} ${Math.abs(kpi.change).toFixed(1)}%`, x + 60, y + 15);
+          const arrow = kpi.change >= 0 ? '▲' : '▼';
+          doc.setTextColor(
+            ...(kpi.change >= 0 ? [34, 197, 94] : [239, 68, 68]) as [number, number, number]
+          );
+          doc.text(`${arrow} ${Math.abs(kpi.change).toFixed(1)}%`, x + cardW - 18, y + 17);
         });
 
-        currentY += 60;
+        currentY += Math.ceil(kpis.length / 3) * (cardH + 5) + 10;
       }
 
-      // Chart Data Section
-      if (chartData && chartData.length > 0) {
-        doc.setFontSize(14);
+      // ─── Chart Snapshots ───
+      // Try to capture the revenue chart from the DOM
+      const chartCanvas = await captureElement('.recharts-wrapper');
+      if (chartCanvas) {
+        // Check if we need a new page
+        if (currentY + 80 > pageHeight - 30) {
+          doc.addPage();
+          currentY = margin;
+        }
+
+        doc.setFontSize(13);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(139, 92, 246);
-        doc.text('📈 Data Overview', margin, currentY);
-        currentY += 10;
+        doc.setTextColor(99, 58, 212);
+        doc.text('Revenue Trend', margin, currentY);
+        currentY += 6;
 
-        // Summary metrics
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(80, 80, 80);
-        doc.text(`Total Data Points: ${chartData.length}`, margin, currentY);
+        const imgData = chartCanvas.toDataURL('image/png');
+        const imgWidth = pageWidth - 2 * margin;
+        const imgHeight = (chartCanvas.height / chartCanvas.width) * imgWidth;
+        const clampedHeight = Math.min(imgHeight, 70);
 
-        if (chartData.length > 0 && chartData[0].revenue !== undefined) {
-          const totalRevenue = chartData.reduce((sum, item) => sum + (item.revenue || 0), 0);
-          const avgRevenue = totalRevenue / chartData.length;
-          doc.text(`Total Revenue: $${totalRevenue.toLocaleString()}`, margin + 60, currentY);
-          doc.text(`Average: $${avgRevenue.toLocaleString()}`, margin + 120, currentY);
+        doc.addImage(imgData, 'PNG', margin, currentY, imgWidth, clampedHeight);
+        currentY += clampedHeight + 10;
+      }
+
+      // ─── Data Table ───
+      if (chartData && chartData.length > 0) {
+        if (currentY + 50 > pageHeight - 30) {
+          doc.addPage();
+          currentY = margin;
         }
 
-        currentY += 10;
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(99, 58, 212);
+        doc.text('Data Overview', margin, currentY);
+        currentY += 8;
 
-        // Mini table of recent data
-        if (chartData.length > 0) {
-          const headers = Object.keys(chartData[0]).slice(0, 4);
-          const colWidth = (pageWidth - 2 * margin) / headers.length;
+        const headers = Object.keys(chartData[0]).slice(0, 5);
+        const colWidth = (pageWidth - 2 * margin) / headers.length;
 
-          // Table header
-          doc.setFillColor(139, 92, 246);
-          doc.rect(margin, currentY, pageWidth - 2 * margin, 8, 'F');
-          doc.setTextColor(255, 255, 255);
-          doc.setFontSize(9);
-          doc.setFont('helvetica', 'bold');
+        // Table header
+        doc.setFillColor(99, 58, 212);
+        doc.rect(margin, currentY, pageWidth - 2 * margin, 7, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        headers.forEach((header, i) => {
+          doc.text(header.charAt(0).toUpperCase() + header.slice(1), margin + i * colWidth + 3, currentY + 5);
+        });
+        currentY += 7;
 
-          headers.forEach((header, i) => {
-            doc.text(header, margin + i * colWidth + 2, currentY + 6);
-          });
+        // Table rows
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        const maxRows = Math.min(chartData.length, 12);
+        chartData.slice(0, maxRows).forEach((row, rowIndex) => {
+          if (currentY > pageHeight - 30) return;
 
-          currentY += 8;
-
-          // Table rows (up to 10)
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8);
-          chartData.slice(0, 10).forEach((row, rowIndex) => {
-            if (currentY > pageHeight - 40) return; // Stop if near page end
-
-            if (rowIndex % 2 === 0) {
-              doc.setFillColor(250, 250, 250);
-              doc.rect(margin, currentY, pageWidth - 2 * margin, 6, 'F');
-            }
-
-            doc.setTextColor(0, 0, 0);
-            headers.forEach((header, i) => {
-              const value = row[header];
-              const displayValue = typeof value === 'number' ? value.toLocaleString() : String(value || '');
-              doc.text(displayValue.substring(0, 15), margin + i * colWidth + 2, currentY + 4);
-            });
-
-            currentY += 6;
-          });
-
-          if (chartData.length > 10) {
-            currentY += 5;
-            doc.setFontSize(8);
-            doc.setTextColor(128, 128, 128);
-            doc.text(`... and ${chartData.length - 10} more records`, margin, currentY);
+          if (rowIndex % 2 === 0) {
+            doc.setFillColor(248, 248, 255);
+            doc.rect(margin, currentY, pageWidth - 2 * margin, 6, 'F');
           }
+
+          doc.setTextColor(50, 50, 60);
+          headers.forEach((header, i) => {
+            const value = row[header];
+            const display = typeof value === 'number'
+              ? value.toLocaleString()
+              : String(value || '').substring(0, 18);
+            doc.text(display, margin + i * colWidth + 3, currentY + 4.5);
+          });
+          currentY += 6;
+        });
+
+        if (chartData.length > maxRows) {
+          currentY += 3;
+          doc.setFontSize(7);
+          doc.setTextColor(140, 140, 160);
+          doc.text(`... and ${chartData.length - maxRows} more records`, margin, currentY);
         }
       }
 
-      // Footer with page info
-      currentY = pageHeight - 30;
-      doc.setDrawColor(200, 200, 200);
-      doc.line(margin, currentY, pageWidth - margin, currentY);
+      // ──────────── Footer ────────────
+      const footerY = pageHeight - 15;
+      doc.setDrawColor(200, 200, 210);
+      doc.setLineWidth(0.3);
+      doc.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
 
-      doc.setFontSize(8);
-      doc.setTextColor(128, 128, 128);
-      doc.text('Biz Stratosphere Analytics Platform', margin, currentY + 8);
-      doc.text('© 2025 All Rights Reserved', pageWidth / 2, currentY + 8, { align: 'center' });
-      doc.text(`Page 1`, pageWidth - margin - 10, currentY + 8);
-
-      // Summary box
-      doc.setDrawColor(139, 92, 246);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(margin, currentY + 12, pageWidth - 2 * margin, 12, 2, 2, 'S');
       doc.setFontSize(7);
-      doc.setTextColor(100, 100, 100);
-      doc.text('📧 For support or questions, contact: d.v.satyanarayana260@gmail.com', margin + 3, currentY + 18);
+      doc.setTextColor(140, 140, 160);
+      doc.text('Biz Stratosphere Analytics Platform', margin, footerY);
+      doc.text('Confidential', pageWidth / 2, footerY, { align: 'center' });
+      doc.text('Page 1', pageWidth - margin, footerY, { align: 'right' });
 
       const filename = `dashboard-report-${new Date().toISOString().split('T')[0]}`;
       doc.save(`${filename}.pdf`);
 
       toast({
-        title: "Export Successful",
-        description: "Professional dashboard report exported as PDF",
+        title: "PDF Exported",
+        description: "Professional dashboard report saved successfully",
       });
     } catch (error) {
       console.error('PDF export error:', error);
@@ -268,6 +316,8 @@ export function ExportButtons({ kpiData, chartData, dashboardElementId }: Export
         description: "Failed to export dashboard as PDF",
         variant: "destructive"
       });
+    } finally {
+      setPdfLoading(false);
     }
   };
 
@@ -328,9 +378,14 @@ export function ExportButtons({ kpiData, chartData, dashboardElementId }: Export
           variant="default"
           size="sm"
           onClick={handleExportDashboard}
-          className="flex items-center bg-gradient-primary"
+          disabled={pdfLoading}
+          className="flex items-center bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md hover:shadow-lg transition-all"
         >
-          <Image className="mr-2 h-4 w-4" />
+          {pdfLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Image className="mr-2 h-4 w-4" />
+          )}
           Export Dashboard PDF
         </Button>
       </div>

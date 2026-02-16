@@ -87,224 +87,226 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <AppLayout>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/" element={<Landing />} />
-              <Route path="/platform-status" element={<PlatformStatus />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/enterprise"
-                element={
-                  <ProtectedRoute>
-                    <Enterprise />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/reports"
-                element={
-                  <ProtectedRoute>
-                    <Reports />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/workspaces"
-                element={
-                  <ProtectedRoute>
-                    <Workspaces />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/api-management"
-                element={
-                  <ProtectedRoute>
-                    <APIManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/advanced-charts"
-                element={
-                  <ProtectedRoute>
-                    <AdvancedCharts />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/ai-chat"
-                element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AIChat />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/ai-analytics"
-                element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AIAnalytics />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/ml-predictions"
-                element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <MLPredictions />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/automation-rules"
-                element={
-                  <ProtectedRoute>
-                    <ErrorBoundary>
-                      <AutomationRules />
-                    </ErrorBoundary>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/ai-comparison"
-                element={
-                  <ProtectedRoute>
-                    <AIComparison />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/help"
-                element={
-                  <ProtectedRoute>
-                    <Help />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/upload-history"
-                element={
-                  <ProtectedRoute>
-                    <UploadHistory />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/system-monitor"
-                element={
-                  <ProtectedRoute>
-                    <SystemMonitor />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/streaming-etl"
-                element={
-                  <ProtectedRoute>
-                    <StreamingETL />
-                  </ProtectedRoute>
-                }
-              />
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <AppLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/" element={<Landing />} />
+                <Route path="/platform-status" element={<PlatformStatus />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/enterprise"
+                  element={
+                    <ProtectedRoute>
+                      <Enterprise />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/reports"
+                  element={
+                    <ProtectedRoute>
+                      <Reports />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/workspaces"
+                  element={
+                    <ProtectedRoute>
+                      <Workspaces />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/api-management"
+                  element={
+                    <ProtectedRoute>
+                      <APIManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/advanced-charts"
+                  element={
+                    <ProtectedRoute>
+                      <AdvancedCharts />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ai-chat"
+                  element={
+                    <ProtectedRoute>
+                      <ErrorBoundary>
+                        <AIChat />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ai-analytics"
+                  element={
+                    <ProtectedRoute>
+                      <ErrorBoundary>
+                        <AIAnalytics />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ml-predictions"
+                  element={
+                    <ProtectedRoute>
+                      <ErrorBoundary>
+                        <MLPredictions />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/automation-rules"
+                  element={
+                    <ProtectedRoute>
+                      <ErrorBoundary>
+                        <AutomationRules />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ai-comparison"
+                  element={
+                    <ProtectedRoute>
+                      <AIComparison />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/help"
+                  element={
+                    <ProtectedRoute>
+                      <Help />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/upload-history"
+                  element={
+                    <ProtectedRoute>
+                      <UploadHistory />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/system-monitor"
+                  element={
+                    <ProtectedRoute>
+                      <SystemMonitor />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/streaming-etl"
+                  element={
+                    <ProtectedRoute>
+                      <StreamingETL />
+                    </ProtectedRoute>
+                  }
+                />
 
 
 
-              {/* Admin Routes */}
-              <Route
-                path="/admin"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/users"
-                element={
-                  <AdminRoute>
-                    <UserManagement />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/ai"
-                element={
-                  <AdminRoute>
-                    <AIControl />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/security"
-                element={
-                  <AdminRoute>
-                    <AuditLogs />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/ai-audit"
-                element={
-                  <AdminRoute>
-                    <AIDecisionAudit />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/decision-memory"
-                element={
-                  <AdminRoute>
-                    <DecisionMemory />
-                  </AdminRoute>
-                }
-              />
+                {/* Admin Routes */}
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminRoute>
+                      <AdminDashboard />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <AdminRoute>
+                      <UserManagement />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/ai"
+                  element={
+                    <AdminRoute>
+                      <AIControl />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/security"
+                  element={
+                    <AdminRoute>
+                      <AuditLogs />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/ai-audit"
+                  element={
+                    <AdminRoute>
+                      <AIDecisionAudit />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/decision-memory"
+                  element={
+                    <AdminRoute>
+                      <DecisionMemory />
+                    </AdminRoute>
+                  }
+                />
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </AppLayout>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </AppLayout>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

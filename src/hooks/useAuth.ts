@@ -1,8 +1,34 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from '@supabase/supabase-js';
+import { setUserContext } from '@/lib/errorTracking';
 
 export type UserRole = 'admin' | 'user' | 'super_admin';
+
+// ─── MFA Session Binding ─────────────────────────────────
+const MFA_SESSION_KEY = 'biz_mfa_verified';
+const MFA_SESSION_EXPIRY_KEY = 'biz_mfa_verified_at';
+const MFA_SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function markMFAVerified() {
+  sessionStorage.setItem(MFA_SESSION_KEY, 'true');
+  sessionStorage.setItem(MFA_SESSION_EXPIRY_KEY, Date.now().toString());
+}
+
+function isMFASessionValid(): boolean {
+  const verified = sessionStorage.getItem(MFA_SESSION_KEY);
+  const verifiedAt = sessionStorage.getItem(MFA_SESSION_EXPIRY_KEY);
+  if (verified !== 'true' || !verifiedAt) return false;
+  const elapsed = Date.now() - parseInt(verifiedAt, 10);
+  return elapsed < MFA_SESSION_TTL_MS;
+}
+
+function clearMFASession() {
+  sessionStorage.removeItem(MFA_SESSION_KEY);
+  sessionStorage.removeItem(MFA_SESSION_EXPIRY_KEY);
+}
+
+export { markMFAVerified, isMFASessionValid, clearMFASession };
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -17,6 +43,17 @@ export function useAuth() {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Bind Sentry user context for error tracking
+        if (session?.user) {
+          setUserContext({
+            id: session.user.id,
+            email: session.user.email ?? undefined,
+          });
+        } else {
+          setUserContext({ id: '' }); // clear on sign out
+          clearMFASession();
+        }
 
         // Fetch user role when session changes
         if (session?.user) {
