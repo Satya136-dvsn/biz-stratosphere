@@ -3,27 +3,35 @@
 // Unauthorized copying or distribution prohibited.
 
 /**
- * Security utilities for headers, CSRF protection, and other security features
+ * Security utilities — headers, CSRF, rate limiting, session management,
+ * input sanitization, and suspicious-activity detection.
+ *
+ * ⚠️  This module is security-critical. All changes MUST be reviewed.
  */
 
-// Security headers configuration
+// ─── Security Headers ────────────────────────────────────────────
 export const securityHeaders = {
-    // Content Security Policy
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://www.googletagmanager.com'],
+            scriptSrc: ["'self'", 'https://www.googletagmanager.com'],
             styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
             fontSrc: ["'self'", 'https://fonts.gstatic.com'],
             imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-            connectSrc: ["'self'", 'https://generativelanguage.googleapis.com', 'https://*.supabase.co'],
+            connectSrc: [
+                "'self'",
+                'https://generativelanguage.googleapis.com',
+                'https://*.supabase.co',
+                'wss://*.supabase.co',
+                'https://api.pwnedpasswords.com',
+            ],
             frameSrc: ["'none'"],
             objectSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
             upgradeInsecureRequests: [],
         },
     },
-
-    // Other security headers
     xFrameOptions: 'DENY',
     xContentTypeOptions: 'nosniff',
     referrerPolicy: 'strict-origin-when-cross-origin',
@@ -31,6 +39,8 @@ export const securityHeaders = {
         camera: ['()'],
         microphone: ['()'],
         geolocation: ['()'],
+        payment: ['()'],
+        usb: ['()'],
     },
 };
 
@@ -45,14 +55,13 @@ export function generateCSPHeader(): string {
         .join('; ');
 }
 
-// CSRF Token Management
+// ─── CSRF Token Management ───────────────────────────────────────
 const CSRF_TOKEN_KEY = 'csrf_token';
 
 export function generateCSRFToken(): string {
     const token = Array.from(crypto.getRandomValues(new Uint8Array(32)))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
-
     sessionStorage.setItem(CSRF_TOKEN_KEY, token);
     return token;
 }
@@ -61,68 +70,112 @@ export function getCSRFToken(): string | null {
     return sessionStorage.getItem(CSRF_TOKEN_KEY);
 }
 
+/**
+ * Timing-safe CSRF token comparison.
+ * Prevents timing side-channel attacks that could leak token bytes.
+ */
 export function validateCSRFToken(token: string): boolean {
     const storedToken = getCSRFToken();
-    return storedToken === token;
+    if (!storedToken || storedToken.length !== token.length) return false;
+    return timingSafeEqual(storedToken, token);
 }
 
-// Rate Limiting (client-side)
+// ─── Timing-Safe Comparison ──────────────────────────────────────
+function timingSafeEqual(a: string, b: string): boolean {
+    if (a.length !== b.length) return false;
+    let mismatch = 0;
+    for (let i = 0; i < a.length; i++) {
+        mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return mismatch === 0;
+}
+
+// ─── Rate Limiting (Client-Side) ─────────────────────────────────
 class RateLimiter {
     private requests: Map<string, number[]> = new Map();
 
     canMakeRequest(key: string, maxRequests: number, windowMs: number): boolean {
         const now = Date.now();
         const windowStart = now - windowMs;
-
-        // Get existing requests for this key
         let timestamps = this.requests.get(key) || [];
-
-        // Filter out old requests
         timestamps = timestamps.filter(ts => ts > windowStart);
 
-        // Check if we're under the limit
         if (timestamps.length >= maxRequests) {
             return false;
         }
 
-        // Add this request
         timestamps.push(now);
         this.requests.set(key, timestamps);
-
         return true;
     }
 
     getRemainingRequests(key: string, maxRequests: number, windowMs: number): number {
         const now = Date.now();
         const windowStart = now - windowMs;
-
         const timestamps = (this.requests.get(key) || []).filter(ts => ts > windowStart);
         return Math.max(0, maxRequests - timestamps.length);
+    }
+
+    reset(key: string): void {
+        this.requests.delete(key);
     }
 }
 
 export const rateLimiter = new RateLimiter();
 
-// IP Validation
+// ─── Auth Attempt Rate Limiter ───────────────────────────────────
+const AUTH_RATE_LIMIT = { maxAttempts: 5, windowMs: 15 * 60 * 1000 }; // 5 per 15min
+
+export function canAttemptLogin(): boolean {
+    return rateLimiter.canMakeRequest('auth_login', AUTH_RATE_LIMIT.maxAttempts, AUTH_RATE_LIMIT.windowMs);
+}
+
+export function getRemainingLoginAttempts(): number {
+    return rateLimiter.getRemainingRequests('auth_login', AUTH_RATE_LIMIT.maxAttempts, AUTH_RATE_LIMIT.windowMs);
+}
+
+// ─── Session Idle Timeout ────────────────────────────────────────
+const SESSION_IDLE_KEY = 'biz_last_activity';
+const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+
+export function updateLastActivity(): void {
+    sessionStorage.setItem(SESSION_IDLE_KEY, Date.now().toString());
+}
+
+export function isSessionIdle(): boolean {
+    const lastActivity = sessionStorage.getItem(SESSION_IDLE_KEY);
+    if (!lastActivity) return false; // first load, not idle
+    const elapsed = Date.now() - parseInt(lastActivity, 10);
+    return elapsed > SESSION_IDLE_TIMEOUT_MS;
+}
+
+export function clearIdleTimer(): void {
+    sessionStorage.removeItem(SESSION_IDLE_KEY);
+}
+
+// ─── IP Validation ───────────────────────────────────────────────
 export function isValidIP(ip: string): boolean {
-    // IPv4
     const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
     if (ipv4Regex.test(ip)) {
-        const parts = ip.split('.');
-        return parts.every(part => parseInt(part) >= 0 && parseInt(part) <= 255);
+        return ip.split('.').every(part => {
+            const n = parseInt(part);
+            return n >= 0 && n <= 255;
+        });
     }
-
-    // IPv6 (basic check)
     const ipv6Regex = /^([0-9a-fA-F]{0,4}:){7}[0-9a-fA-F]{0,4}$/;
     return ipv6Regex.test(ip);
 }
 
-// Input Sanitization
+// ─── Input Sanitization ─────────────────────────────────────────
 export function sanitizeInput(input: string): string {
     return input
-        .replace(/[<>]/g, '') // Remove < and >
-        .replace(/javascript:/gi, '') // Remove javascript: protocol
-        .replace(/on\w+=/gi, '') // Remove event handlers
+        .replace(/[<>]/g, '')             // Strip angle brackets (XSS)
+        .replace(/javascript:/gi, '')     // Strip javascript: protocol
+        .replace(/on\w+\s*=/gi, '')       // Strip event handlers (onclick=, etc.)
+        .replace(/data:/gi, '')           // Strip data: URIs
+        .replace(/vbscript:/gi, '')       // Strip vbscript: protocol
+        .replace(/__proto__/gi, '')       // Prototype pollution prevention
+        .replace(/constructor\s*\[/gi, '') // Prototype pollution via constructor
         .trim();
 }
 
@@ -132,28 +185,50 @@ export function sanitizeHTML(html: string): string {
     return div.innerHTML;
 }
 
-// Session Security
+/**
+ * Sanitize object keys to prevent prototype pollution.
+ */
+export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
+    const dangerous = ['__proto__', 'constructor', 'prototype'];
+    const clean = { ...obj };
+    for (const key of Object.keys(clean)) {
+        if (dangerous.includes(key)) {
+            delete clean[key];
+        }
+    }
+    return clean;
+}
+
+// ─── Session Security ────────────────────────────────────────────
 export function validateSessionAge(createdAt: Date, maxAgeMs: number = 24 * 60 * 60 * 1000): boolean {
     const age = Date.now() - createdAt.getTime();
     return age < maxAgeMs;
 }
 
-export function detectSuspiciousActivity(events: any[]): boolean {
-    // Simple heuristics for suspicious activity
+export function detectSuspiciousActivity(events: Array<{ timestamp: string; action: string }>): boolean {
+    const now = Date.now();
+
     const rapidRequests = events.filter(e => {
-        const age = Date.now() - new Date(e.timestamp).getTime();
+        const age = now - new Date(e.timestamp).getTime();
         return age < 60000; // Last minute
     }).length > 50;
 
     const failedLogins = events.filter(e =>
         e.action === 'login_failure' &&
-        Date.now() - new Date(e.timestamp).getTime() < 300000 // Last 5 minutes
+        now - new Date(e.timestamp).getTime() < 300000 // Last 5 minutes
     ).length > 5;
 
     return rapidRequests || failedLogins;
 }
 
-// Password Strength Checker
+// ─── Secure Nonce Generator ─────────────────────────────────────
+export function generateNonce(length: number = 16): string {
+    return Array.from(crypto.getRandomValues(new Uint8Array(length)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+// ─── Password Strength Checker ──────────────────────────────────
 export function checkPasswordStrength(password: string): {
     score: number;
     feedback: string[];
@@ -181,7 +256,7 @@ export function checkPasswordStrength(password: string): {
     return { score, feedback };
 }
 
-// Export all utilities
+// ─── Exports ─────────────────────────────────────────────────────
 export const security = {
     generateCSRFToken,
     getCSRFToken,
@@ -189,9 +264,16 @@ export const security = {
     isValidIP,
     sanitizeInput,
     sanitizeHTML,
+    sanitizeObject,
     validateSessionAge,
     detectSuspiciousActivity,
     checkPasswordStrength,
+    canAttemptLogin,
+    getRemainingLoginAttempts,
+    updateLastActivity,
+    isSessionIdle,
+    clearIdleTimer,
+    generateNonce,
     rateLimiter,
     headers: securityHeaders,
     generateCSPHeader,

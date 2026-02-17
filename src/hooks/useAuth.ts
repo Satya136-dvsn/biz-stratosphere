@@ -2,10 +2,17 @@
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from '@supabase/supabase-js';
 import { setUserContext } from '@/lib/errorTracking';
+import {
+  canAttemptLogin,
+  getRemainingLoginAttempts,
+  updateLastActivity,
+  isSessionIdle,
+  clearIdleTimer,
+} from '@/lib/security';
 
 export type UserRole = 'admin' | 'user' | 'super_admin';
 
@@ -97,7 +104,39 @@ export function useAuth() {
     }
   };
 
+  // ─── Session Idle Detection (30-min auto-signout) ─────
+  useEffect(() => {
+    if (!session) return;
+    updateLastActivity();
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'] as const;
+    const onActivity = () => updateLastActivity();
+    events.forEach(e => window.addEventListener(e, onActivity, { passive: true }));
+
+    const idleCheck = setInterval(() => {
+      if (isSessionIdle()) {
+        clearIdleTimer();
+        supabase.auth.signOut();
+      }
+    }, 60_000); // check every minute
+
+    return () => {
+      events.forEach(e => window.removeEventListener(e, onActivity));
+      clearInterval(idleCheck);
+    };
+  }, [session]);
+
   const signIn = async (email: string, password: string) => {
+    // ─── Rate Limiting: block brute-force ─────────────
+    if (!canAttemptLogin()) {
+      const remaining = getRemainingLoginAttempts();
+      return {
+        error: {
+          message: `Too many login attempts. ${remaining} attempts remaining. Try again in 15 minutes.`,
+          name: 'RateLimitError',
+        },
+      };
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -105,6 +144,7 @@ export function useAuth() {
       });
 
       if (error) return { error };
+      updateLastActivity();
       return { data, error: null };
     } catch (error: any) {
       return { error };
@@ -131,6 +171,7 @@ export function useAuth() {
   };
 
   const signOut = async () => {
+    clearIdleTimer();
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Error signing out:', error);

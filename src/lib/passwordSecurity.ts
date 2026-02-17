@@ -116,20 +116,32 @@ export function generateSecurePassword(length: number = 16): string {
 
     const allChars = uppercase + lowercase + numbers + special;
 
+    // Use CSPRNG instead of Math.random()
+    const secureRandom = (max: number): number => {
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        return array[0] % max;
+    };
+
     // Ensure at least one of each required type
     let password = '';
-    password += uppercase[Math.floor(Math.random() * uppercase.length)];
-    password += lowercase[Math.floor(Math.random() * lowercase.length)];
-    password += numbers[Math.floor(Math.random() * numbers.length)];
-    password += special[Math.floor(Math.random() * special.length)];
+    password += uppercase[secureRandom(uppercase.length)];
+    password += lowercase[secureRandom(lowercase.length)];
+    password += numbers[secureRandom(numbers.length)];
+    password += special[secureRandom(special.length)];
 
     // Fill remaining length
     for (let i = password.length; i < length; i++) {
-        password += allChars[Math.floor(Math.random() * allChars.length)];
+        password += allChars[secureRandom(allChars.length)];
     }
 
-    // Shuffle password
-    return password.split('').sort(() => Math.random() - 0.5).join('');
+    // Fisher-Yates shuffle with CSPRNG
+    const arr = password.split('');
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = secureRandom(i + 1);
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.join('');
 }
 
 /**

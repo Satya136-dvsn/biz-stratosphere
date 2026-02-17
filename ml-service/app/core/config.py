@@ -11,8 +11,12 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Biz Stratosphere ML Service"
     VERSION: str = "2.0.0"
     
-    # CORS
-    BACKEND_CORS_ORIGINS: List[str] = ["*"]
+    # CORS — NEVER use "*" in production
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost:8080",
+        "http://localhost:5173",
+        "https://biz-stratosphere.vercel.app",
+    ]
     
     # Ollama
     OLLAMA_HOST: str = "http://ollama:11434"
