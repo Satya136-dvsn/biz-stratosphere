@@ -11,12 +11,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 // Mock dependencies
+// Mock dependencies
+const mockInsert = vi.fn(() => ({ select: vi.fn(() => ({ single: vi.fn(() => ({ data: {}, error: null })) })) }));
+const mockUpdate = vi.fn(() => ({ eq: vi.fn(() => ({ select: vi.fn(() => ({ single: vi.fn(() => ({ data: {}, error: null })) })) })) }));
+const mockSelect = vi.fn(() => ({ order: vi.fn(() => ({ data: [], error: null })) }));
+
 vi.mock('@/integrations/supabase/client', () => ({
     supabase: {
         from: vi.fn(() => ({
-            insert: vi.fn(() => ({ select: vi.fn(() => ({ single: vi.fn(() => ({ data: {}, error: null })) })) })),
-            update: vi.fn(() => ({ eq: vi.fn(() => ({ select: vi.fn(() => ({ single: vi.fn(() => ({ data: {}, error: null })) })) })) })),
-            select: vi.fn(() => ({ order: vi.fn(() => ({ data: [], error: null })) })),
+            insert: mockInsert,
+            update: mockUpdate,
+            select: mockSelect,
         })),
     },
 }));
@@ -65,8 +70,8 @@ describe('useDecisionMemory', () => {
         await result.current.createDecision.mutateAsync(payload);
 
         expect(supabase.from).toHaveBeenCalledWith('decision_memory');
-        const insertMock = supabase.from('decision_memory').insert;
-        expect(insertMock).toHaveBeenCalledWith(expect.objectContaining({
+        const chain = (supabase.from as any).mock.results[0].value;
+        expect(chain.insert).toHaveBeenCalledWith(expect.objectContaining({
             ...payload,
             user_id: 'test-user-id',
             workspace_id: 'test-workspace-id',

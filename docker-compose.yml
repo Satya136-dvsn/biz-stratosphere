@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     depends_on:
       - ollama
-      - postgres-airflow
+      # - postgres-airflow
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - DATABASE_URL=${DATABASE_URL}
@@ -19,18 +19,18 @@ services:
       - ./ml-service:/app
       - ./models:/app/models
 
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    environment:
-      - NODE_ENV=production
-      - VITE_SUPABASE_URL=${SUPABASE_URL}
-      - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - NODE_ENV=production
+  #     - VITE_SUPABASE_URL=${SUPABASE_URL}
+  #     - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
 
   # Ollama - Local LLM serving (Tier 3.3)
   ollama:

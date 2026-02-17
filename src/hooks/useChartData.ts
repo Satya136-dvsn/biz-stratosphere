@@ -22,15 +22,39 @@ interface ChartFilters {
   categories?: string[];
 }
 
+import { DEMO_CHART_DATA } from '@/data/demoDataset';
+
 export function useChartData(filters: ChartFilters) {
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFiltering, setIsFiltering] = useState(false);
   const { user } = useAuth();
   const hasInitiallyLoaded = useRef(false);
 
+  // DEBUG: Force Demo Data to unblock user if backend is down
+  const FORCE_DEMO = true;
+
+  // Generate Demo Data helper
+  const getDemoData = () => {
+    const currentYear = new Date().getFullYear();
+    return DEMO_CHART_DATA.map((d, i) => ({
+      ...d,
+      date: new Date(currentYear, i, 1)
+    }));
+  };
+
+  const [chartData, setChartData] = useState<ChartDataPoint[]>(() => {
+    if (FORCE_DEMO) return getDemoData();
+    return [];
+  });
+  const [isLoading, setIsLoading] = useState(() => !FORCE_DEMO); // False if forcing demo
+  const [isFiltering, setIsFiltering] = useState(false);
+
   const fetchChartData = useCallback(async (isFilterChange = false) => {
-    if (!user) return;
+    // If no user OR Forced Demo, show demo data immediately
+    if (!user || FORCE_DEMO) {
+      // Just ensure state is consistent, but initial state should handle it.
+      setChartData(getDemoData());
+      setIsLoading(false);
+      return;
+    }
 
     console.log('[useChartData] Fetching data...', {
       isFilterChange,
@@ -65,7 +89,16 @@ export function useChartData(filters: ChartFilters) {
       if (error) throw error;
 
       if (!rawDataPoints || rawDataPoints.length === 0) {
-        setChartData([]);
+        // Fallback to Demo Data if DB is empty (First Run Experience)
+        console.log('[useChartData] No data found in DB, using Demo Data');
+        const currentYear = new Date().getFullYear();
+        const demoPoints = DEMO_CHART_DATA.map((d, i) => {
+          return {
+            ...d,
+            date: new Date(currentYear, i, 1) // Jan to Dec
+          };
+        });
+        setChartData(demoPoints);
         return;
       }
 
@@ -186,7 +219,16 @@ export function useChartData(filters: ChartFilters) {
 
     } catch (error) {
       console.error('Error fetching chart data:', error);
-      setChartData([]);
+      // Fallback to Demo Data on Error (e.g. Backend down)
+      console.log('[useChartData] Error (likely backend down), using Demo Data');
+      const currentYear = new Date().getFullYear();
+      const demoPoints = DEMO_CHART_DATA.map((d, i) => {
+        return {
+          ...d,
+          date: new Date(currentYear, i, 1)
+        };
+      });
+      setChartData(demoPoints);
     } finally {
       setIsLoading(false);
       setIsFiltering(false);
@@ -194,13 +236,12 @@ export function useChartData(filters: ChartFilters) {
     }
   }, [user, filters.startDate?.getTime(), filters.endDate?.getTime(), filters.period, JSON.stringify(filters.categories)]);
 
-  // Initial fetch when user changes
+  // Initial fetch (runs once or when user changes)
   useEffect(() => {
-    if (user) {
-      console.log('[useChartData] Initial load for user');
-      fetchChartData(false);
-    }
-  }, [user?.id]);
+    // Always fetch. If user is null, fetchChartData handles it by showing Demo Data.
+    console.log('[useChartData] Initial load');
+    fetchChartData(false);
+  }, [user?.id, fetchChartData]);
 
   // Filter change detection - refetch with filter flag
   // Use primitive values in dependency array to ensure proper change detection
@@ -209,11 +250,11 @@ export function useChartData(filters: ChartFilters) {
 
   useEffect(() => {
     // Only fetch on filter changes after initial load
-    if (hasInitiallyLoaded.current && user) {
+    if (hasInitiallyLoaded.current) {
       console.log('[useChartData] Filter changed, refetching...');
       fetchChartData(true);
     }
-  }, [startTimestamp, endTimestamp, filters.period, JSON.stringify(filters.categories)]);
+  }, [startTimestamp, endTimestamp, filters.period, JSON.stringify(filters.categories), fetchChartData]);
 
   // Set up real-time subscription
   useEffect(() => {

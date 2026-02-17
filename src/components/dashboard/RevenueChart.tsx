@@ -1,30 +1,14 @@
-// © 2026 VenkataSatyanarayana Duba
-// Biz Stratosphere - Proprietary Software
-// Unauthorized copying or distribution prohibited.
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2 } from 'lucide-react';
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  AreaChart,
-  Area,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  TooltipProps
+  LineChart, Line,
+  BarChart, Bar,
+  AreaChart, Area,
+  PieChart, Pie, Cell, ResponsiveContainer,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
 import { ChartType } from './ChartTypeSelector';
-import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface ChartDataPoint {
   month: string;
@@ -44,300 +28,117 @@ interface ChartProps {
   metric?: 'revenue' | 'customers';
 }
 
-// Animation configuration for smooth transitions
-const ANIMATION_DURATION = 800;
-const ANIMATION_EASING = 'ease-out';
-
-// Custom Tooltip Component for better styling control
-const CustomTooltip = ({ active, payload, label, metric }: TooltipProps<ValueType, NameType> & { metric: 'revenue' | 'customers' }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-card/95 border border-border/50 rounded-lg p-2 shadow-xl backdrop-blur-md text-xs">
-        <p className="text-foreground font-medium mb-1">{label}</p>
-        {payload.map((entry, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-muted-foreground capitalize">
-              {['revenue', 'target', 'customers'].includes(entry.name as string)
-                ? (entry.name === 'revenue' ? 'Revenue' : entry.name === 'target' ? 'Target' : 'Customers')
-                : (metric === 'revenue' ? 'Revenue' : 'Customers')}
-            </span>
-            <span className="text-foreground font-mono ml-auto pl-4">
-              {metric === 'revenue' && typeof entry.value === 'number'
-                ? `$${entry.value.toLocaleString()}`
-                : entry.value?.toLocaleString()}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
-
-export function RevenueChart({ variant, title, className, data, isLoading, isFiltering = false, metric = 'revenue' }: ChartProps) {
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [displayData, setDisplayData] = useState<ChartDataPoint[]>(data);
-  const prevDataRef = useRef<ChartDataPoint[]>(data);
-
-  // Smooth transition when data changes
-  useEffect(() => {
-    if (JSON.stringify(data) !== JSON.stringify(prevDataRef.current)) {
-      setIsTransitioning(true);
-      const timer = setTimeout(() => {
-        setDisplayData(data);
-        setIsTransitioning(false);
-      }, 150); // Small delay for smooth visual transition
-      prevDataRef.current = data;
-      return () => clearTimeout(timer);
-    }
-  }, [data]);
-
-  // Loading skeleton with pulse animation
-  if (isLoading) {
-    return (
-      <Card className={`border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent ${className}`}>
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
-            {title}
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center">
-            <div className="w-full space-y-4 animate-pulse">
-              <div className="flex items-end justify-around h-[250px] gap-2">
-                {[60, 80, 45, 90, 70, 85, 55].map((h, i) => (
-                  <Skeleton
-                    key={i}
-                    className="w-full rounded-t-md"
-                    style={{
-                      height: `${h}%`,
-                      animationDelay: `${i * 100}ms`
-                    }}
-                  />
-                ))}
-              </div>
-              <Skeleton className="h-4 w-3/4 mx-auto" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
+export function RevenueChart({ variant, title, className, data, isLoading, metric = 'revenue' }: ChartProps) {
+  // DEBUG: verify data is arriving
+  if (!data || data.length === 0) {
+    return <div className="p-4 text-red-500">No Data Available</div>;
   }
 
-  const colors = [
-    'hsl(var(--primary))',
-    'hsl(var(--revenue))',
-    'hsl(var(--warning))',
-    'hsl(var(--info))',
-    'hsl(var(--secondary))'
-  ];
+  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE'];
 
   const renderChart = () => {
-    switch (variant) {
-      case 'line':
-        return (
-          <LineChart data={displayData}>
-            <XAxis
-              dataKey="month"
-              className="text-muted-foreground"
-              fontSize={12}
-              minTickGap={30}
-            />
-            <YAxis
-              className="text-muted-foreground"
-              fontSize={12}
-              tickFormatter={(value) => metric === 'revenue' ? `$${(value / 1000).toFixed(0)}K` : `${(value / 1000).toFixed(0)}K`}
-            />
-            <Tooltip content={<CustomTooltip metric={metric} />} />
+    // 1. BAR CHART
+    if (variant === 'bar') {
+      return (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" stroke="#888888" />
+            <YAxis stroke="#888888" />
+            <Tooltip />
             <Legend />
-            {metric === 'revenue' ? (
-              <>
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="hsl(var(--revenue))"
-                  strokeWidth={3}
-                  dot={{ fill: 'hsl(var(--revenue))', strokeWidth: 2, r: 4 }}
-                  name="Revenue"
-                  animationBegin={0}
-                  animationDuration={ANIMATION_DURATION}
-                  animationEasing="ease-out"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="target"
-                  stroke="hsl(var(--warning))"
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  dot={{ fill: 'hsl(var(--warning))', strokeWidth: 2, r: 3 }}
-                  name="Target"
-                  animationBegin={100}
-                  animationDuration={ANIMATION_DURATION}
-                  animationEasing="ease-out"
-                />
-              </>
-            ) : (
-              <Line
-                type="monotone"
-                dataKey="customers"
-                stroke="hsl(var(--primary))"
-                strokeWidth={3}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                name="Customers"
-                animationBegin={0}
-                animationDuration={ANIMATION_DURATION}
-                animationEasing="ease-out"
-              />
-            )}
-          </LineChart>
-        );
-
-      case 'bar':
-        return (
-          <BarChart data={displayData}>
-            <XAxis
-              dataKey="month"
-              className="text-muted-foreground"
-              fontSize={12}
-              minTickGap={30}
-            />
-            <YAxis
-              className="text-muted-foreground"
-              fontSize={12}
-              tickFormatter={(value) => metric === 'revenue' ? `$${(value / 1000).toFixed(0)}K` : `${(value / 1000).toFixed(0)}K`}
-            />
-            <Tooltip content={<CustomTooltip metric={metric} />} />
-            <Legend />
-            <Bar
-              dataKey={metric}
-              fill={metric === 'revenue' ? "hsl(var(--revenue))" : "hsl(var(--primary))"}
-              radius={[4, 4, 0, 0]}
-              name={metric === 'revenue' ? "Revenue" : "Customers"}
-              animationBegin={0}
-              animationDuration={ANIMATION_DURATION}
-              animationEasing="ease-out"
-            />
+            <Bar dataKey={metric} fill="#8884d8" name={metric === 'revenue' ? 'Revenue' : 'Customers'} />
           </BarChart>
-        );
+        </ResponsiveContainer>
+      );
+    }
 
-      case 'area':
-        return (
-          <AreaChart data={displayData}>
-            <XAxis
-              dataKey="month"
-              className="text-muted-foreground"
-              fontSize={12}
-              minTickGap={30}
-            />
-            <YAxis
-              className="text-muted-foreground"
-              fontSize={12}
-              tickFormatter={(value) => metric === 'revenue' ? `$${(value / 1000).toFixed(0)}K` : `${(value / 1000).toFixed(0)}K`}
-            />
-            <Tooltip content={<CustomTooltip metric={metric} />} />
+    // 2. AREA CHART
+    if (variant === 'area') {
+      return (
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" stroke="#888888" />
+            <YAxis stroke="#888888" />
+            <Tooltip />
             <Legend />
-            {metric === 'revenue' ? (
-              <>
-                <Area
-                  type="monotone"
-                  dataKey="revenue"
-                  stackId="1"
-                  stroke="hsl(var(--revenue))"
-                  fill="hsl(var(--revenue))"
-                  fillOpacity={0.6}
-                  name="Revenue"
-                  animationBegin={0}
-                  animationDuration={ANIMATION_DURATION}
-                  animationEasing="ease-out"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="target"
-                  stackId="1"
-                  stroke="hsl(var(--warning))"
-                  fill="hsl(var(--warning))"
-                  fillOpacity={0.4}
-                  name="Target"
-                  animationBegin={100}
-                  animationDuration={ANIMATION_DURATION}
-                  animationEasing="ease-out"
-                />
-              </>
-            ) : (
-              <Area
-                type="monotone"
-                dataKey="customers"
-                stackId="1"
-                stroke="hsl(var(--primary))"
-                fill="hsl(var(--primary))"
-                fillOpacity={0.6}
-                name="Customers"
-                animationBegin={0}
-                animationDuration={ANIMATION_DURATION}
-                animationEasing="ease-out"
-              />
-            )}
+            <Area type="monotone" dataKey={metric} stroke="#8884d8" fill="#8884d8" />
           </AreaChart>
-        );
+        </ResponsiveContainer>
+      );
+    }
 
-      case 'pie':
-        const pieData = displayData.slice(0, 6).map((item, index) => ({
-          name: item.month,
-          value: metric === 'revenue' ? item.revenue : item.customers,
-          fill: colors[index % colors.length]
-        }));
+    // 3. PIE CHART
+    if (variant === 'pie') {
+      // Prepare data for Pie (sum or slice?)
+      const pieData = data.slice(0, 6).map((d) => ({
+        name: d.month,
+        value: metric === 'revenue' ? d.revenue : d.customers
+      }));
 
-        return (
+      return (
+        <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
               data={pieData}
               cx="50%"
               cy="50%"
-              labelLine={false}
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              outerRadius={100}
+              outerRadius={80}
               fill="#8884d8"
               dataKey="value"
-              animationBegin={0}
-              animationDuration={ANIMATION_DURATION}
-              animationEasing="ease-out"
+              label
             >
               {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip metric={metric} />} />
+            <Tooltip />
             <Legend />
           </PieChart>
-        );
-
-      default:
-        return null;
+        </ResponsiveContainer>
+      );
     }
+
+    // DEFAULT: LINE CHART
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart
+          data={data}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" stroke="#888888" />
+          <YAxis stroke="#888888" />
+          <Tooltip />
+          <Legend />
+          {metric === 'revenue' ? (
+            <>
+              <Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="target" stroke="#82ca9d" />
+            </>
+          ) : (
+            <Line type="monotone" dataKey="customers" stroke="#8884d8" />
+          )}
+        </LineChart>
+      </ResponsiveContainer>
+    );
   };
 
   return (
-    <Card className={`border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent transition-all duration-300 ${className}`}>
+    <Card className={className}>
       <CardHeader>
-        <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
-          {title}
-          {(isTransitioning || isFiltering) && (
-            <Loader2 className="h-4 w-4 animate-spin text-primary/60" />
-          )}
-        </CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div
-          className={`transition-opacity duration-300 ${(isTransitioning || isFiltering) ? 'opacity-60' : 'opacity-100'}`}
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            {renderChart()}
-          </ResponsiveContainer>
+        <div style={{ width: '100%', height: 300 }}>
+          {renderChart()}
         </div>
       </CardContent>
     </Card>

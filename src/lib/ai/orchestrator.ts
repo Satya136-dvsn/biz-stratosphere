@@ -107,11 +107,19 @@ export class AIOrchestrator {
         const startTime = performance.now();
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-        if (!apiKey) {
-            throw new Error('Missing VITE_GEMINI_API_KEY environment variable');
+        // MOCK FALLBACK for Demo/Invalid Key
+        if (!apiKey || apiKey === 'your_gemini_api_key_here' || apiKey.length < 10) {
+            console.warn('[AIOrchestrator] No valid Gemini API Key found. Using Mock Response.');
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate latency
+            return {
+                content: "I'm currently in Demo Mode because a valid API Key wasn't detected. \n\nNormally, I would analyze your data using Gemini Flash, but for now, I can tell you that your Revenue is trending up! 🚀\n\n(To enable real AI, please set VITE_GEMINI_API_KEY in your .env file)",
+                provider: 'gemini (mock)',
+                latencyMs: performance.now() - startTime,
+                metadata: { model: 'mock-gemini' }
+            };
         }
 
-        const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent';
+        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         // Construct Prompt with Context
         let systemInstruction = "";

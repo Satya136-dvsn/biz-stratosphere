@@ -1,3 +1,4 @@
+
 // © 2026 VenkataSatyanarayana Duba
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
@@ -17,6 +18,7 @@ import {
     ReferenceLine,
 } from 'recharts';
 import { cn } from '@/lib/utils';
+import { ChartGradientDefs } from '@/components/ui/ChartGradientDefs';
 
 export interface FeatureContribution {
     feature: string;
@@ -107,43 +109,48 @@ export function SHAPWaterfall({
                             layout="vertical"
                             margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
                         >
+                            <ChartGradientDefs />
                             <CartesianGrid
                                 strokeDasharray="3 3"
                                 horizontal={false}
                                 stroke="hsl(var(--border))"
-                                opacity={0.4}
+                                opacity={0.2}
                             />
                             <XAxis
                                 type="number"
                                 tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                                 domain={[-maxAbsValue * 1.1, maxAbsValue * 1.1]}
                                 tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`}
+                                axisLine={false}
+                                tickLine={false}
                             />
                             <YAxis
                                 type="category"
                                 dataKey="name"
                                 width={120}
                                 tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                                axisLine={false}
+                                tickLine={false}
                             />
                             <Tooltip
                                 content={<SHAPTooltip />}
-                                cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }}
+                                cursor={{ fill: 'hsl(var(--muted))', opacity: 0.1 }}
                             />
                             <ReferenceLine
                                 x={0}
                                 stroke="hsl(var(--border))"
                                 strokeWidth={2}
                             />
-                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={22}>
+                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={22} animationDuration={1500}>
                                 {chartData.map((entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}
                                         fill={
                                             entry.impact === 'positive'
-                                                ? 'hsl(142, 71%, 45%)'   // green
-                                                : 'hsl(0, 84%, 60%)'      // red
+                                                ? 'url(#colorSuccess)'
+                                                : 'url(#colorDestructive)'
                                         }
-                                        opacity={0.85}
+                                        opacity={1}
                                     />
                                 ))}
                             </Bar>
@@ -183,24 +190,25 @@ function SHAPTooltip({ active, payload }: any) {
     const data = payload[0].payload;
 
     return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg text-sm">
-            <p className="font-semibold mb-1">{data.name}</p>
-            <div className="space-y-0.5 text-muted-foreground">
-                <p>
-                    Input Value: <span className="text-foreground font-medium">{data.rawValue?.toFixed(2)}</span>
-                </p>
-                <p>
-                    Impact:{' '}
+        <div className="bg-card/95 border border-border/50 rounded-lg p-3 shadow-xl backdrop-blur-md text-sm animate-in fade-in zoom-in-95 duration-200">
+            <p className="font-semibold mb-2 text-foreground">{data.name}</p>
+            <div className="space-y-1.5 text-muted-foreground">
+                <div className="flex justify-between gap-4">
+                    <span>Input Value:</span>
+                    <span className="text-foreground font-mono">{data.rawValue?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                    <span>Impact:</span>
                     <span
                         className={cn(
-                            'font-medium',
+                            'font-mono font-medium',
                             data.impact === 'positive' ? 'text-green-500' : 'text-red-500'
                         )}
                     >
                         {data.impact === 'positive' ? '+' : '-'}
                         {(data.importance * 100).toFixed(1)}%
                     </span>
-                </p>
+                </div>
             </div>
         </div>
     );
