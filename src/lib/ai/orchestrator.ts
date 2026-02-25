@@ -7,9 +7,11 @@ import { supabase } from '../supabaseClient';
 import { AI_PROMPTS } from './prompts';
 
 const DEFAULT_CONFIG: AIConfig = {
-    localUrl: 'http://localhost:11434/api/chat',
-    preferredProvider: 'gemini', // Default to FREE/Cheap option
-    fallbackEnabled: false
+    localUrl: (import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434') + '/api/chat',
+    preferredProvider: (import.meta.env.VITE_AI_PROVIDER as AIProvider) || 'local',
+    fallbackEnabled: false,
+    chatModel: import.meta.env.VITE_OLLAMA_CHAT_MODEL || 'llama3.2',
+    embeddingModel: import.meta.env.VITE_OLLAMA_EMBED_MODEL || 'nomic-embed-text',
 };
 
 export class AIOrchestrator {
@@ -41,7 +43,7 @@ export class AIOrchestrator {
             console.log('[AIOrchestrator] Cache Hit');
             return {
                 content: cached.content,
-                provider: (request.provider || this.config.preferredProvider) + ' (cached)',
+                provider: (request.provider || this.config.preferredProvider) as AIProvider,
                 latencyMs: 0,
                 metadata: cached.metadata
             };
@@ -113,7 +115,7 @@ export class AIOrchestrator {
             await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate latency
             return {
                 content: "I'm currently in Demo Mode because a valid API Key wasn't detected. \n\nNormally, I would analyze your data using Gemini Flash, but for now, I can tell you that your Revenue is trending up! 🚀\n\n(To enable real AI, please set VITE_GEMINI_API_KEY in your .env file)",
-                provider: 'gemini (mock)',
+                provider: 'local' as AIProvider,
                 latencyMs: performance.now() - startTime,
                 metadata: { model: 'mock-gemini' }
             };
@@ -214,7 +216,7 @@ export class AIOrchestrator {
 
         // Ollama API format
         const payload = {
-            model: "mistral", // Default, could be configurable
+            model: this.config.chatModel,
             messages: request.messages,
             stream: false,
             options: {
@@ -243,9 +245,14 @@ export class AIOrchestrator {
                 metadata: { model: data.model }
             };
         } catch (err) {
-            // If fetch fails (e.g. refused connection), standard error
-            if (err instanceof TypeError && err.message.includes('fetch')) {
-                throw new Error('Local LLM server not reachable. Is Ollama running?');
+            // If fetch fails (e.g. refused connection), helpful error
+            if (err instanceof TypeError && (err.message.includes('fetch') || err.message.includes('Failed'))) {
+                throw new Error(
+                    'Local LLM server not reachable. Please ensure Ollama is running:\n' +
+                    '1. Install Ollama from https://ollama.com/\n' +
+                    `2. Run: ollama pull ${this.config.chatModel}\n` +
+                    '3. Ollama starts automatically after install, or run: ollama serve'
+                );
             }
             throw err;
         }
@@ -349,6 +356,65 @@ export class AIOrchestrator {
             console.error('Failed to parse AI suggestions:', e);
             return [];
         }
+    }
+    /**
+     * Generate embeddings using local Ollama model.
+     * Uses the /api/embed endpoint with a configurable embedding model.
+     */
+    async generateLocalEmbedding(text: string): Promise<number[]> {
+        const baseUrl = import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434';
+        const model = this.config.embeddingModel;
+
+        try {
+            const res = await fetch(`${baseUrl}/api/embed`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: model,
+                    input: text,
+                })
+            });
+
+            if (!res.ok) {
+                const errText = await res.text().catch(() => '');
+                throw new Error(`Ollama embedding error: ${res.statusText} ${errText}`);
+            }
+
+            const data = await res.json();
+
+            // Ollama returns { embeddings: [[...numbers]] } for /api/embed
+            if (data.embeddings && data.embeddings.length > 0) {
+                return data.embeddings[0];
+            }
+
+            throw new Error('No embedding returned from Ollama');
+        } catch (err) {
+            if (err instanceof TypeError && (err.message.includes('fetch') || err.message.includes('Failed'))) {
+                throw new Error(
+                    'Ollama not reachable for embeddings. Please ensure Ollama is running:\n' +
+                    `1. Run: ollama pull ${model}\n` +
+                    '2. Ollama should be running at ' + baseUrl
+                );
+            }
+            throw err;
+        }
+    }
+
+    /**
+     * Returns the currently configured provider.
+     */
+    getProvider(): AIProvider {
+        return this.config.preferredProvider;
+    }
+
+    /**
+     * Returns the currently configured chat model name.
+     */
+    getChatModelName(): string {
+        if (this.config.preferredProvider === 'local') {
+            return this.config.chatModel;
+        }
+        return 'gemini-1.5-flash';
     }
 }
 

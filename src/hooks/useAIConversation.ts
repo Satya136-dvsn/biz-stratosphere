@@ -25,8 +25,7 @@ interface Conversation {
     updated_at: Date;
 }
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-1.5-flash'; // Fast and free!
+
 
 export function useAIConversation(conversationId?: string) {
     const { user } = useAuth();
@@ -82,9 +81,8 @@ export function useAIConversation(conversationId?: string) {
     ${context}
     Provide concise, actionable insights based on the user's data.`;
 
-                    // Call AI Orchestrator
+                    // Call AI Orchestrator (uses env-configured provider)
                     const response = await aiOrchestrator.generateResponse({
-                        provider: 'gemini', // Default to Gemini (Free)
                         messages: [
                             { role: 'system', content: systemInstruction },
                             ...prevMessages,

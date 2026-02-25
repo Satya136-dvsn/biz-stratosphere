@@ -1,9 +1,7 @@
-// © 2026 VenkataSatyanarayana Duba
-// Biz Stratosphere - Proprietary Software
-// Unauthorized copying or distribution prohibited.
-
 import { supabase } from '@/integrations/supabase/client';
+import { aiOrchestrator } from '@/lib/ai/orchestrator';
 
+const AI_PROVIDER = import.meta.env.VITE_AI_PROVIDER || 'local';
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 export interface EmbeddingResult {
@@ -15,9 +13,16 @@ export interface EmbeddingResult {
 }
 
 /**
- * Generate embeddings using OpenAI's ada-002 model
+ * Generate embeddings using local Ollama or OpenAI's ada-002 model.
+ * When VITE_AI_PROVIDER=local, uses Ollama (free, no API key needed).
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
+    // Use local Ollama embeddings when provider is 'local'
+    if (AI_PROVIDER === 'local') {
+        return aiOrchestrator.generateLocalEmbedding(text);
+    }
+
+    // Fallback: OpenAI embedding API
     const response = await fetch('https://api.openai.com/v1/embeddings', {
         method: 'POST',
         headers: {

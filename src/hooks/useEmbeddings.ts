@@ -8,7 +8,9 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { hashContent } from '@/lib/conversationUtils';
 import { useUserUploads } from './useUserUploads';
+import { aiOrchestrator } from '@/lib/ai/orchestrator';
 
+const AI_PROVIDER = import.meta.env.VITE_AI_PROVIDER || 'local';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_EMBEDDING_URL = 'https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent';
 
@@ -62,8 +64,33 @@ export function useEmbeddings() {
             }
         }
 
-        console.log(`[Embeddings] Generating embedding for text length: ${text.length}`);
+        console.log(`[Embeddings] Generating embedding for text length: ${text.length} (provider: ${AI_PROVIDER})`);
 
+        // Use local Ollama embeddings when provider is 'local'
+        if (AI_PROVIDER === 'local') {
+            const embeddingVector = await aiOrchestrator.generateLocalEmbedding(text);
+
+            // Cache if workspace provided
+            if (workspaceId) {
+                const contentHash = await hashContent(text);
+                (async () => {
+                    try {
+                        await supabase.from('embedding_cache').insert({
+                            content_hash: contentHash,
+                            content_text: text.substring(0, 1000),
+                            embedding: embeddingVector,
+                            workspace_id: workspaceId
+                        });
+                    } catch (err) {
+                        console.warn('Cache insert failed:', err);
+                    }
+                })();
+            }
+
+            return embeddingVector;
+        }
+
+        // Fallback: Gemini embedding API
         const response = await fetch(`${GEMINI_EMBEDDING_URL}?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -90,7 +117,7 @@ export function useEmbeddings() {
                 try {
                     await supabase.from('embedding_cache').insert({
                         content_hash: contentHash,
-                        content_text: text.substring(0, 1000), // Store truncated text
+                        content_text: text.substring(0, 1000),
                         embedding: embeddingVector,
                         workspace_id: workspaceId
                     });

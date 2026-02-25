@@ -13,8 +13,7 @@ import { useEmbeddings } from '@/hooks/useEmbeddings';
 import { calculateConfidenceFromResults, type ConfidenceScore } from '@/lib/ai/confidenceScoring';
 import { validateGrounding, type GroundingResult } from '@/lib/ai/groundingValidator';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const GEMINI_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent';
+
 
 export interface ChatMessage {
     id: string;
@@ -225,14 +224,13 @@ export function useRAGChat(conversationId?: string) {
                     content: msg.content
                 }));
 
-                // 3. Call AI Orchestrator (Client-Side)
+                // 3. Call AI Orchestrator (env-configured provider)
                 const systemPrompt = `You are a helpful AI assistant analyzing business data. 
 Answer questions based on the provided context if available.
 If the answer isn't in the context, say so clearly but try to be helpful with general knowledge.
 Cite sources using [Source ID] format if referenced.`;
 
                 const response = await aiOrchestrator.generateResponse({
-                    provider: 'gemini', // Default to Gemini Client-Side
                     messages: [
                         { role: 'system', content: systemPrompt },
                         ...history,
@@ -302,7 +300,7 @@ Cite sources using [Source ID] format if referenced.`;
                             : null,
 
                         // Versioning Metadata
-                        model_version: 'gemini-1.5-flash',
+                        model_version: aiOrchestrator.getChatModelName(),
                         prompt_version: 'v2.1-rag-optimized',
                     }]);
                 } catch (auditError) {

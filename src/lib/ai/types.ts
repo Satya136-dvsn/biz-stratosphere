@@ -31,6 +31,8 @@ export interface AIConfig {
     localUrl: string; // e.g. "http://localhost:11434"
     preferredProvider: AIProvider;
     fallbackEnabled: boolean;
+    chatModel: string; // e.g. "llama3.2"
+    embeddingModel: string; // e.g. "nomic-embed-text"
 }
 
 export interface AIRoutingMetrics {
