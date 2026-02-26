@@ -342,7 +342,7 @@ export class AIOrchestrator {
                 { role: 'system', content: AI_PROMPTS.AUTOMATION_SUGGESTER },
                 { role: 'user', content: prompt }
             ],
-            provider: 'gemini',
+            provider: this.config.preferredProvider,
             jsonMode: true
         });
 
@@ -408,6 +408,13 @@ export class AIOrchestrator {
     }
 
     /**
+     * Set the active provider at runtime (from Settings UI).
+     */
+    setProvider(provider: AIProvider): void {
+        this.config.preferredProvider = provider;
+    }
+
+    /**
      * Returns the currently configured chat model name.
      */
     getChatModelName(): string {
@@ -415,6 +422,58 @@ export class AIOrchestrator {
             return this.config.chatModel;
         }
         return 'gemini-1.5-flash';
+    }
+
+    /**
+     * Stream a response from Ollama token-by-token.
+     * Yields text chunks as they arrive.
+     */
+    async *generateStreamingResponse(request: AIRequest): AsyncGenerator<string> {
+        const baseUrl = import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434';
+        const model = this.config.chatModel;
+
+        const body = {
+            model,
+            messages: request.messages.map(m => ({ role: m.role, content: m.content })),
+            stream: true,
+            options: {
+                temperature: request.temperature || 0.7,
+                num_predict: request.maxTokens || 1000,
+            }
+        };
+
+        const res = await fetch(`${baseUrl}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok || !res.body) {
+            throw new Error(`Ollama streaming error: ${res.statusText}`);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            // Ollama returns newline-delimited JSON
+            const lines = chunk.split('\n').filter(l => l.trim());
+
+            for (const line of lines) {
+                try {
+                    const parsed = JSON.parse(line);
+                    if (parsed.message?.content) {
+                        yield parsed.message.content;
+                    }
+                } catch {
+                    // Skip malformed lines
+                }
+            }
+        }
     }
 }
 

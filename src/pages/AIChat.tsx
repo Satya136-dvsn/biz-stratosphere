@@ -27,6 +27,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2, Zap, ChevronDown, ChevronUp, Settings2, Sliders, RefreshCw } from 'lucide-react';
 import { ConversationSettings } from '@/components/ai/ConversationSettings';
 import { ExportConversation } from '@/components/ai/ExportConversation';
+import { aiOrchestrator } from '@/lib/ai/orchestrator';
 
 export function AIChat() {
     const { user } = useAuth();
@@ -261,6 +262,19 @@ export function AIChat() {
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">AI Assistant</h1>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            {/* Provider Badge */}
+                            {aiOrchestrator.getProvider() === 'local' ? (
+                                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    Local · {aiOrchestrator.getChatModelName()}
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                    Gemini Cloud
+                                </span>
+                            )}
+                            <span className="text-muted-foreground/40">·</span>
                             <span>Knowledge Base:</span>
                             {activeDatasetName ? (
                                 <span className="flex items-center gap-1 font-medium text-primary">

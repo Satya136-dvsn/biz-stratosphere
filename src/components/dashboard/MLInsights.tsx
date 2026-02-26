@@ -2,7 +2,7 @@
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +38,31 @@ export function MLInsights() {
   const [explainLoading, setExplainLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // ML Service health check
+  const [mlServiceStatus, setMlServiceStatus] = useState<'checking' | 'healthy' | 'offline'>('checking');
+  const [mlServiceInfo, setMlServiceInfo] = useState<{ models?: number; ollama?: string }>({});
+
+  useEffect(() => {
+    const checkMLService = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(3000) });
+        if (res.ok) {
+          const data = await res.json();
+          setMlServiceStatus('healthy');
+          setMlServiceInfo({
+            models: data.services?.ml_models?.count,
+            ollama: data.services?.ollama?.status,
+          });
+        } else {
+          setMlServiceStatus('offline');
+        }
+      } catch {
+        setMlServiceStatus('offline');
+      }
+    };
+    checkMLService();
+  }, []);
 
   const runChurnPrediction = async () => {
     if (!user) return;
@@ -181,10 +206,32 @@ export function MLInsights() {
   return (
     <Card className="border-2 border-primary/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-primary" />
-          Advanced ML Analytics
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5 text-primary" />
+            Advanced ML Analytics
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {mlServiceStatus === 'checking' && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Checking...
+              </span>
+            )}
+            {mlServiceStatus === 'healthy' && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                ML Service Online{mlServiceInfo.models ? ` · ${mlServiceInfo.models} models` : ''}
+              </span>
+            )}
+            {mlServiceStatus === 'offline' && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                ML Service Offline
+              </span>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="overview" className="space-y-4">

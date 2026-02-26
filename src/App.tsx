@@ -54,7 +54,16 @@ const PageLoader = () => (
   </div>
 );
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,     // 5 min - reduce refetches
+      gcTime: 1000 * 60 * 10,       // 10 min - keep unused data longer
+      refetchOnWindowFocus: false,   // Don't refetch on tab switch
+      retry: 1,                      // Only retry once
+    },
+  },
+});
 
 // Layout component that includes sidebar for protected pages
 function AppLayout({ children }: { children: React.ReactNode }) {

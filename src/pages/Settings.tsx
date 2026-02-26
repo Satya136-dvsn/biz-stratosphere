@@ -12,8 +12,9 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UsageQuotas } from "@/components/settings/UsageQuotas";
 import { SubscriptionSettings } from "@/components/settings/SubscriptionSettings";
+import { AIProviderSettings } from "@/components/settings/AIProviderSettings";
 import { useAuth } from "@/hooks/useAuth";
-import { User, Bell, Shield, Database, Save, Palette, Moon, Sun, Download, FileText, Trash2, Lock, CreditCard } from "lucide-react";
+import { User, Bell, Shield, Database, Save, Palette, Moon, Sun, Download, FileText, Trash2, Lock, CreditCard, Brain } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -179,6 +180,10 @@ export function Settings() {
           <TabsTrigger value="account" className="gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Account</span>
+          </TabsTrigger>
+          <TabsTrigger value="ai-provider" className="gap-2">
+            <Brain className="h-4 w-4" />
+            <span className="hidden sm:inline">AI Provider</span>
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="h-4 w-4" />
@@ -524,6 +529,11 @@ export function Settings() {
         {/* Usage Settings */}
         <TabsContent value="usage" className="space-y-4">
           <UsageQuotas />
+        </TabsContent>
+
+        {/* AI Provider Settings */}
+        <TabsContent value="ai-provider" className="space-y-4">
+          <AIProviderSettings />
         </TabsContent>
 
         {/* Subscription Settings */}
