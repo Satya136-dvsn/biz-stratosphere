@@ -402,7 +402,6 @@ export function MLPredictions() {
                                                 </div>
                                             )}
 
-                                            {/* AI Explanation Section */}
                                             <div className="pt-4 border-t">
                                                 {!explanation ? (
                                                     <Button
@@ -447,16 +446,17 @@ export function MLPredictions() {
                                                     </div>
                                                 )}
                                             </div>
-                                            )
-                                            ) : (
-                                            <div className="text-center py-12">
-                                                <Brain className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-                                                <p className="text-muted-foreground">
-                                                    Fill in the features and click "Get Prediction" to see results
-                                                </p>
-                                            </div>
+                                        </div>
+                                    )
+                                ) : (
+                                    <div className="text-center py-12">
+                                        <Brain className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+                                        <p className="text-muted-foreground">
+                                            Fill in the features and click "Get Prediction" to see results
+                                        </p>
+                                    </div>
                                 )}
-                                        </CardContent>
+                            </CardContent>
                         </Card>
                     </div>
                 </TabsContent>

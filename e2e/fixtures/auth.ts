@@ -26,6 +26,47 @@ interface AuthFixtures {
 }
 
 /**
+ * Mocks Supabase Auth requests to decouple E2E tests from real database rate limits
+ */
+async function mockSupabaseAuth(page: Page, role: 'user' | 'admin' = 'user') {
+    const userId = role === 'admin' ? 'admin-id' : 'test-user-id';
+    const email = role === 'admin' ? TEST_ADMIN_EMAIL : TEST_USER_EMAIL;
+
+    // Mock login and token generation
+    await page.route('**/auth/v1/token?grant_type=password', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                access_token: 'fake-access-token',
+                token_type: 'bearer',
+                expires_in: 3600,
+                refresh_token: 'fake-refresh-token',
+                user: { id: userId, email, role: 'authenticated', app_metadata: {}, user_metadata: {} }
+            })
+        });
+    });
+
+    // Mock session checking
+    await page.route('**/auth/v1/user', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ id: userId, email, role: 'authenticated', app_metadata: {}, user_metadata: {} })
+        });
+    });
+
+    // Mock role lookup from profiles collection
+    await page.route('**/rest/v1/profiles?id=eq.*', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify([{ role }])
+        });
+    });
+}
+
+/**
  * Custom test with authentication fixtures
  */
 export const test = base.extend<AuthFixtures>({
@@ -35,6 +76,9 @@ export const test = base.extend<AuthFixtures>({
         const page = await context.newPage();
 
         try {
+            // Mock Supabase Auth network requests
+            await mockSupabaseAuth(page, 'user');
+
             // Navigate to auth page
             await page.goto('/auth');
             await page.waitForLoadState('networkidle');
@@ -66,6 +110,9 @@ export const test = base.extend<AuthFixtures>({
         const page = await context.newPage();
 
         try {
+            // Mock Supabase Auth network requests for Admin
+            await mockSupabaseAuth(page, 'admin');
+
             // Navigate to auth page
             await page.goto('/auth');
             await page.waitForLoadState('networkidle');
@@ -95,6 +142,9 @@ export const test = base.extend<AuthFixtures>({
     authContext: async ({ browser }, use) => {
         const context = await browser.newContext();
         const page = await context.newPage();
+
+        // Mock shared context as regular user
+        await mockSupabaseAuth(page, 'user');
 
         // Login once
         await page.goto('/auth');
