@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class SupabaseETL:
     """ETL pipeline that integrates with Supabase for data processing"""
 
-    def __init__(self, supabase_url: str, supabase_key: str):
+    def __init__(self, supabase_url: str = None, supabase_key: str = None):
         """
         Initialize Supabase ETL client
 
@@ -29,7 +29,13 @@ class SupabaseETL:
             supabase_url: Supabase project URL
             supabase_key: Supabase service role key or anon key
         """
-        self.supabase: Client = create_client(supabase_url, supabase_key)
+        self.supabase_url = supabase_url or os.getenv("VITE_SUPABASE_URL") or os.getenv("SUPABASE_URL")
+        self.supabase_key = supabase_key or os.getenv("VITE_SUPABASE_ANON_KEY") or os.getenv("SUPABASE_KEY")
+        
+        if not self.supabase_url or not self.supabase_key:
+            raise ValueError("Supabase URL and Key must be provided either as args or environment variables.")
+            
+        self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
         self.logger = logger
 
     def get_dataset_data(self, dataset_id: str) -> Optional[pd.DataFrame]:
@@ -307,3 +313,47 @@ class SupabaseETL:
         except Exception as e:
             self.logger.error(f"Error getting processing stats: {e}")
             return {'error': str(e)}
+
+    def process_all_unprocessed_datasets(self) -> Dict[str, Any]:
+        """
+        Process all datasets that are in 'pending' or 'uploaded' status
+        """
+        self.logger.info("Fetching unprocessed datasets...")
+        try:
+            # Fetch all datasets with pending status
+            result = self.supabase.table('datasets').select('*').in_('status', ['pending', 'uploaded']).execute()
+            
+            datasets = result.data
+            if not datasets:
+                self.logger.info("No unprocessed datasets found.")
+                return {'processed': 0, 'successful': 0, 'failed': 0}
+                
+            self.logger.info(f"Found {len(datasets)} datasets to process.")
+            
+            stats = {'processed': len(datasets), 'successful': 0, 'failed': 0}
+            
+            for ds in datasets:
+                ds_id = ds['id']
+                self.logger.info(f"Processing dataset: {ds['name']} (ID: {ds_id})")
+                
+                # Retry logic for processing (simple 3 retries)
+                success = False
+                for attempt in range(3):
+                    try:
+                        res = self.process_dataset(ds_id)
+                        if res.get('success'):
+                            stats['successful'] += 1
+                            success = True
+                            break
+                        self.logger.warning(f"Attempt {attempt+1} failed for {ds_id}. Error: {res.get('error')}")
+                    except Exception as e:
+                        self.logger.warning(f"Attempt {attempt+1} exception for {ds_id}: {e}")
+                
+                if not success:
+                    stats['failed'] += 1
+                    
+            return stats
+            
+        except Exception as e:
+            self.logger.error(f"Error processing all datasets: {e}")
+            raise

@@ -1,23 +1,96 @@
 version: '3.8'
 
 services:
-  # The main backend service (formerly ml-service)
-  backend:
-    build: ./ml-service
-    container_name: biz-stratosphere-backend
+  api-gateway:
+    build: ./backend/api-gateway
+    container_name: biz-stratosphere-gateway
     ports:
       - "8000:8000"
     depends_on:
-      - ollama
-      # - postgres-airflow
+      - ml-inference
+      - llm-orchestrator
+      - rag-service
     environment:
-      - OLLAMA_HOST=http://ollama:11434
+      - ML_INFERENCE_URL=http://ml-inference:8001
+      - LLM_ORCHESTRATOR_URL=http://llm-orchestrator:8002
+      - RAG_SERVICE_URL=http://rag-service:8003
       - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_URL=${SUPABASE_URL}
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  ml-inference:
+    build: ./backend/ml-inference
+    container_name: biz-stratosphere-ml
+    ports:
+      - "8001:8001"
+    environment:
       - MLFLOW_TRACKING_URI=sqlite:///mlflow.db
+      - DATABASE_URL=${DATABASE_URL}
     restart: unless-stopped
     volumes:
-      - ./ml-service:/app
       - ./models:/app/models
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  llm-orchestrator:
+    build: ./backend/llm-orchestrator
+    container_name: biz-stratosphere-llm
+    ports:
+      - "8002:8002"
+    depends_on:
+      ollama:
+        condition: service_healthy
+      rag-service:
+        condition: service_started
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - RAG_SERVICE_URL=http://rag-service:8003
+      - ML_INFERENCE_URL=http://ml-inference:8001
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+
+  rag-service:
+    build: ./backend/rag-service
+    container_name: biz-stratosphere-rag
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - OLLAMA_HOST=http://ollama:11434
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  embedding-worker:
+    build: ./backend/embedding-worker
+    container_name: biz-stratosphere-embedding
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - OLLAMA_HOST=http://ollama:11434
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1.5G
 
   # frontend:
   #   build:
@@ -43,6 +116,11 @@ services:
     restart: unless-stopped
     environment:
       - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   postgres-airflow:
     image: postgres:14

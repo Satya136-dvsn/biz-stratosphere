@@ -152,7 +152,8 @@ class SHAPService:
             return f"data:image/png;base64,{image_base64}"
 
         except Exception as e:
-            print(f"Error generating waterfall plot: {e}")
+            from loguru import logger
+            logger.error(f"Error generating waterfall plot: {e}")
             return None
 
     def generate_summary_plot(
@@ -194,7 +195,8 @@ class SHAPService:
             return f"data:image/png;base64,{image_base64}"
 
         except Exception as e:
-            print(f"Error generating summary plot: {e}")
+            from loguru import logger
+            logger.error(f"Error generating summary plot: {e}")
             return None
 
 # Global SHAP service instance

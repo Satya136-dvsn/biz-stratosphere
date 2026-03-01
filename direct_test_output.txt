@@ -1,0 +1,5 @@
+--- 1. Testing Valid Request (Observability Middleware) ---
+--- CAPTURED LOGS ---
+
+
+--- RAW OUTPUT DUMP ---

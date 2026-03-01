@@ -335,123 +335,128 @@ export function MLPredictions() {
                             </CardHeader>
                             <CardContent>
                                 {prediction ? (
-                                    <div className="space-y-4">
-                                        {/* Prediction Result */}
-                                        <div className="space-y-2">
-                                            <Label className="text-muted-foreground">Prediction</Label>
-                                            <div className="text-3xl font-bold">
-                                                {selectedModel === 'churn_model' ? (
-                                                    <span className={prediction.prediction > 0.5 ? 'text-red-600' : 'text-green-600'}>
-                                                        {prediction.prediction > 0.5 ? 'Will Churn' : 'Will Stay'}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-blue-600">
-                                                        ${(prediction.prediction * 1000).toLocaleString('en-US', { maximumFractionDigits: 0 })}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="text-sm text-muted-foreground">
-                                                Raw value: {prediction.prediction.toFixed(4)}
-                                            </div>
-                                        </div>
-
-                                        {/* Confidence */}
-                                        {prediction.confidence && (
+                                    prediction.error ? (
+                                        <Alert variant="destructive">
+                                            <AlertDescription>{prediction.message}</AlertDescription>
+                                        </Alert>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {/* Prediction Result */}
                                             <div className="space-y-2">
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-muted-foreground">Confidence</span>
-                                                    <span className="font-medium">{(prediction.confidence * 100).toFixed(1)}%</span>
-                                                </div>
-                                                <Progress value={prediction.confidence * 100} />
-                                            </div>
-                                        )}
-
-                                        {/* Feature Importance */}
-                                        {prediction.feature_importance && (
-                                            <div className="space-y-3">
-                                                <div className="text-sm font-medium">Feature Importance</div>
-                                                {Object.entries(prediction.feature_importance)
-                                                    .sort(([, a], [, b]) => (b as number) - (a as number))
-                                                    .slice(0, 5)
-                                                    .map(([name, value]) => {
-                                                        const feature = modelConfig.features.find(f => f.name === name);
-                                                        return (
-                                                            <div key={name} className="space-y-1">
-                                                                <div className="flex justify-between text-sm">
-                                                                    <span className="text-muted-foreground">{feature?.label || name}</span>
-                                                                    <span className="font-medium">{(value as number).toFixed(4)}</span>
-                                                                </div>
-                                                                <Progress value={(value as number) * 100} className="h-1" />
-                                                            </div>
-                                                        );
-                                                    })
-                                                }
-                                            </div>
-                                        )}
-
-                                        {/* Cache indicator */}
-                                        {prediction.cache_hit && (
-                                            <div className="flex items-center gap-2 text-sm text-green-600">
-                                                <CheckCircle2 className="h-4 w-4" />
-                                                <span>Loaded from cache (instant!)</span>
-                                            </div>
-                                        )}
-
-                                        {/* AI Explanation Section */}
-                                        <div className="pt-4 border-t">
-                                            {!explanation ? (
-                                                <Button
-                                                    onClick={handleExplain}
-                                                    disabled={isExplaining}
-                                                    variant="outline"
-                                                    className="w-full border-purple-200 hover:bg-purple-50 hover:text-purple-700"
-                                                >
-                                                    {isExplaining ? (
-                                                        <>
-                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                            Analyzing factors...
-                                                        </>
+                                                <Label className="text-muted-foreground">Prediction</Label>
+                                                <div className="text-3xl font-bold">
+                                                    {selectedModel === 'churn_model' ? (
+                                                        <span className={prediction.prediction > 0.5 ? 'text-red-600' : 'text-green-600'}>
+                                                            {prediction.prediction > 0.5 ? 'Will Churn' : 'Will Stay'}
+                                                        </span>
                                                     ) : (
-                                                        <>
-                                                            <Sparkles className="mr-2 h-4 w-4 text-purple-600" />
-                                                            Explain with AI
-                                                        </>
+                                                        <span className="text-blue-600">
+                                                            ${(prediction.prediction * 1000).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                                                        </span>
                                                     )}
-                                                </Button>
-                                            ) : (
-                                                <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <div className="flex items-center gap-2 font-semibold text-purple-800">
-                                                            <Sparkles className="h-4 w-4" />
-                                                            AI Analysis
-                                                        </div>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-7 text-purple-600 hover:text-purple-800 hover:bg-purple-100"
-                                                            onClick={() => setExplanation(null)}
-                                                        >
-                                                            Close
-                                                        </Button>
+                                                </div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    Raw value: {prediction.prediction.toFixed(4)}
+                                                </div>
+                                            </div>
+
+                                            {/* Confidence */}
+                                            {prediction.confidence && (
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-muted-foreground">Confidence</span>
+                                                        <span className="font-medium">{(prediction.confidence * 100).toFixed(1)}%</span>
                                                     </div>
-                                                    <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                                        <p className="text-purple-900 leading-relaxed text-sm">
-                                                            {explanation}
-                                                        </p>
-                                                    </div>
+                                                    <Progress value={prediction.confidence * 100} />
                                                 </div>
                                             )}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-12">
-                                        <Brain className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-                                        <p className="text-muted-foreground">
-                                            Fill in the features and click "Get Prediction" to see results
-                                        </p>
-                                    </div>
+
+                                            {/* Feature Importance */}
+                                            {prediction.feature_importance && (
+                                                <div className="space-y-3">
+                                                    <div className="text-sm font-medium">Feature Importance</div>
+                                                    {Object.entries(prediction.feature_importance)
+                                                        .sort(([, a], [, b]) => (b as number) - (a as number))
+                                                        .slice(0, 5)
+                                                        .map(([name, value]) => {
+                                                            const feature = modelConfig.features.find(f => f.name === name);
+                                                            return (
+                                                                <div key={name} className="space-y-1">
+                                                                    <div className="flex justify-between text-sm">
+                                                                        <span className="text-muted-foreground">{feature?.label || name}</span>
+                                                                        <span className="font-medium">{(value as number).toFixed(4)}</span>
+                                                                    </div>
+                                                                    <Progress value={(value as number) * 100} className="h-1" />
+                                                                </div>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+                                            )}
+
+                                            {/* Cache indicator */}
+                                            {prediction.cache_hit && (
+                                                <div className="flex items-center gap-2 text-sm text-green-600">
+                                                    <CheckCircle2 className="h-4 w-4" />
+                                                    <span>Loaded from cache (instant!)</span>
+                                                </div>
+                                            )}
+
+                                            {/* AI Explanation Section */}
+                                            <div className="pt-4 border-t">
+                                                {!explanation ? (
+                                                    <Button
+                                                        onClick={handleExplain}
+                                                        disabled={isExplaining}
+                                                        variant="outline"
+                                                        className="w-full border-purple-200 hover:bg-purple-50 hover:text-purple-700"
+                                                    >
+                                                        {isExplaining ? (
+                                                            <>
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                Analyzing factors...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Sparkles className="mr-2 h-4 w-4 text-purple-600" />
+                                                                Explain with AI
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                ) : (
+                                                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
+                                                        <div className="flex items-center justify-between mb-3">
+                                                            <div className="flex items-center gap-2 font-semibold text-purple-800">
+                                                                <Sparkles className="h-4 w-4" />
+                                                                AI Analysis
+                                                            </div>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-7 text-purple-600 hover:text-purple-800 hover:bg-purple-100"
+                                                                onClick={() => setExplanation(null)}
+                                                            >
+                                                                Close
+                                                            </Button>
+                                                        </div>
+                                                        <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                                            <p className="text-purple-900 leading-relaxed text-sm">
+                                                                {explanation}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            )
+                                            ) : (
+                                            <div className="text-center py-12">
+                                                <Brain className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+                                                <p className="text-muted-foreground">
+                                                    Fill in the features and click "Get Prediction" to see results
+                                                </p>
+                                            </div>
                                 )}
-                            </CardContent>
+                                        </CardContent>
                         </Card>
                     </div>
                 </TabsContent>

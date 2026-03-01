@@ -4,29 +4,35 @@
 
 import os
 import json
-import logging
 from datetime import datetime
 from typing import Dict, Any, Optional
-from sqlalchemy import create_engine, text
+from loguru import logger
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy import text
 from app.core.config import get_settings
 
 settings = get_settings()
-logger = logging.getLogger(__name__)
 
 class DecisionLogger:
     def __init__(self):
         self.db_url = os.getenv("DATABASE_URL")
         self.engine = None
         if self.db_url:
+            # Convert URL for asyncpg
+            if self.db_url.startswith("postgres://"):
+                self.db_url = self.db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif self.db_url.startswith("postgresql://") and "asyncpg" not in self.db_url:
+                self.db_url = self.db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+                
             try:
-                self.engine = create_engine(self.db_url, pool_pre_ping=True)
-                logger.info("DecisionLogger: Connected to database.")
+                self.engine = create_async_engine(self.db_url, pool_pre_ping=True)
+                logger.info("DecisionLogger: Configured async database engine.")
             except Exception as e:
-                logger.error(f"DecisionLogger: Failed to connect to DB: {e}")
+                logger.error(f"DecisionLogger: Failed to configure DB: {e}")
         else:
             logger.warning("DecisionLogger: DATABASE_URL not set. Logging disabled.")
 
-    def log_decision(
+    async def log_decision(
         self,
         model_name: str,
         model_version: str,
@@ -37,8 +43,7 @@ class DecisionLogger:
         metadata: Optional[Dict[str, Any]] = None
     ):
         """
-        Logs a decision to the integration database asynchronously (simulated via fire-and-forget logic for now, 
-        or simply synchronous if low volume. For high volume, use BackgroundTasks).
+        Logs a decision to the integration database asynchronously.
         """
         if not self.engine:
             return
@@ -56,10 +61,6 @@ class DecisionLogger:
                 "created_at": datetime.utcnow().isoformat()
             }
 
-            # Insert into decision_memory
-            # Note: In a real high-throughput scenario, use a bulk insert or message queue.
-            # Using raw SQL for speed and simplicity without full ORM overhead for this single table.
-            
             insert_query = text("""
                 INSERT INTO decision_memory 
                 (model_name, model_version, input_features, prediction, prediction_proba, shap_values, metadata)
@@ -67,9 +68,8 @@ class DecisionLogger:
                 (:model_name, :model_version, :input_features, :prediction, :prediction_proba, :shap_values, :metadata)
             """)
 
-            with self.engine.connect() as conn:
-                conn.execute(insert_query, decision_record)
-                conn.commit()
+            async with self.engine.begin() as conn:
+                await conn.execute(insert_query, decision_record)
                 
             logger.debug(f"Logged decision for {model_name}")
 

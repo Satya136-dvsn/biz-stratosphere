@@ -2,41 +2,49 @@
 # Biz Stratosphere - Proprietary Software
 # Unauthorized copying or distribution prohibited.
 
-import logging
 import sys
+import logging
+from loguru import logger
 
-class EndpointFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        return record.getMessage().find("/health") == -1
+class InterceptHandler(logging.Handler):
+    """
+    Default handler from examples in loguru documention.
+    """
+    def emit(self, record: logging.LogRecord):
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
 
-def setup_logging(log_level: str = "INFO", json_format: bool = False):
+        frame, depth = logging.currentframe(), 2
+        while frame and frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
+
+        # Use loguru to log
+        logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
+
+def setup_logging(log_level: str = "INFO", json_format: bool = True):
     """
-    Setup logging configuration
+    Setup logging configuration with loguru
     """
-    root_logger = logging.getLogger()
-    root_logger.setLevel(log_level)
+    # Remove standard handlers
+    logging.getLogger().handlers.clear()
     
-    # Remove existing handlers
-    for handler in root_logger.handlers:
-        root_logger.removeHandler(handler)
+    # Configure Loguru
+    logger.remove()
     
-    # Create console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    
-    if json_format:
-        # JSON formatter for production (e.g., simplified here)
-        formatter = logging.Formatter(
-            '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "name": "%(name)s", "message": "%(message)s"}'
-        )
-    else:
-        # Standard formatter for development
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-        
-    console_handler.setFormatter(formatter)
-    
-    # Filter health checks from access logs if using uvicorn
-    logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
-    
-    root_logger.addHandler(console_handler)
+    # Always use JSON in production/hardening
+    logger.add(
+        sys.stdout, 
+        format="{message}", 
+        filter=lambda record: "/health" not in record["message"], 
+        serialize=True, 
+        level=log_level
+    )
+
+    # Intercept standard logging messages
+    logging.basicConfig(handlers=[InterceptHandler()], level=0)
+    for _log in ['uvicorn', 'uvicorn.error', 'uvicorn.access', 'fastapi']:
+        _logger = logging.getLogger(_log)
+        _logger.handlers = [InterceptHandler()]

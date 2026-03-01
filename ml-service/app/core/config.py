@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     OLLAMA_HOST: str = "http://ollama:11434"
     OLLAMA_TIMEOUT: int = 60
     
+    # Auth
+    SUPABASE_URL: str = "https://your-supabase.supabase.co"
+    SUPABASE_JWT_SECRET: str = "your-supabase-jwt-secret-here" # Override in .env
+    JWT_ALGORITHM: str = "RS256"
+    
     # MLflow
     MLFLOW_TRACKING_URI: str = "sqlite:///mlflow.db"
     MODEL_DIR: str = "models"
@@ -29,6 +34,7 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
         env_file = ".env"
+        extra = "ignore"
 
 @lru_cache()
 def get_settings():

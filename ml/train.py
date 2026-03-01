@@ -176,12 +176,16 @@ class BankChurnTrainer:
         # Get model configuration
         model_config = self.config.get_model_config(model_type)
 
-        # Initialize model
+        # Initialize model with deterministic random_state
+        rs = getattr(self.config, 'random_state', 42)
         if model_type == 'random_forest':
+            model_config['random_state'] = model_config.get('random_state', rs)
             model = RandomForestClassifier(**model_config)
         elif model_type == 'xgboost':
+            model_config['random_state'] = model_config.get('random_state', rs)
             model = xgb.XGBClassifier(**model_config)
         elif model_type == 'logistic_regression':
+            model_config['random_state'] = model_config.get('random_state', rs)
             model = LogisticRegression(**model_config)
         else:
             raise ValueError(f"Unsupported model type: {model_type}")
@@ -227,7 +231,7 @@ class BankChurnTrainer:
 
         self.models[model_type] = model_info
 
-        logger.info(f"{model_type} training completed. ROC-AUC: {metrics['roc_auc']".4f"}")
+        logger.info(f"{model_type} training completed. ROC-AUC: {metrics['roc_auc']:.4f}")
 
         return model_info
 
@@ -400,10 +404,10 @@ def main():
 
         # Check class balance
         churn_rate = y.mean()
-        logger.info(f"Churn rate: {churn_rate".3f"}")
+        logger.info(f"Churn rate: {churn_rate:.3f}")
 
         if churn_rate < 0.01 or churn_rate > 0.99:
-            logger.warning(f"Highly imbalanced dataset: churn rate = {churn_rate".3f"}")
+            logger.warning(f"Highly imbalanced dataset: churn rate = {churn_rate:.3f}")
 
         # Train all models
         results = trainer.train_all_models(X, y)
@@ -429,14 +433,13 @@ def main():
         # Print summary
         best_model = trainer.get_best_model()
         if best_model:
-            logger.info("
-=== TRAINING SUMMARY ===")
+            logger.info("\\n=== TRAINING SUMMARY ===")
             logger.info(f"Best Model: {best_model['model_type']}")
-            logger.info(f"ROC-AUC: {best_model['metrics']['roc_auc']".4f"}")
-            logger.info(f"Accuracy: {best_model['metrics']['accuracy']".4f"}")
-            logger.info(f"Precision: {best_model['metrics']['precision']".4f"}")
-            logger.info(f"Recall: {best_model['metrics']['recall']".4f"}")
-            logger.info(f"F1-Score: {best_model['metrics']['f1_score']".4f"}")
+            logger.info(f"ROC-AUC: {best_model['metrics']['roc_auc']:.4f}")
+            logger.info(f"Accuracy: {best_model['metrics']['accuracy']:.4f}")
+            logger.info(f"Precision: {best_model['metrics']['precision']:.4f}")
+            logger.info(f"Recall: {best_model['metrics']['recall']:.4f}")
+            logger.info(f"F1-Score: {best_model['metrics']['f1_score']:.4f}")
 
         logger.info("ML training pipeline completed successfully!")
         return True
