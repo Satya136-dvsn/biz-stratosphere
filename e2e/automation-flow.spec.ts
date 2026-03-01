@@ -63,15 +63,13 @@ test.describe('Automation Rules', () => {
 test.describe('AI Chat', () => {
     test('should load AI chat page', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/ai-chat');
-        // Wait for chat input or heading with longer timeout
-        await authenticatedPage.waitForSelector('[data-testid="ai-chat-input"], h1, h2', { state: 'visible', timeout: 60000 });
 
         // Use data-testid for stable selector - check for chat input or heading
         const chatInput = authenticatedPage.locator('[data-testid="ai-chat-input"]');
-        const aiHeading = authenticatedPage.locator('h1:has-text("AI"), h2:has-text("AI")');
+        const aiHeading = authenticatedPage.locator('h1, h2').filter({ hasText: /AI/i });
 
         // Either chat input or heading should be visible
-        await expect(chatInput.or(aiHeading).first()).toBeVisible({ timeout: 10000 });
+        await expect(chatInput.or(aiHeading).first()).toBeVisible({ timeout: 15000 });
     });
 });
 
@@ -81,10 +79,10 @@ test.describe('AI Chat', () => {
 test.describe('ML Predictions', () => {
     test('should load ML predictions page', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/ml-predictions');
-        // Wait for content (increased timeout for Firefox stability)
-        await authenticatedPage.waitForSelector('h1, h2', { state: 'visible', timeout: 60000 });
 
-        // Should see ML predictions heading or content
-        await expect(authenticatedPage.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
+        // Wait for ML predictions heading or content
+        await expect(authenticatedPage.getByRole('heading', { level: 1 })
+            .or(authenticatedPage.getByRole('heading', { level: 2 })).first()
+        ).toBeVisible({ timeout: 15000 });
     });
 });
