@@ -61,4 +61,4 @@ def test_unauthorized_token_rejection():
         )
         
         assert response.status_code == 401
-        assert "Could not validate credentials" in response.json().get("detail", "")
+        assert "Could not validate credentials" in response.json().get("error", {}).get("message", "")

@@ -9,7 +9,7 @@ from app.api.deps import get_current_user
 
 # Mock authentication
 async def mock_get_current_user():
-    return {"sub": "test-user-id"}
+    return {"sub": "test-user-id", "role": "admin"}
 
 app.dependency_overrides[get_current_user] = mock_get_current_user
 
@@ -43,7 +43,7 @@ def test_protected_ml_endpoint_with_auth(client):
     
     # Meaning auth succeeded, model validation failed
     assert response.status_code == 500 
-    assert "not found" in response.json()["detail"].lower()
+    assert "not found" in response.json()["error"]["message"].lower()
 
 def test_ml_batch_predict_auth(client):
     response = client.post("/api/v1/ml/batch-predict", json=[{"age": 30}])

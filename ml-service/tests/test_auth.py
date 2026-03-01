@@ -1,41 +1,37 @@
-# © 2026 VenkataSatyanarayana Duba
-# Biz Stratosphere - Proprietary Software
-# Unauthorized copying or distribution prohibited.
-
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import HTTPException
-from jose import jwt
-
+from unittest.mock import patch, AsyncMock
 from app.api.deps import get_current_user
-from app.core.config import get_settings
-from main import app
 
-settings = get_settings()
+class MockCredentials:
+    def __init__(self, token):
+        self.credentials = token
 
-def test_get_current_user_valid_token():
-    # Create a valid token
-    payload = {"sub": "user-1234", "role": "authenticated"}
-    token = jwt.encode(payload, settings.SUPABASE_JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
-    
-    # Mock credentials object
-    class MockCredentials:
-        credentials = token
-    
-    user = get_current_user(MockCredentials())
-    assert user["sub"] == "user-1234"
+@pytest.mark.asyncio
+async def test_get_current_user_valid_token():
+    with patch("app.api.deps.jwt.get_unverified_header") as mock_header, \
+         patch("app.api.deps.get_jwks", new_callable=AsyncMock) as mock_get_jwks, \
+         patch("app.api.deps.jwt.decode") as mock_decode:
+            
+        mock_header.return_value = {"alg": "RS256", "kid": "test-kid"}
+        mock_get_jwks.return_value = {"keys": [{"kid": "test-kid", "kty": "RSA"}]}
+        mock_decode.return_value = {"sub": "user-1234", "role": "authenticated"}
+        
+        creds = MockCredentials("fake-valid-token")
+        
+        user = await get_current_user(creds)
+        assert user["sub"] == "user-1234"
 
-def test_get_current_user_invalid_token():
-    # Create an invalid token (wrong secret)
-    payload = {"sub": "user-1234", "role": "authenticated"}
-    token = jwt.encode(payload, "wrong-secret", algorithm=settings.JWT_ALGORITHM)
-    
-    # Mock credentials object
-    class MockCredentials:
-        credentials = token
-    
-    with pytest.raises(HTTPException) as exc_info:
-        get_current_user(MockCredentials())
-    
-    assert exc_info.value.status_code == 401
-    assert "Could not validate credentials" in exc_info.value.detail
+@pytest.mark.asyncio
+async def test_get_current_user_invalid_token():
+    with patch("app.api.deps.jwt.get_unverified_header") as mock_header:
+        # Simulate a token constructed with wrong algo
+        mock_header.return_value = {"alg": "HS256", "kid": "test-kid"}
+        
+        creds = MockCredentials("fake-invalid-token")
+        
+        with pytest.raises(HTTPException) as exc_info:
+            await get_current_user(creds)
+            
+        assert exc_info.value.status_code == 401
+        assert "Could not validate credentials" in exc_info.value.detail
