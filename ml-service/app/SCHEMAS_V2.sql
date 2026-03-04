@@ -121,6 +121,9 @@ CREATE TABLE IF NOT EXISTS public.decision_feedback (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Safely enable RLS
+ALTER TABLE public.decision_feedback ENABLE ROW LEVEL SECURITY;
+
 -- ============================================================================
 -- MODULE: PRESCRIPTIVE ENGINE
 -- ============================================================================
@@ -135,6 +138,9 @@ CREATE TABLE IF NOT EXISTS public.simulation_scenarios (
     status TEXT DEFAULT 'pending'
 );
 
+-- Safely enable RLS
+ALTER TABLE public.simulation_scenarios ENABLE ROW LEVEL SECURITY;
+
 CREATE TABLE IF NOT EXISTS public.simulation_results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     scenario_id UUID REFERENCES public.simulation_scenarios(id) ON DELETE CASCADE,
@@ -143,6 +149,9 @@ CREATE TABLE IF NOT EXISTS public.simulation_results (
     predicted_outcome JSONB,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Safely enable RLS
+ALTER TABLE public.simulation_results ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- MODULE: ML MONITORING
@@ -159,6 +168,9 @@ CREATE TABLE IF NOT EXISTS public.model_monitoring_logs (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Safely enable RLS
+ALTER TABLE public.model_monitoring_logs ENABLE ROW LEVEL SECURITY;
+
 -- ============================================================================
 -- MODULE: GOVERNANCE
 -- ============================================================================
@@ -174,6 +186,9 @@ CREATE TABLE IF NOT EXISTS public.data_provenance (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Safely enable RLS
+ALTER TABLE public.data_provenance ENABLE ROW LEVEL SECURITY;
+
 CREATE TABLE IF NOT EXISTS public.dataset_versions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     dataset_id UUID REFERENCES public.datasets(id),
@@ -184,6 +199,9 @@ CREATE TABLE IF NOT EXISTS public.dataset_versions (
     created_by UUID REFERENCES auth.users(id),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Safely enable RLS
+ALTER TABLE public.dataset_versions ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- MODULE: MONETIZATION
@@ -200,6 +218,9 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Safely enable RLS
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+
 CREATE TABLE IF NOT EXISTS public.usage_meters (
     workspace_id UUID REFERENCES public.workspaces(id),
     metric_name TEXT NOT NULL,
@@ -208,3 +229,6 @@ CREATE TABLE IF NOT EXISTS public.usage_meters (
     reset_at TIMESTAMPTZ,
     PRIMARY KEY (workspace_id, metric_name, period_start)
 );
+
+-- Safely enable RLS
+ALTER TABLE public.usage_meters ENABLE ROW LEVEL SECURITY;
