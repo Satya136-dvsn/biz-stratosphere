@@ -1,152 +1,55 @@
 # Biz Stratosphere
->
-> **The Decision Intelligence Platform for Modern Enterprise**
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
+**Biz Stratosphere** is an enterprise-grade, AI-powered business analytics platform designed as a comprehensive system design case study. It demonstrates modern microservice architecture, demonstrating how to seamlessly integrate Machine Learning inference, Retrieval-Augmented Generation (RAG), and Local LLM orchestration within a highly resilient, cloud-native Kubernetes deployment.
 
-**Biz Stratosphere** is an end-to-end Business Intelligence & Decision Support System (DSS) architected for the data-driven enterprise. Unlike traditional BI tools that merely visualize data, Biz Stratosphere integrates predictive analytics, explainable AI (XAI), and automated decision governance into a unified workflows.
+![Biz Stratosphere Dashboard Workflow](docs/portfolio/assets/dashboard-preview.png) *(Note: Placeholder for actual dashboard screenshot)*
 
 ---
 
-## 🚀 Why Biz Stratosphere Exists
+## 🎯 Platform Pitch & Purpose
 
-In the era of big data, organizations drown in dashboards but starve for insights. Biz Stratosphere was built to bridge the gap between **Observation** and **Action**.
+Biz Stratosphere isn't just an application; it's a blueprint for production-grade AI integration. It proves that complex AI workflows—combining sub-50ms predictive analytics with context-aware generative AI—can be achieved locally and securely without relying on expensive, black-box third-party APIs. 
 
-- **From Reactive to Proactive:** Move beyond "What happened?" to "What will happen?" with integrated ML forecasting.
-- **From Black Box to Glass Box:** Every AI recommendation forces transparency via SHAP-powered explainability.
-- **From Ad-hoc to Governed:** Our **Decision Memory™** engine records the context, confidence, and outcome of every AI-assisted decision, creating an audit trail for the future.
+The platform is designed to answer complex business questions (e.g., *"What is the churn risk for user A, and how can we mitigate it based on our internal playbooks?"*) by fetching structural data, predicting outcomes, searching unstructured documents, and reasoning over the combined context.
 
----
+## 🏗️ High-Level Architecture
 
-## 💎 Core Capabilities
+The backend utilizes an isolated microservice mesh orchestrated by Kubernetes:
 
-### 1. Advanced Decision Intelligence
+1. **API Gateway:** Central routing, rate limiting, and request parallelization.
+2. **ML Inference Service:** High-speed XGBoost/RandomForest predictive modeling.
+3. **RAG Service:** Semantic vector search using PostgreSQL `pgvector`.
+4. **LLM Orchestrator:** Generative reasoning using a local Ollama models (Llama 3/Mistral).
+5. **Embedding Worker:** Asynchronous document ingestion and vectorization.
 
-- **Predictive Analytics:** Forecasting modules for Churn, CLV, and Demand using optimized ML models.
-- **Explainable AI (XAI):** Real-time SHAP value generation to explain *why* a model made a specific prediction.
-- **LLM-Powered Insights:** Integrated RAG (Retrieval-Augmented Generation) chat for conversational data analysis.
+**Core Resilience Features:**
+- Custom **Circuit Breakers** isolating catastrophic component failures.
+- **Exponential Backoff Retries** for transient network stability.
+- Dynamic scaling via **Horizontal Pod Autoscalers (HPA)**.
+- Complete observability via **Prometheus, Grafana, and Jaeger (OpenTelemetry)**.
 
-### 2. Enterprise-Grade Architecture
+## 💻 Technology Stack
 
-- **Microservices Backend:** Modular Python/FastAPI services for scalability and isolation.
-- **Robust ETL Pipelines:** Airflow-orchestrated data ingestion and transformation.
-- **High-Performance Frontend:** React/Vite dashboard optimized for speed and interactivity.
+| Category | Technologies |
+| :--- | :--- |
+| **Backend Framework** | Python 3.11, FastAPI, Pydantic, Uvicorn |
+| **Frontend Framework** | React 18, Vite, Tailwind CSS, Recharts |
+| **Database & Vector Store** | PostgreSQL 16 `pgvector`, SQLAlchemy, asyncpg |
+| **Machine Learning** | Scikit-Learn, XGBoost, Pandas |
+| **Generative AI** | Ollama, HuggingFace Sentence Transformers |
+| **Deployment & Orchestration** | Docker, Docker Compose, Kubernetes, Kustomize |
+| **Observability** | Prometheus (Metrics), Grafana (Dashboards), Jaeger (Distributed Tracing) |
 
-### 3. Security & Governance
+## 🚀 Quick Links
 
-- **Zero-Knowledge Architecture:** Designed with privacy-first principles; sensitive data is processed in isolated environments.
-- **Role-Based Access Control (RBAC):** Granular permission management for workspaces and datasets.
-- **Audit Logging:** Comprehensive tracking of user actions and system events.
+Explore the detailed portfolio documentation to understand the engineering decisions behind the platform:
 
----
-
-## 🏗️ Technical Architecture
-
-The platform follows a modern, containerized microservices architecture:
-
-```mermaid
-graph TD
-    User[User] -->|HTTPS| Frontend[React Frontend]
-    Frontend -->|REST API| Backend[FastAPI Backend]
-    Frontend -->|Supabase SDK| DB[(Supabase / PostgreSQL)]
-
-    subgraph "Backend Services"
-        Backend -->|Model Inference| MLEngine[ML Engine]
-        Backend -->|Explanations| SHAP[SHAP Service]
-        Backend -->|LLM Requests| Ollama[Ollama / Local LLM]
-    end
-
-    subgraph "Data Pipeline"
-        Airflow[Apache Airflow] -->|ETL Jobs| DB
-        Airflow -->|Model Training| MLEngine
-    end
-
-    style User fill:#f9f,stroke:#333,stroke-width:2px
-    style Frontend fill:#bbf,stroke:#333,stroke-width:2px
-    style Backend fill:#bfb,stroke:#333,stroke-width:2px
-    style DB fill:#ff9,stroke:#333,stroke-width:2px
-```
-
-| Component | Technology Stack | Description |
-|-----------|------------------|-------------|
-| **Frontend** | React, TypeScript, Tailwind, Vite | Responsive SPA with real-time visualization |
-| **Backend API** | Python, FastAPI, Pydantic | High-performance REST API for ML & Business Logic |
-| **ML Engine** | PyTorch, Scikit-learn, MLflow | Model training, serving, and lifecycle management |
-| **Orchestration** | Apache Airflow | Reliable ETL and batch processing workflows |
-| **Database** | PostgreSQL, Supabase | Relational data storage with Row-Level Security |
-| **LLM** | Ollama, Llama 3 | Local LLM inference for data privacy |
+- 📖 [System Design Case Study](docs/portfolio/case-study.md) - Deep dive into architecture, scaling, and reliability.
+- 📐 [Simplified Architecture Diagrams](docs/portfolio/architecture.md) - Visual overview of the services and data flow.
+- 🔄 [Request Lifecycle Walkthrough](docs/portfolio/architecture.md#request-lifecycle) - Step-by-step breakdown of a concurrent ML + RAG + LLM request.
+- 🏃 [Demo & Quick Start Guide](docs/portfolio/demo-and-quickstart.md) - How to run the platform locally or on a Kubernetes cluster.
+- 📜 [Full Production Architecture Whitepaper](docs/whitepaper/architecture-overview.md) - The exhaustive technical specification.
 
 ---
 
-## 🛠️ Getting Started
-
-### Prerequisites
-
-- Docker & Docker Compose
-- Python 3.11+
-- Node.js 18+
-
-### Quick Start (Docker)
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/Satya136-dvsn/biz-stratosphere.git
-   cd biz-stratosphere
-   ```
-
-2. **Configure Environment**
-   Copy `.env.example` to `.env` and configure your API keys.
-
-   ```bash
-   cp .env.example .env.local
-   ```
-
-3. **Launch Services**
-
-   ```bash
-   docker-compose up --build -d
-   ```
-
-4. **Access the Platform**
-   - **Dashboard:** `http://localhost:3000`
-   - **API Docs:** `http://localhost:8000/docs`
-   - **Airflow:** `http://localhost:8080`
-
----
-
-## 🔒 Security Policy
-
-Security is core to our design. We maintain a **Zero-Knowledge Inspired** architecture where practical, ensuring that encryption keys and sensitive data are handled with maximal isolation.
-
-For details on our security practices, including vulnerability reporting, please see [SECURITY.md](SECURITY.md).
-
-> **Note:** While architected for enterprise security, this open-source version is provided "as-is". Please review our license for liability details.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from the community! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-### Development Standards
-
-- **Backend:** PEP 8 compliance, MyPy type checking, Pytest coverage.
-- **Frontend:** ESLint, Prettier, Component-driven development.
-- **Commits:** Conventional Commits specification.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<p align="center">
-  Built with ❤️ for the data-driven future.<br>
-  For support, contact: <a href="mailto:d.v.satyanarayana260@gmail.com">d.v.satyanarayana260@gmail.com</a>
-</p>
+*This project is built and maintained as a demonstration of advanced systems engineering, scalable microservices, and applied artificial intelligence.*
