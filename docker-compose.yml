@@ -255,6 +255,77 @@ services:
       - ./ml:/opt/airflow/dags/ml
     command: airflow scheduler
 
+  # ════════════════════════════════════════════
+  # OBSERVABILITY STACK (Phase 6)
+  # ════════════════════════════════════════════
+
+  # ────────────────────────────────
+  # Prometheus (:9090)
+  # ────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: biz-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ────────────────────────────────
+  # Grafana (:3001)
+  # ────────────────────────────────
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: biz-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ────────────────────────────────
+  # Jaeger (:16686 UI, :4317 OTLP)
+  # ────────────────────────────────
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    container_name: biz-jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:16687/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
 volumes:
   airflow-db:
   ollama_data:
+  prometheus_data:
+  grafana_data:

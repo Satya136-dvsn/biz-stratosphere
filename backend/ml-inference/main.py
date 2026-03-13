@@ -30,6 +30,8 @@ from shared import (
     ErrorCodes,
     build_error_json,
 )
+from shared.metrics import get_or_create_metrics, make_metrics_router
+from shared.tracing import init_tracer, make_traces_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("ml-inference")
@@ -96,6 +98,12 @@ async def _readiness_check():
 
 app.include_router(make_health_router("ml-inference", version="1.0.0", readiness_check=_readiness_check))
 
+# Phase 6: Metrics + Tracing
+metrics = get_or_create_metrics("ml_inference")
+tracer = init_tracer("ml-inference")
+app.include_router(make_metrics_router(metrics))
+app.include_router(make_traces_router())
+
 for exc_type, handler in make_exception_handlers("ml-inference"):
     app.add_exception_handler(exc_type, handler)
 
@@ -147,31 +155,40 @@ async def predict(req: PredictRequest):
         )
 
     start = time.monotonic()
-    try:
-        x = np.array(req.features).reshape(1, -1)
+    with tracer.span("ml.predict", attributes={"model": req.model_name}) as span:
+        try:
+            x = np.array(req.features).reshape(1, -1)
 
-        # Deterministic output enforcement: disable internal randomness if possible
-        if hasattr(model, "random_state"):
-            pass  # already frozen at training time
+            # Deterministic output enforcement: disable internal randomness if possible
+            if hasattr(model, "random_state"):
+                pass  # already frozen at training time
 
-        pred = model.predict(x)
-        proba = None
-        if hasattr(model, "predict_proba"):
-            proba = model.predict_proba(x).tolist()[0]
+            pred = model.predict(x)
+            proba = None
+            if hasattr(model, "predict_proba"):
+                proba = model.predict_proba(x).tolist()[0]
 
-        latency_ms = round((time.monotonic() - start) * 1000, 2)
-        if latency_ms > 500:
-            logger.warning(f"[ml-inference] SLOW predict for '{req.model_name}': {latency_ms}ms")
+            latency_s = time.monotonic() - start
+            latency_ms = round(latency_s * 1000, 2)
 
-        return PredictResponse(
-            model_name=req.model_name,
-            prediction=pred.tolist()[0] if hasattr(pred, "tolist") else pred,
-            probability=proba,
-            latency_ms=latency_ms,
-        )
-    except Exception as exc:
-        logger.exception(f"Prediction error for '{req.model_name}': {exc}")
-        raise HTTPException(status_code=500, detail=f"Inference failed: {exc}")
+            # Record metrics
+            metrics.ml_inference_latency.observe(latency_s, model=req.model_name)
+            span.set_attribute("latency_ms", latency_ms)
+            span.set_attribute("prediction", str(pred.tolist()[0] if hasattr(pred, "tolist") else pred))
+
+            if latency_ms > 500:
+                logger.warning(f"[ml-inference] SLOW predict for '{req.model_name}': {latency_ms}ms")
+
+            return PredictResponse(
+                model_name=req.model_name,
+                prediction=pred.tolist()[0] if hasattr(pred, "tolist") else pred,
+                probability=proba,
+                latency_ms=latency_ms,
+            )
+        except Exception as exc:
+            span.set_error(exc)
+            logger.exception(f"Prediction error for '{req.model_name}': {exc}")
+            raise HTTPException(status_code=500, detail=f"Inference failed: {exc}")
 
 
 if __name__ == "__main__":

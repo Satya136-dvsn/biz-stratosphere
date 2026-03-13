@@ -1,0 +1,87 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Request Rate by Service",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "rate(api_gateway_request_total[5m])", "legendFormat": "Gateway - {{method}} {{endpoint}}" },
+        { "expr": "rate(ml_inference_request_total[5m])", "legendFormat": "ML Inference" },
+        { "expr": "rate(llm_orchestrator_request_total[5m])", "legendFormat": "LLM Orchestrator" },
+        { "expr": "rate(rag_service_request_total[5m])", "legendFormat": "RAG Service" },
+        { "expr": "rate(embedding_worker_request_total[5m])", "legendFormat": "Embedding Worker" }
+      ]
+    },
+    {
+      "title": "Error Rate by Service",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "rate(api_gateway_error_total[5m])", "legendFormat": "Gateway" },
+        { "expr": "rate(ml_inference_error_total[5m])", "legendFormat": "ML" },
+        { "expr": "rate(llm_orchestrator_error_total[5m])", "legendFormat": "LLM" },
+        { "expr": "rate(rag_service_error_total[5m])", "legendFormat": "RAG" }
+      ]
+    },
+    {
+      "title": "Request Latency P95 (seconds)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, rate(api_gateway_request_duration_seconds_bucket[5m]))", "legendFormat": "Gateway P95" },
+        { "expr": "histogram_quantile(0.95, rate(ml_inference_request_duration_seconds_bucket[5m]))", "legendFormat": "ML P95" },
+        { "expr": "histogram_quantile(0.95, rate(llm_orchestrator_request_duration_seconds_bucket[5m]))", "legendFormat": "LLM P95" },
+        { "expr": "histogram_quantile(0.95, rate(rag_service_request_duration_seconds_bucket[5m]))", "legendFormat": "RAG P95" }
+      ]
+    },
+    {
+      "title": "ML Inference Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, rate(ml_inference_ml_inference_seconds_bucket[5m]))", "legendFormat": "P50 {{model}}" },
+        { "expr": "histogram_quantile(0.95, rate(ml_inference_ml_inference_seconds_bucket[5m]))", "legendFormat": "P95 {{model}}" },
+        { "expr": "histogram_quantile(0.99, rate(ml_inference_ml_inference_seconds_bucket[5m]))", "legendFormat": "P99 {{model}}" }
+      ]
+    },
+    {
+      "title": "LLM Generation Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, rate(llm_orchestrator_llm_generation_seconds_bucket[5m]))", "legendFormat": "P50 {{model}}" },
+        { "expr": "histogram_quantile(0.95, rate(llm_orchestrator_llm_generation_seconds_bucket[5m]))", "legendFormat": "P95 {{model}}" }
+      ]
+    },
+    {
+      "title": "RAG Retrieval Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, rate(rag_service_rag_retrieval_seconds_bucket[5m]))", "legendFormat": "P50" },
+        { "expr": "histogram_quantile(0.95, rate(rag_service_rag_retrieval_seconds_bucket[5m]))", "legendFormat": "P95" }
+      ]
+    },
+    {
+      "title": "Embedding Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, rate(embedding_worker_embedding_seconds_bucket[5m]))", "legendFormat": "P50 {{model}}" },
+        { "expr": "histogram_quantile(0.95, rate(embedding_worker_embedding_seconds_bucket[5m]))", "legendFormat": "P95 {{model}}" }
+      ]
+    }
+  ],
+  "schemaVersion": 38,
+  "tags": ["biz-stratosphere", "observability"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "Biz Stratosphere – Service Observability",
+  "uid": "biz-stratosphere-overview"
+}

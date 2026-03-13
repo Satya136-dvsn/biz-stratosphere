@@ -32,6 +32,8 @@ from shared import (
     ErrorCodes,
     Timeouts,
 )
+from shared.metrics import get_or_create_metrics, make_metrics_router
+from shared.tracing import init_tracer, make_traces_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("llm-orchestrator")
@@ -56,6 +58,13 @@ async def _readiness_check():
     return {"ollama_host": OLLAMA_HOST, "model": OLLAMA_MODEL}
 
 app.include_router(make_health_router("llm-orchestrator", version="1.0.0", readiness_check=_readiness_check))
+
+# Phase 6: Metrics + Tracing
+metrics = get_or_create_metrics("llm_orchestrator")
+tracer = init_tracer("llm-orchestrator")
+app.include_router(make_metrics_router(metrics))
+app.include_router(make_traces_router())
+
 for exc_type, handler in make_exception_handlers("llm-orchestrator"):
     app.add_exception_handler(exc_type, handler)
 
@@ -140,60 +149,66 @@ async def _fetch_ml_context(model: str, features: list[float]) -> Optional[str]:
 @app.post("/api/v1/generate", response_model=GenerateResponse)
 async def generate(req: GenerateRequest):
     start = time.monotonic()
-    rag_context: Optional[str] = None
-    ml_context: Optional[str] = None
+    with tracer.span("llm.generate", attributes={"query_len": len(req.query), "include_rag": req.include_rag}) as root_span:
+        rag_context: Optional[str] = None
+        ml_context: Optional[str] = None
 
-    # Fetch RAG context (non-blocking on failure)
-    if req.include_rag:
-        rag_context = await _fetch_rag_context(req.query)
+        if req.include_rag:
+            rag_context = await _fetch_rag_context(req.query)
 
-    # Fetch ML prediction context (non-blocking on failure)
-    if req.include_ml and req.ml_model and req.ml_features:
-        ml_context = await _fetch_ml_context(req.ml_model, req.ml_features)
+        if req.include_ml and req.ml_model and req.ml_features:
+            ml_context = await _fetch_ml_context(req.ml_model, req.ml_features)
 
-    # Build enriched prompt
-    system_prompt = "You are Biz Stratosphere AI, a business intelligence assistant."
-    user_prompt = req.query
-    if rag_context:
-        user_prompt = f"[Context from knowledge base]\n{rag_context}\n\n[Question]\n{req.query}"
-    if ml_context:
-        user_prompt += f"\n\n[ML Insight]\n{ml_context}"
+        system_prompt = "You are Biz Stratosphere AI, a business intelligence assistant."
+        user_prompt = req.query
+        if rag_context:
+            user_prompt = f"[Context from knowledge base]\n{rag_context}\n\n[Question]\n{req.query}"
+        if ml_context:
+            user_prompt += f"\n\n[ML Insight]\n{ml_context}"
 
-    # Call Ollama
-    try:
-        async def _ollama_call():
-            async with make_ollama_client(OLLAMA_HOST) as client:
-                r = await client.post("/api/generate", json={
-                    "model": OLLAMA_MODEL,
-                    "prompt": user_prompt,
-                    "system": system_prompt,
-                    "stream": False,
-                })
-                r.raise_for_status()
-                return r.json().get("response", "")
+        try:
+            gen_start = time.monotonic()
 
-        generated_text = await retry_with_backoff(
-            _ollama_call,
-            max_attempts=2,
-            base_delay=1.0,
-            retryable_exceptions=(httpx.TimeoutException, httpx.ConnectError),
+            async def _ollama_call():
+                async with make_ollama_client(OLLAMA_HOST) as client:
+                    r = await client.post("/api/generate", json={
+                        "model": OLLAMA_MODEL,
+                        "prompt": user_prompt,
+                        "system": system_prompt,
+                        "stream": False,
+                    })
+                    r.raise_for_status()
+                    return r.json().get("response", "")
+
+            with tracer.span("llm.ollama_generate", attributes={"model": OLLAMA_MODEL}) as ollama_span:
+                generated_text = await retry_with_backoff(
+                    _ollama_call, max_attempts=2, base_delay=1.0,
+                    retryable_exceptions=(httpx.TimeoutException, httpx.ConnectError),
+                )
+                gen_latency = time.monotonic() - gen_start
+                metrics.llm_generation_latency.observe(gen_latency, model=OLLAMA_MODEL)
+                ollama_span.set_attribute("latency_ms", round(gen_latency * 1000, 1))
+        except httpx.TimeoutException:
+            raise HTTPException(status_code=502, detail="LLM generation timed out after 60s")
+        except Exception as exc:
+            root_span.set_error(exc)
+            logger.exception(f"Ollama generation failed: {exc}")
+            raise HTTPException(status_code=502, detail=f"Upstream LLM error: {exc}")
+
+        latency_ms = round((time.monotonic() - start) * 1000, 1)
+        root_span.set_attribute("total_latency_ms", latency_ms)
+        root_span.set_attribute("rag_used", rag_context is not None)
+        root_span.set_attribute("ml_used", ml_context is not None)
+
+        logger.info(f"Generated response in {latency_ms}ms (rag={rag_context is not None}, ml={ml_context is not None})")
+
+        return GenerateResponse(
+            response=generated_text,
+            rag_context_used=rag_context is not None,
+            ml_context_used=ml_context is not None,
+            latency_ms=latency_ms,
+            fallback_used=(req.include_rag and rag_context is None) or (req.include_ml and ml_context is None),
         )
-    except httpx.TimeoutException:
-        raise HTTPException(status_code=502, detail="LLM generation timed out after 60s")
-    except Exception as exc:
-        logger.exception(f"Ollama generation failed: {exc}")
-        raise HTTPException(status_code=502, detail=f"Upstream LLM error: {exc}")
-
-    latency_ms = round((time.monotonic() - start) * 1000, 1)
-    logger.info(f"Generated response in {latency_ms}ms (rag={rag_context is not None}, ml={ml_context is not None})")
-
-    return GenerateResponse(
-        response=generated_text,
-        rag_context_used=rag_context is not None,
-        ml_context_used=ml_context is not None,
-        latency_ms=latency_ms,
-        fallback_used=(req.include_rag and rag_context is None) or (req.include_ml and ml_context is None),
-    )
 
 
 if __name__ == "__main__":

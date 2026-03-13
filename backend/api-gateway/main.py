@@ -1,10 +1,12 @@
 """
-API Gateway – Biz Stratosphere Phase 5
+API Gateway – Biz Stratosphere Phase 5+6
 Responsibilities:
   - JWT auth (Supabase token verification)
   - Route proxying with circuit breakers and timeouts
   - Global request-ID injection
   - Upstream health aggregation
+  - Prometheus metrics endpoint
+  - Distributed trace propagation
 """
 from __future__ import annotations
 
@@ -31,6 +33,8 @@ from shared import (
     ErrorCodes,
     Timeouts,
 )
+from shared.metrics import get_or_create_metrics, make_metrics_router
+from shared.tracing import init_tracer, make_traces_router, build_traceparent
 
 logging.basicConfig(
     level=logging.INFO,
@@ -74,6 +78,12 @@ app.add_middleware(
 # Mount shared /health and /ready
 app.include_router(make_health_router("api-gateway", version="1.0.0"))
 
+# Phase 6: Metrics + Tracing
+metrics = get_or_create_metrics("api_gateway")
+tracer = init_tracer("api-gateway")
+app.include_router(make_metrics_router(metrics))
+app.include_router(make_traces_router())
+
 # Register exception handlers
 for exc_type, handler in make_exception_handlers("api-gateway"):
     app.add_exception_handler(exc_type, handler)
@@ -83,16 +93,39 @@ for exc_type, handler in make_exception_handlers("api-gateway"):
 # Request-ID middleware
 # ──────────────────────────────────────────────
 @app.middleware("http")
-async def request_id_middleware(request: Request, call_next):
+async def observability_middleware(request: Request, call_next):
+    """Unified middleware: request-ID + metrics + trace span."""
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     request.state.request_id = request_id
+
+    # Extract incoming trace context
+    trace_id, parent_span = tracer.extract_context(request)
+
     start = time.monotonic()
-    response = await call_next(request)
-    elapsed_ms = round((time.monotonic() - start) * 1000, 1)
-    response.headers["X-Request-ID"] = request_id
-    response.headers["X-Response-Time-Ms"] = str(elapsed_ms)
-    if elapsed_ms > 5000:
-        logger.warning(f"SLOW request [{request_id}] {request.method} {request.url.path} {elapsed_ms}ms")
+    with tracer.span("gateway.request",
+                     attributes={"http.method": request.method, "http.path": request.url.path},
+                     trace_id=trace_id, parent_span_id=parent_span) as span:
+        response = await call_next(request)
+        elapsed = time.monotonic() - start
+        elapsed_ms = round(elapsed * 1000, 1)
+
+        # Record metrics
+        status = str(response.status_code)
+        metrics.request_count.inc(method=request.method, endpoint=request.url.path, status=status)
+        metrics.request_latency.observe(elapsed, method=request.method, endpoint=request.url.path)
+        if response.status_code >= 400:
+            metrics.error_count.inc(method=request.method, endpoint=request.url.path, status=status)
+
+        # Set response headers
+        response.headers["X-Request-ID"] = request_id
+        response.headers["X-Response-Time-Ms"] = str(elapsed_ms)
+        response.headers["X-Trace-ID"] = trace_id
+
+        span.set_attribute("http.status_code", response.status_code)
+        span.set_attribute("latency_ms", elapsed_ms)
+
+        if elapsed_ms > 5000:
+            logger.warning(f"SLOW request [{request_id}] {request.method} {request.url.path} {elapsed_ms}ms")
     return response
 
 
@@ -112,6 +145,8 @@ async def _proxy(
         "Content-Type": request.headers.get("Content-Type", "application/json"),
         "X-Request-ID": request_id,
     }
+    # Propagate trace context to downstream services
+    headers = tracer.inject_headers(headers)
     # Forward auth headers if present
     auth = request.headers.get("Authorization")
     if auth:

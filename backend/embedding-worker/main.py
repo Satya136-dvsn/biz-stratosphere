@@ -28,6 +28,8 @@ from shared import (
     make_ollama_client,
     retry_with_backoff,
 )
+from shared.metrics import get_or_create_metrics, make_metrics_router
+from shared.tracing import init_tracer, make_traces_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("embedding-worker")
@@ -70,6 +72,13 @@ async def _readiness_check():
 
 
 app.include_router(make_health_router("embedding-worker", version="1.0.0", readiness_check=_readiness_check))
+
+# Phase 6: Metrics + Tracing
+metrics = get_or_create_metrics("embedding_worker")
+tracer = init_tracer("embedding-worker")
+app.include_router(make_metrics_router(metrics))
+app.include_router(make_traces_router())
+
 for exc_type, handler in make_exception_handlers("embedding-worker"):
     app.add_exception_handler(exc_type, handler)
 
@@ -141,43 +150,52 @@ class IngestResponse(BaseModel):
 async def embed_and_store(req: IngestRequest):
     """Chunk, embed, and persist a document to pgvector."""
     start = time.monotonic()
+    with tracer.span("embed.ingest", attributes={"source": req.source or "manual", "text_len": len(req.text)}) as root_span:
+        chunks = _chunk_text(req.text)
+        if not chunks:
+            raise HTTPException(status_code=422, detail="No chunks produced from text")
 
-    chunks = _chunk_text(req.text)
-    if not chunks:
-        raise HTTPException(status_code=422, detail="No chunks produced from text")
+        root_span.set_attribute("chunk_count", len(chunks))
+        meta = {**(req.metadata or {}), "source": req.source}
+        embedded = 0
 
-    meta = {**(req.metadata or {}), "source": req.source}
-    embedded = 0
+        for i, chunk in enumerate(chunks):
+            try:
+                with tracer.span(f"embed.chunk_{i}", attributes={"chunk_len": len(chunk), "model": EMBED_MODEL}):
+                    embed_start = time.monotonic()
+                    vec = await _embed_text(chunk)
+                    metrics.embedding_latency.observe(time.monotonic() - embed_start, model=EMBED_MODEL)
+            except Exception as exc:
+                root_span.set_error(exc)
+                logger.error(f"Embedding failed for chunk: {exc}")
+                raise HTTPException(status_code=502, detail=f"Ollama embedding error: {exc}")
 
-    for chunk in chunks:
-        try:
-            vec = await _embed_text(chunk)
-        except Exception as exc:
-            logger.error(f"Embedding failed for chunk: {exc}")
-            raise HTTPException(status_code=502, detail=f"Ollama embedding error: {exc}")
+            vec_literal = f"[{','.join(str(v) for v in vec)}]"
+            try:
+                pool = await get_pool()
+                async with pool.acquire() as conn:
+                    await conn.execute(
+                        """
+                        INSERT INTO documents (content, embedding, metadata)
+                        VALUES ($1, $2::vector, $3::jsonb)
+                        """,
+                        chunk,
+                        vec_literal,
+                        str(meta),
+                    )
+                embedded += 1
+            except asyncpg.PostgresError as exc:
+                root_span.set_error(exc)
+                logger.error(f"DB insert failed: {exc}")
+                raise HTTPException(status_code=503, detail=f"Database write error: {exc}")
 
-        vec_literal = f"[{','.join(str(v) for v in vec)}]"
-        try:
-            pool = await get_pool()
-            async with pool.acquire() as conn:
-                await conn.execute(
-                    """
-                    INSERT INTO documents (content, embedding, metadata)
-                    VALUES ($1, $2::vector, $3::jsonb)
-                    """,
-                    chunk,
-                    vec_literal,
-                    str(meta),
-                )
-            embedded += 1
-        except asyncpg.PostgresError as exc:
-            logger.error(f"DB insert failed: {exc}")
-            raise HTTPException(status_code=503, detail=f"Database write error: {exc}")
+        latency_s = time.monotonic() - start
+        latency_ms = round(latency_s * 1000, 1)
+        root_span.set_attribute("chunks_embedded", embedded)
+        root_span.set_attribute("total_latency_ms", latency_ms)
+        logger.info(f"Embedded {embedded} chunks from '{req.source}' in {latency_ms}ms")
 
-    latency_ms = round((time.monotonic() - start) * 1000, 1)
-    logger.info(f"Embedded {embedded} chunks from '{req.source}' in {latency_ms}ms")
-
-    return IngestResponse(chunks_embedded=embedded, latency_ms=latency_ms)
+        return IngestResponse(chunks_embedded=embedded, latency_ms=latency_ms)
 
 
 if __name__ == "__main__":

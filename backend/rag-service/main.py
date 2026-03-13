@@ -29,6 +29,8 @@ from shared import (
     ErrorCodes,
     Timeouts,
 )
+from shared.metrics import get_or_create_metrics, make_metrics_router
+from shared.tracing import init_tracer, make_traces_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("rag-service")
@@ -73,6 +75,13 @@ async def _readiness_check():
 
 
 app.include_router(make_health_router("rag-service", version="1.0.0", readiness_check=_readiness_check))
+
+# Phase 6: Metrics + Tracing
+metrics = get_or_create_metrics("rag_service")
+tracer = init_tracer("rag-service")
+app.include_router(make_metrics_router(metrics))
+app.include_router(make_traces_router())
+
 for exc_type, handler in make_exception_handlers("rag-service"):
     app.add_exception_handler(exc_type, handler)
 
@@ -137,50 +146,60 @@ async def _embed(text: str) -> list[float]:
 @app.post("/api/v1/retrieve", response_model=RetrieveResponse)
 async def retrieve(req: RetrieveRequest):
     start = time.monotonic()
+    with tracer.span("rag.retrieve", attributes={"query_len": len(req.query), "top_k": req.top_k}) as root_span:
+        try:
+            with tracer.span("rag.embed_query", attributes={"model": EMBED_MODEL}):
+                query_vec = await _embed(req.query)
+        except Exception as exc:
+            root_span.set_error(exc)
+            logger.error(f"Embedding failed: {exc}")
+            raise HTTPException(status_code=502, detail=f"Embedding service error: {exc}")
 
-    try:
-        query_vec = await _embed(req.query)
-    except Exception as exc:
-        logger.error(f"Embedding failed: {exc}")
-        raise HTTPException(status_code=502, detail=f"Embedding service error: {exc}")
+        vec_literal = f"[{','.join(str(v) for v in query_vec)}]"
 
-    vec_literal = f"[{','.join(str(v) for v in query_vec)}]"
+        try:
+            with tracer.span("rag.pgvector_query") as db_span:
+                pool = await get_pool()
+                async with pool.acquire() as conn:
+                    rows = await conn.fetch(
+                        """
+                        SELECT id::text, content, metadata,
+                               1 - (embedding <=> $1::vector) AS score
+                        FROM documents
+                        WHERE 1 - (embedding <=> $1::vector) >= $2
+                        ORDER BY embedding <=> $1::vector
+                        LIMIT $3
+                        """,
+                        vec_literal,
+                        req.min_score,
+                        req.top_k,
+                    )
+                db_span.set_attribute("rows_returned", len(rows))
+        except asyncpg.PostgresError as exc:
+            root_span.set_error(exc)
+            logger.error(f"DB query failed: {exc}")
+            raise HTTPException(status_code=503, detail=f"Database error: {exc}")
 
-    try:
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-            rows = await conn.fetch(
-                """
-                SELECT id::text, content, metadata,
-                       1 - (embedding <=> $1::vector) AS score
-                FROM documents
-                WHERE 1 - (embedding <=> $1::vector) >= $2
-                ORDER BY embedding <=> $1::vector
-                LIMIT $3
-                """,
-                vec_literal,
-                req.min_score,
-                req.top_k,
+        snippets = [
+            Snippet(
+                id=row["id"],
+                text=row["content"],
+                score=round(float(row["score"]), 4),
+                source=row["metadata"].get("source") if row["metadata"] else None,
             )
-    except asyncpg.PostgresError as exc:
-        logger.error(f"DB query failed: {exc}")
-        raise HTTPException(status_code=503, detail=f"Database error: {exc}")
+            for row in rows
+        ]
 
-    snippets = [
-        Snippet(
-            id=row["id"],
-            text=row["content"],
-            score=round(float(row["score"]), 4),
-            source=row["metadata"].get("source") if row["metadata"] else None,
-        )
-        for row in rows
-    ]
+        latency_s = time.monotonic() - start
+        latency_ms = round(latency_s * 1000, 1)
+        metrics.rag_retrieval_latency.observe(latency_s, query_type="semantic")
+        root_span.set_attribute("latency_ms", latency_ms)
+        root_span.set_attribute("snippet_count", len(snippets))
 
-    latency_ms = round((time.monotonic() - start) * 1000, 1)
-    if latency_ms > 3000:
-        logger.warning(f"[rag-service] Retrieval slow: {latency_ms}ms")
+        if latency_ms > 3000:
+            logger.warning(f"[rag-service] Retrieval slow: {latency_ms}ms")
 
-    return RetrieveResponse(query=req.query, snippets=snippets, latency_ms=latency_ms)
+        return RetrieveResponse(query=req.query, snippets=snippets, latency_ms=latency_ms)
 
 
 if __name__ == "__main__":
