@@ -1,0 +1,10 @@
+# ══════════════════════════════════════════════════════════════
+# Biz Stratosphere – Kubernetes Namespace
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: biz-stratosphere
+  labels:
+    app.kubernetes.io/part-of: biz-stratosphere
+    environment: production

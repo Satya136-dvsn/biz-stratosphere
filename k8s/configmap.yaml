@@ -1,0 +1,21 @@
+# ══════════════════════════════════════════════════════════════
+# Biz Stratosphere – Shared Configuration
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: biz-config
+  namespace: biz-stratosphere
+  labels:
+    app.kubernetes.io/part-of: biz-stratosphere
+data:
+  # Service Discovery (K8s DNS)
+  ML_INFERENCE_URL: "http://ml-inference:8001"
+  LLM_ORCHESTRATOR_URL: "http://llm-orchestrator:8002"
+  RAG_SERVICE_URL: "http://rag-service:8003"
+  OLLAMA_HOST: "http://ollama:11434"
+  EMBED_MODEL: "nomic-embed-text"
+  OLLAMA_MODEL: "llama3"
+  CHUNK_SIZE: "512"
+  CHUNK_OVERLAP: "64"
+  MODELS_DIR: "/app/models"

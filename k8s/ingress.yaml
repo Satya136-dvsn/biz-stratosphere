@@ -1,0 +1,66 @@
+# ══════════════════════════════════════════════════════════════
+# Ingress – Route external traffic to services
+# Requires: nginx-ingress controller installed in the cluster
+# ══════════════════════════════════════════════════════════════
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: biz-stratosphere-ingress
+  namespace: biz-stratosphere
+  labels:
+    app.kubernetes.io/part-of: biz-stratosphere
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+spec:
+  ingressClassName: nginx
+  rules:
+    # ── API Gateway (primary traffic)
+    - host: api.biz-stratosphere.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8000
+
+    # ── Grafana Dashboards
+    - host: grafana.biz-stratosphere.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+
+    # ── Jaeger Trace UI
+    - host: jaeger.biz-stratosphere.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jaeger
+                port:
+                  number: 16686
+
+    # ── Prometheus (internal monitoring)
+    - host: prometheus.biz-stratosphere.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus
+                port:
+                  number: 9090

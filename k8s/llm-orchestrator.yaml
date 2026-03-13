@@ -1,0 +1,118 @@
+# ══════════════════════════════════════════════════════════════
+# LLM Orchestrator – Deployment + Service + HPA
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-orchestrator
+  namespace: biz-stratosphere
+  labels:
+    app: llm-orchestrator
+    app.kubernetes.io/part-of: biz-stratosphere
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8002"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8002
+      targetPort: 8002
+      protocol: TCP
+      name: http
+  selector:
+    app: llm-orchestrator
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-orchestrator
+  namespace: biz-stratosphere
+  labels:
+    app: llm-orchestrator
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: llm-orchestrator
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: llm-orchestrator
+        app.kubernetes.io/part-of: biz-stratosphere
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8002"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: llm-orchestrator
+          image: biz-stratosphere/llm-orchestrator:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8002
+              name: http
+          envFrom:
+            - configMapRef:
+                name: biz-config
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: llm-orchestrator-hpa
+  namespace: biz-stratosphere
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: llm-orchestrator
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 65
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 120
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60

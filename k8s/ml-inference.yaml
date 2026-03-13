@@ -1,0 +1,126 @@
+# ══════════════════════════════════════════════════════════════
+# ML Inference Service – Deployment + Service + HPA
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-inference
+  namespace: biz-stratosphere
+  labels:
+    app: ml-inference
+    app.kubernetes.io/part-of: biz-stratosphere
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8001"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP
+      name: http
+  selector:
+    app: ml-inference
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-inference
+  namespace: biz-stratosphere
+  labels:
+    app: ml-inference
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ml-inference
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: ml-inference
+        app.kubernetes.io/part-of: biz-stratosphere
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: ml-inference
+          image: biz-stratosphere/ml-inference:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8001
+              name: http
+          envFrom:
+            - configMapRef:
+                name: biz-config
+            - secretRef:
+                name: biz-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ml-inference-hpa
+  namespace: biz-stratosphere
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ml-inference
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 75
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 180
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120

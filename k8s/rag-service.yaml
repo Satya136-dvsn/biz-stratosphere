@@ -1,0 +1,126 @@
+# ══════════════════════════════════════════════════════════════
+# RAG Service – Deployment + Service + HPA
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-service
+  namespace: biz-stratosphere
+  labels:
+    app: rag-service
+    app.kubernetes.io/part-of: biz-stratosphere
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8003"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8003
+      targetPort: 8003
+      protocol: TCP
+      name: http
+  selector:
+    app: rag-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-service
+  namespace: biz-stratosphere
+  labels:
+    app: rag-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rag-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: rag-service
+        app.kubernetes.io/part-of: biz-stratosphere
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8003"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: rag-service
+          image: biz-stratosphere/rag-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8003
+              name: http
+          envFrom:
+            - configMapRef:
+                name: biz-config
+            - secretRef:
+                name: biz-secrets
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8003
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: rag-service-hpa
+  namespace: biz-stratosphere
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: rag-service
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 65
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 120
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60

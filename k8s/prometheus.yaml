@@ -1,0 +1,179 @@
+# ══════════════════════════════════════════════════════════════
+# Prometheus – Deployment + ConfigMap + Service
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: biz-stratosphere
+  labels:
+    app: prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: ['biz-stratosphere']
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: replace
+            target_label: service
+
+      - job_name: 'api-gateway'
+        static_configs:
+          - targets: ['api-gateway:8000']
+        metrics_path: '/metrics'
+
+      - job_name: 'ml-inference'
+        static_configs:
+          - targets: ['ml-inference:8001']
+        metrics_path: '/metrics'
+
+      - job_name: 'llm-orchestrator'
+        static_configs:
+          - targets: ['llm-orchestrator:8002']
+        metrics_path: '/metrics'
+
+      - job_name: 'rag-service'
+        static_configs:
+          - targets: ['rag-service:8003']
+        metrics_path: '/metrics'
+
+      - job_name: 'embedding-worker'
+        static_configs:
+          - targets: ['embedding-worker:8004']
+        metrics_path: '/metrics'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: biz-stratosphere
+  labels:
+    app: prometheus
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    app: prometheus
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-data
+  namespace: biz-stratosphere
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: biz-stratosphere
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        app.kubernetes.io/part-of: biz-stratosphere
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.48.0
+          ports:
+            - containerPort: 9090
+          args:
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.retention.time=30d'
+            - '--storage.tsdb.path=/prometheus'
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: storage
+              mountPath: /prometheus
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: prometheus-data
+---
+# ServiceAccount + RBAC for pod discovery
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: biz-stratosphere
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: biz-prometheus
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: biz-prometheus
+subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: biz-stratosphere
+roleRef:
+  kind: ClusterRole
+  name: biz-prometheus
+  apiGroup: rbac.authorization.k8s.io

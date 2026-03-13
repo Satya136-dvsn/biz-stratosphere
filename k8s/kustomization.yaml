@@ -1,0 +1,35 @@
+# ══════════════════════════════════════════════════════════════
+# Kustomization – Apply all manifests in order
+# ══════════════════════════════════════════════════════════════
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: biz-stratosphere
+
+resources:
+  # 1. Base infrastructure
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+
+  # 2. Stateful services
+  - postgres.yaml
+  - ollama.yaml
+
+  # 3. Application services
+  - api-gateway.yaml
+  - ml-inference.yaml
+  - llm-orchestrator.yaml
+  - rag-service.yaml
+  - embedding-worker.yaml
+
+  # 4. Observability stack
+  - prometheus.yaml
+  - grafana.yaml
+  - jaeger.yaml
+
+  # 5. Networking
+  - ingress.yaml
+
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/part-of: biz-stratosphere

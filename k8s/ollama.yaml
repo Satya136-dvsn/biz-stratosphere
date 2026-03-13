@@ -1,0 +1,87 @@
+# ══════════════════════════════════════════════════════════════
+# Ollama – Local LLM Runtime
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: biz-stratosphere
+  labels:
+    app: ollama
+    app.kubernetes.io/part-of: biz-stratosphere
+spec:
+  type: ClusterIP
+  ports:
+    - port: 11434
+      targetPort: 11434
+      protocol: TCP
+  selector:
+    app: ollama
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-data
+  namespace: biz-stratosphere
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: biz-stratosphere
+  labels:
+    app: ollama
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Ollama needs exclusive GPU/model access
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+        app.kubernetes.io/part-of: biz-stratosphere
+    spec:
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          ports:
+            - containerPort: 11434
+          env:
+            - name: OLLAMA_HOST
+              value: "0.0.0.0"
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "4Gi"
+            limits:
+              cpu: "2000m"
+              memory: "8Gi"
+          livenessProbe:
+            httpGet:
+              path: /api/tags
+              port: 11434
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /api/tags
+              port: 11434
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: ollama-storage
+              mountPath: /root/.ollama
+      volumes:
+        - name: ollama-storage
+          persistentVolumeClaim:
+            claimName: ollama-data

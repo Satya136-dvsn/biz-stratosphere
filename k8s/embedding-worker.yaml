@@ -1,0 +1,120 @@
+# ══════════════════════════════════════════════════════════════
+# Embedding Worker – Deployment + Service + HPA
+# ══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Service
+metadata:
+  name: embedding-worker
+  namespace: biz-stratosphere
+  labels:
+    app: embedding-worker
+    app.kubernetes.io/part-of: biz-stratosphere
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8004"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8004
+      targetPort: 8004
+      protocol: TCP
+      name: http
+  selector:
+    app: embedding-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embedding-worker
+  namespace: biz-stratosphere
+  labels:
+    app: embedding-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: embedding-worker
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: embedding-worker
+        app.kubernetes.io/part-of: biz-stratosphere
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8004"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: embedding-worker
+          image: biz-stratosphere/embedding-worker:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8004
+              name: http
+          envFrom:
+            - configMapRef:
+                name: biz-config
+            - secretRef:
+                name: biz-secrets
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1536Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8004
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: embedding-worker-hpa
+  namespace: biz-stratosphere
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: embedding-worker
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
