@@ -5,11 +5,11 @@ Visual representations of the Biz Stratosphere deployment and data flow.
 ## 1. System Architecture Diagram
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0d47a1', 'primaryTextColor': '#fff', 'primaryBorderColor': '#1565c0', 'lineColor': '#888', 'secondaryColor': '#e65100', 'tertiaryColor': '#4a148c' }}}%%
+%%{init: {'theme': 'dark', 'themeVariables': { 'lineColor': '#888', 'primaryTextColor': '#fff' }}}%%
 graph TD
     %% External
     Client([Client Application])
-    Ingress[NGINX Ingress]
+    Ingress([NGINX Ingress])
 
     %% Observability
     subgraph Observability Stack
@@ -65,13 +65,15 @@ graph TD
     RAG -.->|OTLP| Jaeg
     ORCH -.->|OTLP| Jaeg
 
-    classDef stateless fill:#0d47a1,stroke:#1565c0,stroke-width:2px,color:#fff;
-    classDef stateful fill:#e65100,stroke:#ef6c00,stroke-width:2px,color:#fff;
-    classDef obs fill:#4a148c,stroke:#6a1b9a,stroke-width:2px,color:#fff;
+    classDef stateless fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
+    classDef stateful fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#fff;
+    classDef obs fill:#020617,stroke:#10b981,stroke-width:2px,color:#fff;
+    classDef ext fill:#334155,stroke:#94a3b8,stroke-width:2px,color:#fff;
     
     class GW,ML,RAG,ORCH,WORK stateless;
     class PG,LLM stateful;
     class Prom,Graf,Jaeg obs;
+    class Client,Ingress ext;
 ```
 
 ## 2. Request Lifecycle Data Flow
