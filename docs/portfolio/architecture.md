@@ -16,14 +16,14 @@ graph TD
         GW[API Gateway]
         
         subgraph Compute Tier
-            ML[ML Service<br/>(XGBoost)]
-            RAG[RAG Service<br/>(Semantic Search)]
-            ORCH[LLM Orchestrator<br/>(Prompt Engine)]
+            ML["ML Service\n(XGBoost)"]
+            RAG["RAG Service\n(Semantic Search)"]
+            ORCH["LLM Orchestrator\n(Prompt Engine)"]
         end
         
         subgraph Data Tier
-            DB[(PostgreSQL<br/>with pgvector)]
-            LLM[[Ollama<br/>(Local Llama3)]]
+            DB[("PostgreSQL\nwith pgvector")]
+            LLM[["Ollama\n(Local Llama3)"]]
         end
     end
     

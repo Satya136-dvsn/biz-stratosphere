@@ -12,25 +12,25 @@ graph TD
     end
 
     subgraph "Kubernetes Cluster (biz-stratosphere namespace)"
-        Ingress["Ingress Controller<br/>nginx"]
+        Ingress["Ingress Controller\nnginx"]
 
         subgraph "Application Tier"
-            GW["API Gateway<br/>2-8 pods (HPA)"]
-            ML["ML Inference<br/>2-6 pods (HPA)"]
-            LLM["LLM Orchestrator<br/>2-6 pods (HPA)"]
-            RAG["RAG Service<br/>2-6 pods (HPA)"]
-            EW["Embedding Worker<br/>1-4 pods (HPA)"]
+            GW["API Gateway\n2-8 pods (HPA)"]
+            ML["ML Inference\n2-6 pods (HPA)"]
+            LLM["LLM Orchestrator\n2-6 pods (HPA)"]
+            RAG["RAG Service\n2-6 pods (HPA)"]
+            EW["Embedding Worker\n1-4 pods (HPA)"]
         end
 
         subgraph "Data Tier"
-            PG["PostgreSQL + pgvector<br/>StatefulSet (1 replica)"]
-            OL["Ollama LLM Runtime<br/>Deployment (1 replica)"]
+            PG["PostgreSQL + pgvector\nStatefulSet (1 replica)"]
+            OL["Ollama LLM Runtime\nDeployment (1 replica)"]
         end
 
         subgraph "Observability Tier"
-            PR["Prometheus<br/>:9090"]
-            GR["Grafana<br/>:3000"]
-            JA["Jaeger<br/>:16686"]
+            PR["Prometheus\n:9090"]
+            GR["Grafana\n:3000"]
+            JA["Jaeger\n:16686"]
         end
     end
 

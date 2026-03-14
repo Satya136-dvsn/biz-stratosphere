@@ -252,8 +252,8 @@ By submitting a contribution, you agree:
 
 ```mermaid
 graph LR
-    A["Community<br/>(Self-Hosted)"] -->|"Hit 100 AI decisions"| B["Pro SaaS<br/>($49/seat/mo)"]
-    B -->|"Need SSO/Compliance"| C["Enterprise<br/>(Custom)"]
+    A["Community\n(Self-Hosted)"] -->|"Hit 100 AI decisions"| B["Pro SaaS\n($49/seat/mo)"]
+    B -->|"Need SSO/Compliance"| C["Enterprise\n(Custom)"]
     A -->|"Direct enterprise"| C
     
     style A fill:#1a1a2e,stroke:#6366f1,color:#fff
@@ -280,7 +280,7 @@ graph LR
 graph TD
     subgraph "Frontend (React)"
         FF["featureGate.ts"]
-        UI["Component renders<br/>conditionally"]
+        UI["Component renders\nconditionally"]
     end
     
     subgraph "Backend (FastAPI)"
