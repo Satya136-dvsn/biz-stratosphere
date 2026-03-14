@@ -1,0 +1,115 @@
+﻿python : [CircuitBreaker:f
+ailing-svc] 3 failures 
+ΓåÆ OPEN
+At line:1 char:32
++ ... OENCODING="utf-8"; 
+python backend/phase5_virt
+ual_test.py 2>&1 | Out-F 
+...
++                        ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: ([  
+  CircuitBreaker...ilur   
+ es ΓåÆ OPEN:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+[CircuitBreaker:dead-svc] 
+1 failures ΓåÆ OPEN
+[CircuitBreaker:recovering
+-svc] 2 failures ΓåÆ OPEN
+Retry 1/3 for _flaky in 
+0.06s ΓÇô Attempt 1 failed
+Retry 2/3 for _flaky in 
+0.11s ΓÇô Attempt 2 failed
+Retry 1/3 for 
+_always_fail in 0.01s ΓÇô 
+permanent failure
+Retry 2/3 for 
+_always_fail in 0.02s ΓÇô 
+permanent failure
+All 3 attempts failed for 
+_always_fail: permanent 
+failure
+============================================================
+  Biz Stratosphere ΓÇô Phase 5 Virtual Test Suite
+============================================================
+
+ΓöÇΓöÇ Test 1: Error Schema ΓöÇΓöÇ
+  Γ£à  ErrorResponse is correct type
+  Γ£à  Error code matches
+  Γ£à  success=False
+  Γ£à  service field set
+  Γ£à  request_id propagated
+  Γ£à  ErrorCode.CIRCUIT_OPEN defined
+  Γ£à  ErrorCode.UPSTREAM_TIMEOUT defined
+  Γ£à  ErrorCode.MODEL_NOT_LOADED defined
+  Γ£à  ErrorCode.DB_UNAVAILABLE defined
+  Γ£à  ErrorCode.INTERNAL_ERROR defined
+  Γ£à  ErrorCode.GENERATION_FAILED defined
+
+ΓöÇΓöÇ Test 8: Timeout Budget Constants ΓöÇΓöÇ
+  Γ£à  GATEWAY_DEFAULT read=15s
+  Γ£à  ORCHESTRATOR_TO_RAG read=3s
+  Γ£à  ORCHESTRATOR_TO_ML read=3s
+  Γ£à  ANY_TO_OLLAMA read=60s
+  Γ£à  HEALTH_CHECK read=3s
+  Γ£à  Ollama budget > Gateway budget
+
+ΓöÇΓöÇ Test 2: Circuit Breaker ΓÇô Initial State ΓöÇΓöÇ
+  Γ£à  Starts CLOSED
+  Γ£à  is_open=False
+  Γ£à  Passes successful call
+  Γ£à  Stays CLOSED after success
+
+ΓöÇΓöÇ Test 3: Circuit Breaker ΓÇô Opens After Failures ΓöÇΓöÇ
+  Γ£à  Circuit is OPEN after 3 failures
+  Γ£à  is_open=True
+  Γ£à  failure_count==3
+
+ΓöÇΓöÇ Test 4: Circuit Breaker ΓÇô OPEN Rejects Without Calling ΓöÇΓöÇ
+  Γ£à  CircuitBreakerError raised
+  Γ£à  Rejected in <5ms (no network call) ΓÇô 0.0ms
+  Γ£à  Downstream not called
+  Γ£à  Error names correct service
+
+ΓöÇΓöÇ Test 5: Circuit Breaker ΓÇô HALF_OPEN Recovery ΓöÇΓöÇ
+  Γ£à  Starts OPEN
+  Γ£à  Transitions to HALF_OPEN
+  Γ£à  Returns to CLOSED after 2 successes
+
+ΓöÇΓöÇ Test 6: Retry With Exponential Backoff ΓöÇΓöÇ
+  Γ£à  Succeeded after retries
+  Γ£à  Called exactly 3 times
+  Γ£à  First retry delay > 20ms ΓÇô 61ms
+  Γ£à  Second retry delay > first (backoff)
+
+ΓöÇΓöÇ Test 7: Retry Exhaustion ΓöÇΓöÇ
+  Γ£à  Raises after max_attempts
+
+ΓöÇΓöÇ Test 9: Concurrent Circuit Breaker ΓÇô Asyncio Safety ΓöÇΓöÇ
+  Γ£à  Concurrent calls all resolved
+  Γ£à  5 successes (odd indices)
+  Γ£à  5 failures (even indices)
+  Γ£à  Breaker state consistent
+
+ΓöÇΓöÇ Test 10: Circuit Breaker Registry ΓöÇΓöÇ
+  Γ£à  Registry contains reg-svc-a
+  Γ£à  Registry contains reg-svc-b
+  Γ£à  Status has required fields
+
+ΓöÇΓöÇ Test 11: Latency Envelope Simulation ΓöÇΓöÇ
+  Γ£à  ML result is a float
+  Γ£à  RAG result is non-empty
+  Γ£à  LLM result generated
+  Γ£à  Total latency within 15s gateway budget (1381ms) ΓÇô 1381ms
+
+============================================================
+  Results: 47/47 passed, 0 failed
+============================================================
+
+  ≡ƒÄë All Phase 5 virtual tests passed!

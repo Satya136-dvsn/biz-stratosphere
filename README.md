@@ -8,22 +8,27 @@
 
 ## 🎯 Platform Pitch & Purpose
 
-Biz Stratosphere isn't just an application; it's a blueprint for production-grade AI integration. It proves that complex AI workflows—combining sub-50ms predictive analytics with context-aware generative AI—can be achieved locally and securely without relying on expensive, black-box third-party APIs. 
+Biz Stratosphere isn't just an application; it's a blueprint for production-grade AI integration. It proves that complex AI workflows—combining sub-50ms predictive analytics with context-aware generative AI—can be achieved locally and securely without relying on expensive, black-box third-party APIs.
 
 The platform is designed to answer complex business questions (e.g., *"What is the churn risk for user A, and how can we mitigate it based on our internal playbooks?"*) by fetching structural data, predicting outcomes, searching unstructured documents, and reasoning over the combined context.
 
 ## 🏗️ High-Level Architecture
 
-The backend utilizes an isolated microservice mesh orchestrated by Kubernetes:
+The backend utilizes an isolated microservice mesh orchestrated by Kubernetes. We have recently introduced an **AI Agent Orchestration Layer** that can plan, execute tools, and reason over multi-step decisions.
 
 1. **API Gateway:** Central routing, rate limiting, and request parallelization.
-2. **ML Inference Service:** High-speed XGBoost/RandomForest predictive modeling.
-3. **RAG Service:** Semantic vector search using PostgreSQL `pgvector`.
-4. **LLM Orchestrator:** Generative reasoning using a local Ollama models (Llama 3/Mistral).
+2. **Agent Controller (LLM Orchestrator):** Multi-step ReAct reasoning, orchestrating underlying microservices as tools.
+3. **ML Inference Service:** High-speed XGBoost/RandomForest predictive models exposed as the `ml_predict` tool.
+4. **RAG Service:** Semantic vector search using PostgreSQL `pgvector` exposed as the `rag_retrieve` tool.
 5. **Embedding Worker:** Asynchronous document ingestion and vectorization.
 
+### 10-Second Agent Architecture
+
+![Biz Stratosphere Agent Diagram](docs/agent_architecture.md)
+*(View `docs/agent_architecture.md` for the Mermaid source)*
+
 **Core Resilience Features:**
-- Custom **Circuit Breakers** isolating catastrophic component failures.
+- Custom **Circuit Breakers** isolating catastrophic component failures limit blast radius.
 - **Exponential Backoff Retries** for transient network stability.
 - Dynamic scaling via **Horizontal Pod Autoscalers (HPA)**.
 - Complete observability via **Prometheus, Grafana, and Jaeger (OpenTelemetry)**.

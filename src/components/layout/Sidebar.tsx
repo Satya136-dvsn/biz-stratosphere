@@ -100,6 +100,16 @@ const navItems: NavItem[] = [
         icon: Brain,
     },
     {
+        title: "Agent Playground",
+        href: "/agent-playground",
+        icon: Brain,
+    },
+    {
+        title: "Decision History",
+        href: "/decision-history",
+        icon: FileText,
+    },
+    {
         title: "Automation Rules",
         href: "/automation-rules",
         icon: Workflow,

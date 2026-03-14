@@ -45,6 +45,8 @@ const DecisionMemory = lazy(() => import("./pages/admin/DecisionMemory"));
 const UploadHistory = lazy(() => import("./pages/UploadHistory").then(m => ({ default: m.UploadHistory })));
 const SystemMonitor = lazy(() => import("./pages/SystemMonitor"));
 const StreamingETL = lazy(() => import("./pages/StreamingETL"));
+const AgentPlayground = lazy(() => import("./pages/AgentPlayground"));
+const DecisionHistory = lazy(() => import("./pages/DecisionHistory"));
 import { AdminRoute } from "./components/AdminRoute";
 
 // Loading fallback component
@@ -247,6 +249,26 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <SystemMonitor />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/agent-playground"
+                  element={
+                    <ProtectedRoute>
+                      <ErrorBoundary>
+                        <AgentPlayground />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/decision-history"
+                  element={
+                    <ProtectedRoute>
+                      <ErrorBoundary>
+                        <DecisionHistory />
+                      </ErrorBoundary>
                     </ProtectedRoute>
                   }
                 />

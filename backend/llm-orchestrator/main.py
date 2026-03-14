@@ -80,6 +80,9 @@ class GenerateRequest(BaseModel):
     ml_model: Optional[str] = None
     ml_features: Optional[list[float]] = None
 
+class AgentQueryRequest(BaseModel):
+    query: str
+
 
 class GenerateResponse(BaseModel):
     success: bool = True
@@ -210,6 +213,18 @@ async def generate(req: GenerateRequest):
             fallback_used=(req.include_rag and rag_context is None) or (req.include_ml and ml_context is None),
         )
 
+from agent import run_agent
+
+@app.post("/api/v1/agent/query")
+async def agent_query(req: AgentQueryRequest):
+    try:
+        result = await run_agent(req.query)
+        if not result.get("success"):
+            raise HTTPException(status_code=500, detail="Agent execution failed internally.")
+        return result
+    except Exception as exc:
+        logger.exception(f"Agent execution failed: {exc}")
+        raise HTTPException(status_code=500, detail=str(exc))
 
 if __name__ == "__main__":
     import uvicorn

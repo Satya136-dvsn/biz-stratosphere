@@ -1,0 +1,29 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.3, pytest-8.4.2, pluggy-1.6.0 -- C:\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: C:\biz-stratosphere-main\ml-service
+plugins: anyio-4.10.0, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 13 items
+
+tests/test_api.py::test_protected_ml_endpoint_without_auth PASSED        [  7%]
+tests/test_api.py::test_protected_ml_endpoint_with_auth PASSED           [ 15%]
+tests/test_api.py::test_ml_batch_predict_auth PASSED                     [ 23%]
+tests/test_api.py::test_list_models_auth PASSED                          [ 30%]
+tests/test_auth.py::test_get_current_user_valid_token PASSED             [ 38%]
+tests/test_auth.py::test_get_current_user_invalid_token PASSED           [ 46%]
+tests/test_docker.py::test_docker_backend_health SKIPPED (Requires D...) [ 53%]
+tests/test_docker.py::test_docker_ollama_health SKIPPED (Requires Do...) [ 61%]
+tests/test_docker.py::test_docker_db_retry_connection SKIPPED (Requi...) [ 69%]
+tests/test_health.py::test_health_check PASSED                           [ 76%]
+tests/test_security.py::test_sql_injection_payload_in_features PASSED    [ 84%]
+tests/test_security.py::test_invalid_payload_structure PASSED            [ 92%]
+tests/test_security.py::test_unauthorized_token_rejection PASSED         [100%]
+
+============================== warnings summary ===============================
+..\..\Users\ACER\AppData\Roaming\Python\Python313\site-packages\pydantic\_internal\_config.py:323
+  C:\Users\ACER\AppData\Roaming\Python\Python313\site-packages\pydantic\_internal\_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 10 passed, 3 skipped, 1 warning in 24.10s ==================

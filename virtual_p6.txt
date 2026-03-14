@@ -1,0 +1,37 @@
+﻿python : [CircuitBreaker:f
+ailing-svc] 3 failures 
+ΓåÆ OPEN
+At line:1 char:32
++ ... OENCODING="utf-8"; 
+python backend/phase5_virt
+ual_test.py 2>&1 | Out-F 
+...
++                        ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: ([  
+  CircuitBreaker...ilur   
+ es ΓåÆ OPEN:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+[CircuitBreaker:dead-svc] 
+1 failures ΓåÆ OPEN
+[CircuitBreaker:recovering
+-svc] 2 failures ΓåÆ OPEN
+Retry 1/3 for _flaky in 
+0.06s ΓÇô Attempt 1 failed
+Retry 2/3 for _flaky in 
+0.11s ΓÇô Attempt 2 failed
+Retry 1/3 for 
+_always_fail in 0.01s ΓÇô 
+permanent failure
+Retry 2/3 for 
+_always_fail in 0.02s ΓÇô 
+permanent failure
+All 3 attempts failed for 
+_always_fail: permanent 
+failure

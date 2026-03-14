@@ -1,0 +1,230 @@
+﻿
+Running 38 tests using 4 workers
+
+  Γ£ô   1 [chromium] ΓÇ║ e2e\admin-decision-memory.spec.ts:18:5 ΓÇ║ Decision Memory Admin ΓÇ║ should navigate to decision memory admin page (5.1s)
+  Γ£ô   2 [chromium] ΓÇ║ e2e\admin-flow.spec.ts:12:5 ΓÇ║ Admin Control Plane ΓÇ║ should prevent non-admins from accessing admin panel (6.5s)
+  Γ£ô   4 [chromium] ΓÇ║ e2e\admin-flow.spec.ts:35:5 ΓÇ║ Admin Control Plane ΓÇ║ should show user info in sidebar (6.6s)
+  Γ£ô   3 [chromium] ΓÇ║ e2e\admin-flow.spec.ts:22:5 ΓÇ║ Admin Control Plane ΓÇ║ should allow authenticated user to view profile (6.6s)
+  Γ£ô   5 [chromium] ΓÇ║ e2e\admin-flow.spec.ts:47:5 ΓÇ║ RBAC Protection ΓÇ║ should protect admin routes (2.7s)
+  Γ£ô   6 [chromium] ΓÇ║ e2e\automation-flow.spec.ts:12:5 ΓÇ║ Automation Rules ΓÇ║ should display automation rules page (3.4s)
+  Γ£ô   7 [chromium] ΓÇ║ e2e\automation-flow.spec.ts:21:5 ΓÇ║ Automation Rules ΓÇ║ should show Create Rule button (3.5s)
+  Γ£ô   8 [chromium] ΓÇ║ e2e\automation-flow.spec.ts:31:5 ΓÇ║ Automation Rules ΓÇ║ should open rule creation wizard (3.7s)
+  Γ£ô   9 [chromium] ΓÇ║ e2e\automation-flow.spec.ts:46:5 ΓÇ║ Automation Rules ΓÇ║ should show existing rules if any (3.1s)
+  Γ£ô  12 [chromium] ΓÇ║ e2e\critical-flows.spec.ts:11:5 ΓÇ║ Critical Public Flows ΓÇ║ should load landing page (2.6s)
+  Γ£ô  13 [chromium] ΓÇ║ e2e\critical-flows.spec.ts:18:5 ΓÇ║ Critical Public Flows ΓÇ║ should navigate to login page (2.2s)
+  Γ£ô  11 [chromium] ΓÇ║ e2e\automation-flow.spec.ts:80:5 ΓÇ║ ML Predictions ΓÇ║ should load ML predictions page (3.2s)
+  Γ£ô  16 [chromium] ΓÇ║ e2e\dashboard-flow.spec.ts:24:5 ΓÇ║ Dashboard Functionality ΓÇ║ should display chart components (3.5s)
+  Γ£ô  10 [chromium] ΓÇ║ e2e\automation-flow.spec.ts:64:5 ΓÇ║ AI Chat ΓÇ║ should load AI chat page (7.0s)
+  Γ£ô  15 [chromium] ΓÇ║ e2e\dashboard-flow.spec.ts:12:5 ΓÇ║ Dashboard Functionality ΓÇ║ should load dashboard with KPI cards (4.5s)
+  Γ£ô  14 [chromium] ΓÇ║ e2e\critical-flows.spec.ts:33:5 ΓÇ║ Critical Public Flows ΓÇ║ should redirect unauthenticated dashboard access (5.1s)
+  Γ£ô  17 [chromium] ΓÇ║ e2e\dashboard-flow.spec.ts:34:5 ΓÇ║ Dashboard Functionality ΓÇ║ should navigate to other pages from sidebar (2.9s)
+  Γ£ÿ  19 [chromium] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot (345ms)
+  Γ£ô  18 [chromium] ΓÇ║ e2e\subscription.spec.ts:9:5 ΓÇ║ Subscription Settings ΓÇ║ should redirect unauthenticated user to auth page (3.9s)
+  Γ£ÿ  20 [chromium] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot (retry #1) (453ms)
+  Γ£ÿ  24 [chromium] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot (retry #2) (381ms)
+  Γ£ô  21 [firefox] ΓÇ║ e2e\admin-decision-memory.spec.ts:18:5 ΓÇ║ Decision Memory Admin ΓÇ║ should navigate to decision memory admin page (5.0s)
+  Γ£ô  25 [firefox] ΓÇ║ e2e\admin-flow.spec.ts:35:5 ΓÇ║ Admin Control Plane ΓÇ║ should show user info in sidebar (12.5s)
+  Γ£ô  23 [firefox] ΓÇ║ e2e\admin-flow.spec.ts:22:5 ΓÇ║ Admin Control Plane ΓÇ║ should allow authenticated user to view profile (12.1s)
+  Γ£ô  26 [firefox] ΓÇ║ e2e\admin-flow.spec.ts:47:5 ΓÇ║ RBAC Protection ΓÇ║ should protect admin routes (8.8s)
+  Γ£ô  27 [firefox] ΓÇ║ e2e\automation-flow.spec.ts:12:5 ΓÇ║ Automation Rules ΓÇ║ should display automation rules page (9.3s)
+  Γ£ô  28 [firefox] ΓÇ║ e2e\automation-flow.spec.ts:21:5 ΓÇ║ Automation Rules ΓÇ║ should show Create Rule button (9.1s)
+  Γ£ô  29 [firefox] ΓÇ║ e2e\automation-flow.spec.ts:31:5 ΓÇ║ Automation Rules ΓÇ║ should open rule creation wizard (8.9s)
+  Γ£ô  30 [firefox] ΓÇ║ e2e\automation-flow.spec.ts:46:5 ΓÇ║ Automation Rules ΓÇ║ should show existing rules if any (10.8s)
+  Γ£ô  31 [firefox] ΓÇ║ e2e\automation-flow.spec.ts:64:5 ΓÇ║ AI Chat ΓÇ║ should load AI chat page (14.7s)
+  Γ£ô  33 [firefox] ΓÇ║ e2e\critical-flows.spec.ts:11:5 ΓÇ║ Critical Public Flows ΓÇ║ should load landing page (4.8s)
+  Γ£ô  34 [firefox] ΓÇ║ e2e\critical-flows.spec.ts:18:5 ΓÇ║ Critical Public Flows ΓÇ║ should navigate to login page (3.2s)
+  Γ£ô  35 [firefox] ΓÇ║ e2e\critical-flows.spec.ts:33:5 ΓÇ║ Critical Public Flows ΓÇ║ should redirect unauthenticated dashboard access (5.8s)
+  Γ£ÿ  22 [firefox] ΓÇ║ e2e\admin-flow.spec.ts:12:5 ΓÇ║ Admin Control Plane ΓÇ║ should prevent non-admins from accessing admin panel (41.8s)
+  Γ£ô  36 [firefox] ΓÇ║ e2e\dashboard-flow.spec.ts:12:5 ΓÇ║ Dashboard Functionality ΓÇ║ should load dashboard with KPI cards (7.2s)
+  Γ£ô  37 [firefox] ΓÇ║ e2e\dashboard-flow.spec.ts:24:5 ΓÇ║ Dashboard Functionality ΓÇ║ should display chart components (6.4s)
+  Γ£ô  32 [firefox] ΓÇ║ e2e\automation-flow.spec.ts:80:5 ΓÇ║ ML Predictions ΓÇ║ should load ML predictions page (31.1s)
+  Γ£ô  39 [firefox] ΓÇ║ e2e\subscription.spec.ts:9:5 ΓÇ║ Subscription Settings ΓÇ║ should redirect unauthenticated user to auth page (6.7s)
+  Γ£ô  38 [firefox] ΓÇ║ e2e\dashboard-flow.spec.ts:34:5 ΓÇ║ Dashboard Functionality ΓÇ║ should navigate to other pages from sidebar (12.2s)
+  Γ£ÿ  41 [firefox] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot (2.6s)
+  Γ£ô  40 [firefox] ΓÇ║ e2e\admin-flow.spec.ts:12:5 ΓÇ║ Admin Control Plane ΓÇ║ should prevent non-admins from accessing admin panel (retry #1) (11.4s)
+  Γ£ÿ  42 [firefox] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot (retry #1) (1.5s)
+  Γ£ÿ  43 [firefox] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot (retry #2) (1.2s)
+
+
+  1) [chromium] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: Playwright Test did not expect test.use() to be called here.
+    Most common reasons include:
+    - You are calling test.use() in a configuration file.
+    - You are calling test.use() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+
+      3 |
+      4 | test('simple screenshot', async ({ page }) => {
+    > 5 |     test.use({ viewport: { width: 1280, height: 1024 } });
+        |          ^
+      6 |
+      7 |     console.log('Navigating to http://127.0.0.1:8082/dashboard');
+      8 |     try {
+        at C:\biz-stratosphere-main\e2e\visual-verification.spec.ts:5:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-chromium\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Retry #1 ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: Playwright Test did not expect test.use() to be called here.
+    Most common reasons include:
+    - You are calling test.use() in a configuration file.
+    - You are calling test.use() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+
+      3 |
+      4 | test('simple screenshot', async ({ page }) => {
+    > 5 |     test.use({ viewport: { width: 1280, height: 1024 } });
+        |          ^
+      6 |
+      7 |     console.log('Navigating to http://127.0.0.1:8082/dashboard');
+      8 |     try {
+        at C:\biz-stratosphere-main\e2e\visual-verification.spec.ts:5:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-chromium-retry1\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    attachment #2: trace (application/zip) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\visual-verification-simple-screenshot-chromium-retry1\trace.zip
+
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Retry #2 ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: Playwright Test did not expect test.use() to be called here.
+    Most common reasons include:
+    - You are calling test.use() in a configuration file.
+    - You are calling test.use() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+
+      3 |
+      4 | test('simple screenshot', async ({ page }) => {
+    > 5 |     test.use({ viewport: { width: 1280, height: 1024 } });
+        |          ^
+      6 |
+      7 |     console.log('Navigating to http://127.0.0.1:8082/dashboard');
+      8 |     try {
+        at C:\biz-stratosphere-main\e2e\visual-verification.spec.ts:5:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-chromium-retry2\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  2) [firefox] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: Playwright Test did not expect test.use() to be called here.
+    Most common reasons include:
+    - You are calling test.use() in a configuration file.
+    - You are calling test.use() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+
+      3 |
+      4 | test('simple screenshot', async ({ page }) => {
+    > 5 |     test.use({ viewport: { width: 1280, height: 1024 } });
+        |          ^
+      6 |
+      7 |     console.log('Navigating to http://127.0.0.1:8082/dashboard');
+      8 |     try {
+        at C:\biz-stratosphere-main\e2e\visual-verification.spec.ts:5:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Retry #1 ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: Playwright Test did not expect test.use() to be called here.
+    Most common reasons include:
+    - You are calling test.use() in a configuration file.
+    - You are calling test.use() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+
+      3 |
+      4 | test('simple screenshot', async ({ page }) => {
+    > 5 |     test.use({ viewport: { width: 1280, height: 1024 } });
+        |          ^
+      6 |
+      7 |     console.log('Navigating to http://127.0.0.1:8082/dashboard');
+      8 |     try {
+        at C:\biz-stratosphere-main\e2e\visual-verification.spec.ts:5:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-firefox-retry1\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    attachment #2: trace (application/zip) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-firefox-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\visual-verification-simple-screenshot-firefox-retry1\trace.zip
+
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Retry #2 ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: Playwright Test did not expect test.use() to be called here.
+    Most common reasons include:
+    - You are calling test.use() in a configuration file.
+    - You are calling test.use() in a file that is imported by the configuration file.
+    - You have two different versions of @playwright/test. This usually happens
+      when one of the dependencies in your package.json depends on @playwright/test.
+
+      3 |
+      4 | test('simple screenshot', async ({ page }) => {
+    > 5 |     test.use({ viewport: { width: 1280, height: 1024 } });
+        |          ^
+      6 |
+      7 |     console.log('Navigating to http://127.0.0.1:8082/dashboard');
+      8 |     try {
+        at C:\biz-stratosphere-main\e2e\visual-verification.spec.ts:5:10
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\visual-verification-simple-screenshot-firefox-retry2\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  3) [firefox] ΓÇ║ e2e\admin-flow.spec.ts:12:5 ΓÇ║ Admin Control Plane ΓÇ║ should prevent non-admins from accessing admin panel 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/(dashboard|$)/[39m
+    Received string:  [31m"http://localhost:8080/auth"[39m
+    Timeout: 30000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 30000ms[22m
+    [2m    31 ├ù unexpected value "http://localhost:8080/auth"[22m
+
+
+      17 |
+      18 |         // Should redirect to dashboard (not admin panel)
+    > 19 |         await expect(authenticatedPage).toHaveURL(/\/(dashboard|$)/, { timeout: 30000 });
+         |                                         ^
+      20 |     });
+      21 |
+      22 |     test('should allow authenticated user to view profile', async ({ authenticatedPage }) => {
+        at C:\biz-stratosphere-main\e2e\admin-flow.spec.ts:19:41
+
+    attachment #1: screenshot (image/png) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\admin-flow-Admin-Control-P-00d13--from-accessing-admin-panel-firefox\test-failed-1.png
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error Context: test-results\admin-flow-Admin-Control-P-00d13--from-accessing-admin-panel-firefox\error-context.md
+
+  2 failed
+    [chromium] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    [firefox] ΓÇ║ e2e\visual-verification.spec.ts:4:1 ΓÇ║ simple screenshot ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  1 flaky
+    [firefox] ΓÇ║ e2e\admin-flow.spec.ts:12:5 ΓÇ║ Admin Control Plane ΓÇ║ should prevent non-admins from accessing admin panel 
+  35 passed (1.9m)
