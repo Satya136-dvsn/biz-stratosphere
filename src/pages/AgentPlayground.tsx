@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Brain, Sparkles, Send, Loader2, Database, BarChart3, Workflow, ChevronRight } from 'lucide-react';
-import { apiClients } from '@/lib/api/clients';
+const API_BASE_URL = 'http://localhost:8000';
 
 interface ToolUsage {
     name: string;
@@ -36,11 +36,22 @@ export default function AgentPlayground() {
         setResult(null);
 
         try {
-            const res = await apiClients.llm.post('/agent/query', { query });
-            setResult(res.data);
+            const response = await fetch(`${API_BASE_URL}/api/v1/llm/agent/query`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query }),
+            });
+            
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.detail || `Error ${response.status}`);
+            }
+
+            const data = await response.json();
+            setResult(data);
             toast({
                 title: "Agent Execution Complete",
-                description: `Decision reached with ${(res.data.confidence_score * 100).toFixed(1)}% confidence.`,
+                description: `Decision reached with ${(data.confidence_score * 100).toFixed(1)}% confidence.`,
             });
         } catch (error: any) {
             console.error(error);

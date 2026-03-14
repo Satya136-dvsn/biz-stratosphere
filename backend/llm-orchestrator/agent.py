@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, "/app")
 from shared.tracing import init_tracer
-from shared.metrics import Counter, Histogram
+from shared.metrics import metrics
+Counter = metrics.Counter
+Histogram = metrics.Histogram
 
 import asyncpg
 

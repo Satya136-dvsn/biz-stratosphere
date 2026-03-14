@@ -56,7 +56,7 @@ export default function DecisionHistory() {
         try {
             const { error } = await supabase
                 .from('agent_decision_memory')
-                .update({ status: newStatus })
+                .update({ status: newStatus } as any)
                 .eq('id', id);
             
             if (error) throw error;
