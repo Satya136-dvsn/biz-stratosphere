@@ -35,6 +35,7 @@ dist-ssr
 test-results/
 playwright-report/
 blob-report/
+force_dashboard.png
 
 # Python
 __pycache__/
@@ -47,17 +48,36 @@ __pycache__/
 
 # MLflow & ML artifacts
 mlruns/
+mlflow.db
 
 # Bun (project uses npm)
 bun.lockb
 
-# Test artifacts
-test_output.txt
-test-output.txt
-test_results.txt
-test_results_fixed.txt
-test_failures.log
+# Test output dumps (any .txt test/lint/pytest/e2e logs at root)
+*_output.txt
+*_output_utf8.txt
+*_results.txt
+*_results_latest.txt
+*_utf8.txt
+dep_test*.txt
+direct_test_output.txt
+e2e_*.txt
+lint_*.txt
+pytest_*.txt
+vitest_*.txt
+virtual_*.txt
+test_err.txt
+
+# Simulation & load test artifacts
+browser-load-report.json
+browser-load.log
+final-simulation.log
+
+# One-off scripts (keep in scripts/ instead)
+apply_migration.py
+dependency_failure_test.py
 
 # Misc
 .blackboxrules
 .testing/
+.kiro/
