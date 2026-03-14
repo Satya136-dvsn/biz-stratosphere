@@ -1,0 +1,11 @@
+{
+  "concurrency": 200,
+  "durationSeconds": 104.22245180000002,
+  "success": 1,
+  "errors": 199,
+  "errorRate": 99.5,
+  "pageLoad": "P50: 4427.3ms | P95: 4427.3ms | P99: 4427.3ms",
+  "apiLatency": "N/A",
+  "networkDrops": 0,
+  "chaosMode": false
+}
