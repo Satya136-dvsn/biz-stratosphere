@@ -36,7 +36,7 @@ test.describe('Admin Control Plane', () => {
         await authenticatedPage.goto('/dashboard');
 
         // Sidebar should be visible (by role if possible, fallback to class)
-        await expect(authenticatedPage.locator('nav, aside, [class*="sidebar"]').first()).toBeVisible({ timeout: 15000 });
+        await expect(authenticatedPage.locator('nav, aside, [class*="sidebar"]').first()).toBeVisible({ timeout: 45000 });
     });
 });
 

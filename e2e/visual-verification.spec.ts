@@ -1,8 +1,9 @@
 
 import { test, expect } from '@playwright/test';
 
+test.use({ viewport: { width: 1280, height: 1024 } });
+
 test('simple screenshot', async ({ page }) => {
-    test.use({ viewport: { width: 1280, height: 1024 } });
 
     console.log('Navigating to http://127.0.0.1:8082/dashboard');
     try {

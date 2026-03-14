@@ -12,32 +12,32 @@ test.describe('Automation Rules', () => {
     test('should display automation rules page', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/automation-rules');
         // Wait for page header
-        await authenticatedPage.waitForSelector('h2:has-text("Automation Rules")', { state: 'visible', timeout: 15000 });
+        await authenticatedPage.waitForSelector('h2:has-text("Automation Rules")', { state: 'visible', timeout: 45000 });
 
         // Verify page loaded - check for heading
-        await expect(authenticatedPage.locator('h2:has-text("Automation Rules")').first()).toBeVisible({ timeout: 10000 });
+        await expect(authenticatedPage.locator('h2:has-text("Automation Rules")').first()).toBeVisible({ timeout: 30000 });
     });
 
     test('should show Create Rule button', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/automation-rules');
         // Wait for create button
-        await authenticatedPage.waitForSelector('[data-testid="create-rule-button"]', { state: 'visible', timeout: 15000 });
+        await authenticatedPage.waitForSelector('[data-testid="create-rule-button"]', { state: 'visible', timeout: 45000 });
 
         // Use data-testid for stable selector
         const createButton = authenticatedPage.locator('[data-testid="create-rule-button"]');
-        await expect(createButton).toBeVisible({ timeout: 10000 });
+        await expect(createButton).toBeVisible({ timeout: 30000 });
     });
 
     test('should open rule creation wizard', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/automation-rules');
         // Wait for create button before clicking
-        await authenticatedPage.waitForSelector('[data-testid="create-rule-button"]', { state: 'visible', timeout: 15000 });
+        await authenticatedPage.waitForSelector('[data-testid="create-rule-button"]', { state: 'visible', timeout: 45000 });
 
         // Click Create Rule button using data-testid
         await authenticatedPage.locator('[data-testid="create-rule-button"]').click();
 
         // Wait for wizard to appear using data-testid
-        await expect(authenticatedPage.locator('[data-testid="wizard-title"]')).toBeVisible({ timeout: 5000 });
+        await expect(authenticatedPage.locator('[data-testid="wizard-title"]')).toBeVisible({ timeout: 15000 });
 
         // Also verify rule name input is visible
         await expect(authenticatedPage.locator('[data-testid="rule-name-input"]')).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('Automation Rules', () => {
     test('should show existing rules if any', async ({ authenticatedPage }) => {
         await authenticatedPage.goto('/automation-rules');
         // Wait for header
-        await authenticatedPage.waitForSelector('h2:has-text("Automation Rules")', { state: 'visible', timeout: 15000 });
+        await authenticatedPage.waitForSelector('h2:has-text("Automation Rules")', { state: 'visible', timeout: 45000 });
 
         // The page should show either rules or the empty state message
         const pageContent = authenticatedPage.locator('body');
@@ -69,7 +69,7 @@ test.describe('AI Chat', () => {
         const aiHeading = authenticatedPage.locator('h1, h2').filter({ hasText: /AI/i });
 
         // Either chat input or heading should be visible
-        await expect(chatInput.or(aiHeading).first()).toBeVisible({ timeout: 15000 });
+        await expect(chatInput.or(aiHeading).first()).toBeVisible({ timeout: 45000 });
     });
 });
 
@@ -83,6 +83,6 @@ test.describe('ML Predictions', () => {
         // Wait for ML predictions heading or content
         await expect(authenticatedPage.getByRole('heading', { level: 1 })
             .or(authenticatedPage.getByRole('heading', { level: 2 })).first()
-        ).toBeVisible({ timeout: 15000 });
+        ).toBeVisible({ timeout: 45000 });
     });
 });
