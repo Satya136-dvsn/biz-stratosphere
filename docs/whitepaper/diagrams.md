@@ -5,6 +5,7 @@ Visual representations of the Biz Stratosphere deployment and data flow.
 ## 1. System Architecture Diagram
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0d47a1', 'primaryTextColor': '#fff', 'primaryBorderColor': '#1565c0', 'lineColor': '#888', 'secondaryColor': '#e65100', 'tertiaryColor': '#4a148c' }}}%%
 graph TD
     %% External
     Client([Client Application])
@@ -64,9 +65,9 @@ graph TD
     RAG -.->|OTLP| Jaeg
     ORCH -.->|OTLP| Jaeg
 
-    classDef stateless fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
-    classDef stateful fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
-    classDef obs fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px;
+    classDef stateless fill:#0d47a1,stroke:#1565c0,stroke-width:2px,color:#fff;
+    classDef stateful fill:#e65100,stroke:#ef6c00,stroke-width:2px,color:#fff;
+    classDef obs fill:#4a148c,stroke:#6a1b9a,stroke-width:2px,color:#fff;
     
     class GW,ML,RAG,ORCH,WORK stateless;
     class PG,LLM stateful;
