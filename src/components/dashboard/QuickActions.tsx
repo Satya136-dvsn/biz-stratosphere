@@ -4,6 +4,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
     Upload,
     Download,
@@ -84,21 +85,23 @@ export function QuickActions() {
                 <CardDescription>Common tasks and operations</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {actions.map((action) => {
                         const Icon = action.icon;
                         return (
                             <Button
                                 key={action.id}
                                 variant="outline"
-                                className="h-auto flex-col items-start gap-2 p-4 hover:bg-muted/50 hover-lift"
+                                className="h-auto flex flex-col items-start gap-2 p-3 hover:bg-muted/50 hover-lift bg-card/50 backdrop-blur-sm border-primary/10 hover:border-primary/30 transition-all duration-300"
                                 onClick={action.action}
                             >
                                 <div className="flex items-center gap-2 w-full">
-                                    <Icon className={`h-4 w-4 ${action.color}`} />
-                                    <span className="text-sm font-medium">{action.title}</span>
+                                    <div className={cn("p-1.5 rounded-md bg-foreground/5", action.color)}>
+                                        <Icon className="h-4 w-4" />
+                                    </div>
+                                    <span className="text-xs font-semibold text-left line-clamp-1">{action.title}</span>
                                 </div>
-                                <p className="text-xs text-muted-foreground text-left">
+                                <p className="text-[10px] text-muted-foreground text-left leading-tight line-clamp-2">
                                     {action.description}
                                 </p>
                             </Button>

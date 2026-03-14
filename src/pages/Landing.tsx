@@ -79,8 +79,8 @@ export default function LandingPage() {
                             Built for SaaS teams who outgrew spreadsheets
                         </Badge>
 
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-                            Know <em className="not-italic bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">why</em> your metrics change.
+                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.2] py-2">
+                            Know <em className="not-italic px-1 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">why</em> your metrics change.
                             <br />
                             Not just <em className="not-italic text-muted-foreground/70">that</em> they changed.
                         </h1>
@@ -317,7 +317,7 @@ export default function LandingPage() {
             {/* ─── CTA Section ────────────────────────────────────── */}
             <section className="container mx-auto px-4 py-28">
                 <div className="max-w-4xl mx-auto text-center space-y-8 glass-strong rounded-2xl p-12 md:p-16 shadow-2xl hover-lift">
-                    <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent py-4 leading-tight">
                         Stop guessing. Start knowing.
                     </h2>
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

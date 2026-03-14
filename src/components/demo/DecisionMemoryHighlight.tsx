@@ -79,7 +79,7 @@ export function DecisionMemoryHighlight() {
                     );
                 })}
 
-                <Link to="/decision-audit">
+                <Link to="/decision-history">
                     <Button variant="ghost" size="sm" className="w-full text-primary hover:text-primary/80 text-xs mt-1">
                         View All Decisions
                         <ChevronRight className="h-3 w-3 ml-1" />

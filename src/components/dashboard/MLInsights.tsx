@@ -46,7 +46,7 @@ export function MLInsights() {
   useEffect(() => {
     const checkMLService = async () => {
       try {
-        const res = await fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(3000) });
+        const res = await fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(8000) });
         if (res.ok) {
           const data = await res.json();
           setMlServiceStatus('healthy');
@@ -57,7 +57,8 @@ export function MLInsights() {
         } else {
           setMlServiceStatus('offline');
         }
-      } catch {
+      } catch (e) {
+        console.warn("ML Service Health Check Failed:", e);
         setMlServiceStatus('offline');
       }
     };
@@ -154,13 +155,15 @@ export function MLInsights() {
     setExplainLoading(true);
     try {
       // Get the most recent prediction to explain
-      const { data: prediction, error: predError } = await supabase
+      const { data: predData, error: predError } = await supabase
         .from('predictions_log')
         .select('id')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
+
+      const prediction = predData as { id: string } | null;
 
       if (predError || !prediction) {
         toast({
@@ -234,48 +237,54 @@ export function MLInsights() {
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="churn">Churn</TabsTrigger>
-            <TabsTrigger value="forecast">Forecast</TabsTrigger>
-            <TabsTrigger value="anomalies">Anomalies</TabsTrigger>
-            <TabsTrigger value="explain" className="gap-1">
-              <Lightbulb className="h-3 w-3" />
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="flex flex-wrap h-auto w-full max-w-full bg-card/60 backdrop-blur-md p-1.5 gap-1 md:gap-2 rounded-xl border border-border/50 shadow-sm shadow-black/5 overflow-x-auto no-scrollbar">
+            <TabsTrigger value="overview" className="flex-1 min-w-[100px] h-10 rounded-lg font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all">Overview</TabsTrigger>
+            <TabsTrigger value="churn" className="flex-1 min-w-[100px] h-10 rounded-lg font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all">Churn</TabsTrigger>
+            <TabsTrigger value="forecast" className="flex-1 min-w-[100px] h-10 rounded-lg font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all">Forecast</TabsTrigger>
+            <TabsTrigger value="anomalies" className="flex-1 min-w-[100px] h-10 rounded-lg font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all">Anomalies</TabsTrigger>
+            <TabsTrigger value="explain" className="flex-1 min-w-[100px] h-10 rounded-lg font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all gap-2">
+              <Lightbulb className="h-4 w-4" />
               Explain
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
+          <TabsContent value="overview" className="space-y-6 animate-in fade-in-50 duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Button
                 variant="outline"
-                className="h-20 flex flex-col gap-2"
+                className="group h-auto min-h-[120px] flex flex-col items-center justify-center gap-3 p-6 bg-card/40 backdrop-blur-sm border-primary/10 hover:border-primary/30 hover:bg-primary/5 hover:shadow-glow-soft transition-all duration-300"
                 onClick={runChurnPrediction}
                 disabled={isLoading}
               >
-                <Users className="h-6 w-6 text-warning" />
-                <span className="text-sm">Churn Risk</span>
+                <div className="p-3 rounded-xl bg-warning/10 group-hover:bg-warning/20 group-hover:scale-110 transition-all duration-300">
+                  <Users className="h-7 w-7 text-warning" />
+                </div>
+                <span className="font-semibold text-sm tracking-tight text-foreground/80 group-hover:text-foreground">Churn Risk</span>
               </Button>
 
               <Button
                 variant="outline"
-                className="h-20 flex flex-col gap-2"
+                className="group h-auto min-h-[120px] flex flex-col items-center justify-center gap-3 p-6 bg-card/40 backdrop-blur-sm border-primary/10 hover:border-primary/30 hover:bg-primary/5 hover:shadow-glow-soft transition-all duration-300"
                 onClick={runSalesForecasting}
                 disabled={isLoading}
               >
-                <TrendingUp className="h-6 w-6 text-revenue" />
-                <span className="text-sm">Sales Forecast</span>
+                <div className="p-3 rounded-xl bg-revenue/10 group-hover:bg-revenue/20 group-hover:scale-110 transition-all duration-300">
+                  <TrendingUp className="h-7 w-7 text-revenue" />
+                </div>
+                <span className="font-semibold text-sm tracking-tight text-foreground/80 group-hover:text-foreground">Sales Forecast</span>
               </Button>
 
               <Button
                 variant="outline"
-                className="h-20 flex flex-col gap-2"
+                className="group h-auto min-h-[120px] flex flex-col items-center justify-center gap-3 p-6 bg-card/40 backdrop-blur-sm border-primary/10 hover:border-primary/30 hover:bg-primary/5 hover:shadow-glow-soft transition-all duration-300"
                 onClick={runAnomalyDetection}
                 disabled={isLoading}
               >
-                <AlertTriangle className="h-6 w-6 text-info" />
-                <span className="text-sm">Anomaly Scan</span>
+                <div className="p-3 rounded-xl bg-info/10 group-hover:bg-info/20 group-hover:scale-110 transition-all duration-300">
+                  <AlertTriangle className="h-7 w-7 text-info" />
+                </div>
+                <span className="font-semibold text-sm tracking-tight text-foreground/80 group-hover:text-foreground">Anomaly Scan</span>
               </Button>
             </div>
 

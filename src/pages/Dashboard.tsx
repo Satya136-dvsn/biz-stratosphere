@@ -258,11 +258,11 @@ export default function Dashboard() {
         </div>
 
         {/* ── AI & ML Section ────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '700ms' }} data-testid="ai-chatbot">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+          <div className="xl:col-span-3 animate-fade-in" style={{ animationDelay: '700ms' }} data-testid="ai-chatbot">
             <AIChatbot />
           </div>
-          <div className="space-y-6 animate-fade-in" style={{ animationDelay: '800ms' }} data-testid="ml-insights">
+          <div className="xl:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '800ms' }} data-testid="ml-insights">
             <ExportButtons
               kpiData={kpiData}
               chartData={chartData}

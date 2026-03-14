@@ -9,6 +9,8 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
 import { ChartType } from './ChartTypeSelector';
+import { GlassTooltip } from '@/components/ui/GlassTooltip';
+import { formatCurrency, formatNumber } from '@/lib/utils';
 
 interface ChartDataPoint {
   month: string;
@@ -45,12 +47,24 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" stroke="#888888" />
-            <YAxis stroke="#888888" />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+            <XAxis 
+              dataKey="month" 
+              stroke="rgba(255,255,255,0.4)" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              stroke="rgba(255,255,255,0.4)"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(v) => metric === 'revenue' ? `$${v/1000}k` : v}
+            />
+            <Tooltip content={<GlassTooltip formatter={metric === 'revenue' ? (v) => formatCurrency(v as number) : (v) => formatNumber(v as number)} />} />
             <Legend />
-            <Bar dataKey={metric} fill="#8884d8" name={metric === 'revenue' ? 'Revenue' : 'Customers'} />
+            <Bar dataKey={metric} fill="#8884d8" name={metric === 'revenue' ? 'Revenue' : 'Customers'} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       );
@@ -64,12 +78,24 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" stroke="#888888" />
-            <YAxis stroke="#888888" />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+            <XAxis 
+              dataKey="month" 
+              stroke="rgba(255,255,255,0.4)" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              stroke="rgba(255,255,255,0.4)"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(v) => metric === 'revenue' ? `$${v/1000}k` : v}
+            />
+            <Tooltip content={<GlassTooltip formatter={metric === 'revenue' ? (v) => formatCurrency(v as number) : (v) => formatNumber(v as number)} />} />
             <Legend />
-            <Area type="monotone" dataKey={metric} stroke="#8884d8" fill="#8884d8" />
+            <Area type="monotone" dataKey={metric} stroke="#8884d8" fill="#8884d8" fillOpacity={0.1} />
           </AreaChart>
         </ResponsiveContainer>
       );
@@ -77,7 +103,6 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
 
     // 3. PIE CHART
     if (variant === 'pie') {
-      // Prepare data for Pie (sum or slice?)
       const pieData = data.slice(0, 6).map((d) => ({
         name: d.month,
         value: metric === 'revenue' ? d.revenue : d.customers
@@ -93,13 +118,13 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
-              label
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             >
               {pieData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip content={<GlassTooltip formatter={metric === 'revenue' ? (v) => formatCurrency(v as number) : (v) => formatNumber(v as number)} />} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
@@ -113,18 +138,30 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
           data={data}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" stroke="#888888" />
-          <YAxis stroke="#888888" />
-          <Tooltip />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+          <XAxis 
+            dataKey="month" 
+            stroke="rgba(255,255,255,0.4)" 
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis 
+            stroke="rgba(255,255,255,0.4)"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(v) => metric === 'revenue' ? `$${v/1000}k` : v}
+          />
+          <Tooltip content={<GlassTooltip formatter={(v) => metric === 'revenue' ? formatCurrency(v as number) : formatNumber(v as number)} />} />
           <Legend />
           {metric === 'revenue' ? (
             <>
-              <Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="target" stroke="#82ca9d" />
+              <Line type="monotone" dataKey="revenue" stroke="#8884d8" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="target" stroke="#82ca9d" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6, strokeWidth: 0 }} />
             </>
           ) : (
-            <Line type="monotone" dataKey="customers" stroke="#8884d8" />
+            <Line type="monotone" dataKey="customers" stroke="#8884d8" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6, strokeWidth: 0 }} />
           )}
         </LineChart>
       </ResponsiveContainer>
