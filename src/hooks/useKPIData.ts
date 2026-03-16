@@ -25,7 +25,7 @@ import { DEMO_KPI_DATA } from '@/data/demoDataset';
 
 export function useKPIData() {
   const { user } = useAuth();
-  const FORCE_DEMO = true;
+  const FORCE_DEMO = false;
 
   return useQuery({
     queryKey: ['kpi-data', user?.id],
@@ -56,10 +56,23 @@ export function useKPIData() {
 
         const activeCustomers = usersData?.[0]?.metric_value || 0;
 
-        // Fallback to Demo Data if DB is empty (First Run Experience)
+        // Return 0 values if no data to be ACCURATE, rather than showing confusing demo data
         if (totalRevenue === 0 && activeCustomers === 0) {
-          console.log('useKPIData: No data found, using Demo Data');
-          return DEMO_KPI_DATA;
+          console.log('useKPIData: No data found for user, showing empty state');
+          return {
+            totalRevenue: 0,
+            revenueChange: 0,
+            activeCustomers: 0,
+            customersChange: 0,
+            churnRate: 0,
+            churnChange: 0,
+            averageDealSize: 0,
+            dealSizeChange: 0,
+            conversionRate: 0,
+            conversionChange: 0,
+            growthRate: 0,
+            growthChange: 0,
+          };
         }
 
         return {

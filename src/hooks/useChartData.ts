@@ -29,7 +29,7 @@ export function useChartData(filters: ChartFilters) {
   const hasInitiallyLoaded = useRef(false);
 
   // DEBUG: Force Demo Data to unblock user if backend is down
-  const FORCE_DEMO = true;
+  const FORCE_DEMO = false;
 
   // Generate Demo Data helper
   const getDemoData = () => {
@@ -89,16 +89,9 @@ export function useChartData(filters: ChartFilters) {
       if (error) throw error;
 
       if (!rawDataPoints || rawDataPoints.length === 0) {
-        // Fallback to Demo Data if DB is empty (First Run Experience)
-        console.log('[useChartData] No data found in DB, using Demo Data');
-        const currentYear = new Date().getFullYear();
-        const demoPoints = DEMO_CHART_DATA.map((d, i) => {
-          return {
-            ...d,
-            date: new Date(currentYear, i, 1) // Jan to Dec
-          };
-        });
-        setChartData(demoPoints);
+        // Return empty chart points if no data to be ACCURATE
+        console.log('[useChartData] No data found in DB, showing empty state');
+        setChartData([]);
         return;
       }
 

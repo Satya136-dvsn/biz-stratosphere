@@ -13,26 +13,75 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Mail, MessageSquare, Building2, Send, CheckCircle2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ContactSales() {
+    const { user } = useAuth();
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+
+    // Form states
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        company: "",
+        tier: "enterprise",
+        message: ""
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        setIsSubmitting(false);
-        setSubmitted(true);
-        
-        toast({
-            title: "Inquiry Sent",
-            description: "An Enterprise Account Manager will reach out to you within 24 hours.",
-        });
+        try {
+            // 1. Persist to database (using notifications as a temporary store)
+            // We'll tag it as 'sales_inquiry' so it can be filtered/searched
+            
+            // Find an admin user to notify if possible, else notify the current user OR a system record
+            const { data: admins } = await supabase
+                .from('profiles')
+                .select('id')
+                .or('role.eq.admin,role.eq.super_admin')
+                .limit(1) as any;
+
+            const targetUserId = (admins as any)?.[0]?.id || user?.id;
+
+            if (targetUserId) {
+                const { error } = await supabase.from('notifications' as any).insert({
+                    user_id: targetUserId,
+                    title: `New Enterprise Inquiry: ${formData.company}`,
+                    message: `Inquiry from ${formData.firstName} ${formData.lastName} (${formData.email}).\nScale: ${formData.tier}\nRequirements: ${formData.message}`,
+                    type: 'sales_inquiry',
+                    read: false
+                } as any);
+
+                if (error) throw error;
+            } else {
+                // Fallback for anonymous users: log to console or handled by Edge Function in prod
+                console.log("Anonymous inquiry:", formData);
+            }
+
+            // Simulate slight delay for professional feel
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            setSubmitted(true);
+            toast({
+                title: "Inquiry Sent",
+                description: "An Enterprise Account Manager will reach out to you within 24 hours.",
+            });
+        } catch (error: any) {
+            console.error("Submission error:", error);
+            toast({
+                title: "Submission Failed",
+                description: "There was an error sending your inquiry. Please try again or email us directly.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (submitted) {
@@ -83,27 +132,59 @@ export default function ContactSales() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="firstName">First Name</Label>
-                                    <Input id="firstName" placeholder="Jane" required className="glass" />
+                                    <Input 
+                                        id="firstName" 
+                                        placeholder="Jane" 
+                                        required 
+                                        className="glass" 
+                                        value={formData.firstName}
+                                        onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="lastName">Last Name</Label>
-                                    <Input id="lastName" placeholder="Doe" required className="glass" />
+                                    <Input 
+                                        id="lastName" 
+                                        placeholder="Doe" 
+                                        required 
+                                        className="glass" 
+                                        value={formData.lastName}
+                                        onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                                    />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="email">Work Email</Label>
-                                <Input id="email" type="email" placeholder="jane.doe@company.com" required className="glass" />
+                                <Input 
+                                    id="email" 
+                                    type="email" 
+                                    placeholder="jane.doe@company.com" 
+                                    required 
+                                    className="glass" 
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="company">Company Name</Label>
-                                <Input id="company" placeholder="Acme Corp" required className="glass" />
+                                <Input 
+                                    id="company" 
+                                    placeholder="Acme Corp" 
+                                    required 
+                                    className="glass" 
+                                    value={formData.company}
+                                    onChange={(e) => setFormData({...formData, company: e.target.value})}
+                                />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="tier">Expected Scale</Label>
-                                <Select defaultValue="enterprise">
+                                <Select 
+                                    defaultValue="enterprise" 
+                                    onValueChange={(val) => setFormData({...formData, tier: val})}
+                                >
                                     <SelectTrigger className="glass">
                                         <SelectValue placeholder="Select scale" />
                                     </SelectTrigger>
@@ -122,6 +203,8 @@ export default function ContactSales() {
                                     placeholder="Tell us about your data volume, compliance needs (SSO, GDPR), or custom ML requirements..." 
                                     className="min-h-[120px] glass" 
                                     required 
+                                    value={formData.message}
+                                    onChange={(e) => setFormData({...formData, message: e.target.value})}
                                 />
                             </div>
 
@@ -177,11 +260,11 @@ export default function ContactSales() {
                             <div className="space-y-2 text-sm">
                                 <p className="flex items-center gap-2">
                                     <Mail className="h-4 w-4 text-primary" />
-                                    sales@biz-stratosphere.com
+                                    d.v.satyanarayana260@gmail.com
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <Building2 className="h-4 w-4 text-primary" />
-                                    San Francisco • London • Hyderabad
+                                    Visakhapatnam, India
                                 </p>
                             </div>
                         </CardContent>

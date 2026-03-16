@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Biz Stratosphere ML Service"
     VERSION: str = "2.0.0"
+    DATABASE_URL: str = "" # Loaded from .env
     
     # CORS — NEVER use "*" in production
     BACKEND_CORS_ORIGINS: List[str] = [

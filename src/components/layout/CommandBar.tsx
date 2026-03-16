@@ -37,6 +37,7 @@ const notificationIcons = {
     'success': CheckCircle,
     'warning': AlertTriangle,
     'error': AlertCircle,
+    'sales_inquiry': Building2,
 };
 
 export function CommandBar() {
@@ -232,7 +233,8 @@ export function CommandBar() {
                                                 notification.type === 'success' && "text-green-500",
                                                 notification.type === 'warning' && "text-yellow-500",
                                                 notification.type === 'error' && "text-red-500",
-                                                notification.type === 'info' && "text-blue-500"
+                                                notification.type === 'info' && "text-blue-500",
+                                                notification.type === 'sales_inquiry' && "text-primary"
                                             )} />
                                             <div className="flex-1 min-w-0">
                                                 <p className={cn(

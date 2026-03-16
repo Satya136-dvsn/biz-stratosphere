@@ -12,7 +12,7 @@ export interface Notification {
     user_id: string;
     title: string;
     message: string;
-    type: 'info' | 'success' | 'warning' | 'error';
+    type: 'info' | 'success' | 'warning' | 'error' | 'sales_inquiry';
     read: boolean;
     action_url?: string;
     created_at: string;

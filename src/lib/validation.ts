@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 // Reusable password complexity regex
 // At least one uppercase, one lowercase, one number, one special char
-const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
 
 export const passwordSchema = z
     .string()
