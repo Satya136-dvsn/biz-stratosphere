@@ -175,8 +175,8 @@ export function Settings() {
         </p>
       </div>
 
-      <Tabs defaultValue="account" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+      <Tabs defaultValue="account" orientation="vertical" className="flex flex-col md:flex-row gap-8 mt-8 w-full max-w-6xl mx-auto">
+        <TabsList className="flex flex-col h-auto w-full md:w-64 bg-transparent space-y-1 p-0 justify-start items-stretch sticky top-6">
           <TabsTrigger value="account" className="gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Account</span>
@@ -207,11 +207,12 @@ export function Settings() {
           </TabsTrigger>
           <TabsTrigger value="subscription" className="gap-2">
             <CreditCard className="h-4 w-4" />
-            <span className="hidden sm:inline">Subscription</span>
+            <span className="inline">Subscription</span>
           </TabsTrigger>
         </TabsList>
 
-        {/* Account Settings */}
+        <div className="flex-1 max-w-4xl space-y-6">
+          {/* Account Settings */}
         <TabsContent value="account" className="space-y-4">
           <Card>
             <CardHeader>
@@ -537,9 +538,10 @@ export function Settings() {
         </TabsContent>
 
         {/* Subscription Settings */}
-        <TabsContent value="subscription" className="space-y-4">
+        <TabsContent value="subscription" className="space-y-4 m-0">
           <SubscriptionSettings />
         </TabsContent>
+        </div>
       </Tabs>
     </PageLayout>
   );

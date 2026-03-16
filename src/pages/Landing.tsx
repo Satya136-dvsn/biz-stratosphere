@@ -294,7 +294,7 @@ export default function LandingPage() {
                                 'White-glove onboarding',
                             ]}
                             cta="Contact Sales"
-                            ctaLink="mailto:d.v.satyanarayana260@gmail.com"
+                            ctaLink="/contact-sales"
                         />
                     </div>
                 </div>
