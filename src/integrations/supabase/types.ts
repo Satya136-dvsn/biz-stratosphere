@@ -268,13 +268,40 @@ export interface Database {
                     similarity: number;
                 }>;
             };
+            get_admin_users_v2: {
+                Args: {
+                    page: number;
+                    page_size: number;
+                    search_query?: string;
+                };
+                Returns: Array<{
+                    id: string;
+                    email: string;
+                    full_name: string;
+                    role: string;
+                    suspended: boolean;
+                    created_at: string;
+                    last_sign_in: string | null;
+                    dataset_count: number;
+                }>;
+            };
+            admin_update_role: {
+                Args: {
+                    target_user_id: string;
+                    new_role: string;
+                };
+                Returns: null;
+            };
+            admin_toggle_suspend: {
+                Args: {
+                    target_user_id: string;
+                    suspend: boolean;
+                };
+                Returns: null;
+            };
             increment: {
                 Args: { row_id: string };
                 Returns: number;
-            };
-            [key: string]: {
-                Args: any;
-                Returns: any;
             };
         };
         Enums: {

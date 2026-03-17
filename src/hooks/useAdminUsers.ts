@@ -15,6 +15,7 @@ export type AdminUser = {
     suspended: boolean;
     created_at: string;
     last_sign_in: string | null;
+    dataset_count: number;
 };
 
 export function useAdminUsers(page = 1, search = '') {
@@ -24,7 +25,7 @@ export function useAdminUsers(page = 1, search = '') {
     const { data: users, isLoading, error } = useQuery({
         queryKey: ['admin-users', page, search],
         queryFn: async () => {
-            const { data, error } = await supabase.rpc('get_admin_users', {
+            const { data, error } = await supabase.rpc('get_admin_users_v2', {
                 page,
                 page_size: 20,
                 search_query: search
@@ -32,7 +33,7 @@ export function useAdminUsers(page = 1, search = '') {
             if (error) throw error;
             return data as AdminUser[];
         },
-        keepPreviousData: true,
+        placeholderData: (previousData) => previousData,
     });
 
     const updateRoleMutation = useMutation({
@@ -44,7 +45,7 @@ export function useAdminUsers(page = 1, search = '') {
             if (error) throw error;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(['admin-users']);
+            queryClient.invalidateQueries({ queryKey: ['admin-users'] });
             toast({ title: 'Role Updated', description: 'User role changed successfully.' });
         },
         onError: (err: any) => {
@@ -61,7 +62,7 @@ export function useAdminUsers(page = 1, search = '') {
             if (error) throw error;
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries(['admin-users']);
+            queryClient.invalidateQueries({ queryKey: ['admin-users'] });
             toast({
                 title: variables.suspend ? 'User Suspended' : 'User Restored',
                 description: `User access has been ${variables.suspend ? 'revoked' : 'restored'}.`
