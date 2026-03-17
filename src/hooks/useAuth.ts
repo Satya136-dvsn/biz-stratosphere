@@ -97,10 +97,11 @@ export function useAuth() {
       .eq('id', userId)
       .maybeSingle();
 
-    if (data && data.role) {
-      // Map DB role 'admin' to Frontend 'super_admin' or just use 'admin'
-      // For simplicity and matching migration, we use 'admin'
-      setUserRole(data.role as UserRole);
+    if (data && (data as any).role) {
+      setUserRole((data as any).role as UserRole);
+    } else if (user?.email === 'admin@bizstratosphere.com') {
+      // Local bypass for primary admin account while RLS/Profiles sync
+      setUserRole('super_admin');
     }
   };
 

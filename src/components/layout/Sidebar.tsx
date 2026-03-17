@@ -24,6 +24,7 @@ import {
     FolderOpen,
     Zap,
     Server,
+    LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -129,7 +130,7 @@ const navItems: NavItem[] = [
 export function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
 
     const getUserInitials = () => {
         const name = user?.user_metadata?.display_name || user?.email || "User";
@@ -214,6 +215,38 @@ export function Sidebar() {
                         </Link>
                     );
                 })}
+
+                {isAdmin() && (
+                    <>
+                        <div className={cn("mt-6 mb-2 px-3", collapsed ? "hidden" : "block")}>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground opacity-60">
+                                Administrator
+                            </p>
+                        </div>
+                        {[
+                            { title: "Admin Overview", href: "/admin", icon: LayoutDashboard },
+                            { title: "Enterprise Leads", href: "/admin/inquiries", icon: Building2 },
+                        ].map((item) => {
+                            const Icon = item.icon;
+                            const isActive = location.pathname === item.href;
+                            return (
+                                <Link key={item.href} to={item.href}>
+                                    <Button
+                                        variant={isActive ? "secondary" : "ghost"}
+                                        className={cn(
+                                            "w-full justify-start transition-all duration-200 mb-1",
+                                            collapsed ? "px-2" : "px-3",
+                                            isActive && "bg-primary/20 text-primary hover:bg-primary/30"
+                                        )}
+                                    >
+                                        <Icon className={cn("h-5 w-5 flex-shrink-0", !collapsed && "mr-3")} />
+                                        {!collapsed && <span className="text-sm font-medium truncate flex-1">{item.title}</span>}
+                                    </Button>
+                                </Link>
+                            );
+                        })}
+                    </>
+                )}
             </nav>
 
             {/* User Profile Section */}

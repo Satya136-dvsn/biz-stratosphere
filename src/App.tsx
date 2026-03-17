@@ -39,6 +39,7 @@ const PlatformStatus = lazy(() => import("./pages/PlatformStatus"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement").then(m => ({ default: m.UserManagement })));
 const AIControl = lazy(() => import("./pages/admin/AIControl").then(m => ({ default: m.AIControl })));
+const AdminInquiries = lazy(() => import("./pages/admin/AdminInquiries").then(m => ({ default: m.AdminInquiries })));
 const AuditLogs = lazy(() => import("./pages/admin/AuditLogs").then(m => ({ default: m.AuditLogs })));
 const AIDecisionAudit = lazy(() => import("./pages/admin/AIDecisionAudit"));
 const DecisionMemory = lazy(() => import("./pages/admin/DecisionMemory"));
@@ -306,6 +307,14 @@ const App = () => (
                   element={
                     <AdminRoute>
                       <UserManagement />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/inquiries"
+                  element={
+                    <AdminRoute>
+                      <AdminInquiries />
                     </AdminRoute>
                   }
                 />

@@ -5,14 +5,24 @@
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldCheck, Users, Activity, Database, AlertCircle, Building } from "lucide-react";
+import { ShieldCheck, Users, Activity, Database, AlertCircle, Building, Building2, ExternalLink } from "lucide-react";
 import { useAdminStats } from "@/hooks/useAdminStats";
+import { useNotifications } from "@/hooks/useNotifications";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const AdminDashboard = () => {
   const { stats, signups, loading, error } = useAdminStats();
+  const { notifications, isLoading: notificationsLoading } = useNotifications();
+
+  // Filter for sales inquiries
+  const salesLeads = notifications
+    .filter(n => n.type === 'sales_inquiry')
+    .slice(0, 5);
 
   if (error) {
     return (
@@ -154,6 +164,74 @@ export const AdminDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Sales Leads</CardTitle>
+              <p className="text-sm text-muted-foreground">Latest enterprise inquiries from Contact Sales</p>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/admin/inquiries" className="flex items-center gap-2">
+                View All <ExternalLink className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {notificationsLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ) : salesLeads.length > 0 ? (
+              <div className="relative overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs uppercase bg-muted/50">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">Lead Name</th>
+                      <th className="px-4 py-3 font-medium">Type</th>
+                      <th className="px-4 py-3 font-medium">Date</th>
+                      <th className="px-4 py-3 font-medium text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {salesLeads.map((lead) => (
+                      <tr key={lead.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Building2 className="h-4 w-4 text-primary" />
+                            </div>
+                            <span className="font-medium text-foreground">{lead.title}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 border-none">
+                            Enterprise
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground italic">
+                          {new Date(lead.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link to="/admin/inquiries">Review</Link>
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Building2 className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>No recent enterprise leads found.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </PageLayout>
   );
