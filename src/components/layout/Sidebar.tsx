@@ -25,6 +25,9 @@ import {
     Zap,
     Server,
     LayoutDashboard,
+    Shield,
+    ScanEye,
+    DatabaseZap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -225,7 +228,12 @@ export function Sidebar() {
                         </div>
                         {[
                             { title: "Admin Overview", href: "/admin", icon: LayoutDashboard },
+                            { title: "User Management", href: "/admin/users", icon: Users },
                             { title: "Enterprise Leads", href: "/admin/inquiries", icon: Building2 },
+                            { title: "AI Control", href: "/admin/ai", icon: Brain },
+                            { title: "Security & Audit Logs", href: "/admin/security", icon: Shield },
+                            { title: "AI Decision Audit", href: "/admin/ai-audit", icon: ScanEye },
+                            { title: "Decision Memory", href: "/admin/decision-memory", icon: DatabaseZap },
                         ].map((item) => {
                             const Icon = item.icon;
                             const isActive = location.pathname === item.href;

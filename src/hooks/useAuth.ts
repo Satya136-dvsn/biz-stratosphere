@@ -66,9 +66,8 @@ export function useAuth() {
           clearMFASession();
         }
 
-        // Fetch user role when session changes
         if (session?.user) {
-          setTimeout(() => fetchUserRole(session.user.id), 0);
+          setTimeout(() => fetchUserRole(session.user.id, session.user.email), 0);
         } else {
           setUserRole(null);
         }
@@ -82,26 +81,43 @@ export function useAuth() {
       setLoading(false);
 
       if (session?.user) {
-        fetchUserRole(session.user.id);
+        fetchUserRole(session.user.id, session.user.email);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserRole = async (userId: string) => {
-    // Phase 1: Fetch role from profiles (Single Source of Truth)
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .maybeSingle();
+  const fetchUserRole = async (userId: string, email?: string | null) => {
+    try {
+      // Phase 1: Fetch role from profiles (Single Source of Truth)
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .maybeSingle();
 
-    if (data && (data as any).role) {
-      setUserRole((data as any).role as UserRole);
-    } else if (user?.email === 'admin@bizstratosphere.com') {
-      // Local bypass for primary admin account while RLS/Profiles sync
-      setUserRole('super_admin');
+      const userEmail = email?.toLowerCase() || user?.email?.toLowerCase();
+      
+      console.log(`[Auth] Identifying role for ${userEmail} (ID: ${userId})`);
+
+      if (data && (data as any).role) {
+        console.log(`[Auth] Found role in database: ${(data as any).role}`);
+        setUserRole((data as any).role as UserRole);
+      } else if (userEmail === 'admin@bizstratosphere.com') {
+        // Local bypass for primary admin account while RLS/Profiles sync
+        console.log(`[Auth] Admin bypass triggered for ${userEmail}`);
+        setUserRole('super_admin');
+      } else {
+        console.log(`[Auth] No specific role found, defaulting to 'user'`);
+        setUserRole('user');
+      }
+    } catch (err) {
+      console.error('[Auth] Error in fetchUserRole:', err);
+      // Fail safe for primary admin
+      if (email?.toLowerCase() === 'admin@bizstratosphere.com') {
+        setUserRole('super_admin');
+      }
     }
   };
 

@@ -46,7 +46,8 @@ export default function Auth() {
           title: "Welcome back!",
           description: "Signed in successfully",
         });
-        navigate("/dashboard");
+        const normalizedEmail = email.trim().toLowerCase();
+        navigate(normalizedEmail === "admin@bizstratosphere.com" ? "/admin" : "/dashboard");
       }
     } catch (validationError: any) {
       if (validationError.errors) {
