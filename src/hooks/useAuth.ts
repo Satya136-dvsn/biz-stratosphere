@@ -46,6 +46,7 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [roleLoading, setRoleLoading] = useState(true);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -67,9 +68,11 @@ export function useAuth() {
         }
 
         if (session?.user) {
+          setRoleLoading(true);
           setTimeout(() => fetchUserRole(session.user.id, session.user.email), 0);
         } else {
           setUserRole(null);
+          setRoleLoading(false);
         }
       }
     );
@@ -81,7 +84,10 @@ export function useAuth() {
       setLoading(false);
 
       if (session?.user) {
+        setRoleLoading(true);
         fetchUserRole(session.user.id, session.user.email);
+      } else {
+        setRoleLoading(false);
       }
     });
 
@@ -94,16 +100,25 @@ export function useAuth() {
       const { data, error } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .maybeSingle();
 
       const userEmail = email?.toLowerCase() || user?.email?.toLowerCase();
       
       console.log(`[Auth] Identifying role for ${userEmail} (ID: ${userId})`);
 
+      if (error) {
+        console.warn('[Auth] profiles.role lookup error:', error);
+      }
+
       if (data && (data as any).role) {
-        console.log(`[Auth] Found role in database: ${(data as any).role}`);
-        setUserRole((data as any).role as UserRole);
+        const roleText = String((data as any).role);
+        console.log(`[Auth] Found role in database: ${roleText}`);
+        // Normalize legacy roles into our app roles
+        if (roleText === 'company_admin') setUserRole('admin');
+        else if (roleText === 'super_admin') setUserRole('super_admin');
+        else if (roleText === 'admin') setUserRole('admin');
+        else setUserRole('user');
       } else if (userEmail === 'admin@bizstratosphere.com') {
         // Local bypass for primary admin account while RLS/Profiles sync
         console.log(`[Auth] Admin bypass triggered for ${userEmail}`);
@@ -117,7 +132,11 @@ export function useAuth() {
       // Fail safe for primary admin
       if (email?.toLowerCase() === 'admin@bizstratosphere.com') {
         setUserRole('super_admin');
+      } else {
+        setUserRole('user');
       }
+    } finally {
+      setRoleLoading(false);
     }
   };
 
@@ -205,6 +224,7 @@ export function useAuth() {
     user,
     session,
     loading,
+    roleLoading,
     signIn,
     signUp,
     signOut,

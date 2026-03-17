@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
 export type AdminUser = {
     id: string;
@@ -35,6 +36,15 @@ export function useAdminUsers(page = 1, search = '') {
         },
         placeholderData: (previousData) => previousData,
     });
+
+    useEffect(() => {
+        if (!error) return;
+        toast({
+            title: 'Failed to load users',
+            description: (error as any)?.message ?? 'Unknown error',
+            variant: 'destructive',
+        });
+    }, [error, toast]);
 
     const updateRoleMutation = useMutation({
         mutationFn: async ({ id, role }: { id: string; role: string }) => {

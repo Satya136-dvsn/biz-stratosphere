@@ -18,12 +18,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const UserManagement = () => {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
-    const { users, isLoading, updateRole, toggleSuspend } = useAdminUsers(page, search);
+    const { users, isLoading, error, updateRole, toggleSuspend } = useAdminUsers(page, search);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -50,6 +51,14 @@ export const UserManagement = () => {
                         <CardTitle>Users Directory</CardTitle>
                     </CardHeader>
                     <CardContent>
+                        {error && (
+                            <Alert variant="destructive" className="mb-4">
+                                <AlertTitle>Unable to load users</AlertTitle>
+                                <AlertDescription>
+                                    {(error as any)?.message ?? "Unknown error"}
+                                </AlertDescription>
+                            </Alert>
+                        )}
                         {isLoading ? (
                             <div className="flex justify-center p-8"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div>
                         ) : (
@@ -67,7 +76,9 @@ export const UserManagement = () => {
                                 <TableBody>
                                     {users.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No users found.</TableCell>
+                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                                {error ? "Failed to load users." : "No users found."}
+                                            </TableCell>
                                         </TableRow>
                                     ) : users.map((user: AdminUser) => (
                                         <TableRow key={user.id}>

@@ -39,31 +39,33 @@ export function MLInsights() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // ML Service health check
-  const [mlServiceStatus, setMlServiceStatus] = useState<'checking' | 'healthy' | 'offline'>('checking');
-  const [mlServiceInfo, setMlServiceInfo] = useState<{ models?: number; ollama?: string }>({});
+  // Backend ML service health check (optional). Browser ML remains available regardless.
+  const ML_SERVICE_URL =
+    import.meta.env.VITE_ML_SERVICE_URL || 'http://localhost:8000';
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'healthy' | 'offline'>('checking');
+  const [backendInfo, setBackendInfo] = useState<{ models?: number; ollama?: string }>({});
 
   useEffect(() => {
-    const checkMLService = async () => {
+    const checkBackend = async () => {
       try {
-        const res = await fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(8000) });
+        const res = await fetch(`${ML_SERVICE_URL}/health`, { signal: AbortSignal.timeout(8000) });
         if (res.ok) {
           const data = await res.json();
-          setMlServiceStatus('healthy');
-          setMlServiceInfo({
+          setBackendStatus('healthy');
+          setBackendInfo({
             models: data.services?.ml_models?.count,
             ollama: data.services?.ollama?.status,
           });
         } else {
-          setMlServiceStatus('offline');
+          setBackendStatus('offline');
         }
       } catch (e) {
-        console.warn("ML Service Health Check Failed:", e);
-        setMlServiceStatus('offline');
+        console.warn("Backend ML health check failed:", e);
+        setBackendStatus('offline');
       }
     };
-    checkMLService();
-  }, []);
+    checkBackend();
+  }, [ML_SERVICE_URL]);
 
   const runChurnPrediction = async () => {
     if (!user) return;
@@ -215,22 +217,26 @@ export function MLInsights() {
             Advanced ML Analytics
           </CardTitle>
           <div className="flex items-center gap-2">
-            {mlServiceStatus === 'checking' && (
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Browser ML Ready
+            </span>
+            {backendStatus === 'checking' && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground border border-border/50">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                Checking...
+                Backend checking...
               </span>
             )}
-            {mlServiceStatus === 'healthy' && (
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                ML Service Online{mlServiceInfo.models ? ` · ${mlServiceInfo.models} models` : ''}
+            {backendStatus === 'healthy' && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-600 border border-sky-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                Backend Online{backendInfo.models ? ` · ${backendInfo.models} models` : ''}
               </span>
             )}
-            {mlServiceStatus === 'offline' && (
+            {backendStatus === 'offline' && (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 border border-amber-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                ML Service Offline
+                Backend Offline
               </span>
             )}
           </div>
