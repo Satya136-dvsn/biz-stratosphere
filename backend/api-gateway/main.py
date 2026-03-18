@@ -109,6 +109,34 @@ async def health_check():
 app.include_router(make_health_router("api-gateway", version="1.0.0"))
 
 
+from jose import jwt, JWTError
+
+# ──────────────────────────────────────────────
+# Auth Middleware (Phase 5)
+# ──────────────────────────────────────────────
+async def get_current_user(request: Request):
+    """Simple JWT validation against Supabase if configured."""
+    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
+        # In demo/local mode without Supabase config, allow all
+        return {"id": "demo-user", "role": "authenticated"}
+
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        # Log the missing header for debugging (Phase 5)
+        logger.warning(f"Missing or malformed Authorization header for {request.url.path}")
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+    
+    token = auth_header.split(" ")[1]
+    try:
+        # Note: In a real prod env, we'd use the Supabase secret or public key
+        # For this blueprint, we're demonstrating the integration point
+        payload = jwt.decode(token, SUPABASE_ANON_KEY, algorithms=["HS256"], audience="authenticated")
+        return payload
+    except JWTError as e:
+        logger.warning(f"JWT Validation failed: {e}")
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
 # ──────────────────────────────────────────────
 # Request-ID middleware
 # ──────────────────────────────────────────────
@@ -117,6 +145,25 @@ async def observability_middleware(request: Request, call_next):
     """Unified middleware: request-ID + metrics + trace span."""
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     request.state.request_id = request_id
+
+    # ──────────────────────────────────────────────
+    # Phase 5: Auth check for protected routes
+    # ──────────────────────────────────────────────
+    if request.url.path.startswith("/api/v1/llm") or request.url.path.startswith("/api/v1/ml") or request.url.path.startswith("/api/v1/rag") or request.url.path.startswith("/health"):
+        # We skip auth for demo purposes if NOT configured, otherwise enforce
+        if SUPABASE_URL and SUPABASE_ANON_KEY:
+            # Skip auth for health check even if Supabase is configured
+            if request.url.path == "/health":
+                return await call_next(request)
+            
+            try:
+                await get_current_user(request)
+            except HTTPException as e:
+                # Check if this is a development/local environment skip
+                if os.getenv("ENV") == "development":
+                    logger.debug(f"Skipping auth for {request.url.path} in development mode")
+                else:
+                    return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
     # Extract incoming trace context
     trace_id, parent_span = tracer.extract_context(request)

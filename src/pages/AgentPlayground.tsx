@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Brain, Sparkles, Send, Loader2, Database, BarChart3, Workflow, ChevronRight, History, Trash2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 const API_BASE_URL = 'http://localhost:8000';
 
 interface ToolUsage {
@@ -31,6 +32,7 @@ interface ChatMessage {
 
 export default function AgentPlayground() {
     const { toast } = useToast();
+    const { session } = useAuth();
     const [query, setQuery] = useState('');
     const [isThinking, setIsThinking] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -72,9 +74,14 @@ export default function AgentPlayground() {
         setMessages(prev => [...prev, newUserMessage]);
 
         try {
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+            }
+
             const response = await fetch(`${API_BASE_URL}/api/v1/llm/agent/query`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify({ 
                     query: userQuery,
                     session_id: sessionId 
