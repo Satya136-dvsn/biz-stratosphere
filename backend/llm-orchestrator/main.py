@@ -82,6 +82,7 @@ class GenerateRequest(BaseModel):
 
 class AgentQueryRequest(BaseModel):
     query: str
+    session_id: Optional[str] = None
 
 
 class GenerateResponse(BaseModel):
@@ -218,7 +219,7 @@ from agent import run_agent
 @app.post("/api/v1/agent/query")
 async def agent_query(req: AgentQueryRequest):
     try:
-        result = await run_agent(req.query)
+        result = await run_agent(req.query, session_id=req.session_id)
         if not result.get("success"):
             raise HTTPException(status_code=500, detail="Agent execution failed internally.")
         return result

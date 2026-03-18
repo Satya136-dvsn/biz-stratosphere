@@ -131,12 +131,28 @@ class ServiceMetrics:
             "Embedding generation latency",
             labels=["model"],
         )
+        self.cache_hit_total = Counter(
+            f"{service_name}_cache_hit_total",
+            "Total cache hits",
+            labels=["cache_type"],
+        )
+        self.cache_miss_total = Counter(
+            f"{service_name}_cache_miss_total",
+            "Total cache misses",
+            labels=["cache_type"],
+        )
+        self.cache_latency_seconds = Histogram(
+            f"{service_name}_cache_latency_seconds",
+            "Cache lookup latency",
+            labels=["cache_type"],
+        )
 
         self._all = [
             self.request_count, self.error_count,
             self.request_latency, self.ml_inference_latency,
             self.rag_retrieval_latency, self.llm_generation_latency,
             self.embedding_latency,
+            self.cache_hit_total, self.cache_miss_total, self.cache_latency_seconds,
         ]
 
     async def middleware(self, request: Request, call_next) -> Response:

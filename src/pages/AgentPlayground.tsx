@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Brain, Sparkles, Send, Loader2, Database, BarChart3, Workflow, ChevronRight } from 'lucide-react';
+import { Brain, Sparkles, Send, Loader2, Database, BarChart3, Workflow, ChevronRight, History, Trash2 } from 'lucide-react';
 const API_BASE_URL = 'http://localhost:8000';
 
 interface ToolUsage {
@@ -23,23 +23,62 @@ interface AgentResponse {
     status: string;
 }
 
+interface ChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+    result?: AgentResponse;
+}
+
 export default function AgentPlayground() {
     const { toast } = useToast();
     const [query, setQuery] = useState('');
     const [isThinking, setIsThinking] = useState(false);
-    const [result, setResult] = useState<AgentResponse | null>(null);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [sessionId, setSessionId] = useState<string>('');
+
+    // Initialize session ID on load
+    useEffect(() => {
+        const existingSessionId = sessionStorage.getItem('agent_session_id');
+        if (existingSessionId) {
+            setSessionId(existingSessionId);
+        } else {
+            const newSessionId = crypto.randomUUID();
+            setSessionId(newSessionId);
+            sessionStorage.setItem('agent_session_id', newSessionId);
+        }
+    }, []);
+
+    const handleResetSession = () => {
+        const newSessionId = crypto.randomUUID();
+        setSessionId(newSessionId);
+        sessionStorage.setItem('agent_session_id', newSessionId);
+        setMessages([]);
+        setQuery('');
+        toast({
+            title: "Session Reset",
+            description: "New agent session started. History cleared.",
+        });
+    };
 
     const handleSubmit = async () => {
         if (!query.trim() || isThinking) return;
 
+        const userQuery = query;
+        setQuery('');
         setIsThinking(true);
-        setResult(null);
+        
+        // Optimistically add user message
+        const newUserMessage: ChatMessage = { role: 'user', content: userQuery };
+        setMessages(prev => [...prev, newUserMessage]);
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/v1/llm/agent/query`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query }),
+                body: JSON.stringify({ 
+                    query: userQuery,
+                    session_id: sessionId 
+                }),
             });
             
             if (!response.ok) {
@@ -48,7 +87,15 @@ export default function AgentPlayground() {
             }
 
             const data = await response.json();
-            setResult(data);
+            
+            // Add assistant response
+            const assistantMessage: ChatMessage = { 
+                role: 'assistant', 
+                content: data.final_decision,
+                result: data
+            };
+            setMessages(prev => [...prev, assistantMessage]);
+
             toast({
                 title: "Agent Execution Complete",
                 description: `Decision reached with ${(data.confidence_score * 100).toFixed(1)}% confidence.`,
@@ -57,9 +104,11 @@ export default function AgentPlayground() {
             console.error(error);
             toast({
                 title: "Agent Execution Failed",
-                description: error.response?.data?.detail || error.message,
+                description: error.message,
                 variant: "destructive"
             });
+            // Remove the optimistic user message on failure if you want, 
+            // or just leave it and show the error.
         } finally {
             setIsThinking(false);
         }
@@ -76,181 +125,190 @@ export default function AgentPlayground() {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">AI Agent Playground</h1>
-                <p className="text-muted-foreground mt-2">
-                    Submit multi-step business queries and watch the ReAct AI Agent plan, 
-                    call tools, reason, and make a decision.
-                </p>
+        <div className="space-y-6 animate-in fade-in duration-500 pb-20">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">AI Agent Playground</h1>
+                    <p className="text-muted-foreground mt-2">
+                        Submit multi-step business queries and watch the ReAct AI Agent plan, 
+                        call tools, and maintain session context.
+                    </p>
+                </div>
+                <div className="flex items-center gap-3">
+                    {sessionId && (
+                        <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20 px-3 py-1 flex items-center gap-2">
+                            <History className="h-3 w-3" />
+                            Session: {sessionId.substring(0, 8)}
+                        </Badge>
+                    )}
+                    <Button variant="outline" size="sm" onClick={handleResetSession} className="text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Reset Session
+                    </Button>
+                </div>
             </div>
 
-            <Card className="border-primary/20 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4">
-                    <Badge variant="outline" className="bg-primary/5 text-primary">Experimental Agent Engine</Badge>
-                </div>
-                <CardHeader>
-                    <CardTitle>Decision Query</CardTitle>
-                    <CardDescription>Enter a complex business scenario.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                        <Input
-                            placeholder="e.g., Should we offer a discount to John Doe given his usage decline?"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                            disabled={isThinking}
-                        />
-                        <Button onClick={handleSubmit} disabled={!query.trim() || isThinking}>
-                            {isThinking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                            <span className="ml-2 hidden sm:inline">{isThinking ? 'Analyzing...' : 'Execute'}</span>
-                        </Button>
-                    </div>
+            <div className="space-y-6">
+                {/* Chat History */}
+                <ScrollArea className="h-full min-h-[400px] rounded-xl border bg-muted/5 p-4">
+                    <div className="space-y-8 max-w-5xl mx-auto">
+                        {messages.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 opacity-80">
+                                <div className="p-4 bg-primary/5 rounded-full ring-1 ring-primary/10">
+                                    <Brain className="h-8 w-8 text-primary/60" />
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="font-semibold text-lg">New Agent Session</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Ask a complex question to begin the decision-making process.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
 
-                    <div className="flex flex-wrap gap-2 pt-2 text-xs">
-                        <span className="text-muted-foreground font-medium flex items-center mt-1">Example Scenarios:</span>
-                        <Badge variant="secondary" className="cursor-pointer hover:bg-muted" onClick={() => setQuery("What is our predicted churn for next month, and what should we do about it?")}>Churn Prediction</Badge>
-                        <Badge variant="secondary" className="cursor-pointer hover:bg-muted" onClick={() => setQuery("Summarize our corporate onboarding policies and draft a welcome email.")}>Policy & Email</Badge>
-                        <Badge variant="secondary" className="cursor-pointer hover:bg-muted" onClick={() => setQuery("Analyze our Q3 user growth and determine if we should launch the paid tier early.")}>Analytics Review</Badge>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {isThinking && (
-                <Card className="border-dashed bg-muted/20 animate-pulse">
-                    <CardContent className="flex flex-col items-center justify-center p-12 text-muted-foreground">
-                        <Brain className="h-10 w-10 mb-4 animate-bounce text-primary/50" />
-                        <h3 className="text-lg font-medium">Agent is thinking...</h3>
-                        <p className="text-sm mt-2">Interpreting query, routing to tools, and formulating a decision.</p>
-                    </CardContent>
-                </Card>
-            )}
-
-            {result && !isThinking && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Execution Pathway */}
-                    <Card className="lg:col-span-1 shadow-sm">
-                        <CardHeader className="bg-muted/5 pb-4 border-b">
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <Workflow className="h-5 w-5 text-primary" />
-                                Execution Pathway
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <ScrollArea className="h-[400px]">
-                                <div className="p-6 space-y-6">
-                                    <div className="flex gap-4">
-                                        <div className="flex flex-col items-center">
-                                            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary z-10">
-                                                <span>1</span>
+                        {messages.map((msg, idx) => (
+                            <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                <div className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
+                                    msg.role === 'user' 
+                                    ? 'bg-primary text-primary-foreground rounded-tr-none' 
+                                    : 'bg-card border border-border/60 rounded-tl-none'
+                                }`}>
+                                    <div className="flex items-center gap-2 mb-2 opacity-80">
+                                        {msg.role === 'user' ? (
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">You</span>
+                                        ) : (
+                                            <div className="flex items-center gap-1.5">
+                                                <Sparkles className="h-3 w-3 text-primary" />
+                                                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">AI Agent</span>
                                             </div>
-                                            <div className="w-0.5 h-full bg-border mt-2 -mb-6" />
-                                        </div>
-                                        <div className="pt-1 w-full">
-                                            <h4 className="font-semibold text-sm">Query Interpreted</h4>
-                                            <p className="text-xs text-muted-foreground mt-1 break-words">{result.query}</p>
-                                        </div>
+                                        )}
                                     </div>
+                                    <div className="text-[15px] leading-relaxed whitespace-pre-wrap">
+                                        {msg.content}
+                                    </div>
+                                </div>
 
-                                    {result.tools_used.length === 0 ? (
-                                        <div className="flex gap-4">
-                                            <div className="flex flex-col items-center">
-                                                <div className="h-4 w-4 mt-2 rounded-full bg-muted border-2 border-background z-10" />
-                                                <div className="w-0.5 h-full bg-border -mt-2 -mb-6" />
-                                            </div>
-                                            <div className="pt-1.5 pb-4 text-xs text-muted-foreground italic">
-                                                Zero-shot answer (No tools called)
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        result.tools_used.map((tool, idx) => (
-                                            <div key={idx} className="flex gap-4">
-                                                <div className="flex flex-col items-center">
-                                                    <div className="h-8 w-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600 z-10 shadow-sm relative overflow-hidden">
-                                                        {getToolIcon(tool.name)}
+                                {/* Agent Result Breakdown for Assistant Messages */}
+                                {msg.role === 'assistant' && msg.result && (
+                                    <div className="mt-4 w-full grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in slide-in-from-bottom-2 duration-500">
+                                        {/* Execution Pathway */}
+                                        <Card className="lg:col-span-1 shadow-sm bg-background/50 border-muted/50">
+                                            <CardHeader className="py-3 border-b bg-muted/10">
+                                                <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                                                    <Workflow className="h-4 w-4 text-primary" />
+                                                    Execution Pathway
+                                                </CardTitle>
+                                            </CardHeader>
+                                            <CardContent className="p-0">
+                                                <ScrollArea className="h-[300px]">
+                                                    <div className="p-4 space-y-4">
+                                                        {msg.result.tools_used.length === 0 ? (
+                                                            <div className="flex gap-3">
+                                                                <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">0</div>
+                                                                <p className="text-xs text-muted-foreground italic pt-1">Zero-shot answer</p>
+                                                            </div>
+                                                        ) : (
+                                                            msg.result.tools_used.map((tool, tIdx) => (
+                                                                <div key={tIdx} className="flex gap-3">
+                                                                    <div className="h-6 w-6 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600">
+                                                                        {getToolIcon(tool.name)}
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <h4 className="font-semibold text-xs">{tool.name}</h4>
+                                                                        <div className="mt-1 bg-muted/40 rounded p-1.5 text-[10px] font-mono text-muted-foreground overflow-x-auto border border-border/30">
+                                                                            {JSON.stringify(tool.args, null, 2)}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                        )}
                                                     </div>
-                                                    <div className="w-0.5 h-full bg-border mt-2 -mb-6" />
-                                                </div>
-                                                <div className="pt-1 w-full">
-                                                    <div className="flex items-center justify-between">
-                                                        <h4 className="font-semibold text-sm text-foreground flex items-center gap-2">
-                                                            {tool.name}
-                                                        </h4>
-                                                    </div>
-                                                    <div className="mt-2 bg-muted/30 rounded-md p-2 text-[11px] font-mono text-muted-foreground overflow-x-auto border border-border/50">
-                                                        {JSON.stringify(tool.args, null, 2)}
+                                                </ScrollArea>
+                                            </CardContent>
+                                        </Card>
+
+                                        {/* Reasoning & Confidence */}
+                                        <Card className="lg:col-span-2 shadow-sm border-primary/10 bg-background/50">
+                                            <CardHeader className="py-3 border-b bg-primary/5 flex flex-row items-center justify-between">
+                                                <CardTitle className="text-sm font-medium">Internal Logic</CardTitle>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Confidence</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="h-1.5 w-16 bg-muted rounded-full overflow-hidden">
+                                                            <div 
+                                                                className="h-full bg-primary transition-all duration-1000"
+                                                                style={{ width: `${msg.result.confidence_score * 100}%` }}
+                                                            />
+                                                        </div>
+                                                        <span className="text-xs font-bold">{(msg.result.confidence_score * 100).toFixed(0)}%</span>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))
-                                    )}
-
-                                    <div className="flex gap-4">
-                                        <div className="flex flex-col items-center">
-                                            <div className="h-8 w-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-600 z-10">
-                                                <ChevronRight className="h-5 w-5" />
-                                            </div>
-                                        </div>
-                                        <div className="pt-1 w-full">
-                                            <h4 className="font-semibold text-sm">Formulating Decision</h4>
-                                            <p className="text-xs text-muted-foreground mt-1">Internal reasoning synthesized.</p>
-                                        </div>
+                                            </CardHeader>
+                                            <CardContent className="p-4 space-y-4">
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5 font-medium">
+                                                        <Brain className="h-3 w-3" />
+                                                        Agent Reasoning
+                                                    </p>
+                                                    <div className="p-3 rounded-lg bg-muted/30 border text-xs text-foreground/80 leading-relaxed italic">
+                                                        {msg.result.agent_reasoning}
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
                                     </div>
-                                </div>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
+                                )}
+                            </div>
+                        ))}
 
-                    {/* Reasoning & Final Decision */}
-                    <Card className="lg:col-span-2 shadow-sm border-primary/10">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 bg-primary/5 border-b border-border/50">
-                            <div>
-                                <CardTitle className="text-lg">Agent Outcome</CardTitle>
-                                <CardDescription>Final synthesized ReAct decision.</CardDescription>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
-                                <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider">Confidence</span>
-                                <div className="flex items-center gap-2">
-                                    <div className="h-2 w-24 bg-muted rounded-full overflow-hidden">
-                                        <div 
-                                            className="h-full bg-primary transition-all duration-1000 ease-out"
-                                            style={{ width: `${result.confidence_score * 100}%` }}
-                                        />
-                                    </div>
-                                    <span className="text-sm font-bold">{(result.confidence_score * 100).toFixed(1)}%</span>
+                        {isThinking && (
+                            <div className="flex flex-col items-start animate-in fade-in duration-300">
+                                <div className="bg-card border border-border/60 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center gap-3">
+                                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                    <span className="text-sm font-medium text-muted-foreground">Agent is processing and calling tools...</span>
                                 </div>
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <div>
-                                <h3 className="text-sm font-semibold flex items-center gap-2 text-muted-foreground mb-3">
-                                    <Brain className="h-4 w-4" />
-                                    Internal Reasoning
-                                </h3>
-                                <div className="p-4 rounded-xl bg-muted/50 border shadow-inner whitespace-pre-wrap text-sm">
-                                    {result.agent_reasoning}
-                                </div>
-                            </div>
+                        )}
+                    </div>
+                </ScrollArea>
+            </div>
 
-                            <div>
-                                <h3 className="text-sm font-semibold flex items-center gap-2 text-primary mb-3">
-                                    <Sparkles className="h-4 w-4" />
-                                    Final Recommendation / Action
-                                </h3>
-                                <div className="p-5 rounded-xl bg-primary/5 border border-primary/20 shadow-sm whitespace-pre-wrap text-[15px] leading-relaxed relative">
-                                    {result.status === 'pending' && (
-                                        <Badge className="absolute top-4 right-4 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 shadow-none">
-                                            Requires Approval
-                                        </Badge>
-                                    )}
-                                    {result.final_decision}
-                                </div>
+            {/* Input Fixed at Bottom */}
+            <div className="fixed bottom-6 left-0 right-0 px-6 z-20">
+                <div className="max-w-5xl mx-auto">
+                    <Card className="border-primary/20 shadow-2xl bg-background/90 backdrop-blur-md">
+                        <CardContent className="p-3">
+                            <div className="flex gap-2">
+                                <Input
+                                    placeholder="Ask the Agent a follow-up or a new business query..."
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                                    disabled={isThinking}
+                                    className="bg-background/50 border-none shadow-none focus-visible:ring-0 text-base"
+                                />
+                                <Button 
+                                    onClick={handleSubmit} 
+                                    disabled={!query.trim() || isThinking}
+                                    className="rounded-full h-10 w-10 p-0 shadow-lg shadow-primary/20"
+                                >
+                                    {isThinking ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
+                    <div className="flex justify-center gap-4 mt-2 px-2">
+                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest flex items-center gap-1.5">
+                            <Sparkles className="h-3 w-3" />
+                            Multi-turn enabled
+                        </span>
+                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest flex items-center gap-1.5">
+                            <Database className="h-3 w-3" />
+                            RAG Knowledge Active
+                        </span>
+                    </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

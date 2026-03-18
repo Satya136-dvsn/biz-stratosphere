@@ -12,6 +12,7 @@ import os
 import sys
 import logging
 import time
+import json
 from typing import Optional
 
 import asyncpg
@@ -141,24 +142,91 @@ async def _embed(text: str) -> list[float]:
 
 
 # ──────────────────────────────────────────────
+# Cache helpers
+# ──────────────────────────────────────────────
+async def _check_embedding_cache(query_vec: list[float]) -> Optional[list[Snippet]]:
+    """Check for similar queries in the embedding cache (cosine similarity >= 0.90)."""
+    start = time.monotonic()
+    try:
+        vec_literal = f"[{','.join(str(v) for v in query_vec)}]"
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            # Cosine similarity check (1 - cosine distance)
+            row = await conn.fetchrow(
+                """
+                SELECT retrieved_context, id
+                FROM embedding_cache
+                WHERE 1 - (embedding_vector <=> $1::vector) >= 0.90
+                AND last_used_at >= NOW() - INTERVAL '24 hours'
+                ORDER BY embedding_vector <=> $1::vector
+                LIMIT 1
+                """,
+                vec_literal,
+            )
+            if row:
+                # Update stats
+                await conn.execute(
+                    "UPDATE embedding_cache SET usage_count = usage_count + 1, last_used_at = NOW() WHERE id = $1",
+                    row["id"],
+                )
+                metrics.cache_hit_total.inc(cache_type="embedding")
+                metrics.cache_latency_seconds.observe(time.monotonic() - start, cache_type="embedding")
+                
+                # Parse the cached snippets
+                cached_data = json.loads(row["retrieved_context"])
+                return [Snippet(**s) for s in cached_data]
+    except Exception as exc:
+        logger.error(f"Cache lookup failed: {exc}")
+    
+    metrics.cache_miss_total.inc(cache_type="embedding")
+    return None
+
+
+async def _store_embedding_cache(query_text: str, query_vec: list[float], snippets: list[Snippet]):
+    """Store the retrieval result in the embedding cache."""
+    try:
+        vec_literal = f"[{','.join(str(v) for v in query_vec)}]"
+        snippets_json = json.dumps([s.dict() for s in snippets])
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO embedding_cache (query_text, embedding_vector, retrieved_context)
+                VALUES ($1, $2::vector, $3)
+                """,
+                query_text,
+                vec_literal,
+                snippets_json,
+            )
+    except Exception as exc:
+        logger.error(f"Cache storage failed: {exc}")
+
+
+# ──────────────────────────────────────────────
 # Endpoints
 # ──────────────────────────────────────────────
 @app.post("/api/v1/retrieve", response_model=RetrieveResponse)
 async def retrieve(req: RetrieveRequest):
     start = time.monotonic()
-    with tracer.span("rag.retrieve", attributes={"query_len": len(req.query), "top_k": req.top_k}) as root_span:
+    with tracer.start_as_current_span("rag.retrieve", attributes={"query_len": len(req.query), "top_k": req.top_k}) as root_span:
         try:
-            with tracer.span("rag.embed_query", attributes={"model": EMBED_MODEL}):
+            with tracer.start_as_current_span("rag.embed_query", attributes={"model": EMBED_MODEL}):
                 query_vec = await _embed(req.query)
         except Exception as exc:
             root_span.set_error(exc)
             logger.error(f"Embedding failed: {exc}")
             raise HTTPException(status_code=502, detail=f"Embedding service error: {exc}")
 
+        # --- Semantic Cache Check ---
+        cached_snippets = await _check_embedding_cache(query_vec)
+        if cached_snippets:
+            latency_ms = round((time.monotonic() - start) * 1000, 1)
+            return RetrieveResponse(query=req.query, snippets=cached_snippets, latency_ms=latency_ms)
+
         vec_literal = f"[{','.join(str(v) for v in query_vec)}]"
 
         try:
-            with tracer.span("rag.pgvector_query") as db_span:
+            with tracer.start_as_current_span("rag.pgvector_query") as db_span:
                 pool = await get_pool()
                 async with pool.acquire() as conn:
                     rows = await conn.fetch(
@@ -189,6 +257,10 @@ async def retrieve(req: RetrieveRequest):
             )
             for row in rows
         ]
+
+        # --- Cache storage for future hits ---
+        if snippets:
+            await _store_embedding_cache(req.query, query_vec, snippets)
 
         latency_s = time.monotonic() - start
         latency_ms = round(latency_s * 1000, 1)

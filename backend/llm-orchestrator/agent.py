@@ -15,6 +15,7 @@ Histogram = metrics.Histogram
 import asyncpg
 
 from tools import TOOLS_SCHEMA, execute_tool
+from memory import memory_manager
 
 logger = logging.getLogger("llm-orchestrator.agent")
 tracer = init_tracer("llm-orchestrator.agent")
@@ -27,6 +28,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 agent_decision_total = Counter("agent_decision_total", "Total number of agent decisions", labels=["status"])
 agent_tool_calls_total = Counter("agent_tool_calls_total", "Total number of tool calls by agent", labels=["tool_name"])
 agent_decision_latency_seconds = Histogram("agent_decision_latency_seconds", "Latency of full agent decision loop", labels=[])
+agent_cache_hits_total = Counter("agent_cache_hits_total", "Total number of cache hits for agent queries", labels=[])
 
 async def get_system_prompt() -> str:
     default_prompt = (
@@ -85,17 +87,71 @@ async def _save_decision(
     except Exception as e:
         logger.error(f"Failed to save decision_memory: {e}")
 
-async def run_agent(query: str) -> Dict[str, Any]:
+async def _check_cache(query: str) -> Optional[Dict[str, Any]]:
+    """Simple cache check to avoid redundant LLM/tool calls for identical queries."""
+    if not DATABASE_URL:
+        return None
+    try:
+        import ssl
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
+        conn = await asyncpg.connect(DATABASE_URL, ssl=ssl_ctx)
+        
+        # Exact match for now (Semantic-ish would use pgvector, but let's start with high-confidence exact matches)
+        # We look for successful executions from the last 24 hours
+        row = await conn.fetchrow(
+            """SELECT tools_used, agent_reasoning, final_decision, confidence_score, status 
+               FROM public.agent_decision_memory 
+               WHERE user_query = $1 AND status = 'executed' 
+               ORDER BY timestamp DESC LIMIT 1""",
+            query
+        )
+        await conn.close()
+        
+        if row:
+            logger.info(f"Cache hit for query: {query[:50]}...")
+            agent_cache_hits_total.inc()
+            return {
+                "success": True,
+                "query": query,
+                "tools_used": json.loads(row['tools_used']),
+                "agent_reasoning": row['agent_reasoning'],
+                "final_decision": row['final_decision'],
+                "confidence_score": row['confidence_score'],
+                "status": row['status'],
+                "cached": True
+            }
+    except Exception as e:
+        logger.error(f"Cache check error: {e}")
+    return None
+
+async def run_agent(query: str, session_id: Optional[str] = None) -> Dict[str, Any]:
     start_time = time.monotonic()
     
+    # Check Cache first (Only if no session history is requested, or skip cache for multi-turn)
+    if not session_id:
+        cached_result = await _check_cache(query)
+        if cached_result:
+            return cached_result
+
     with tracer.start_as_current_span("agent.plan") as plan_span:
         system_prompt = await get_system_prompt()
         plan_span.set_attribute("query", query)
+        if session_id:
+            plan_span.set_attribute("session_id", session_id)
         
         messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": query}
+            {"role": "system", "content": system_prompt}
         ]
+        
+        # Inject Memory if session_id is provided
+        if session_id:
+            history = memory_manager.get_context(session_id)
+            for msg in history:
+                messages.append({"role": msg["role"], "content": msg["content"]})
+        
+        messages.append({"role": "user", "content": query})
 
     tools_used = []
     ml_results = {}
@@ -209,6 +265,16 @@ async def run_agent(query: str) -> Dict[str, Any]:
             confidence_score=confidence_score,
             status=status
         )
+
+        # Update Short-Term Memory
+        if session_id:
+            memory_manager.add_interaction(
+                session_id=session_id,
+                user_query=query,
+                agent_reasoning=agent_reasoning,
+                tools_used=tools_used,
+                final_decision=final_decision
+            )
 
     agent_decision_total.inc(status=status)
     agent_decision_latency_seconds.observe(time.monotonic() - start_time)

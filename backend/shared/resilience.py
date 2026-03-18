@@ -115,11 +115,16 @@ class CircuitBreaker:
                     f"{self._failure_count} failures → OPEN"
                 )
 
-    async def call(self, func: Callable, *args: Any, **kwargs: Any) -> Any:
+    async def call(self, func: Callable, *args: Any, fallback: Optional[Callable] = None, **kwargs: Any) -> Any:
         """Execute *func* through the circuit breaker."""
         await self._check_recovery()
 
         if self._state == CircuitState.OPEN:
+            if fallback:
+                logger.warning(f"[CircuitBreaker:{self.name}] OPEN - Executing fallback")
+                if asyncio.iscoroutinefunction(fallback):
+                    return await fallback(*args, **kwargs)
+                return fallback(*args, **kwargs)
             raise CircuitBreakerError(self.name)
 
         try:
@@ -128,6 +133,11 @@ class CircuitBreaker:
             return result
         except Exception as exc:
             await self._on_failure()
+            if fallback:
+                logger.warning(f"[CircuitBreaker:{self.name}] Call failed - Executing fallback")
+                if asyncio.iscoroutinefunction(fallback):
+                    return await fallback(*args, **kwargs)
+                return fallback(*args, **kwargs)
             raise
 
     def status(self) -> dict:

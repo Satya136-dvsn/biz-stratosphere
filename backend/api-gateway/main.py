@@ -50,6 +50,7 @@ LLM_URL = os.getenv("LLM_ORCHESTRATOR_URL", "http://llm-orchestrator:8002")
 RAG_URL = os.getenv("RAG_SERVICE_URL", "http://rag-service:8003")
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
 
 # ──────────────────────────────────────────────
 # Circuit Breakers (per downstream service)
@@ -69,7 +70,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
