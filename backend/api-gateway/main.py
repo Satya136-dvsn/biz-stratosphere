@@ -45,12 +45,19 @@ logger = logging.getLogger("gateway")
 # ──────────────────────────────────────────────
 # Configuration from environment
 # ──────────────────────────────────────────────
-ML_URL = os.getenv("ML_INFERENCE_URL", "http://ml-inference:8001")
-LLM_URL = os.getenv("LLM_ORCHESTRATOR_URL", "http://llm-orchestrator:8002")
-RAG_URL = os.getenv("RAG_SERVICE_URL", "http://rag-service:8003")
+ML_URL = os.getenv("ML_INFERENCE_URL", "http://localhost:8001")
+LLM_URL = os.getenv("LLM_ORCHESTRATOR_URL", "http://localhost:8002")
+RAG_URL = os.getenv("RAG_SERVICE_URL", "http://localhost:8003")
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8080"
+]
 
 # ──────────────────────────────────────────────
 # Circuit Breakers (per downstream service)
@@ -76,9 +83,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount shared /health and /ready
-app.include_router(make_health_router("api-gateway", version="1.0.0"))
-
 # Phase 6: Metrics + Tracing
 metrics = get_or_create_metrics("api_gateway")
 tracer = init_tracer("api-gateway")
@@ -88,6 +92,21 @@ app.include_router(make_traces_router())
 # Register exception handlers
 for exc_type, handler in make_exception_handlers("api-gateway"):
     app.add_exception_handler(exc_type, handler)
+
+
+# ──────────────────────────────────────────────
+# Custom Health (Override shared for frontend)
+# ──────────────────────────────────────────────
+@app.get("/health")
+async def health_check():
+    """Simple health check returning aggregate for compatibility with MLInsights.tsx."""
+    # We hit our own aggregate endpoint logic
+    res = await aggregate_health(None)
+    return res
+
+
+# Mount shared /health and /ready (Note: /health is already matched above)
+app.include_router(make_health_router("api-gateway", version="1.0.0"))
 
 
 # ──────────────────────────────────────────────
@@ -225,16 +244,29 @@ async def proxy_rag(path: str, request: Request):
 # ──────────────────────────────────────────────
 @app.get("/api/v1/services/health")
 async def aggregate_health(request: Request):
-    """Poll /health on all downstream services and aggregate."""
+    """Poll downstream services and return summary for frontend."""
     results = {}
-    async with httpx.AsyncClient(timeout=httpx.Timeout(3.0)) as client:
-        for name, url in [("ml-inference", ML_URL), ("llm-orchestrator", LLM_URL), ("rag-service", RAG_URL)]:
-            try:
-                r = await client.get(f"{url}/health")
-                results[name] = {"status": "healthy" if r.is_success else "degraded", "code": r.status_code}
-            except Exception as exc:
-                results[name] = {"status": "unreachable", "error": str(exc)}
+    async with httpx.AsyncClient(timeout=httpx.Timeout(2.0)) as client:
+        # ML Models
+        try:
+            r = await client.get(f"{ML_URL}/ready")
+            results["ml_models"] = {
+                "status": "healthy" if r.is_success else "degraded",
+                "count": r.json().get("loaded_models", 0) if r.is_success else 0
+            }
+        except Exception:
+            results["ml_models"] = {"status": "offline", "count": 0}
+
+        # LLM / Ollama
+        try:
+            r = await client.get(f"{LLM_URL}/health")
+            results["ollama"] = {"status": "healthy" if r.is_success else "offline"}
+        except Exception:
+            results["ollama"] = {"status": "offline"}
+
     return {"gateway": "healthy", "services": results}
+
+
 
 
 if __name__ == "__main__":

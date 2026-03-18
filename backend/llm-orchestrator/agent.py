@@ -8,9 +8,13 @@ import sys
 
 sys.path.insert(0, "/app")
 from shared.tracing import init_tracer
-from shared.metrics import metrics
-Counter = metrics.Counter
-Histogram = metrics.Histogram
+from shared.metrics import get_or_create_metrics
+metrics_service = get_or_create_metrics("llm-orchestrator-agent")
+Counter = metrics_service.Counter if hasattr(metrics_service, 'Counter') else None
+# Since shared.metrics.py uses Counter and Histogram classes directly in ServiceMetrics
+# but doesn't export a global 'metrics' object, let's fix the imports.
+
+from shared.metrics import Counter, Histogram
 
 import asyncpg
 

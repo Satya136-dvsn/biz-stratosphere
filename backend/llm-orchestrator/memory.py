@@ -2,24 +2,14 @@ import time
 import logging
 from typing import Dict, List, Any, Optional
 from collections import deque
-from shared.metrics import metrics
+from shared.metrics import Counter, Histogram
 
 logger = logging.getLogger("llm-orchestrator.memory")
 
-# Standalone metrics for Memory (if not in shared, we'll use local or shared)
-# Using shared metrics if available, otherwise fallback
-try:
-    agent_memory_reads_total = metrics.Counter("agent_memory_reads_total", "Total number of memory reads", labels=["status"])
-    agent_memory_writes_total = metrics.Counter("agent_memory_writes_total", "Total number of memory writes", labels=["status"])
-    agent_memory_context_size = metrics.Histogram("agent_memory_context_size", "Size of memory context in messages", labels=[])
-except Exception:
-    # Fallback to simple objects if shared metrics registry fails
-    class MockMetric:
-        def inc(self, **kwargs): pass
-        def observe(self, val, **kwargs): pass
-    agent_memory_reads_total = MockMetric()
-    agent_memory_writes_total = MockMetric()
-    agent_memory_context_size = MockMetric()
+# Standalone metrics for Memory
+agent_memory_reads_total = Counter("agent_memory_reads_total", "Total number of memory reads", labels=["status"])
+agent_memory_writes_total = Counter("agent_memory_writes_total", "Total number of memory writes", labels=["status"])
+agent_memory_context_size = Histogram("agent_memory_context_size", "Size of memory context in messages", labels=[])
 
 class AgentMemoryManager:
     """

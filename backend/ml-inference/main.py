@@ -87,7 +87,7 @@ registry = ModelRegistry()
 # ──────────────────────────────────────────────
 # App
 # ──────────────────────────────────────────────
-app = FastAPI(title="ML Inference Service", version="1.0.0")
+app = FastAPI(title="ML Inference Service", version="1.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # Shared health routes
