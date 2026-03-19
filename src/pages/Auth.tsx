@@ -193,12 +193,15 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Auth Forms */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 overflow-y-auto">
+        <div className="w-full max-w-md py-8">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2.5 mb-8">
-            <img src="/logo-orbit.png" alt="Biz Stratosphere" className="h-8 w-8 rounded-lg object-contain" />
-            <span className="text-sm font-bold text-foreground tracking-tight">Biz Stratosphere</span>
+          <div className="lg:hidden flex flex-col items-center mb-8 gap-3">
+            <img src="/logo-orbit.png" alt="Biz Stratosphere" className="h-12 w-12 rounded-xl object-contain shadow-glow-primary" />
+            <div className="text-center">
+              <span className="text-sm font-bold text-foreground tracking-widest uppercase">Stratosphere</span>
+              <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-widest mt-0.5">Neural Analytics Node</p>
+            </div>
           </div>
 
           <div className="rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)] p-6">

@@ -92,45 +92,47 @@ export default function Dashboard() {
   const firstName = user?.user_metadata?.display_name?.split(' ')[0] || "there";
 
   return (
-    <PageLayout maxWidth="2xl">
+    <PageLayout maxWidth="7xl">
         {/* ─── Header Section ─── */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 lg:p-8 bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] rounded-3xl shadow-2xl relative overflow-hidden group">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-6 lg:p-10 bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] rounded-3xl shadow-2xl relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
           
-          <div>
-            <h2 className="text-3xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors duration-300">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors duration-300 leading-tight truncate-on-mobile">
               {getGreeting()}, {firstName}
             </h2>
-            <div className="flex items-center gap-3 mt-1.5">
-              <p className="text-sm text-muted-foreground/60 font-medium italic">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4">
+              <p className="text-[12px] sm:text-sm text-muted-foreground/60 font-medium italic">
                 Strategic Intelligence Node: Active
               </p>
-              <div className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-mono text-emerald-500/50 uppercase tracking-widest">Real-time_Sync</span>
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 shadow-sm shadow-emerald-500/5">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] sm:text-[11px] font-mono text-emerald-500 uppercase tracking-widest leading-none">Real-time_Sync</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             <DemoModeTrigger onClick={() => setShowDemoTour(true)} />
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="gap-2 h-9 text-xs border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/10 transition-all font-bold uppercase tracking-widest"
+              className="gap-2 h-11 text-[10px] sm:text-xs border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/10 transition-all font-bold uppercase tracking-widest rounded-xl px-5"
             >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
-              SYSTEM_FILTERS
+              <SlidersHorizontal className="h-4 w-4" />
+              <span className="xs:inline">SYSTEM_FILTERS</span>
             </Button>
 
             <Sheet>
               <SheetTrigger asChild>
                 <Button
                   size="sm"
-                  className="gap-2 h-9 text-xs bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all font-bold uppercase tracking-widest px-5"
+                  className="gap-2 h-11 text-[10px] sm:text-xs bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/10 hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all font-bold uppercase tracking-widest px-5 sm:px-8 rounded-xl"
                 >
-                  <Upload className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">DATA_CONSOLE</span>
-                  <span className="sm:hidden">DATA</span>
+                  <Upload className="h-4 w-4" />
+                  <span className="hidden xs:inline">DATA_CONSOLE</span>
+                  <span className="xs:hidden">DATA</span>
                 </Button>
               </SheetTrigger>
               <SheetContent className="w-full sm:max-w-lg overflow-y-auto bg-[hsl(220_18%_7%)] border-[hsl(220_16%_12%)]">

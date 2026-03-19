@@ -1,13 +1,10 @@
-// © 2026 VenkataSatyanarayana Duba
-// Biz Stratosphere - Proprietary Software
-// Unauthorized copying or distribution prohibited.
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
 import {
     Treemap,
     ResponsiveContainer,
     Tooltip,
 } from 'recharts';
+import { GlassTooltip } from '@/components/ui/GlassTooltip';
 
 interface TreemapChartProps {
     data: any[];
@@ -15,7 +12,15 @@ interface TreemapChartProps {
     showTooltip?: boolean;
 }
 
-const COLORS = ['#8884d8', '#83a6ed', '#8dd1e1', '#82ca9d', '#a4de6c', '#d0ed57', '#ffc658'];
+const COLORS = [
+    'hsl(221, 83%, 53%)', // Strategic Blue
+    'hsl(262, 83%, 58%)', // Strategic Purple
+    'hsl(142, 71%, 45%)', // Strategic Emerald
+    'hsl(38, 92%, 50%)',  // Strategic Amber
+    'hsl(199, 89%, 48%)', // Sky Blue
+    'hsl(215, 25%, 27%)', // Slate
+    'hsl(221, 83%, 43%)'  // Dark Blue
+];
 
 export function TreemapChart({
     data,
@@ -26,7 +31,7 @@ export function TreemapChart({
         const { x, y, width, height, name, value, fill, fillOpacity = 1 } = props;
 
         // Hide text only for very small boxes
-        if (width < 40 || height < 25) {
+        if (width < 30 || height < 20) {
             return (
                 <g>
                     <rect
@@ -36,8 +41,9 @@ export function TreemapChart({
                         height={height}
                         fill={fill}
                         fillOpacity={fillOpacity}
-                        stroke="#fff"
+                        stroke="rgba(0,0,0,0.2)"
                         strokeWidth={1}
+                        rx={4}
                     />
                 </g>
             );
@@ -54,11 +60,11 @@ export function TreemapChart({
                     return str;
                 }
             }
-            return str.length > 10 ? `${str.substring(0, 10)}..` : str;
+            return str.length > 12 ? `${str.substring(0, 10)}..` : str;
         };
 
         return (
-            <g>
+            <g className="transition-all hover:opacity-90">
                 <rect
                     x={x}
                     y={y}
@@ -66,30 +72,36 @@ export function TreemapChart({
                     height={height}
                     fill={fill}
                     fillOpacity={fillOpacity}
-                    stroke="#fff"
+                    stroke="rgba(0,0,0,0.2)"
                     strokeWidth={1}
+                    rx={4}
                 />
-                <text
-                    x={x + width / 2}
-                    y={y + height / 2 - 7}
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize={11}
-                    fontWeight="500"
-                    style={{ pointerEvents: 'none', textShadow: '0px 1px 2px rgba(0,0,0,0.3)' }}
-                >
-                    {formatName(name)}
-                </text>
-                <text
-                    x={x + width / 2}
-                    y={y + height / 2 + 10}
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize={10}
-                    style={{ pointerEvents: 'none', textShadow: '0px 1px 2px rgba(0,0,0,0.3)' }}
-                >
-                    {value}
-                </text>
+                {width > 60 && height > 40 && (
+                    <>
+                        <text
+                            x={x + 8}
+                            y={y + 18}
+                            fill="#fff"
+                            fontSize={10}
+                            fontWeight="800"
+                            className="uppercase tracking-tighter"
+                            style={{ pointerEvents: 'none', opacity: 0.9 }}
+                        >
+                            {formatName(name)}
+                        </text>
+                        <text
+                            x={x + 8}
+                            y={y + 32}
+                            fill="#fff"
+                            fontSize={12}
+                            fontWeight="900"
+                            fontFamily="JetBrains Mono, monospace"
+                            style={{ pointerEvents: 'none', opacity: 1 }}
+                        >
+                            {value.toLocaleString()}
+                        </text>
+                    </>
+                )}
             </g>
         );
     };
@@ -100,11 +112,12 @@ export function TreemapChart({
                 data={data}
                 dataKey="value"
                 nameKey="name"
-                stroke="#fff"
-                fill="#8884d8"
+                stroke="rgba(0,0,0,0.1)"
+                fill="hsl(221, 83%, 53%)"
                 content={<CustomContent />}
+                animationDuration={1500}
             >
-                {showTooltip && <Tooltip />}
+                {showTooltip && <Tooltip content={<GlassTooltip />} />}
             </Treemap>
         </ResponsiveContainer>
     );

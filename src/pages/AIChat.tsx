@@ -265,22 +265,22 @@ export function AIChat() {
             </div>
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex flex-wrap items-center gap-2">
               Neural Assistant
-              <Badge variant="outline" className="ml-2 border-primary/20 text-[10px] text-primary bg-primary/5 uppercase tracking-widest px-2 py-0 font-bold"> v2.4.0-STABLE </Badge>
+              <Badge variant="outline" className="border-primary/20 text-[9px] sm:text-[10px] text-primary bg-primary/5 uppercase tracking-widest px-2 py-0 font-bold whitespace-nowrap"> v2.4.0-STABLE </Badge>
             </h1>
-            <div className="flex items-center gap-3 mt-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1">
                <div className="flex items-center gap-1.5">
                   <div className={cn("h-1.5 w-1.5 rounded-full", aiOrchestrator.getProvider() === 'local' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]")} />
-                  <span className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">
-                    {aiOrchestrator.getProvider() === 'local' ? 'Edge-Node' : 'Cloud-Compute'} : {aiOrchestrator.getChatModelName()}
+                  <span className="text-[10px] sm:text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">
+                    {aiOrchestrator.getProvider() === 'local' ? 'Edge' : 'Cloud'} : {aiOrchestrator.getChatModelName()}
                   </span>
                </div>
-               <span className="text-muted-foreground/20 text-xs text-bold">|</span>
+               <span className="hidden sm:block text-muted-foreground/20 text-xs text-bold">|</span>
                <div className="flex items-center gap-1.5">
                   <Database className="h-3 w-3 text-muted-foreground/60" />
-                  <span className="text-[11px] font-medium text-muted-foreground/60">
-                    Context: <span className="text-foreground/80">{activeDatasetName || 'Generalized Knowledge'}</span>
+                  <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground/60">
+                    <span className="hidden xs:inline">Context: </span><span className="text-foreground/80 truncate max-w-[120px] inline-block align-bottom">{activeDatasetName || 'Generalized Knowledge'}</span>
                   </span>
                </div>
             </div>
@@ -629,14 +629,14 @@ export function AIChat() {
                      {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                    </Button>
                 </div>
-                <div className="flex items-center justify-between mt-3 px-1">
-                   <p className="text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest">
+                <div className="flex flex-col sm:flex-row items-center justify-between mt-3 px-1 gap-2">
+                   <p className="text-[9px] sm:text-[10px] text-muted-foreground/30 font-bold uppercase tracking-widest hidden xs:block">
                       ENTER TO TRANSMIT · SHIFT+ENTER FOR SPACE
                    </p>
                    {selectedDataset && (
-                     <div className="flex items-center gap-1.5 opacity-40 hover:opacity-100 transition-opacity cursor-help">
+                     <div className="flex items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-help bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">
                         <Database className="h-3 w-3 text-primary" />
-                        <span className="text-[10px] font-bold text-primary uppercase tracking-tighter">Vector-Gated Active</span>
+                        <span className="text-[9px] sm:text-[10px] font-bold text-primary uppercase tracking-tighter">Vector-Gated Active</span>
                      </div>
                    )}
                 </div>

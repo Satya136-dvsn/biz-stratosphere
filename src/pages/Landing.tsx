@@ -2,28 +2,46 @@
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
 
-import { Button } from '@/components/ui/button';
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
-    ArrowRight,
-    BarChart3,
-    Users,
-    TrendingUp,
-    Zap,
+    Sheet,
+    SheetContent,
+    SheetTrigger,
+} from "@/components/ui/sheet";
+import { 
+    Menu, 
+    Sparkles, 
+    TrendingUp, 
+    ShieldCheck, 
+    Mail, 
+    ArrowRight, 
+    Github, 
+    Twitter, 
+    Linkedin, 
+    Briefcase, 
+    Users, 
+    PieChart, 
+    Activity, 
+    Cpu,
     Shield,
-    Sparkles,
     Brain,
-    Check,
-    Star,
     Clock,
     Lightbulb,
+    Check,
+    Zap,
+    ChevronRight,
+    Search,
+    LayoutDashboard,
+    Lock,
+    BarChart3,
+    Star
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Footer } from '@/components/layout/Footer';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
     return (
-        <div className="min-h-screen bg-[hsl(220_20%_5%)]">
+        <div className="min-h-screen bg-[hsl(220_20%_5%)] overflow-x-hidden">
             {/* ─── Nav ─── */}
             <nav className="fixed top-0 w-full z-50 bg-[hsl(220_20%_5%/0.85)] backdrop-blur-xl border-b border-[hsl(220_16%_12%)]">
                 <div className="container mx-auto px-4">
@@ -39,67 +57,115 @@ export default function LandingPage() {
                             </span>
                         </Link>
 
+                        {/* Desktop Nav */}
                         <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-muted-foreground">
                             <a href="#features" className="hover:text-foreground transition-colors">Features</a>
                             <a href="#decision-memory" className="hover:text-foreground transition-colors">Decision Memory™</a>
                             <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <Link to="/auth">
-                                <Button variant="ghost" size="sm" className="text-[13px] text-muted-foreground hover:text-foreground h-8">
-                                    Sign In
-                                </Button>
-                            </Link>
-                            <Link to="/auth">
-                                <Button size="sm" className="text-[13px] h-8 bg-primary hover:bg-primary/90 text-white">
-                                    Start Free
-                                </Button>
-                            </Link>
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="hidden sm:flex items-center gap-3">
+                                <Link to="/auth">
+                                    <Button variant="ghost" size="sm" className="text-[13px] text-muted-foreground hover:text-foreground h-8">
+                                        Sign In
+                                    </Button>
+                                </Link>
+                                <Link to="/auth">
+                                    <Button size="sm" className="text-[13px] h-8 bg-primary hover:bg-primary/90 text-white">
+                                        Start Free
+                                    </Button>
+                                </Link>
+                            </div>
+
+                            {/* Mobile Nav Trigger */}
+                            <div className="md:hidden">
+                                <Sheet>
+                                    <SheetTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground">
+                                            <Menu className="h-5 w-5" />
+                                        </Button>
+                                    </SheetTrigger>
+                                    <SheetContent side="right" className="w-[280px] bg-[hsl(220_20%_5%)] border-primary/10 p-0">
+                                        <div className="flex flex-col h-full">
+                                            <div className="p-6 border-b border-primary/5">
+                                                <div className="flex items-center gap-2.5">
+                                                    <img src="/logo-orbit.png" alt="Logo" className="h-7 w-7" />
+                                                    <span className="text-sm font-bold uppercase tracking-widest">Stratosphere</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                                <div className="space-y-4">
+                                                    <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">Navigation</p>
+                                                    <div className="grid gap-2">
+                                                        <a href="#features" className="flex items-center h-10 px-3 rounded-lg hover:bg-primary/5 text-sm font-medium transition-colors">Features</a>
+                                                        <a href="#decision-memory" className="flex items-center h-10 px-3 rounded-lg hover:bg-primary/5 text-sm font-medium transition-colors">Decision Memory™</a>
+                                                        <a href="#pricing" className="flex items-center h-10 px-3 rounded-lg hover:bg-primary/5 text-sm font-medium transition-colors">Pricing</a>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 pt-4 border-t border-primary/5">
+                                                    <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">Account</p>
+                                                    <div className="grid gap-3">
+                                                        <Link to="/auth">
+                                                            <Button variant="outline" className="w-full justify-start h-11 border-primary/10">Sign In</Button>
+                                                        </Link>
+                                                        <Link to="/auth">
+                                                            <Button className="w-full justify-start h-11">Start Free</Button>
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="p-6 mt-auto border-t border-primary/5 text-[10px] text-muted-foreground/40 font-mono">
+                                                v1.0.4-BETA_NODE
+                                            </div>
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
+                            </div>
                         </div>
                     </div>
                 </div>
             </nav>
 
             {/* ─── Hero ─── */}
-            <section className="relative container mx-auto px-4 pt-32 pb-24 overflow-hidden">
-                {/* Background glow */}
-                <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-                <div className="absolute top-40 left-1/3 w-[300px] h-[300px] bg-secondary/4 rounded-full blur-[100px] pointer-events-none" />
+            <section className="relative container mx-auto px-4 pt-32 pb-24 max-w-full overflow-x-hidden">
+                {/* Background glow - Contained for mobile */}
+                <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none opacity-50 sm:opacity-100" />
+                <div className="absolute top-40 left-1/3 w-full max-w-[300px] h-[300px] bg-secondary/4 rounded-full blur-[100px] pointer-events-none" />
 
                 <div className="max-w-4xl mx-auto relative">
                     <div className="text-center space-y-6 animate-fade-in-up">
                         {/* Tag */}
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[12px] font-semibold">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] sm:text-[12px] font-semibold">
                             <Sparkles className="h-3 w-3" />
                             Built for SaaS teams who outgrew spreadsheets
                         </div>
 
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1]">
+                        <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] px-2 sm:px-0">
                             Know{' '}
                             <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">
                                 why
                             </span>{' '}
                             your metrics change.
                             <br />
-                            <span className="text-muted-foreground/40">Not just that they changed.</span>
+                            <span className="text-muted-foreground/70">Not just that they changed.</span>
                         </h1>
 
-                        <p className="text-base md:text-lg text-muted-foreground/70 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-sm md:text-lg text-muted-foreground/70 max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
                             Biz Stratosphere is the BI platform with{' '}
                             <strong className="text-foreground font-semibold">Decision Memory™</strong> — it remembers every prediction,
                             every action, and every outcome so your team never repeats the same mistake twice.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2 px-6 sm:px-0">
                             <Link to="/dashboard">
-                                <Button size="lg" className="text-sm px-6 py-5 bg-primary hover:bg-primary/90 text-white shadow-glow-primary transition-all duration-200 hover:-translate-y-0.5">
+                                <Button size="lg" className="w-full sm:w-auto text-sm px-6 py-5 bg-primary hover:bg-primary/90 text-white shadow-glow-primary transition-all duration-200 hover:-translate-y-0.5 h-12 sm:h-auto">
                                     Try Live Demo
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
                             <a href="#pricing">
-                                <Button size="lg" variant="outline" className="text-sm px-6 py-5 border-[hsl(220_16%_18%)] text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200">
+                                <Button size="lg" variant="outline" className="w-full sm:w-auto text-sm px-6 py-5 border-[hsl(220_16%_18%)] text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200 h-12 sm:h-auto">
                                     View Pricing
                                 </Button>
                             </a>
@@ -389,5 +455,67 @@ function StatCard({ value, label }: { value: string; label: string }) {
             </div>
             <div className="text-[11px] text-muted-foreground/50 font-medium">{label}</div>
         </div>
+    );
+}
+
+function Footer() {
+    return (
+        <footer className="border-t border-[hsl(220_16%_12%)] bg-[hsl(220_20%_4%)] pb-12 pt-16">
+            <div className="container mx-auto px-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
+                    <div className="col-span-2 md:col-span-1 space-y-4">
+                        <div className="flex items-center gap-2.5">
+                            <img src="/logo-orbit.png" alt="Logo" className="h-7 w-7 rounded-lg" />
+                            <span className="font-bold tracking-tight text-foreground">Stratosphere</span>
+                        </div>
+                        <p className="text-[13px] text-muted-foreground/60 leading-relaxed max-w-[200px]">
+                            Advanced decision-memory platform for scaling SaaS teams.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 className="text-[13px] font-bold text-foreground mb-4">Product</h4>
+                        <ul className="space-y-2.5 text-[13px] text-muted-foreground/60">
+                            <li><a href="#features" className="hover:text-primary transition-colors">Features</a></li>
+                            <li><a href="#decision-memory" className="hover:text-primary transition-colors">Decision Memory™</a></li>
+                            <li><a href="#pricing" className="hover:text-primary transition-colors">Pricing</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="text-[13px] font-bold text-foreground mb-4">Legal</h4>
+                        <ul className="space-y-2.5 text-[13px] text-muted-foreground/60">
+                            <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+                            <li><a href="#" className="hover:text-primary transition-colors">GDPR</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="text-[13px] font-bold text-foreground mb-4">Connect</h4>
+                        <div className="flex gap-4">
+                            <a href="#" className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-primary transition-colors">
+                                <Twitter className="h-4 w-4" />
+                            </a>
+                            <a href="#" className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-primary transition-colors">
+                                <Github className="h-4 w-4" />
+                            </a>
+                            <a href="#" className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-primary transition-colors">
+                                <Linkedin className="h-4 w-4" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-t border-[hsl(220_16%_12%)] pt-8">
+                    <p className="text-[12px] text-muted-foreground/40 font-medium">
+                        © 2026 VenkataSatyanarayana Duba. All rights reserved.
+                    </p>
+                    <div className="flex items-center gap-6 text-[12px] text-muted-foreground/40 font-medium">
+                        <span>Built with AI + Precision</span>
+                        <div className="flex items-center gap-1.5 opacity-60">
+                            <Shield className="h-3 w-3" />
+                            <span>SOC 2 Type II</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     );
 }

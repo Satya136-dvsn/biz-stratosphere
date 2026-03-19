@@ -2,7 +2,7 @@
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
 
-import { useState, useRef, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ import {
     ResponsiveContainer, Cell, FunnelChart, Funnel, LabelList,
 } from 'recharts';
 import { ChartTypeSelector, ChartType } from '@/components/dashboard/ChartTypeSelector';
+import { GlassTooltip } from '@/components/ui/GlassTooltip';
 import { DataSourcePicker } from '@/components/charts/DataSourcePicker';
 import { ChartFilters, ChartFiltersState } from '@/components/charts/ChartFilters';
 import { ChartCustomizer, ChartCustomization } from '@/components/charts/ChartCustomizer';
@@ -129,7 +130,7 @@ export default function AdvancedCharts() {
     }); // Filter changes also trigger refetch, but pagination needs page dependency
 
     // reset page when dataset changes
-    useMemo(() => {
+    useEffect(() => {
         setPage(1);
     }, [selectedDatasetId]);
 
@@ -137,10 +138,16 @@ export default function AdvancedCharts() {
     const availableColumns = useMemo(() => {
         if (chartData.length === 0) return [];
 
-        const allColumns = Object.keys(chartData[0]);
+        // Scan first 5 rows to ensure we capture all possible keys (resilience for sparse datasets)
+        const allKeys = new Set<string>();
+        chartData.slice(0, 5).forEach(row => {
+            Object.keys(row).forEach(key => allKeys.add(key));
+        });
+
+        const allColumns = Array.from(allKeys);
 
         // Exclude internal fields added during extraction
-        const excludedFields = ['_id', '_date_recorded', 'id', 'user_id', 'dataset_id', 'created_at', 'updated_at'];
+        const excludedFields = ['_id', '_date_recorded', 'id', 'user_id', 'dataset_id', 'created_at', 'updated_at', 'metric_name', 'metric_value', 'metric_type'];
 
         return allColumns.filter(col => !excludedFields.includes(col));
     }, [chartData]);
@@ -311,22 +318,34 @@ export default function AdvancedCharts() {
 
         switch (chartType) {
             case 'line':
-                // Note: Line/Bar/Area usually better with full time-series data, so NOT using aggregatedData effectively unless user wants "Top 10 Categories"
-                // For now, let's keep them full for Time Series capability.
-                // We only aggregate for Pie/Radar/Funnel which are Snapshot charts.
                 return (
                     <ResponsiveContainer {...commonProps}>
-                        <LineChart data={transformedData}>
-                            {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
+                        <LineChart data={transformedData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            {customization.showGrid && <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.03)" />}
                             <XAxis
                                 dataKey="name"
                                 minTickGap={30}
-                                tick={{ fontSize: 12 }}
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
+                                dy={10}
                             />
-                            <YAxis />
-                            {customization.showTooltip && <Tooltip />}
-                            {customization.showLegend && <Legend />}
-                            <Line type="monotone" dataKey="value" stroke={customization.primaryColor} dot={false} />
+                            <YAxis 
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
+                            />
+                            {customization.showTooltip && <Tooltip content={<GlassTooltip />} />}
+                            {customization.showLegend && <Legend verticalAlign="top" align="right" iconType="circle" />}
+                            <Line 
+                                type="monotone" 
+                                dataKey="value" 
+                                stroke={customization.primaryColor} 
+                                strokeWidth={3}
+                                dot={{ r: 4, strokeWidth: 2, fill: '#0c0c0e' }} 
+                                activeDot={{ r: 6, strokeWidth: 0, fill: customization.primaryColor }}
+                                animationDuration={1500}
+                            />
                         </LineChart>
                     </ResponsiveContainer>
                 );
@@ -334,17 +353,35 @@ export default function AdvancedCharts() {
             case 'bar':
                 return (
                     <ResponsiveContainer {...commonProps}>
-                        <BarChart data={transformedData}>
-                            {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
+                        <BarChart data={transformedData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="advBarGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor={customization.primaryColor} stopOpacity={1} />
+                                    <stop offset="100%" stopColor={customization.secondaryColor} stopOpacity={0.8} />
+                                </linearGradient>
+                            </defs>
+                            {customization.showGrid && <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.03)" />}
                             <XAxis
                                 dataKey="name"
                                 minTickGap={30}
-                                tick={{ fontSize: 12 }}
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
+                                dy={10}
                             />
-                            <YAxis />
-                            {customization.showTooltip && <Tooltip />}
-                            {customization.showLegend && <Legend />}
-                            <Bar dataKey="value" fill={customization.primaryColor} />
+                            <YAxis 
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
+                            />
+                            {customization.showTooltip && <Tooltip content={<GlassTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />}
+                            {customization.showLegend && <Legend verticalAlign="top" align="right" iconType="circle" />}
+                            <Bar 
+                                dataKey="value" 
+                                fill="url(#advBarGradient)" 
+                                radius={[6, 6, 0, 0]}
+                                animationDuration={1500}
+                            />
                         </BarChart>
                     </ResponsiveContainer>
                 );
@@ -352,17 +389,37 @@ export default function AdvancedCharts() {
             case 'area':
                 return (
                     <ResponsiveContainer {...commonProps}>
-                        <AreaChart data={transformedData}>
-                            {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
+                        <AreaChart data={transformedData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="advAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={customization.primaryColor} stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor={customization.primaryColor} stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            {customization.showGrid && <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.03)" />}
                             <XAxis
                                 dataKey="name"
                                 minTickGap={30}
-                                tick={{ fontSize: 12 }}
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
+                                dy={10}
                             />
-                            <YAxis />
-                            {customization.showTooltip && <Tooltip />}
-                            {customization.showLegend && <Legend />}
-                            <Area type="monotone" dataKey="value" fill={customization.primaryColor} stroke={customization.secondaryColor} />
+                            <YAxis 
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
+                            />
+                            {customization.showTooltip && <Tooltip content={<GlassTooltip />} />}
+                            {customization.showLegend && <Legend verticalAlign="top" align="right" iconType="circle" />}
+                            <Area 
+                                type="monotone" 
+                                dataKey="value" 
+                                stroke={customization.primaryColor} 
+                                strokeWidth={3}
+                                fill="url(#advAreaGradient)" 
+                                animationDuration={1500}
+                            />
                         </AreaChart>
                     </ResponsiveContainer>
                 );
@@ -371,16 +428,29 @@ export default function AdvancedCharts() {
                 return (
                     <ResponsiveContainer {...commonProps}>
                         <PieChart>
-                            <Pie data={aggregatedData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={false}>
+                            <Pie 
+                                data={aggregatedData} 
+                                dataKey="value" 
+                                nameKey="name" 
+                                cx="50%" 
+                                cy="50%" 
+                                innerRadius={60}
+                                outerRadius={90} 
+                                paddingAngle={5}
+                                label={false}
+                                animationDuration={1500}
+                            >
                                 {aggregatedData.map((entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}
                                         fill={entry.name === 'Others' ? '#9ca3af' : COLORS[index % COLORS.length]}
+                                        stroke="none"
+                                        className="hover:opacity-80 transition-opacity"
                                     />
                                 ))}
                             </Pie>
-                            {customization.showTooltip && <Tooltip />}
-                            {customization.showLegend && <Legend />}
+                            {customization.showTooltip && <Tooltip content={<GlassTooltip />} />}
+                            {customization.showLegend && <Legend verticalAlign="bottom" height={36} iconType="circle" />}
                         </PieChart>
                     </ResponsiveContainer>
                 );
@@ -388,21 +458,32 @@ export default function AdvancedCharts() {
             case 'scatter':
                 return (
                     <ResponsiveContainer {...commonProps}>
-                        <ScatterChart>
-                            {customization.showGrid && <CartesianGrid strokeDasharray="3 3" />}
+                        <ScatterChart margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            {customization.showGrid && <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.03)" />}
                             <XAxis
                                 dataKey={xColumn || 'x'}
                                 name={xColumn || 'X'}
                                 minTickGap={30}
-                                tick={{ fontSize: 12 }}
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
+                                dy={10}
                             />
                             <YAxis
                                 dataKey={yColumn || 'y'}
                                 name={yColumn || 'Y'}
+                                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)', fontFamily: 'JetBrains Mono, monospace' }}
+                                axisLine={false}
+                                tickLine={false}
                             />
-                            {customization.showTooltip && <Tooltip cursor={{ strokeDasharray: '3 3' }} />}
-                            {customization.showLegend && <Legend />}
-                            <Scatter name="Data" data={transformedData} fill={customization.primaryColor} />
+                            {customization.showTooltip && <Tooltip cursor={{ strokeDasharray: '4 4' }} content={<GlassTooltip />} />}
+                            {customization.showLegend && <Legend verticalAlign="top" align="right" iconType="circle" />}
+                            <Scatter 
+                                name="Data Points" 
+                                data={transformedData} 
+                                fill={customization.primaryColor} 
+                                animationDuration={1500}
+                            />
                         </ScatterChart>
                     </ResponsiveContainer>
                 );
@@ -629,8 +710,8 @@ export default function AdvancedCharts() {
 
                 {/* Chart Area - Flexible width */}
                 <div className="space-y-6">
-                    <Card className="shadow-lg border-2">
-                        <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
+                    <Card className="shadow-2xl border border-white/5 bg-card/40 backdrop-blur-xl rounded-2xl overflow-hidden">
+                        <CardHeader className="border-b border-white/5 bg-gradient-to-r from-primary/10 to-transparent">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="text-xl">{customization.title}</CardTitle>
                                 {selectedDatasetId && (
