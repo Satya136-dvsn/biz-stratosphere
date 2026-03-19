@@ -9,7 +9,10 @@ import { Upload, FileSpreadsheet, Download } from 'lucide-react';
 
 export function WelcomeCard() {
     const downloadSampleCSV = () => {
-        const csvContent = `metric_name,metric_value,metric_type,date_recorded
+        const csvContent = `# NOTE: This is only an example template. It is NOT mandatory to follow this format.
+# Biz Stratosphere works with ANY CSV data - your own columns and structure are fully supported.
+# The system auto-detects column types (numeric, date, text) and adapts accordingly.
+metric_name,metric_value,metric_type,date_recorded
 revenue,50000,currency,2024-12-01
 revenue,55000,currency,2024-11-01
 revenue,48000,currency,2024-10-01

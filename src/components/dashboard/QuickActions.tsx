@@ -5,6 +5,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import {
     Upload,
     Download,
@@ -24,6 +26,56 @@ interface QuickAction {
 }
 
 export function QuickActions() {
+    const navigate = useNavigate();
+    const { toast } = useToast();
+
+    const downloadSampleCSV = () => {
+        const csvContent = `# NOTE: This is only an example template. It is NOT mandatory to follow this format.
+# Biz Stratosphere works with ANY CSV data - your own columns and structure are fully supported.
+# The system auto-detects column types (numeric, date, text) and adapts accordingly.
+metric_name,metric_value,metric_type,date_recorded
+revenue,50000,currency,2024-12-01
+revenue,55000,currency,2024-11-01
+revenue,48000,currency,2024-10-01
+customers,150,number,2024-12-01
+customers,145,number,2024-11-01
+customers,140,number,2024-10-01
+churn,5,percentage,2024-12-01
+churn,6,percentage,2024-11-01
+churn,4,percentage,2024-10-01`;
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sample-data-template.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        toast({
+            title: "Template Downloaded",
+            description: "Sample CSV template has been downloaded. Fill it with your data and use Upload Data to import.",
+        });
+    };
+
+    const openDataUpload = () => {
+        // Click the "Manage Data" sheet trigger button in the dashboard header
+        const manageDataBtn = document.querySelector<HTMLButtonElement>(
+            'button:has(.lucide-upload)'
+        );
+        if (manageDataBtn) {
+            manageDataBtn.click();
+        } else {
+            // Fallback: scroll to Upload section or show toast
+            toast({
+                title: "Upload Data",
+                description: "Use the 'Manage Data' button at the top of the dashboard to upload CSV files.",
+            });
+        }
+    };
+
     const actions: QuickAction[] = [
         {
             id: '1',
@@ -31,7 +83,7 @@ export function QuickActions() {
             description: 'Import new CSV data',
             icon: Upload,
             color: 'text-primary',
-            action: () => console.log('Upload data')
+            action: openDataUpload
         },
         {
             id: '2',
@@ -39,7 +91,7 @@ export function QuickActions() {
             description: 'Download analytics',
             icon: Download,
             color: 'text-success',
-            action: () => console.log('Export report')
+            action: () => navigate('/reports')
         },
         {
             id: '3',
@@ -47,7 +99,7 @@ export function QuickActions() {
             description: 'AI-powered analysis',
             icon: Brain,
             color: 'text-secondary',
-            action: () => console.log('Generate insights')
+            action: () => navigate('/ai-analytics')
         },
         {
             id: '4',
@@ -55,7 +107,7 @@ export function QuickActions() {
             description: 'Analyze patterns',
             icon: TrendingUp,
             color: 'text-info',
-            action: () => console.log('View trends')
+            action: () => navigate('/advanced-charts')
         },
         {
             id: '5',
@@ -63,7 +115,7 @@ export function QuickActions() {
             description: 'Instant metrics',
             icon: Zap,
             color: 'text-warning',
-            action: () => console.log('Quick analysis')
+            action: () => navigate('/ml-predictions')
         },
         {
             id: '6',
@@ -71,7 +123,7 @@ export function QuickActions() {
             description: 'Download sample',
             icon: FileSpreadsheet,
             color: 'text-accent',
-            action: () => console.log('Download template')
+            action: downloadSampleCSV
         }
     ];
 
