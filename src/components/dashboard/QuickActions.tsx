@@ -128,39 +128,39 @@ churn,4,percentage,2024-10-01`;
     ];
 
     return (
-        <Card className="glass">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-warning" />
-                    Quick Actions
-                </CardTitle>
-                <CardDescription>Common tasks and operations</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7.5%)] overflow-hidden">
+            <div className="px-5 py-4 border-b border-[hsl(220_16%_12%)]">
+                <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-amber-400" />
+                    <h3 className="text-sm font-semibold text-foreground">Quick Actions</h3>
+                </div>
+                <p className="text-[11px] text-muted-foreground/50 mt-0.5">Common tasks and operations</p>
+            </div>
+            <div className="p-3">
+                <div className="grid grid-cols-2 gap-2">
                     {actions.map((action) => {
                         const Icon = action.icon;
                         return (
-                            <Button
+                            <button
                                 key={action.id}
-                                variant="outline"
-                                className="h-auto flex flex-col items-start gap-2 p-3 hover:bg-muted/50 hover-lift bg-card/50 backdrop-blur-sm border-primary/10 hover:border-primary/30 transition-all duration-300"
                                 onClick={action.action}
+                                className="group flex flex-col items-start gap-2 p-3 rounded-lg border border-transparent bg-[hsl(220_16%_9%)] hover:border-[hsl(220_16%_18%)] hover:bg-[hsl(220_16%_10%)] transition-all duration-150 text-left"
                             >
                                 <div className="flex items-center gap-2 w-full">
-                                    <div className={cn("p-1.5 rounded-md bg-foreground/5", action.color)}>
-                                        <Icon className="h-4 w-4" />
+                                    <div className={cn("p-1.5 rounded-md bg-[hsl(220_16%_13%)] group-hover:bg-[hsl(220_16%_16%)] transition-colors", action.color)}>
+                                        <Icon className="h-3.5 w-3.5" />
                                     </div>
-                                    <span className="text-xs font-semibold text-left line-clamp-1">{action.title}</span>
+                                    <span className="text-xs font-semibold text-foreground/90 truncate">{action.title}</span>
                                 </div>
-                                <p className="text-[10px] text-muted-foreground text-left leading-tight line-clamp-2">
+                                <p className="text-[10px] text-muted-foreground/50 leading-snug">
                                     {action.description}
                                 </p>
-                            </Button>
+                            </button>
                         );
                     })}
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }
+

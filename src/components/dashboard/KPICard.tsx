@@ -2,7 +2,7 @@
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
 
-import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useRef, useState } from "react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,25 +15,55 @@ interface KPICardProps {
   variant?: "revenue" | "growth" | "warning" | "info";
 }
 
+function useCountUp(end: number, duration = 1200) {
+  const [count, setCount] = useState(0);
+  const frameRef = useRef<number>();
+
+  useEffect(() => {
+    const start = 0;
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(start + (end - start) * eased));
+
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, [end, duration]);
+
+  return count;
+}
+
 export function KPICard({
   title,
   value,
   change,
   period = "vs last month",
   format = "number",
-  variant = "info"
+  variant = "info",
 }: KPICardProps) {
   const isPositive = change > 0;
   const isNeutral = change === 0;
+  const animatedValue = useCountUp(Number(value) || 0);
 
-  const formatValue = (val: string | number) => {
+  const formatValue = (val: number) => {
     if (format === "currency") {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(Number(val));
+        maximumFractionDigits: 0,
+      }).format(val);
     }
     if (format === "percentage") {
       return `${val}%`;
@@ -41,61 +71,69 @@ export function KPICard({
     return val.toLocaleString();
   };
 
-  const getVariantStyles = () => {
-    switch (variant) {
-      case "revenue":
-        return "glass border-primary/30 shadow-lg hover:shadow-glow-primary";
-      case "growth":
-        return "glass border-secondary/30 shadow-lg hover:shadow-glow-secondary";
-      case "warning":
-        return "glass border-warning/30 shadow-lg hover:shadow-xl";
-      default:
-        return "glass border-primary/20 shadow-lg hover:shadow-xl";
-    }
-  };
+  const accentColor = {
+    revenue: "hsl(142 71% 45%)",
+    growth: "hsl(36 95% 55%)",
+    warning: "hsl(36 95% 55%)",
+    info: "hsl(224 100% 64%)",
+  }[variant];
 
   return (
-    <Card
+    <div
       className={cn(
-        "relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1",
-        getVariantStyles()
+        "group relative overflow-hidden rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7.5%)]",
+        "transition-all duration-300 hover:-translate-y-0.5 hover:border-[hsl(220_16%_20%)]",
+        "hover:shadow-lg"
       )}
       data-testid="kpi-card"
-      data-testid-title={title.toLowerCase().replace(/\s+/g, '-')}
+      data-testid-title={title.toLowerCase().replace(/\s+/g, "-")}
     >
-      <CardContent className="p-7">
-        <div className="flex items-center justify-between">
-          <div className="space-y-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+      {/* Top accent line */}
+      <div
+        className="h-[2px] w-full opacity-60 group-hover:opacity-100 transition-opacity"
+        style={{ background: `linear-gradient(90deg, ${accentColor}, transparent)` }}
+      />
+
+      <div className="p-5">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2.5">
+            {/* Label */}
+            <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-[0.08em]">
               {title}
             </p>
-            <p className="text-4xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
-              {formatValue(value)}
+
+            {/* Value */}
+            <p className="text-3xl font-bold text-foreground tracking-tight font-mono">
+              {formatValue(animatedValue)}
             </p>
-            <div className="flex items-center space-x-2 text-sm">
-              {isNeutral ? (
-                <Minus className="h-4 w-4 text-muted-foreground" />
-              ) : isPositive ? (
-                <TrendingUp className="h-4 w-4 text-success" />
-              ) : (
-                <TrendingDown className="h-4 w-4 text-destructive" />
-              )}
-              <span className={cn(
-                "font-semibold",
-                isNeutral && "text-muted-foreground",
-                isPositive && "text-success",
-                !isPositive && !isNeutral && "text-destructive"
-              )}>
-                {isPositive ? "+" : ""}{change}%
-              </span>
-              <span className="text-muted-foreground text-xs">{period}</span>
+
+            {/* Change indicator */}
+            <div className="flex items-center gap-1.5">
+              <div
+                className={cn(
+                  "flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-semibold",
+                  isNeutral && "bg-muted/50 text-muted-foreground",
+                  isPositive && "bg-emerald-500/10 text-emerald-400",
+                  !isPositive && !isNeutral && "bg-red-500/10 text-red-400"
+                )}
+              >
+                {isNeutral ? (
+                  <Minus className="h-3 w-3" />
+                ) : isPositive ? (
+                  <TrendingUp className="h-3 w-3" />
+                ) : (
+                  <TrendingDown className="h-3 w-3" />
+                )}
+                <span>
+                  {isPositive ? "+" : ""}
+                  {change}%
+                </span>
+              </div>
+              <span className="text-[11px] text-muted-foreground/50">{period}</span>
             </div>
           </div>
         </div>
-
-        {/* Enhanced decorative gradient overlay */}
-        <div className="absolute top-0 right-0 w-24 h-24 opacity-20 bg-gradient-to-br from-primary via-secondary to-transparent rounded-bl-3xl blur-sm" />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
