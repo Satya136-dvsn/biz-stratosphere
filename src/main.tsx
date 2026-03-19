@@ -16,11 +16,14 @@ initializeErrorTracking();
 trackWebVitals();
 
 import { HelmetProvider } from 'react-helmet-async';
+import { ThemeProvider } from "./components/ThemeProvider";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <HelmetProvider>
-            <App />
+            <ThemeProvider defaultTheme="dark" storageKey="biz-stratosphere-theme" attribute="class">
+                <App />
+            </ThemeProvider>
         </HelmetProvider>
     </StrictMode>
 );

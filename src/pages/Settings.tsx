@@ -33,7 +33,8 @@ import {
   Zap,
   Loader2
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -44,8 +45,8 @@ import { Badge } from "@/components/ui/badge";
 export function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const [isExporting, setIsExporting] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
   // Password Change State
   const [currentPassword, setCurrentPassword] = useState("");
@@ -132,23 +133,6 @@ export function Settings() {
     // Feature: Notification preferences
     toast({ title: "Saved", description: "Notification preferences saved locally." });
     console.log('Saving notifications...', notifications);
-  };
-
-  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
-    setTheme(newTheme);
-    // Theme change logic
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else if (newTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      // System preference
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
   };
 
   const handleExportData = async () => {
@@ -414,7 +398,7 @@ export function Settings() {
               <CardContent className="space-y-8">
                 <div className="space-y-4">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">COLOR_SPECTRUM_MODE</Label>
-                  <Select value={theme} onValueChange={handleThemeChange}>
+                  <Select value={theme} onValueChange={setTheme}>
                     <SelectTrigger className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)]">
                       <SelectValue />
                     </SelectTrigger>
