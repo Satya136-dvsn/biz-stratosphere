@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useReports, ReportConfig, exportReportAsCSV, exportReportAsJSON } from '@/hooks/useReports';
@@ -17,7 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, Plus, Download, Loader2, Play, Save, FileDown, Trash2, Copy } from 'lucide-react';
+import { FileText, Plus, Download, Loader2, Play, Save, FileDown, Trash2, Copy, TrendingUp, BarChart3, Users, Zap, Sparkles } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { PageLayout } from '@/components/layout/PageLayout';
 

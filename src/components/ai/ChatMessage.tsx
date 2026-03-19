@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ChatMessage } from '@/hooks/useRAGChat';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { Bot, User, ExternalLink, Copy, Check } from 'lucide-react';
 import { format } from 'date-fns';
