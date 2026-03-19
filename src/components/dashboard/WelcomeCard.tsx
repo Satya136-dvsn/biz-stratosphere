@@ -5,7 +5,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileSpreadsheet, Download } from 'lucide-react';
+import { Upload, FileSpreadsheet, Download, Sparkles, Lightbulb } from 'lucide-react';
 
 export function WelcomeCard() {
     const downloadSampleCSV = () => {
@@ -38,7 +38,10 @@ churn,4,percentage,2024-10-01`;
         <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
             <CardHeader>
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-2xl">Welcome to Your Dashboard! 🎉</CardTitle>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                        Welcome to Your Dashboard!
+                        <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                    </CardTitle>
                     <Badge variant="outline" className="text-xs">
                         Getting Started
                     </Badge>
@@ -98,9 +101,10 @@ churn,4,percentage,2024-10-01`;
                     </div>
                 </div>
 
-                <div className="p-4 rounded-lg bg-info/5 border border-info/20">
+                <div className="p-4 rounded-lg bg-info/5 border border-info/20 flex items-start gap-2">
+                    <Lightbulb className="h-4 w-4 text-info mt-0.5" />
                     <p className="text-sm text-info">
-                        <strong>💡 Pro Tip:</strong> Include metrics like revenue, customers, churn rate, and deal size for best results
+                        <strong>PRO_TIP:</strong> Include metrics like revenue, customers, churn rate, and deal size for best results
                     </p>
                 </div>
             </CardContent>

@@ -150,7 +150,7 @@ function NavGroupSection({
                                 >
                                     {/* Active indicator bar */}
                                     {isActive && (
-                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-primary transition-all duration-200" />
+                                        <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-[4px] h-6 rounded-full bg-primary shadow-[0_0_12px_rgba(59,130,246,0.6)] transition-all duration-300" />
                                     )}
 
                                     <Icon
@@ -200,12 +200,12 @@ export function Sidebar() {
         <div
             className={cn(
                 "hidden lg:flex relative flex-col h-screen border-r transition-all duration-300 ease-in-out z-30",
-                "bg-[hsl(220_20%_5.5%)] border-[hsl(220_16%_12%)]",
-                collapsed ? "w-[60px]" : "w-[248px]"
+                "bg-[hsl(220_20%_5%)]/90 backdrop-blur-xl border-primary/10 shadow-2xl",
+                collapsed ? "w-[64px]" : "w-[260px]"
             )}
         >
             {/* ─── Logo ─── */}
-            <div className="flex items-center justify-between px-4 h-14 border-b border-[hsl(220_16%_12%)]">
+            <div className="flex items-center justify-between px-4 h-14 border-b border-primary/10">
                 {collapsed ? (
                     <div className="flex items-center justify-center w-full">
                         <img
@@ -249,7 +249,7 @@ export function Sidebar() {
 
             {/* ─── Workspace Selector ─── */}
             {!collapsed && (
-                <div className="px-3 py-2.5 border-b border-[hsl(220_16%_12%)]">
+                <div className="px-3 py-2.5 border-b border-primary/10">
                     <WorkspaceSelector />
                 </div>
             )}
@@ -267,7 +267,7 @@ export function Sidebar() {
 
                 {/* ─── Admin Section ─── */}
                 {isAdmin() && (
-                    <div className="mt-3 pt-3 border-t border-[hsl(220_16%_12%)]">
+                    <div className="mt-3 pt-3 border-t border-primary/10">
                         {!collapsed && (
                             <div className="px-3 py-1.5">
                                 <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">
@@ -314,7 +314,7 @@ export function Sidebar() {
             </nav>
 
             {/* ─── Bottom Actions ─── */}
-            <div className="border-t border-[hsl(220_16%_12%)]">
+            <div className="border-t border-primary/10">
                 {/* Quick links */}
                 <div className="px-2 py-2 space-y-0.5">
                     <Link to="/profile">
@@ -356,7 +356,7 @@ export function Sidebar() {
                 </div>
 
                 {/* User card */}
-                <div className="px-2 py-3 border-t border-[hsl(220_16%_12%)]">
+                <div className="px-2 py-3 border-t border-primary/10">
                     <div
                         className={cn(
                             "flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer",

@@ -69,10 +69,10 @@
     --gradient-primary: linear-gradient(135deg, hsl(224 100% 64%) 0%, hsl(258 65% 68%) 100%);
     --gradient-secondary: linear-gradient(135deg, hsl(258 65% 68%) 0%, hsl(199 89% 60%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 71% 35%) 100%);
-    --gradient-bg: linear-gradient(180deg, hsl(220 20% 5%) 0%, hsl(220 24% 3.5%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(220 18% 8% / 0.9) 0%, hsl(220 20% 6% / 0.9) 100%);
-    --gradient-glass: linear-gradient(135deg, hsl(224 100% 64% / 0.03) 0%, hsl(258 65% 68% / 0.03) 100%);
-    --gradient-surface: linear-gradient(180deg, hsl(220 18% 9%) 0%, hsl(220 18% 7%) 100%);
+    --gradient-bg: radial-gradient(circle at 50% 0%, hsl(220 20% 8%) 0%, hsl(220 20% 5%) 50%, hsl(220 24% 4%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(220 18% 10% / 0.7) 0%, hsl(220 18% 7% / 0.7) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(224 100% 64% / 0.04) 0%, hsl(258 65% 68% / 0.04) 100%);
+    --gradient-surface: linear-gradient(180deg, hsl(220 18% 10%) 0%, hsl(220 18% 8%) 100%);
 
     /* ─── SHADOWS ─── */
     --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.15);
@@ -84,14 +84,14 @@
 
     --shadow-glow-primary: 0 0 20px hsl(224 100% 64% / 0.15), 0 0 40px hsl(224 100% 64% / 0.05);
     --shadow-glow-secondary: 0 0 20px hsl(258 65% 68% / 0.15), 0 0 40px hsl(258 65% 68% / 0.05);
-    --shadow-card: 0 2px 8px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.2);
-    --shadow-card-hover: 0 8px 24px rgb(0 0 0 / 0.4), 0 0 20px hsl(224 100% 64% / 0.08);
+    --shadow-card: 0 4px 12px rgb(0 0 0 / 0.4), 0 1px 4px rgb(0 0 0 / 0.2);
+    --shadow-card-hover: 0 12px 32px rgb(0 0 0 / 0.5), 0 0 24px hsl(224 100% 64% / 0.1);
 
     /* ─── BORDER RADIUS ─── */
-    --radius: 0.625rem;      /* 10px */
-    --radius-sm: 0.375rem;   /* 6px */
-    --radius-lg: 0.875rem;   /* 14px */
-    --radius-xl: 1.25rem;    /* 20px */
+    --radius: 0.75rem;       /* 12px */
+    --radius-sm: 0.5rem;      /* 8px */
+    --radius-lg: 1rem;       /* 16px */
+    --radius-xl: 1.5rem;     /* 24px */
     --radius-full: 9999px;
 
     /* ─── SIDEBAR ─── */
@@ -125,6 +125,22 @@
     background: var(--gradient-bg);
     background-attachment: fixed;
     text-rendering: optimizeLegibility;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(224, 100%, 64%, 0.03) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(258, 65%, 68%, 0.03) 0, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
   }
 
   /* ─── TYPOGRAPHY ─── */

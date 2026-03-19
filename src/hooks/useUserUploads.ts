@@ -104,7 +104,7 @@ export function useUserUploads(filters?: UploadFilters) {
             }
 
             try {
-                const { data, error } = await supabase.rpc('get_user_storage_usage', {
+                const { data, error } = await (supabase.rpc as any)('get_user_storage_usage', {
                     target_user_id: userData.user.id,
                 });
 
@@ -135,8 +135,8 @@ export function useUserUploads(filters?: UploadFilters) {
             const { data: userData } = await supabase.auth.getUser();
             if (!userData.user) throw new Error('Not authenticated');
 
-            const { data, error } = await supabase
-                .from('user_uploads')
+            const { data, error } = await (supabase
+                .from('user_uploads') as any)
                 .insert({
                     user_id: userData.user.id,
                     ...uploadData,
@@ -163,8 +163,8 @@ export function useUserUploads(filters?: UploadFilters) {
     // Delete upload mutation (soft delete)
     const deleteUploadMutation = useMutation({
         mutationFn: async (uploadId: string) => {
-            const { error } = await supabase
-                .from('user_uploads')
+            const { error } = await (supabase
+                .from('user_uploads') as any)
                 .update({ deleted_at: new Date().toISOString() })
                 .eq('id', uploadId);
 
@@ -190,8 +190,8 @@ export function useUserUploads(filters?: UploadFilters) {
     // Update upload metadata
     const updateUploadMutation = useMutation({
         mutationFn: async ({ id, updates }: { id: string; updates: Partial<UserUpload> }) => {
-            const { data, error } = await supabase
-                .from('user_uploads')
+            const { data, error } = await (supabase
+                .from('user_uploads') as any)
                 .update(updates)
                 .eq('id', id)
                 .select()
@@ -219,15 +219,15 @@ export function useUserUploads(filters?: UploadFilters) {
     // Track file access
     const trackAccessMutation = useMutation({
         mutationFn: async (uploadId: string) => {
-            const { error } = await supabase.rpc('increment', {
+            const { error } = await (supabase.rpc as any)('increment', {
                 table_name: 'user_uploads',
                 row_id: uploadId,
                 column_name: 'access_count',
             });
 
             // Also update last_accessed_at
-            await supabase
-                .from('user_uploads')
+            await (supabase
+                .from('user_uploads') as any)
                 .update({ last_accessed_at: new Date().toISOString() })
                 .eq('id', uploadId);
 
@@ -280,15 +280,15 @@ export function getSourceDisplayName(source: string): string {
     return names[source] || source;
 }
 
-// Helper function to get source icon
+// Helper function to get source icon identifier
 export function getSourceIcon(source: string): string {
     const icons: Record<string, string> = {
-        ai_chat: '📊',
-        ml_predictions: '🧠',
-        dashboard: '📈',
-        advanced_charts: '📉',
-        profile: '👤',
-        other: '📁',
+        ai_chat: 'sparkles',
+        ml_predictions: 'brain',
+        dashboard: 'layout-dashboard',
+        advanced_charts: 'line-chart',
+        profile: 'user',
+        other: 'folder-open',
     };
-    return icons[source] || '📄';
+    return icons[source] || 'file-text';
 }

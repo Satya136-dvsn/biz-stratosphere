@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { KPICard } from "@/components/dashboard/KPICard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import { PageLayout } from '@/components/layout/PageLayout';
 import { AIChatbot } from "@/components/dashboard/AIChatbot";
 import { DataUpload } from "@/components/dashboard/DataUpload";
 import { ChurnDataUpload } from "@/components/dashboard/ChurnDataUpload";
@@ -39,14 +40,14 @@ import { Upload, Filter, SlidersHorizontal } from "lucide-react";
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="flex items-center gap-3 mb-1">
-      <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
-      <div className="text-center">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/50">
+    <div className="flex items-center gap-4 mb-4">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/20 to-primary/40" />
+      <div className="px-4 py-1.5 rounded-full border border-primary/10 bg-primary/5 backdrop-blur-sm shadow-[0_0_15px_rgba(59,130,246,0.05)]">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/70">
           {title}
         </h3>
       </div>
-      <div className="h-px flex-1 bg-gradient-to-l from-border to-transparent" />
+      <div className="h-px flex-1 bg-gradient-to-l from-transparent via-primary/20 to-primary/40" />
     </div>
   );
 }
@@ -91,18 +92,22 @@ export default function Dashboard() {
   const firstName = user?.user_metadata?.display_name?.split(' ')[0] || "there";
 
   return (
-    <div id="dashboard-content" className="min-h-screen">
-      <main className="p-6 lg:p-8 space-y-8 max-w-[1600px] mx-auto">
-
-        {/* ─── Header ─── */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fade-in-up">
+    <PageLayout maxWidth="2xl">
+        {/* ─── Header Section ─── */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 lg:p-8 bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] rounded-3xl shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
+          
           <div>
-            <h2 className="text-2xl font-bold text-foreground tracking-tight">
+            <h2 className="text-3xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors duration-300">
               {getGreeting()}, {firstName}
             </h2>
-            <p className="text-sm text-muted-foreground/60 mt-0.5">
-              Here's what's happening with your business today
-            </p>
+            <div className="flex items-center gap-3 mt-1.5">
+              <p className="text-sm text-muted-foreground/60 font-medium italic">
+                Strategic Intelligence Node: Active
+              </p>
+              <div className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-mono text-emerald-500/50 uppercase tracking-widest">Real-time_Sync</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -111,31 +116,31 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="gap-2 h-8 text-xs border-border/50 text-muted-foreground hover:text-foreground"
+              className="gap-2 h-9 text-xs border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/10 transition-all font-bold uppercase tracking-widest"
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
-              Filters
+              SYSTEM_FILTERS
             </Button>
 
             <Sheet>
               <SheetTrigger asChild>
                 <Button
                   size="sm"
-                  className="gap-2 h-8 text-xs bg-primary hover:bg-primary/90 text-white"
+                  className="gap-2 h-9 text-xs bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all font-bold uppercase tracking-widest px-5"
                 >
                   <Upload className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Manage Data</span>
-                  <span className="sm:hidden">Data</span>
+                  <span className="hidden sm:inline">DATA_CONSOLE</span>
+                  <span className="sm:hidden">DATA</span>
                 </Button>
               </SheetTrigger>
               <SheetContent className="w-full sm:max-w-lg overflow-y-auto bg-[hsl(220_18%_7%)] border-[hsl(220_16%_12%)]">
                 <SheetHeader>
-                  <SheetTitle className="flex items-center gap-2 text-foreground">
+                  <SheetTitle className="flex items-center gap-2 text-foreground font-bold uppercase tracking-widest">
                     <Upload className="h-5 w-5 text-primary" />
-                    Data Manager
+                    DATA_MANAGER
                   </SheetTitle>
-                  <SheetDescription className="text-muted-foreground/60">
-                    Upload, manage, and process your business data.
+                  <SheetDescription className="text-muted-foreground/60 font-medium">
+                    Upload, manage, and process your business intelligence data assets.
                   </SheetDescription>
                 </SheetHeader>
                 <div className="space-y-6 mt-6">
@@ -269,10 +274,9 @@ export default function Dashboard() {
             <RevenueBreakdown />
           </div>
         </div>
-      </main>
-
+      
       {/* Guided Demo Tour Overlay */}
       <GuidedDemoMode isActive={showDemoTour} onClose={() => setShowDemoTour(false)} />
-    </div>
+    </PageLayout>
   );
 }

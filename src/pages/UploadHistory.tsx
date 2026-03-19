@@ -28,8 +28,26 @@ import {
     Calendar,
     FileText,
     Loader2,
+    Sparkles,
+    Brain,
+    LayoutDashboard,
+    LineChart,
+    User,
+    BarChart3,
 } from 'lucide-react';
 import { format } from 'date-fns';
+
+function SourceIcon({ source, className }: { source: string; className?: string }) {
+    const iconKey = getSourceIcon(source);
+    switch (iconKey) {
+        case 'sparkles': return <Sparkles className={className} />;
+        case 'brain': return <Brain className={className} />;
+        case 'layout-dashboard': return <LayoutDashboard className={className} />;
+        case 'line-chart': return <LineChart className={className} />;
+        case 'user': return <User className={className} />;
+        default: return <FolderOpen className={className} />;
+    }
+}
 
 export function UploadHistory() {
     const [filters, setFilters] = useState<UploadFilters>({});
@@ -198,11 +216,15 @@ export function UploadHistory() {
                     Object.entries(uploadsBySource).map(([source, sourceUploads]) => (
                         <div key={source} className="space-y-3">
                             <div className="flex items-center gap-2">
-                                <span className="text-2xl">{getSourceIcon(source)}</span>
+                                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                    <SourceIcon source={source} className="h-5 w-5" />
+                                </div>
                                 <h2 className="text-xl font-semibold">
                                     {getSourceDisplayName(source)}
                                 </h2>
-                                <Badge variant="secondary">{sourceUploads.length} files</Badge>
+                                <Badge variant="secondary" className="bg-secondary/20 border-secondary/20">
+                                    {sourceUploads.length} files
+                                </Badge>
                             </div>
 
                             <div className="grid gap-4">
@@ -226,17 +248,26 @@ export function UploadHistory() {
                                                         )}
                                                     </div>
 
-                                                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                                                        <span className="flex items-center gap-1">
-                                                            <Calendar className="h-3 w-3" />
-                                                            {format(new Date(upload.created_at), 'MMM d, yyyy h:mm a')}
+                                                    <div className="flex flex-wrap gap-4 text-xs font-medium text-muted-foreground/70">
+                                                        <span className="flex items-center gap-1.5 px-2 py-1 bg-muted/30 rounded-md">
+                                                            <Calendar className="h-3.5 w-3.5" />
+                                                            {format(new Date(upload.created_at), 'MMM d, yyyy')}
                                                         </span>
-                                                        <span>💾 {formatFileSize(upload.file_size_bytes)}</span>
+                                                        <span className="flex items-center gap-1.5 px-2 py-1 bg-muted/30 rounded-md">
+                                                            <HardDrive className="h-3.5 w-3.5" />
+                                                            {formatFileSize(upload.file_size_bytes)}
+                                                        </span>
                                                         {upload.row_count && (
-                                                            <span>📊 {upload.row_count.toLocaleString()} rows</span>
+                                                            <span className="flex items-center gap-1.5 px-2 py-1 bg-muted/30 rounded-md">
+                                                                <BarChart3 className="h-3.5 w-3.5" />
+                                                                {upload.row_count.toLocaleString()} rows
+                                                            </span>
                                                         )}
                                                         {upload.access_count > 0 && (
-                                                            <span>👁️ {upload.access_count} views</span>
+                                                            <span className="flex items-center gap-1.5 px-2 py-1 bg-muted/30 rounded-md">
+                                                                <Eye className="h-3.5 w-3.5" />
+                                                                {upload.access_count} views
+                                                            </span>
                                                         )}
                                                     </div>
 

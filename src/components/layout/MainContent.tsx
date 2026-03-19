@@ -19,10 +19,10 @@ interface MainContentProps {
  */
 export function MainContent({ children, className }: MainContentProps) {
     return (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
             <div
                 className={cn(
-                    "container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6",
+                    "container mx-auto max-w-7xl animate-fade-in",
                     className
                 )}
             >

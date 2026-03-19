@@ -199,8 +199,8 @@ export function EnhancedDataUpload() {
 
         if (scanResult.hasPII) {
           toast({
-            title: "⚠️ PII Detected",
-            description: `Found ${scanResult.piiColumns.length} columns with potential personally identifiable information. Please review and provide consent.`,
+            title: "PII Detected",
+            description: "Potential personally identifiable information found. Please review and provide consent.",
             variant: "destructive",
           });
         } else {
@@ -254,8 +254,8 @@ export function EnhancedDataUpload() {
       if (!user) throw new Error('Not authenticated');
 
       // 1. Create dataset record
-      const { data: dataset, error: datasetError } = await supabase
-        .from('datasets')
+      const { data: dataset, error: datasetError } = await (supabase
+        .from('datasets') as any)
         .insert([{
           user_id: user.id,
           name: file.name,
@@ -329,8 +329,8 @@ export function EnhancedDataUpload() {
 
       for (let i = 0; i < pointsToInsert.length; i += BATCH_SIZE) {
         const batch = pointsToInsert.slice(i, i + BATCH_SIZE);
-        const { error: batchError } = await supabase
-          .from('data_points')
+        const { error: batchError } = await (supabase
+          .from('data_points') as any)
           .insert(batch);
 
         if (batchError) {
@@ -349,8 +349,8 @@ export function EnhancedDataUpload() {
       }
 
       // 4. Update Dataset Status to Completed
-      await supabase
-        .from('datasets')
+      await (supabase
+        .from('datasets') as any)
         .update({ status: 'completed' } as any)
         .eq('id', dataset.id);
 

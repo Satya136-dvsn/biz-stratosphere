@@ -1,7 +1,3 @@
-// © 2026 VenkataSatyanarayana Duba
-// Biz Stratosphere - Proprietary Software
-// Unauthorized copying or distribution prohibited.
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -14,13 +10,36 @@ import { UsageQuotas } from "@/components/settings/UsageQuotas";
 import { SubscriptionSettings } from "@/components/settings/SubscriptionSettings";
 import { AIProviderSettings } from "@/components/settings/AIProviderSettings";
 import { useAuth } from "@/hooks/useAuth";
-import { User, Bell, Shield, Database, Save, Palette, Moon, Sun, Download, FileText, Trash2, Lock, CreditCard, Brain } from "lucide-react";
+import { 
+  User, 
+  Bell, 
+  Shield, 
+  Database, 
+  Save, 
+  Palette, 
+  Moon, 
+  Sun, 
+  Download, 
+  FileText, 
+  Trash2, 
+  Lock, 
+  CreditCard, 
+  Brain,
+  ChevronRight,
+  Sparkles,
+  Fingerprint,
+  Settings as SettingsIcon,
+  ShieldCheck,
+  Zap,
+  Loader2
+} from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { passwordSchema } from "@/lib/validation";
-import { z } from "zod";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 export function Settings() {
   const { user } = useAuth();
@@ -168,381 +187,410 @@ export function Settings() {
 
   return (
     <PageLayout>
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account settings and preferences
-        </p>
-      </div>
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <SettingsIcon className="h-5 w-5 text-primary" />
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground uppercase tracking-widest">SYSTEM_CONFIG</h1>
+            </div>
+            <p className="text-muted-foreground font-medium text-sm">
+              Global override parameters and autonomous agent preferences.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-mono text-[10px] py-1 px-3">
+                SECURE_MODE: ACTIVE
+             </Badge>
+          </div>
+        </div>
 
-      <Tabs defaultValue="account" orientation="vertical" className="flex flex-col md:flex-row gap-8 mt-8 w-full max-w-6xl mx-auto">
-        <TabsList className="flex flex-col h-auto w-full md:w-64 bg-transparent space-y-1 p-0 justify-start items-stretch sticky top-6">
-          <TabsTrigger value="account" className="gap-2">
-            <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Account</span>
-          </TabsTrigger>
-          <TabsTrigger value="ai-provider" className="gap-2">
-            <Brain className="h-4 w-4" />
-            <span className="hidden sm:inline">AI Provider</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="appearance" className="gap-2">
-            <Palette className="h-4 w-4" />
-            <span className="hidden sm:inline">Appearance</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Security</span>
-          </TabsTrigger>
-          <TabsTrigger value="privacy" className="gap-2">
-            <Lock className="h-4 w-4" />
-            <span className="hidden sm:inline">Privacy & Data</span>
-          </TabsTrigger>
-          <TabsTrigger value="usage" className="gap-2">
-            <Database className="h-4 w-4" />
-            <span className="hidden sm:inline">Usage</span>
-          </TabsTrigger>
-          <TabsTrigger value="subscription" className="gap-2">
-            <CreditCard className="h-4 w-4" />
-            <span className="inline">Subscription</span>
-          </TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="account" orientation="vertical" className="flex flex-col md:flex-row gap-10 w-full max-w-7xl mx-auto items-start">
+          <TabsList className="flex flex-col h-auto w-full md:w-72 bg-transparent space-y-2 p-0 justify-start items-stretch sticky top-6">
+            <TabsTrigger 
+              value="account" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <User className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Identity_Core</span>
+              </div>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
 
-        <div className="flex-1 max-w-4xl space-y-6">
-          {/* Account Settings */}
-        <TabsContent value="account" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
-                Update your account's profile information and email address
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Display Name</Label>
-                <Input
-                  id="name"
-                  defaultValue={user?.user_metadata?.display_name || ""}
-                  placeholder="Enter your name"
-                />
+            <TabsTrigger 
+              value="ai-provider" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <Brain className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Neural_Engine</span>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  defaultValue={user?.email || ""}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Email cannot be changed
-                </p>
-              </div>
-              <Separator />
-              <Button onClick={handleSaveProfile} className="w-full sm:w-auto">
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
 
-        {/* Notifications Settings */}
-        <TabsContent value="notifications" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>
-                Configure how you receive notifications and updates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive notifications via email
-                  </p>
-                </div>
-                <Switch
-                  checked={notifications.email}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, email: checked })
-                  }
-                />
+            <TabsTrigger 
+              value="notifications" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <Bell className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Alert_Protocols</span>
               </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Push Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive push notifications in your browser
-                  </p>
-                </div>
-                <Switch
-                  checked={notifications.push}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, push: checked })
-                  }
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Report Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Get notified when scheduled reports are ready
-                  </p>
-                </div>
-                <Switch
-                  checked={notifications.reports}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, reports: checked })
-                  }
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Alert Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive alerts for important system events
-                  </p>
-                </div>
-                <Switch
-                  checked={notifications.alerts}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, alerts: checked })
-                  }
-                />
-              </div>
-              <Separator />
-              <Button onClick={handleSaveNotifications} className="w-full sm:w-auto">
-                <Save className="mr-2 h-4 w-4" />
-                Save Preferences
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
 
-        {/* Appearance Settings */}
-        <TabsContent value="appearance" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>
-                Customize the look and feel of your dashboard
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <Label>Theme</Label>
-                <Select value={theme} onValueChange={handleThemeChange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">
-                      <div className="flex items-center gap-2">
-                        <Sun className="h-4 w-4" />
-                        Light
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="dark">
-                      <div className="flex items-center gap-2">
-                        <Moon className="h-4 w-4" />
-                        Dark
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="system">
-                      <div className="flex items-center gap-2">
-                        <Palette className="h-4 w-4" />
-                        System
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  Choose your preferred color scheme. System will use your device's settings.
-                </p>
+            <TabsTrigger 
+              value="appearance" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <Palette className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Visual_Skin</span>
               </div>
-              <Separator />
-              <div className="space-y-4">
-                <Label>Compact Mode</Label>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">
-                    Use smaller spacing for a more compact interface
-                  </p>
-                  <Switch />
-                </div>
-              </div>
-              <Separator />
-              <div className="space-y-4">
-                <Label>Animations</Label>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">
-                    Enable animations and transitions
-                  </p>
-                  <Switch defaultChecked />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
 
-        {/* Security Settings */}
-        <TabsContent value="security" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>
-                Manage your account security and password
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="font-semibold">Change Password</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="current-password">Current Password</Label>
+            <TabsTrigger 
+              value="security" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <Shield className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Defensive_Grid</span>
+              </div>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
+
+            <TabsTrigger 
+              value="privacy" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <Lock className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Data_Lockdown</span>
+              </div>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
+
+            <TabsTrigger 
+              value="usage" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <Database className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Resource_Nodes</span>
+              </div>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
+
+            <TabsTrigger 
+              value="subscription" 
+              className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary transition-all duration-300 hover:bg-muted/10 text-muted-foreground/60"
+            >
+              <div className="flex items-center gap-3">
+                <CreditCard className="h-4 w-4 group-data-[state=active]:scale-110 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Ops_License</span>
+              </div>
+              <ChevronRight className="h-3 w-3 opacity-0 group-data-[state=active]:opacity-100 transition-opacity" />
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex-1 max-w-4xl w-full translate-y-0 opacity-100 transition-all duration-500">
+            {/* Account Settings */}
+          <TabsContent value="account" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 to-transparent" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                   <Fingerprint className="h-4 w-4 text-primary" />
+                   PROFILE_SYNOPSIS
+                </CardTitle>
+                <CardDescription className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/40">OPERATOR_IDENTITY_DESCRIPTORS</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">DISPLAY_LABEL</Label>
                   <Input
-                    id="current-password"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    id="name"
+                    defaultValue={user?.user_metadata?.display_name || ""}
+                    placeholder="Enter branding name"
+                    className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">NODE_ADDRESS</Label>
                   <Input
-                    id="new-password"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    id="email"
+                    type="email"
+                    defaultValue={user?.email || ""}
+                    disabled
+                    className="h-11 bg-muted/20 border-border/10 text-muted-foreground/50 font-mono italic"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Must be at least 8 characters with uppercase, lowercase, number, and special char.
+                  <p className="text-[10px] text-muted-foreground/40 font-mono tracking-tighter">
+                    NODE_ADDRESS_IS_IMMUTABLE_FOR_CURRENT_EPOCH
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
-                </div>
-                <Button
-                  className="w-full sm:w-auto"
-                  onClick={handleChangePassword}
-                  disabled={passwordLoading || !currentPassword || !newPassword}
-                >
-                  {passwordLoading ? "Updating..." : "Update Password"}
+                <Separator className="bg-[hsl(220_16%_14%)]" />
+                <Button onClick={handleSaveProfile} className="h-11 px-8 font-bold uppercase tracking-widest text-[10px] bg-primary text-primary-foreground hover:scale-[1.02] transition-transform">
+                  <Save className="mr-2 h-4 w-4" />
+                  COMMIT_IDENTITY
                 </Button>
-              </div>
-              <Separator />
-              <div className="space-y-4">
-                <h3 className="font-semibold">Two-Factor Authentication</h3>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">2FA Status</p>
-                    <p className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-              </div>
-              <Separator />
-              <div className="space-y-4">
-                <h3 className="font-semibold">Active Sessions</h3>
-                <p className="text-sm text-muted-foreground">
-                  You are currently signed in on 1 device
-                </p>
-                <Button variant="outline">View All Sessions</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        {/* Privacy Settings */}
-        <TabsContent value="privacy" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Data Privacy & Portability</CardTitle>
-              <CardDescription>
-                Manage your personal data and retention settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
+          {/* Notifications Settings */}
+          <TabsContent value="notifications" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary/40 to-transparent" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                   <Bell className="h-4 w-4 text-secondary" />
+                   FEEDBACK_CHANNELS
+                </CardTitle>
+                <CardDescription className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/40">EVENT_DOCKING_PREFERENCES</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between p-4 rounded-xl bg-orange-500/5 border border-orange-500/10 group">
                   <div className="space-y-1">
-                    <h3 className="font-semibold flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-primary" />
-                      GDPR Data Export
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Download a copy of all your personal data, including profile info, logs, and automation rules.
-                    </p>
+                    <Label className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">EMAIL_TRANSMISSION</Label>
+                    <p className="text-xs text-muted-foreground/60 uppercase">DOCK_ALERTS_TO_REGISTERED_INBOX</p>
                   </div>
-                  <Button variant="outline" onClick={handleExportData} disabled={isExporting}>
-                    {isExporting ? (
-                      <span className="flex items-center gap-2">Generating...</span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Download className="h-4 w-4" />
-                        Export Data
-                      </span>
-                    )}
+                  <Switch
+                    checked={notifications.email}
+                    onCheckedChange={(checked) =>
+                      setNotifications({ ...notifications, email: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4 rounded-xl bg-primary/5 border border-primary/10 group">
+                  <div className="space-y-1">
+                    <Label className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">BROWSER_PUSH</Label>
+                    <p className="text-xs text-muted-foreground/60 uppercase">REALTIME_WEB_SOCKET_INTERRUPTS</p>
+                  </div>
+                  <Switch
+                    checked={notifications.push}
+                    onCheckedChange={(checked) =>
+                      setNotifications({ ...notifications, push: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 group">
+                  <div className="space-y-1">
+                    <Label className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">REPORT_GENERATION</Label>
+                    <p className="text-xs text-muted-foreground/60 uppercase">NOTIFY_ON_ANALYTIC_SYNTHESIS_COMPLETION</p>
+                  </div>
+                  <Switch
+                    checked={notifications.reports}
+                    onCheckedChange={(checked) =>
+                      setNotifications({ ...notifications, reports: checked })
+                    }
+                  />
+                </div>
+                <Separator className="bg-[hsl(220_16%_14%)]" />
+                <Button onClick={handleSaveNotifications} className="h-11 px-8 font-bold uppercase tracking-widest text-[10px] bg-secondary text-secondary-foreground hover:scale-[1.02] transition-transform">
+                  <Save className="mr-2 h-4 w-4" />
+                  SAVE_PROTOCOL
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Appearance Settings */}
+          <TabsContent value="appearance" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/40 to-transparent" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                   <Zap className="h-4 w-4 text-emerald-500" />
+                   HUD_CONFIGURATION
+                </CardTitle>
+                <CardDescription className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/40">VISUAL_INTERFACE_PARAMETERS</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                <div className="space-y-4">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">COLOR_SPECTRUM_MODE</Label>
+                  <Select value={theme} onValueChange={handleThemeChange}>
+                    <SelectTrigger className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_12%)]">
+                      <SelectItem value="light">
+                        <div className="flex items-center gap-2">
+                          <Sun className="h-4 w-4 text-orange-400" />
+                          <span className="font-mono text-xs uppercase">Solaris_Light</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="dark">
+                        <div className="flex items-center gap-2">
+                          <Moon className="h-4 w-4 text-primary" />
+                          <span className="font-mono text-xs uppercase">Obsidian_Dark</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="system">
+                        <div className="flex items-center gap-2">
+                          <Palette className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-mono text-xs uppercase">Auto_Sync_OS</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Separator className="bg-[hsl(220_16%_14%)]" />
+                
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                       <Label className="text-sm font-bold tracking-tight">DENSE_LAYOUT</Label>
+                       <p className="text-[10px] text-muted-foreground/60 uppercase">MINIMIZE_INTERFACE_PADDING_AND_HUD_SPACING</p>
+                    </div>
+                    <Switch />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                       <Label className="text-sm font-bold tracking-tight">FLUID_TRANSITIONS</Label>
+                       <p className="text-[10px] text-muted-foreground/60 uppercase">ENABLE_SMOOTH_CSS_ANIMATIONS_AND_GLASS_BLUR</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security Settings */}
+          <TabsContent value="security" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500/40 to-transparent" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                   <ShieldCheck className="h-4 w-4 text-red-500" />
+                   SECURITY_OVERRIDE
+                </CardTitle>
+                <CardDescription className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/40">PASSPHRASE_AND_GRID_HARDENING</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                <div className="space-y-6">
+                  <div className="grid gap-4">
+                    <div className="space-y-3">
+                      <Label htmlFor="current-password" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">EXISTING_PHRASE</Label>
+                      <Input
+                        id="current-password"
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <Label htmlFor="new-password" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">NEW_IDENT_KEY</Label>
+                        <Input
+                          id="new-password"
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <Label htmlFor="confirm-password" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">CONFIRM_KEY</Label>
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    className="h-11 px-8 font-bold uppercase tracking-widest text-[10px] bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all hover:scale-[1.02]"
+                    onClick={handleChangePassword}
+                    disabled={passwordLoading || !currentPassword || !newPassword}
+                  >
+                    {passwordLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Shield className="mr-2 h-4 w-4" />}
+                    ROTATE_SECURITY_KEYS
                   </Button>
                 </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                    Data Retention Policy
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Biz Stratosphere automatically retains system logs (automations, notifications, alerts) for <strong>90 days</strong>.
-                    Old logs are securely deleted permanently.
-                  </p>
-
-                  <div className="mt-4 p-4 bg-muted/50 rounded-lg text-sm border">
-                    <p>Current Policy: <strong>90 Days</strong></p>
-                    <p className="text-xs text-muted-foreground mt-1">Logs created before {new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toLocaleDateString()} will be removed during the next scheduled cleanup.</p>
+                
+                <Separator className="bg-[hsl(220_16%_14%)]" />
+                
+                <div className="p-4 rounded-xl bg-muted/5 border border-dashed border-muted-foreground/20">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold tracking-tight uppercase">MULTI_FACTOR_AUTH</p>
+                      <p className="text-[10px] text-muted-foreground/60 uppercase">HARDEN_ACCESS_WITH_TEMPORAL_CODES</p>
+                    </div>
+                    <Switch />
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        {/* Usage Settings */}
-        <TabsContent value="usage" className="space-y-4">
-          <UsageQuotas />
-        </TabsContent>
+          {/* Privacy Settings */}
+          <TabsContent value="privacy" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/40 to-transparent" />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                   <Lock className="h-4 w-4 text-blue-500" />
+                   DATA_SOVEREIGNTY
+                </CardTitle>
+                <CardDescription className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/40 font-mono">PORTABILITY_AND_RETENTION_POLICY</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                <div className="flex items-center justify-between p-6 rounded-2xl bg-primary/5 border border-primary/10 group">
+                  <div className="space-y-1">
+                    <h3 className="font-bold flex items-center gap-2 text-sm uppercase tracking-wide group-hover:text-primary transition-colors">
+                      <FileText className="h-4 w-4 text-primary" />
+                      GDPR_EXTRACT_REQUEST
+                    </h3>
+                    <p className="text-[10px] text-muted-foreground/60 uppercase max-w-sm font-medium">DENSE_SYNCHRONOUS_EXPORT_OF_ALL_NODE_RELATED_METADATA</p>
+                  </div>
+                  <Button variant="outline" onClick={handleExportData} disabled={isExporting} className="h-10 px-6 font-mono text-[10px] tracking-widest uppercase bg-background/50 border-primary/20 hover:bg-primary/10 hover:text-primary transition-all">
+                    {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : "INIT_EXPORT"}
+                  </Button>
+                </div>
 
-        {/* AI Provider Settings */}
-        <TabsContent value="ai-provider" className="space-y-4">
-          <AIProviderSettings />
-        </TabsContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    <Trash2 className="h-3 w-3" />
+                    PURGE_PROTOCOL_STATUS
+                  </div>
+                  <div className="p-6 rounded-2xl bg-muted/5 border border-[hsl(220_16%_12%)] space-y-4">
+                    <p className="text-xs leading-relaxed text-muted-foreground uppercase font-medium">Standard retention is active: <strong className="text-foreground border-b border-foreground/20 italic">90_SOLAR_DAYS</strong>. Systems logs are automatically purged beyond this TTL.</p>
+                    <Badge variant="outline" className="bg-muted/10 text-muted-foreground border-muted-foreground/20 font-mono text-[9px] py-1 px-3">ENFORCED_GLOBAL_POLICY</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        {/* Subscription Settings */}
-        <TabsContent value="subscription" className="space-y-4 m-0">
-          <SubscriptionSettings />
-        </TabsContent>
-        </div>
-      </Tabs>
+          {/* Usage Settings */}
+          <TabsContent value="usage" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <UsageQuotas />
+          </TabsContent>
+
+          {/* AI Provider Settings */}
+          <TabsContent value="ai-provider" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <AIProviderSettings />
+          </TabsContent>
+
+          {/* Subscription Settings */}
+          <TabsContent value="subscription" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+            <SubscriptionSettings />
+          </TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </PageLayout>
   );
 }

@@ -242,9 +242,9 @@ export function Monitoring() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-sm text-muted-foreground">
-                        <p>✅ Performance monitoring active</p>
-                        <p>✅ Error tracking enabled</p>
-                        <p>✅ Real-time metrics collection</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Performance monitoring active</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Error tracking enabled</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Real-time metrics collection</p>
                         <p className="mt-4">
                             For production deployment, integrate with services like:
                             <ul className="list-disc list-inside mt-2">

@@ -25,7 +25,7 @@ import { useChartConfigurations, exportChartAsImage, exportDataAsCSV } from '@/h
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Save, Download, FileDown, Loader2, Info, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
+import { Save, Download, FileDown, Loader2, Info, ChevronLeft, ChevronRight, CheckCircle, BarChart3, Palette } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PageLayout } from '@/components/layout/PageLayout';
@@ -284,10 +284,19 @@ export default function AdvancedCharts() {
                     <p className="text-muted-foreground max-w-md">
                         Select a dataset from the sidebar and choose your chart type to begin visualizing your data
                     </p>
-                    <div className="mt-6 flex gap-2 text-sm text-muted-foreground">
-                        <span className="px-3 py-1 bg-secondary rounded-full">📊 8 Chart Types</span>
-                        <span className="px-3 py-1 bg-secondary rounded-full">🎨 Customizable</span>
-                        <span className="px-3 py-1 bg-secondary rounded-full">💾 Save Configs</span>
+                    <div className="mt-6 flex flex-wrap justify-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/20 border border-secondary/20 rounded-lg">
+                            <BarChart3 className="h-3 w-3 text-primary" />
+                            8_CHART_TYPES
+                        </span>
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/20 border border-secondary/20 rounded-lg">
+                            <Palette className="h-3 w-3 text-primary" />
+                            CUSTOMIZABLE
+                        </span>
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary/20 border border-secondary/20 rounded-lg">
+                            <Save className="h-3 w-3 text-primary" />
+                            SAVE_CONFIGS
+                        </span>
                     </div>
                 </div>
             );

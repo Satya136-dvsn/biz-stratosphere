@@ -121,26 +121,36 @@ export function CommandBar() {
     }, []);
 
     return (
-        <div className="sticky top-0 z-40 flex items-center justify-between px-6 py-3 border-b border-border/50 bg-card/50 backdrop-blur-xl">
-            {/* Search */}
-            <div className="flex-1 max-w-md relative" ref={searchRef}>
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            setShowResults(true);
-                        }}
-                        onFocus={() => setShowResults(true)}
-                        placeholder="Search... (Cmd+K)"
-                        className="pl-9 pr-16 bg-muted/50 border-border/50 focus-visible:ring-primary/50"
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-muted-foreground">
-                        <Command className="h-3 w-3" />
-                        <span>K</span>
+        <header className="sticky top-0 z-40 w-full border-b border-primary/10 bg-background/60 backdrop-blur-xl transition-all duration-300">
+            <div className="flex h-16 items-center justify-between px-6">
+                {/* Left - Branding or Page Title placeholder (can be expanded later) */}
+                <div className="flex items-center gap-4">
+                    <div className="flex md:hidden items-center gap-2">
+                        <img src="/logo-orbit.png" alt="Logo" className="h-7 w-7 object-contain" />
+                        <span className="text-sm font-bold tracking-tight">Stratosphere</span>
                     </div>
                 </div>
+
+                {/* Center - Search */}
+                <div className="flex-1 max-w-xl relative mx-8" ref={searchRef}>
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-primary/5 rounded-lg blur-md opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 group-focus-within:text-primary transition-colors" />
+                        <Input
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setShowResults(true);
+                            }}
+                            onFocus={() => setShowResults(true)}
+                            placeholder="Search command or page... (Cmd+K)"
+                            className="pl-9 pr-16 bg-[hsl(220_16%_9%)]/50 border-primary/10 transition-all focus-visible:ring-primary/30 h-10 text-[13px] rounded-lg"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 px-1.5 py-0.5 rounded border border-border/50 bg-muted/30 text-[10px] text-muted-foreground/50 font-mono">
+                            <span className="text-[9px]">⌘</span>
+                            <span>K</span>
+                        </div>
+                    </div>
 
                 {/* Search Results Dropdown */}
                 {showResults && isSearching && (
@@ -300,7 +310,8 @@ export function CommandBar() {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+                </div>
             </div>
-        </div>
+        </header>
     );
 }

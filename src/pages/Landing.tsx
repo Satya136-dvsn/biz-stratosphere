@@ -165,7 +165,7 @@ export default function LandingPage() {
                                 model="Churn Predictor v2.1"
                                 prediction="82% likely to churn"
                                 action="Offered 20% discount"
-                                outcome="Customer retained ✓"
+                                outcome="Customer retained"
                                 confidence={82}
                             />
                             <DecisionLogEntry
@@ -373,7 +373,10 @@ function DecisionLogEntry({
             <p className="text-muted-foreground/60 text-[12px]">
                 <span className="text-secondary font-medium">Action:</span> {action}
             </p>
-            <p className="text-emerald-400 text-[11px] font-semibold">{outcome}</p>
+            <div className="flex items-center gap-1.5 pt-0.5">
+                <Check className="h-3 w-3 text-emerald-400" />
+                <p className="text-emerald-400 text-[11px] font-semibold">{outcome}</p>
+            </div>
         </div>
     );
 }
