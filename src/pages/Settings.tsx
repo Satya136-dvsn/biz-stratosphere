@@ -286,7 +286,7 @@ export function Settings() {
           <div className="flex-1 max-w-4xl w-full translate-y-0 opacity-100 transition-all duration-500">
             {/* Account Settings */}
           <TabsContent value="account" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+            <Card className="bg-card/50 backdrop-blur-xl border border-border shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 to-transparent" />
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -302,7 +302,7 @@ export function Settings() {
                     id="name"
                     defaultValue={user?.user_metadata?.display_name || ""}
                     placeholder="Enter branding name"
-                    className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
+                    className="h-11 bg-muted/50 border-input focus-visible:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-3">
@@ -318,7 +318,7 @@ export function Settings() {
                     NODE_ADDRESS_IS_IMMUTABLE_FOR_CURRENT_EPOCH
                   </p>
                 </div>
-                <Separator className="bg-[hsl(220_16%_14%)]" />
+                <Separator className="bg-border" />
                 <Button onClick={handleSaveProfile} className="h-11 px-8 font-bold uppercase tracking-widest text-[10px] bg-primary text-primary-foreground hover:scale-[1.02] transition-transform">
                   <Save className="mr-2 h-4 w-4" />
                   COMMIT_IDENTITY
@@ -329,7 +329,7 @@ export function Settings() {
 
           {/* Notifications Settings */}
           <TabsContent value="notifications" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+            <Card className="bg-card/50 backdrop-blur-xl border border-border shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary/40 to-transparent" />
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -375,7 +375,7 @@ export function Settings() {
                     }
                   />
                 </div>
-                <Separator className="bg-[hsl(220_16%_14%)]" />
+                <Separator className="bg-border" />
                 <Button onClick={handleSaveNotifications} className="h-11 px-8 font-bold uppercase tracking-widest text-[10px] bg-secondary text-secondary-foreground hover:scale-[1.02] transition-transform">
                   <Save className="mr-2 h-4 w-4" />
                   SAVE_PROTOCOL
@@ -386,7 +386,7 @@ export function Settings() {
 
           {/* Appearance Settings */}
           <TabsContent value="appearance" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+            <Card className="bg-card/50 backdrop-blur-xl border border-border shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/40 to-transparent" />
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -399,10 +399,10 @@ export function Settings() {
                 <div className="space-y-4">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">COLOR_SPECTRUM_MODE</Label>
                   <Select value={theme} onValueChange={setTheme}>
-                    <SelectTrigger className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)]">
+                    <SelectTrigger className="h-11 bg-muted/50 border-input">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_12%)]">
+                    <SelectContent className="bg-popover border-border">
                       <SelectItem value="light">
                         <div className="flex items-center gap-2">
                           <Sun className="h-4 w-4 text-orange-400" />
@@ -425,7 +425,7 @@ export function Settings() {
                   </Select>
                 </div>
                 
-                <Separator className="bg-[hsl(220_16%_14%)]" />
+                <Separator className="bg-border" />
                 
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
@@ -449,7 +449,7 @@ export function Settings() {
 
           {/* Security Settings */}
           <TabsContent value="security" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+            <Card className="bg-card/50 backdrop-blur-xl border border-border shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500/40 to-transparent" />
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -468,7 +468,7 @@ export function Settings() {
                         type="password"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
+                        className="h-11 bg-muted/50 border-input focus-visible:ring-primary/20"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -479,7 +479,7 @@ export function Settings() {
                           type="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
+                          className="h-11 bg-muted/50 border-input focus-visible:ring-primary/20"
                         />
                       </div>
                       <div className="space-y-3">
@@ -489,7 +489,7 @@ export function Settings() {
                           type="password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="h-11 bg-[hsl(220_18%_9%)] border-[hsl(220_16%_16%)] focus-visible:ring-primary/20"
+                          className="h-11 bg-muted/50 border-input focus-visible:ring-primary/20"
                         />
                       </div>
                     </div>
@@ -504,7 +504,7 @@ export function Settings() {
                   </Button>
                 </div>
                 
-                <Separator className="bg-[hsl(220_16%_14%)]" />
+                <Separator className="bg-border" />
                 
                 <div className="p-4 rounded-xl bg-muted/5 border border-dashed border-muted-foreground/20">
                   <div className="flex items-center justify-between">
@@ -521,7 +521,7 @@ export function Settings() {
 
           {/* Privacy Settings */}
           <TabsContent value="privacy" className="space-y-6 mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-            <Card className="bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] shadow-2xl relative overflow-hidden">
+            <Card className="bg-card/50 backdrop-blur-xl border border-border shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/40 to-transparent" />
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -549,7 +549,7 @@ export function Settings() {
                     <Trash2 className="h-3 w-3" />
                     PURGE_PROTOCOL_STATUS
                   </div>
-                  <div className="p-6 rounded-2xl bg-muted/5 border border-[hsl(220_16%_12%)] space-y-4">
+                  <div className="p-6 rounded-2xl bg-muted/5 border border-border space-y-4">
                     <p className="text-xs leading-relaxed text-muted-foreground uppercase font-medium">Standard retention is active: <strong className="text-foreground border-b border-foreground/20 italic">90_SOLAR_DAYS</strong>. Systems logs are automatically purged beyond this TTL.</p>
                     <Badge variant="outline" className="bg-muted/10 text-muted-foreground border-muted-foreground/20 font-mono text-[9px] py-1 px-3">ENFORCED_GLOBAL_POLICY</Badge>
                   </div>

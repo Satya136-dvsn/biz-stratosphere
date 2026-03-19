@@ -37,13 +37,13 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
   }
 
   const CHART_HEIGHT = 320;
-  // Use a more professional color palette
-  const STRATEGIC_BLUE = "hsl(221, 83%, 53%)";
-  const STRATEGIC_PURPLE = "hsl(262, 83%, 58%)";
-  const STRATEGIC_EMERALD = "hsl(142, 71%, 45%)";
-  const STRATEGIC_AMBER = "hsl(38, 92%, 50%)";
+  // Use theme variables for more professional color palette
+  const STRATEGIC_BLUE = "hsl(var(--primary))";
+  const STRATEGIC_PURPLE = "hsl(var(--secondary))";
+  const STRATEGIC_EMERALD = "hsl(var(--success))";
+  const STRATEGIC_AMBER = "hsl(var(--warning))";
   
-  const COLORS = [STRATEGIC_BLUE, STRATEGIC_PURPLE, STRATEGIC_EMERALD, STRATEGIC_AMBER, '#ff8042'];
+  const COLORS = [STRATEGIC_BLUE, STRATEGIC_PURPLE, STRATEGIC_EMERALD, STRATEGIC_AMBER, 'hsl(var(--accent))'];
 
   const renderChart = () => {
     // 1. BAR CHART
@@ -57,10 +57,10 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                 <stop offset="100%" stopColor={STRATEGIC_PURPLE} stopOpacity={0.8} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.03)" />
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="hsl(var(--border) / 0.3)" />
             <XAxis 
               dataKey="month" 
-              stroke="rgba(255,255,255,0.3)" 
+              stroke="hsl(var(--muted-foreground) / 0.5)" 
               fontSize={10}
               tickLine={false}
               axisLine={false}
@@ -68,14 +68,14 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
               fontFamily="JetBrains Mono, monospace"
             />
             <YAxis 
-              stroke="rgba(255,255,255,0.3)"
+              stroke="hsl(var(--muted-foreground) / 0.5)"
               fontSize={10}
               tickLine={false}
               axisLine={false}
               tickFormatter={(v) => metric === 'revenue' ? `$${v/1000}k` : v}
               fontFamily="JetBrains Mono, monospace"
             />
-            <Tooltip content={<GlassTooltip formatter={metric === 'revenue' ? (v) => formatCurrency(v as number) : (v) => formatNumber(v as number)} />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+            <Tooltip content={<GlassTooltip formatter={metric === 'revenue' ? (v) => formatCurrency(v as number) : (v) => formatNumber(v as number)} />} cursor={{ fill: 'hsl(var(--muted) / 0.3)' }} />
             <Bar 
               dataKey={metric} 
               fill="url(#barGradient)" 
@@ -100,10 +100,10 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                 <stop offset="95%" stopColor={STRATEGIC_BLUE} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.03)" />
+            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="hsl(var(--border) / 0.3)" />
             <XAxis 
               dataKey="month" 
-              stroke="rgba(255,255,255,0.3)" 
+              stroke="hsl(var(--muted-foreground) / 0.5)" 
               fontSize={10}
               tickLine={false}
               axisLine={false}
@@ -111,7 +111,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
               fontFamily="JetBrains Mono, monospace"
             />
             <YAxis 
-              stroke="rgba(255,255,255,0.3)"
+              stroke="hsl(var(--muted-foreground) / 0.5)"
               fontSize={10}
               tickLine={false}
               axisLine={false}
@@ -172,10 +172,10 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
     return (
       <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
         <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="rgba(255,255,255,0.03)" />
+          <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="hsl(var(--border) / 0.3)" />
           <XAxis 
             dataKey="month" 
-            stroke="rgba(255,255,255,0.3)" 
+            stroke="hsl(var(--muted-foreground) / 0.5)" 
             fontSize={10}
             tickLine={false}
             axisLine={false}
@@ -183,7 +183,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
             fontFamily="JetBrains Mono, monospace"
           />
           <YAxis 
-            stroke="rgba(255,255,255,0.3)"
+            stroke="hsl(var(--muted-foreground) / 0.5)"
             fontSize={10}
             tickLine={false}
             axisLine={false}
@@ -199,7 +199,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                 dataKey="revenue" 
                 stroke={STRATEGIC_BLUE} 
                 strokeWidth={3} 
-                dot={{ r: 4, strokeWidth: 2, fill: '#0c0c0e' }} 
+                dot={{ r: 4, strokeWidth: 2, fill: 'hsl(var(--background))' }} 
                 activeDot={{ r: 6, strokeWidth: 0, fill: STRATEGIC_BLUE }} 
                 animationDuration={1500}
                 name="Actual Revenue"
@@ -210,7 +210,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
                 stroke={STRATEGIC_EMERALD} 
                 strokeWidth={2} 
                 strokeDasharray="5 5" 
-                dot={{ r: 2, strokeWidth: 2, fill: '#0c0c0e' }} 
+                dot={{ r: 2, strokeWidth: 2, fill: 'hsl(var(--background))' }} 
                 activeDot={{ r: 4, strokeWidth: 0, fill: STRATEGIC_EMERALD }} 
                 animationDuration={1500}
                 name="System Target"
@@ -222,7 +222,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
               dataKey="customers" 
               stroke={STRATEGIC_PURPLE} 
               strokeWidth={3} 
-              dot={{ r: 4, strokeWidth: 2, fill: '#0c0c0e' }} 
+              dot={{ r: 4, strokeWidth: 2, fill: 'hsl(var(--background))' }} 
               activeDot={{ r: 6, strokeWidth: 0, fill: STRATEGIC_PURPLE }} 
               animationDuration={1500}
               name="Active Entities"
@@ -234,7 +234,7 @@ export function RevenueChart({ variant, title, className, data, isLoading, metri
   };
 
   return (
-    <Card className={cn("bg-[hsl(220_18%_7%)]/40 border-[hsl(220_16%_12%)] backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden group/card", className)}>
+    <Card className={cn("bg-card/40 border-border/40 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden group/card", className)}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground/60 transition-colors group-hover/card:text-primary/70">
           {title}

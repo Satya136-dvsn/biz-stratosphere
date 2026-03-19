@@ -186,7 +186,7 @@ export function CommandBar() {
                             }}
                             onFocus={() => setShowResults(true)}
                             placeholder="Search command or page..."
-                            className="pl-9 pr-16 bg-[hsl(220_16%_9%)]/50 border-primary/10 transition-all focus-visible:ring-primary/30 h-10 text-[13px] rounded-lg w-full"
+                            className="pl-9 pr-16 bg-muted/30 border-primary/10 transition-all focus-visible:ring-primary/30 h-10 text-[13px] rounded-lg w-full"
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                             {/* Collapse button for mobile */}

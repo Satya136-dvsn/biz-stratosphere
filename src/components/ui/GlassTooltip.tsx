@@ -21,9 +21,9 @@ export function GlassTooltip({
 }: GlassTooltipProps) {
     if (active && payload && payload.length) {
         return (
-            <div className="bg-[hsl(220_18%_7%)]/80 border border-[hsl(220_16%_14%)] rounded-xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl text-sm animate-in fade-in zoom-in-95 duration-200 ring-1 ring-white/5">
-                <p className="text-foreground/90 font-bold mb-3 uppercase tracking-widest text-[10px] sm:text-[11px] border-b border-border/10 pb-2">{label}</p>
-                <div className="space-y-2.5">
+            <div className="bg-popover/80 border border-border rounded-xl p-2.5 shadow-xl backdrop-blur-xl text-xs animate-in fade-in zoom-in-95 duration-200 ring-1 ring-border/5 min-w-[140px]">
+                <p className="text-foreground/90 font-bold mb-2 uppercase tracking-[0.15em] text-[9px] border-b border-border/10 pb-1.5">{label}</p>
+                <div className="space-y-1.5">
                     {payload.map((entry, index) => {
                         const name = entry.name;
                         const value = entry.value;
@@ -36,23 +36,23 @@ export function GlassTooltip({
                                 : value);
 
                         return (
-                            <div key={index} className="flex items-center gap-4 group/item">
+                            <div key={index} className="flex items-center gap-3 group/item">
                                 {indicator === 'dot' && (
                                     <div
-                                        className="w-2.5 h-2.5 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)] ring-2 ring-white/10 transition-transform group-hover/item:scale-110"
-                                        style={{ backgroundColor: color, boxShadow: `0 0 12px ${color}40` }}
+                                        className="w-2 h-2 rounded-full shadow-sm ring-1 ring-border/10 transition-transform group-hover/item:scale-110"
+                                        style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}40` }}
                                     />
                                 )}
                                 {indicator === 'line' && (
                                     <div
-                                        className="w-1.5 h-4 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.3)]"
+                                        className="w-1 h-3 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.3)]"
                                         style={{ backgroundColor: color }}
                                     />
                                 )}
-                                <span className="text-muted-foreground/80 capitalize text-[11px] font-semibold tracking-wide">
+                                <span className="text-muted-foreground/90 capitalize text-[10px] font-medium tracking-tight">
                                     {name}
                                 </span>
-                                <span className="text-foreground font-mono ml-auto pl-6 font-bold text-xs">
+                                <span className="text-foreground font-mono ml-auto pl-4 font-black text-[11px]">
                                     {formattedValue}
                                 </span>
                             </div>

@@ -31,8 +31,8 @@ export function PageLayout({ children, className, maxWidth = "7xl" }: PageLayout
             className={cn(
                 "w-full min-h-screen overflow-x-hidden animate-content-reveal",
                 maxWidthClasses[maxWidth],
-                "mx-auto px-4 sm:px-6 lg:px-8 py-8",
-                "space-y-8",
+                "mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6",
+                "space-y-4 sm:space-y-6",
                 className
             )}
         >

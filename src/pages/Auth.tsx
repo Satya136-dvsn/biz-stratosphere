@@ -143,11 +143,11 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[hsl(220_20%_5%)]">
+    <div className="min-h-screen flex bg-background">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden border-r border-[hsl(220_16%_12%)]">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden border-r border-border">
         {/* Background */}
-        <div className="absolute inset-0 bg-[hsl(220_20%_4%)]" />
+        <div className="absolute inset-0 bg-background/50" />
         <div className="absolute top-1/4 left-1/3 w-[400px] h-[400px] bg-primary/6 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
 
@@ -173,14 +173,14 @@ export default function Auth() {
             </p>
 
             <div className="space-y-3 pt-2">
-              <div className="flex items-start gap-3 p-3.5 rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)]">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl border border-border bg-card">
                 <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <h3 className="text-[13px] font-semibold text-foreground">AI-Powered Analytics</h3>
                   <p className="text-[12px] text-muted-foreground/50">Get instant insights with machine learning predictions</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-3.5 rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)]">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl border border-border bg-card">
                 <TrendingUp className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <h3 className="text-[13px] font-semibold text-foreground">Real-Time Dashboards</h3>
@@ -204,14 +204,14 @@ export default function Auth() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)] p-6">
+          <div className="rounded-xl border border-border bg-card p-6">
             <div className="mb-5">
               <h3 className="text-xl font-bold text-foreground">Welcome</h3>
               <p className="text-[13px] text-muted-foreground/50 mt-0.5">Sign in to your account or create a new one</p>
             </div>
 
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-5 bg-[hsl(220_16%_9%)] border border-[hsl(220_16%_14%)]">
+              <TabsList className="grid w-full grid-cols-2 mb-5 bg-muted/50 border border-border">
                 <TabsTrigger value="signin" className="text-[13px] data-[state=active]:bg-primary/15 data-[state=active]:text-primary">Sign In</TabsTrigger>
                 <TabsTrigger value="signup" className="text-[13px] data-[state=active]:bg-primary/15 data-[state=active]:text-primary">Sign Up</TabsTrigger>
               </TabsList>
@@ -225,7 +225,7 @@ export default function Auth() {
                       <Input
                         id="email" type="email" placeholder="you@example.com"
                         value={email} onChange={(e) => setEmail(e.target.value)}
-                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        className="pl-9 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
                         required autoComplete="email"
                       />
                     </div>
@@ -237,7 +237,7 @@ export default function Auth() {
                       <Input
                         id="password" type="password" placeholder="••••••••"
                         value={password} onChange={(e) => setPassword(e.target.value)}
-                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        className="pl-9 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
                         required autoComplete="current-password"
                       />
                     </div>
@@ -254,16 +254,16 @@ export default function Auth() {
 
                   <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-[hsl(220_16%_14%)]" />
+                      <span className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-[11px] uppercase">
-                      <span className="bg-[hsl(220_18%_7%)] px-2 text-muted-foreground/40">Or</span>
+                      <span className="bg-card px-2 text-muted-foreground/40">Or</span>
                     </div>
                   </div>
 
                   <Button
                     type="button" variant="outline"
-                    className="w-full border-[hsl(220_16%_16%)] hover:bg-primary/5 hover:border-primary/20 text-muted-foreground hover:text-foreground h-10 text-[13px]"
+                    className="w-full border-input hover:bg-primary/5 hover:border-primary/20 text-muted-foreground hover:text-foreground h-10 text-[13px]"
                     disabled={loading}
                     onClick={async () => {
                       const demoEmail = 'demo@bizstratosphere.com';
@@ -314,7 +314,7 @@ export default function Auth() {
                       <Input
                         id="signup-name" type="text" placeholder="John Doe"
                         value={displayName} onChange={(e) => setDisplayName(e.target.value)}
-                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        className="pl-9 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
                         autoComplete="name"
                       />
                     </div>
@@ -326,7 +326,7 @@ export default function Auth() {
                       <Input
                         id="signup-email" type="email" placeholder="you@example.com"
                         value={email} onChange={(e) => setEmail(e.target.value)}
-                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        className="pl-9 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
                         required autoComplete="email"
                       />
                     </div>
@@ -338,7 +338,7 @@ export default function Auth() {
                       <Input
                         id="signup-password" type="password" placeholder="••••••••"
                         value={password} onChange={(e) => setPassword(e.target.value)}
-                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        className="pl-9 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
                         required autoComplete="new-password"
                       />
                     </div>

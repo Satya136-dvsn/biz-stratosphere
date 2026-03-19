@@ -72,31 +72,31 @@ export function KPICard({
   };
 
   const accentColor = {
-    revenue: "hsl(142 71% 45%)",
-    growth: "hsl(36 95% 55%)",
-    warning: "hsl(36 95% 55%)",
-    info: "hsl(224 100% 64%)",
+    revenue: "hsl(var(--revenue))",
+    growth: "hsl(var(--growth))",
+    warning: "hsl(var(--warning))",
+    info: "hsl(var(--primary))",
   }[variant];
 
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7.5%)]",
-        "transition-all duration-300 hover:-translate-y-0.5 hover:border-[hsl(220_16%_20%)]",
-        "hover:shadow-lg"
+        "group relative overflow-hidden rounded-xl border border-border/40 bg-card/60",
+        "transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/20",
+        "hover:shadow-md"
       )}
       data-testid="kpi-card"
       data-testid-title={title.toLowerCase().replace(/\s+/g, "-")}
     >
       {/* Top accent line */}
       <div
-        className="h-[2px] w-full opacity-60 group-hover:opacity-100 transition-opacity"
+        className="h-[1.5px] w-full opacity-60 group-hover:opacity-100 transition-opacity"
         style={{ background: `linear-gradient(90deg, ${accentColor}, transparent)` }}
       />
 
-      <div className="p-5">
+      <div className="p-4">
         <div className="flex items-start justify-between">
-          <div className="space-y-2.5">
+          <div className="space-y-1.5">
             {/* Label */}
             <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-[0.08em]">
               {title}

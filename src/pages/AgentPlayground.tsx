@@ -206,14 +206,14 @@ export default function AgentPlayground() {
             <div className="relative flex-1 min-h-0 flex flex-col mb-4">
                 <ScrollArea 
                     ref={scrollAreaRef}
-                    className="flex-1 rounded-2xl border border-[hsl(220_16%_12%)] bg-[hsl(220_18%_6%)]/40 backdrop-blur-sm shadow-inner"
+                    className="flex-1 rounded-2xl border border-border bg-muted/20 backdrop-blur-sm shadow-inner"
                 >
                     <div className="p-4 sm:p-6 space-y-6 lg:space-y-10 max-w-4xl mx-auto">
                         {messages.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-20 lg:py-32 text-center">
                                 <div className="relative mb-6">
                                     <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
-                                    <div className="relative p-6 bg-[hsl(220_18%_10%)] rounded-3xl border border-primary/20 shadow-2xl">
+                                    <div className="relative p-6 bg-card rounded-3xl border border-primary/20 shadow-2xl">
                                         <Bot className="h-10 w-10 text-primary" />
                                     </div>
                                 </div>
@@ -228,7 +228,7 @@ export default function AgentPlayground() {
                                         <button 
                                             key={i}
                                             onClick={() => setQuery(example.slice(1, -1))}
-                                            className="text-[11px] px-3 py-1.5 rounded-full border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_8%)] text-muted-foreground hover:bg-muted/10 hover:text-primary transition-all duration-200"
+                                            className="text-[11px] px-3 py-1.5 rounded-full border border-border bg-card text-muted-foreground hover:bg-muted/10 hover:text-primary transition-all duration-200"
                                         >
                                             {example}
                                         </button>
@@ -242,8 +242,8 @@ export default function AgentPlayground() {
                                 <div className={cn(
                                     "relative max-w-[85%] sm:max-w-[75%] p-4 lg:p-5 rounded-3xl",
                                     msg.role === 'user' 
-                                        ? "bg-[hsl(220_18%_12%)] text-foreground border border-[hsl(220_16%_18%)] rounded-tr-sm shadow-lg"
-                                        : "bg-[hsl(220_18%_7%)]/80 backdrop-blur-md border border-primary/10 rounded-tl-sm shadow-xl"
+                                        ? "bg-muted/50 text-foreground border border-border rounded-tr-sm shadow-lg"
+                                        : "bg-card/80 backdrop-blur-md border border-primary/10 rounded-tl-sm shadow-xl"
                                 )}>
                                     <div className="flex items-center gap-2 mb-2">
                                         {msg.role === 'user' ? (
@@ -267,8 +267,8 @@ export default function AgentPlayground() {
                                 {msg.role === 'assistant' && msg.result && (
                                     <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 animate-in zoom-in-95 duration-500">
                                         {/* Pathway Detail */}
-                                        <div className="p-4 rounded-2xl bg-[hsl(220_18%_8%)]/50 border border-[hsl(220_16%_12%)] space-y-4">
-                                            <div className="flex items-center justify-between border-b border-[hsl(220_16%_14%)] pb-2 mb-2">
+                                        <div className="p-4 rounded-2xl bg-card border border-border space-y-4">
+                                            <div className="flex items-center justify-between border-b border-border pb-2 mb-2">
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-primary/70">EXECUTION_STACK</span>
                                                 <span className="text-[10px] font-mono text-muted-foreground/40">{msg.result.tools_used.length} TOOLS_ACCESSED</span>
                                             </div>
@@ -286,7 +286,7 @@ export default function AgentPlayground() {
                                                             </div>
                                                             <div className="flex-1 min-w-0">
                                                                 <h4 className="font-bold text-[11px] uppercase tracking-wide text-foreground/80">{tool.name}</h4>
-                                                                <div className="mt-1.5 p-2 rounded-md bg-[hsl(220_18%_10%)] border border-[hsl(220_16%_16%)] text-[9px] font-mono text-muted-foreground/70 overflow-x-auto custom-scrollbar">
+                                                                <div className="mt-1.5 p-2 rounded-md bg-muted/50 border border-input text-[9px] font-mono text-muted-foreground/70 overflow-x-auto custom-scrollbar">
                                                                     {JSON.stringify(tool.args, null, 2)}
                                                                 </div>
                                                             </div>
@@ -297,12 +297,12 @@ export default function AgentPlayground() {
                                         </div>
 
                                         {/* Logic Detail */}
-                                        <div className="p-4 rounded-2xl bg-[hsl(220_18%_8%)]/50 border border-[hsl(220_16%_12%)] flex flex-col">
-                                            <div className="flex items-center justify-between border-b border-[hsl(220_16%_14%)] pb-2 mb-4">
+                                        <div className="p-4 rounded-2xl bg-card border border-border flex flex-col">
+                                            <div className="flex items-center justify-between border-b border-border pb-2 mb-4">
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-amber-500/70">REASONING_ENGINE</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] font-mono text-foreground font-bold">{Math.round(msg.result.confidence_score * 100)}%</span>
-                                                    <div className="h-1 w-12 bg-[hsl(220_16%_16%)] rounded-full overflow-hidden">
+                                                    <div className="h-1 w-12 bg-muted rounded-full overflow-hidden">
                                                         <div 
                                                             className="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
                                                             style={{ width: `${msg.result.confidence_score * 100}%` }}
@@ -321,7 +321,7 @@ export default function AgentPlayground() {
 
                         {isThinking && (
                             <div className="flex flex-col items-start animate-pulse">
-                                <div className="bg-[hsl(220_18%_7%)]/50 border border-primary/10 rounded-3xl rounded-tl-sm p-4 shadow-sm flex items-center gap-3">
+                                <div className="bg-card/50 border border-primary/10 rounded-3xl rounded-tl-sm p-4 shadow-sm flex items-center gap-3">
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-primary/20 blur-md rounded-full animate-ping" />
                                         <Brain className="h-4 w-4 text-primary relative z-10" />
@@ -335,7 +335,7 @@ export default function AgentPlayground() {
 
                 {/* --- Bottom Input Dock (NON-FIXED) --- */}
                 <div className="mt-4">
-                    <Card className="relative overflow-hidden border-[hsl(220_16%_14%)] shadow-2xl bg-[hsl(220_18%_9%)]/95 backdrop-blur-xl">
+                    <Card className="relative overflow-hidden border-border shadow-2xl bg-card/95 backdrop-blur-xl">
                         {/* Decorative glow */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-3/4 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                         

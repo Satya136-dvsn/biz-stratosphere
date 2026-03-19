@@ -260,7 +260,7 @@ export function AIChat() {
         <div className="flex items-center gap-4">
           <div className="relative">
             <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-purple-500 rounded-xl blur opacity-25 animate-pulse" />
-            <div className="relative h-12 w-12 bg-[hsl(220_18%_7%)] border border-[hsl(220_16%_14%)] rounded-xl flex items-center justify-center text-primary shadow-xl">
+            <div className="relative h-12 w-12 bg-card border border-border rounded-xl flex items-center justify-center text-primary shadow-xl">
               <Sparkles className="h-6 w-6" />
             </div>
           </div>
@@ -290,12 +290,12 @@ export function AIChat() {
         <div className="flex items-center gap-2">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" className="h-10 border-[hsl(220_16%_14%)] bg-[hsl(220_16%_9%)] hover:bg-white/5 font-bold text-xs gap-2">
+              <Button variant="outline" className="h-10 border-border bg-muted/50 hover:bg-muted/30 font-bold text-xs gap-2">
                 <Settings2 className="h-4 w-4 opacity-60" />
                 RAG PARAMETERS
               </Button>
             </SheetTrigger>
-            <SheetContent className="bg-[hsl(220_18%_7%)] border-l-[hsl(220_16%_14%)] text-foreground sm:max-w-md custom-scrollbar">
+            <SheetContent className="bg-card border-l-border text-foreground sm:max-w-md custom-scrollbar">
               <SheetHeader className="space-y-1 mb-8">
                 <div className="h-1 w-20 bg-primary mb-4 rounded-full" />
                 <SheetTitle className="text-xl font-bold">Neural Configuration</SheetTitle>
@@ -326,10 +326,10 @@ export function AIChat() {
                       value={selectedDataset || 'none'}
                       onValueChange={(val) => setSelectedDataset(val === 'none' ? null : val)}
                     >
-                      <SelectTrigger className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] h-11">
+                      <SelectTrigger className="bg-muted/50 border-input h-11">
                         <SelectValue placeholder="Select analytical context..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_14%)] text-foreground">
+                      <SelectContent className="bg-popover border-border text-foreground">
                         <SelectItem value="none" className="focus:bg-primary/10 transition-colors">None (General Reasoning)</SelectItem>
                         {datasets.map((dataset) => (
                           <SelectItem key={dataset.id} value={dataset.id} className="focus:bg-primary/10 transition-colors">
@@ -396,7 +396,7 @@ export function AIChat() {
                           max={20}
                           value={contextLimit}
                           onChange={(e) => setContextLimit(parseInt(e.target.value))}
-                          className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)]"
+                          className="bg-muted/50 border-input"
                         />
                       </div>
 

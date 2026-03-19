@@ -16,11 +16,11 @@
 @layer base {
   :root {
     /* ─── BASE (Light) ─── */
-    --background: 0 0% 100%;          /* #FFFFFF */
-    --foreground: 222.2 84% 4.9%;     /* #0F172A */
+    --background: 210 40% 98%;          /* #F8FAFC - Soft slate white */
+    --foreground: 222.2 84% 4.9%;       /* #0F172A */
 
     /* ─── SURFACES ─── */
-    --card: 0 0% 100%;
+    --card: 0 0% 100%;                  /* Pure White */
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
@@ -69,33 +69,33 @@
     --gradient-primary: linear-gradient(135deg, hsl(221.2 83.2% 53.3%) 0%, hsl(262.1 83.3% 57.8%) 100%);
     --gradient-secondary: linear-gradient(135deg, hsl(262.1 83.3% 57.8%) 0%, hsl(199 89% 48%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 71% 35%) 100%);
-    --gradient-bg: radial-gradient(circle at 50% 0%, hsl(210 40% 98%) 0%, hsl(0 0% 100%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100% / 0.9) 0%, hsl(210 40% 96% / 0.9) 100%);
-    --gradient-glass: linear-gradient(135deg, hsl(221.2 83.2% 53.3% / 0.05) 0%, hsl(262.1 83.3% 57.8% / 0.05) 100%);
+    --gradient-bg: radial-gradient(circle at 50% 0%, hsl(210 40% 99%) 0%, hsl(210 40% 98%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100% / 0.95) 0%, hsl(210 40% 98% / 0.95) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(221.2 83.2% 53.3% / 0.03) 0%, hsl(262.1 83.3% 57.8% / 0.03) 100%);
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
 
     /* ─── SHADOWS (Light) ─── */
-    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.05);
-    --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px rgb(0 0 0 / 0.06);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.06);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.03);
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.03);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.08);
 
-    --shadow-glow-primary: 0 0 20px hsl(221.2 83.2% 53.3% / 0.1), 0 0 40px hsl(221.2 83.2% 53.3% / 0.05);
-    --shadow-glow-secondary: 0 0 20px hsl(262.1 83.3% 57.8% / 0.1), 0 0 40px hsl(262.1 83.3% 57.8% / 0.05);
-    --shadow-card: 0 4px 12px rgb(0 0 0 / 0.05), 0 1px 4px rgb(0 0 0 / 0.02);
-    --shadow-card-hover: 0 12px 32px rgb(0 0 0 / 0.1), 0 0 24px hsl(221.2 83.2% 53.3% / 0.05);
+    --shadow-glow-primary: 0 0 20px hsl(221.2 83.2% 53.3% / 0.08), 0 0 40px hsl(221.2 83.2% 53.3% / 0.03);
+    --shadow-glow-secondary: 0 0 20px hsl(262.1 83.3% 57.8% / 0.08), 0 0 40px hsl(262.1 83.3% 57.8% / 0.03);
+    --shadow-card: 0 2px 8px rgb(0 0 0 / 0.04), 0 1px 2px rgb(0 0 0 / 0.02);
+    --shadow-card-hover: 0 8px 24px rgb(0 0 0 / 0.08), 0 0 16px hsl(221.2 83.2% 53.3% / 0.04);
 
     /* ─── BORDER RADIUS ─── */
-    --radius: 0.75rem;
-    --radius-sm: 0.5rem;
-    --radius-lg: 1rem;
-    --radius-xl: 1.5rem;
+    --radius: 0.5rem;          /* 8px - more compact */
+    --radius-sm: 0.375rem;     /* 6px */
+    --radius-lg: 0.75rem;      /* 12px */
+    --radius-xl: 1rem;         /* 16px */
     --radius-full: 9999px;
 
     /* ─── SIDEBAR (Light) ─── */
-    --sidebar-background: 210 40% 98%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222.2 84% 4.9%;
     --sidebar-primary: 221.2 83.2% 53.3%;
     --sidebar-primary-foreground: 210 40% 98%;
@@ -177,6 +177,13 @@
     --shadow-glow-secondary: 0 0 20px hsl(258 65% 68% / 0.15), 0 0 40px hsl(258 65% 68% / 0.05);
     --shadow-card: 0 4px 12px rgb(0 0 0 / 0.4), 0 1px 4px rgb(0 0 0 / 0.2);
     --shadow-card-hover: 0 12px 32px rgb(0 0 0 / 0.5), 0 0 24px hsl(224 100% 64% / 0.1);
+
+    /* ─── BORDER RADIUS (Dark) ─── */
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 9999px;
 
     /* ─── SIDEBAR (Dark) ─── */
     --sidebar-background: 220 20% 6%;
@@ -265,24 +272,24 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(220 16% 20%);
+    background: hsl(var(--muted-foreground) / 0.3);
     border-radius: 999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(220 16% 28%);
+    background: hsl(var(--muted-foreground) / 0.5);
   }
 
   /* Auto-hide scrollbar when not scrolling */
   * {
     scrollbar-width: thin;
-    scrollbar-color: hsl(220 16% 20%) transparent;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
   }
 
   /* ─── SELECTION ─── */
   ::selection {
-    background: hsl(224 100% 64% / 0.25);
-    color: hsl(214 32% 98%);
+    background: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
   }
 
   /* ─── FOCUS STATES ─── */
@@ -290,7 +297,7 @@
     outline: none;
     box-shadow:
       0 0 0 2px hsl(var(--background)),
-      0 0 0 4px hsl(224 100% 64% / 0.5);
+      0 0 0 4px hsl(var(--primary) / 0.5);
   }
 }
 
@@ -384,24 +391,40 @@
 
 @layer base {
   .glass {
-    background: hsl(220 18% 8% / 0.6);
+    background: hsl(var(--card) / 0.6);
     backdrop-filter: blur(16px) saturate(150%);
     -webkit-backdrop-filter: blur(16px) saturate(150%);
-    border: 1px solid hsl(220 16% 18% / 0.4);
+    border: 1px solid hsl(var(--border) / 0.4);
   }
 
   .glass-strong {
-    background: hsl(220 18% 8% / 0.8);
+    background: hsl(var(--card) / 0.85);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid hsl(220 16% 18% / 0.5);
+    border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow: var(--shadow-xl);
   }
 
-  .glass-subtle {
-    background: hsl(220 18% 8% / 0.35);
-    backdrop-filter: blur(8px) saturate(130%);
-    -webkit-backdrop-filter: blur(8px) saturate(130%);
-    border: 1px solid hsl(220 16% 16% / 0.3);
+  .glass-effect {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .glass-sidebar {
+    background: hsl(var(--sidebar-background) / 0.8);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-right: 1px solid hsl(var(--sidebar-border) / 0.4);
+  }
+
+  .glass-card {
+    background: hsl(var(--card) / 0.5);
+    backdrop-filter: blur(10px) saturate(130%);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    border: 1px solid hsl(var(--border) / 0.2);
+    box-shadow: var(--shadow-md);
   }
 }
 

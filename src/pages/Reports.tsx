@@ -167,71 +167,72 @@ export function Reports() {
       <SEO title="Reports | Biz Stratosphere" description="Generate enterprise-grade business reports" />
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="h-2 w-2 rounded-full bg-primary shadow-[0_0_8px_rgba(74,124,255,0.5)]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Intelligence Center</span>
+            <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(74,124,255,0.5)]" />
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/80">Intelligence Center</span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Reports & Analytics</h1>
-          <p className="text-sm text-muted-foreground/60 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Reports & Analytics</h1>
+          <p className="text-xs text-muted-foreground/60 mt-0.5">
             Generate and export comprehensive business performance deep-dives.
           </p>
         </div>
         <Button 
           onClick={() => setShowBuilder(!showBuilder)}
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all active:scale-95"
+          size="sm"
+          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all active:scale-95 px-5 h-9"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-3.5 w-3.5 mr-2" />
           Create New Report
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-[hsl(220_16%_9%)] border border-[hsl(220_16%_14%)] p-1">
-          <TabsTrigger value="builder" className="text-xs data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="bg-muted/50 border border-border/40 p-1">
+          <TabsTrigger value="builder" className="text-[11px] h-8 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
             Report Builder
           </TabsTrigger>
-          <TabsTrigger value="saved" className="text-xs data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
-            Saved Library <Badge variant="secondary" className="ml-2 bg-primary/10 text-primary border-none pointer-events-none">{savedReports.length}</Badge>
+          <TabsTrigger value="saved" className="text-[11px] h-8 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
+            Saved Library <Badge variant="secondary" className="ml-2 h-4 px-1.5 text-[9px] bg-primary/10 text-primary border-none pointer-events-none">{savedReports.length}</Badge>
           </TabsTrigger>
           {generatedReport && (
-            <TabsTrigger value="preview" className="text-xs data-[state=active]:bg-primary/15 data-[state=active]:text-primary flex items-center gap-2">
-              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <TabsTrigger value="preview" className="text-[11px] h-8 data-[state=active]:bg-primary/15 data-[state=active]:text-primary flex items-center gap-2">
+              <div className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
               Active Preview
             </TabsTrigger>
           )}
         </TabsList>
 
         {/* Report Builder Tab */}
-        <TabsContent value="builder" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <TabsContent value="builder" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             {/* Configuration Panel */}
             <div className="lg:col-span-4 space-y-4">
-              <Card className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_14%)] overflow-hidden">
+              <Card className="bg-card border-border/40 overflow-hidden shadow-sm">
                 <div className="h-1 w-full bg-gradient-to-r from-primary/50 to-transparent" />
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <Save className="h-4 w-4 text-primary" />
+                <CardHeader className="pb-3 pt-4">
+                  <CardTitle className="text-xs font-bold flex items-center gap-2">
+                    <Save className="h-3.5 w-3.5 text-primary" />
                     Configuration
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-5">
+                <CardContent className="space-y-4">
                   {/* Template Selection */}
-                  <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">Template</Label>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Template</Label>
                     <Select
                       value={reportConfig.report_type}
                       onValueChange={(value: any) =>
                         setReportConfig({ ...reportConfig, report_type: value })
                       }
                     >
-                      <SelectTrigger className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-sm h-10">
+                      <SelectTrigger className="bg-muted/30 border-border/40 text-xs h-9">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_14%)] text-foreground">
+                      <SelectContent className="bg-card border-border text-foreground">
                         {REPORT_TEMPLATES.map(template => (
-                          <SelectItem key={template.id} value={template.id} className="text-sm focus:bg-primary/10 focus:text-primary">
+                          <SelectItem key={template.id} value={template.id} className="text-xs focus:bg-primary/10 focus:text-primary">
                             {template.name}
                           </SelectItem>
                         ))}
@@ -240,8 +241,8 @@ export function Reports() {
                   </div>
 
                   {/* Date Range */}
-                  <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">Time Horizon</Label>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Time Horizon</Label>
                     <div className="grid grid-cols-2 gap-2">
                       <Input
                         type="date"
@@ -249,7 +250,7 @@ export function Reports() {
                         onChange={(e) =>
                           setReportConfig({ ...reportConfig, date_range_start: e.target.value })
                         }
-                        className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-[12px] h-10"
+                        className="bg-muted/30 border-border/40 text-[11px] h-9"
                       />
                       <Input
                         type="date"
@@ -257,159 +258,106 @@ export function Reports() {
                         onChange={(e) =>
                           setReportConfig({ ...reportConfig, date_range_end: e.target.value })
                         }
-                        className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-[12px] h-10"
+                        className="bg-muted/30 border-border/40 text-[11px] h-9"
                       />
                     </div>
                   </div>
 
-                  {/* Dataset Selection */}
-                  <div className="space-y-2">
-                    <Label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">Contextual Dataset</Label>
+                  {/* Metrics Selection */}
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Contextual Dataset</Label>
                     <Select
-                      value={reportConfig.dataset_id || ''}
-                      onValueChange={(value) =>
-                        setReportConfig({ ...reportConfig, dataset_id: value === 'all' ? undefined : value })
-                      }
+                      onValueChange={(value) => {
+                        // In a real app, this would filter metrics by dataset
+                        console.log('Selected dataset:', value);
+                      }}
                     >
-                      <SelectTrigger className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-sm h-10">
+                      <SelectTrigger className="bg-muted/30 border-border/40 text-xs h-9">
                         <SelectValue placeholder="All datasets" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_14%)] text-foreground">
-                        <SelectItem value="all" className="text-sm focus:bg-primary/10 focus:text-primary">All datasets</SelectItem>
-                        {datasets.map(dataset => (
-                          <SelectItem key={dataset.id} value={dataset.id} className="text-sm focus:bg-primary/10 focus:text-primary">
-                            {dataset.name || dataset.file_name}
-                          </SelectItem>
+                      <SelectContent className="bg-card border-border">
+                        {datasets.map(d => (
+                          <SelectItem key={d.id} value={d.id} className="text-xs">{d.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {/* Custom Metrics Selection */}
-                  {reportConfig.report_type === 'custom' && (
-                    <div className="space-y-2">
-                      <Label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">Metric Selection</Label>
-                      <div className="max-h-56 overflow-y-auto border border-[hsl(220_16%_14%)] bg-[hsl(220_16%_9%)] rounded-xl p-3 space-y-2 custom-scrollbar">
-                        {availableMetrics.length > 0 ? availableMetrics.slice(0, 20).map(metric => (
-                          <div key={metric} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors group">
-                            <input
-                              type="checkbox"
-                              id={metric}
-                              checked={reportConfig.selected_metrics.includes(metric)}
-                              onChange={() => toggleMetric(metric)}
-                              className="rounded border-[hsl(220_16%_20%)] bg-transparent text-primary focus:ring-primary/20 h-4 w-4"
-                            />
-                            <label htmlFor={metric} className="text-[13px] text-muted-foreground group-hover:text-foreground cursor-pointer transition-colors truncate">
-                              {metric}
-                            </label>
-                          </div>
-                        )) : (
-                          <p className="text-[12px] text-muted-foreground/50 text-center py-4 italic">No metrics found in context</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2">
+                  <div className="pt-2">
                     <Button
                       onClick={handleGenerateReport}
                       disabled={isGenerating}
-                      className="flex-1 bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 h-11 text-xs font-bold"
+                      className="w-full h-10 bg-primary hover:bg-primary/90 text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-primary/20"
                     >
                       {isGenerating ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Play className="h-4 w-4 mr-2 fill-current" />
+                        <>
+                          <Play className="h-3.5 w-3.5 mr-2" />
+                          Run Analysis
+                        </>
                       )}
-                      RUN ANALYSIS
                     </Button>
-                    <Dialog open={showSaveDialog} onValueChange={setShowSaveDialog}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="border-[hsl(220_16%_14%)] bg-[hsl(220_16%_9%)] hover:bg-white/5 h-11 px-4">
-                          <Save className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_14%)] text-foreground sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle className="text-xl font-bold">Persistence</DialogTitle>
-                          <DialogDescription className="text-muted-foreground/60">
-                            Save this exact configuration for rapid one-click execution later.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <div className="space-y-2">
-                            <Label className="text-[11px] font-bold uppercase tracking-wider">Report Name</Label>
-                            <Input
-                              value={saveName}
-                              onChange={(e) => setSaveName(e.target.value)}
-                              placeholder="e.g., Q1 Revenue Distribution"
-                              className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] focus-visible:ring-primary/30"
-                            />
-                          </div>
-                          <Button onClick={handleSave} disabled={isSaving} className="w-full bg-primary hover:bg-primary/90 h-11">
-                            {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                            Store Configuration
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Template Cards */}
-            <div className="lg:col-span-8">
-              <Card className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_14%)] h-full">
-                <CardHeader>
-                  <CardTitle className="text-lg font-bold">Analytical Frameworks</CardTitle>
-                  <CardDescription>Select a specialized template for your current business query</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {REPORT_TEMPLATES.map(template => (
-                      <div
-                        key={template.id}
-                        className={cn(
-                          "relative group cursor-pointer p-6 rounded-2xl border transition-all duration-300",
-                          reportConfig.report_type === template.id
-                            ? 'bg-primary/5 border-primary/50 shadow-[0_0_20px_rgba(74,124,255,0.1)]'
-                            : 'bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] hover:border-primary/30 hover:bg-white/[0.02]'
-                        )}
-                        onClick={() =>
-                          setReportConfig({ ...reportConfig, report_type: template.id as any })
-                        }
-                      >
+            {/* Template Preview Panel */}
+            <div className="lg:col-span-8 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {REPORT_TEMPLATES.map(template => (
+                  <Card 
+                    key={template.id}
+                    onClick={() => setReportConfig({ ...reportConfig, report_type: template.id })}
+                    className={cn(
+                      "cursor-pointer transition-all duration-300 border-border/40 hover:border-primary/40 group relative overflow-hidden h-32",
+                      reportConfig.report_type === template.id ? "ring-2 ring-primary/20 bg-primary/5 border-border/40" : "bg-card hover:bg-muted/5"
+                    )}
+                  >
+                    <CardContent className="p-4 flex flex-col justify-between h-full">
+                      <div className="flex items-center justify-between">
                         <div className={cn(
-                          "h-10 w-10 flex items-center justify-center rounded-xl mb-4 transition-colors",
-                          reportConfig.report_type === template.id ? 'bg-primary text-white' : 'bg-[hsl(220_16%_14%)] text-muted-foreground group-hover:text-primary group-hover:bg-primary/10'
+                          "p-2 rounded-lg transition-colors",
+                          reportConfig.report_type === template.id ? "bg-primary/20" : "bg-muted/40 group-hover:bg-primary/10"
                         )}>
-                          {template.id === 'kpi_summary' ? <TrendingUp className="h-5 w-5" /> : 
-                           template.id === 'sales_report' ? <FileText className="h-5 w-5" /> : 
-                           <Copy className="h-5 w-5" />}
+                          {template.id === 'kpi_summary' && <TrendingUp className="h-4 w-4 text-primary" />}
+                          {template.id === 'sales_report' && <BarChart3 className="h-4 w-4 text-primary" />}
+                          {template.id === 'custom' && <Copy className="h-4 w-4 text-primary" />}
                         </div>
-                        <h4 className="font-bold text-foreground mb-1.5">{template.name}</h4>
-                        <p className="text-[12px] text-muted-foreground/60 leading-relaxed">{template.description}</p>
-                        
                         {reportConfig.report_type === template.id && (
-                          <div className="absolute top-4 right-4 h-2 w-2 rounded-full bg-primary" />
+                          <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                         )}
                       </div>
-                    ))}
-                  </div>
+                      <div>
+                        <h4 className="font-bold text-xs group-hover:text-primary transition-colors">{template.name}</h4>
+                        <p className="text-[10px] text-muted-foreground/60 mt-1 line-clamp-2 uppercase font-medium">{template.description}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-                  {/* Pro-tip section */}
-                  <div className="mt-10 p-5 rounded-2xl bg-primary/5 border border-primary/10 flex items-start gap-4">
-                    <div className="p-2 bg-primary/20 rounded-lg text-primary">
-                      <Sparkles className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <h5 className="text-[13px] font-bold text-foreground">AI Intelligence Tip</h5>
-                      <p className="text-[12px] text-muted-foreground/70 mt-1 leading-relaxed">
-                        The "Custom Report" template combined with automated PDF export is currently the preferred choice for monthly executive briefings.
-                      </p>
-                    </div>
+              <Card className="bg-card border-border/40 shadow-sm min-h-[300px] flex flex-col">
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    Analytical Frameworks
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
+                  <div className="p-4 rounded-full bg-primary/5 border border-primary/10">
+                    <FileText className="h-8 w-8 text-primary/40" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-sm">Select a specialized template for your current business query</h3>
+                    <p className="text-xs text-muted-foreground/60 max-w-sm">Connect your enterprise datasets via the RAG interface to begin deep-analysis chat or start a fresh generalized session.</p>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/10 max-w-md w-full">
+                    <Sparkles className="h-4 w-4 text-primary shrink-0" />
+                    <p className="text-[10px] text-left text-muted-foreground/80 leading-relaxed uppercase font-medium">
+                      AI Intelligence Tip: The "Custom Report" template combined with automated PDF export is currently the preferred choice for monthly executive briefings.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -507,27 +455,27 @@ export function Reports() {
 
         {/* Preview Tab */}
         {generatedReport && (
-          <TabsContent value="preview" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
-            <Card className="bg-[hsl(220_18%_7%)] border-[hsl(220_16%_14%)] overflow-hidden">
+          <TabsContent value="preview" className="space-y-4 focus-visible:outline-none focus-visible:ring-0">
+            <Card className="bg-card border-border/40 overflow-hidden">
               <div className="h-1 w-full bg-emerald-500/40" />
-              <CardHeader className="pb-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <CardHeader className="pb-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <div className="flex items-center gap-3 mb-2">
-                       <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/5 px-2 py-0 text-[10px] uppercase font-bold tracking-widest">Live Output</Badge>
-                       <span className="text-xs text-muted-foreground/50 font-mono">UUID: {generatedReport.id?.substring(0, 8) || 'volat'}</span>
+                    <div className="flex items-center gap-2 mb-1.5">
+                       <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/5 px-2 py-0 text-[9px] uppercase font-bold tracking-widest">Live Output</Badge>
+                       <span className="text-[10px] text-muted-foreground/50 font-mono">UUID: {generatedReport.id?.substring(0, 8) || 'volat'}</span>
                     </div>
-                    <CardTitle className="text-xl font-bold">Analysis Output</CardTitle>
-                    <CardDescription className="flex items-center gap-2 text-muted-foreground/60">
-                      <FileText className="h-3.5 w-3.5" />
+                    <CardTitle className="text-lg font-bold">Analysis Output</CardTitle>
+                    <CardDescription className="flex items-center gap-2 text-[11px] text-muted-foreground/60">
+                      <FileText className="h-3 w-3" />
                       {generatedReport.summary.total_records} indexed segments · Runtime: {new Date(generatedReport.summary.generated_at).toLocaleTimeString()}
                     </CardDescription>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] hover:bg-white/5 text-xs font-bold transition-all"
+                      className="bg-muted/30 border-border/40 hover:bg-primary/5 text-[10px] font-bold h-8"
                       onClick={() =>
                         exportReportAsCSV(
                           generatedReport.data,
@@ -535,13 +483,13 @@ export function Reports() {
                         )
                       }
                     >
-                      <FileDown className="h-3.5 w-3.5 mr-2 opacity-60" />
+                      <FileDown className="h-3 w-3 mr-1.5 opacity-60" />
                       EXPORT CSV
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] hover:bg-white/5 text-xs font-bold transition-all"
+                      className="bg-muted/30 border-border/40 hover:bg-primary/5 text-[10px] font-bold h-8"
                       onClick={() =>
                         exportReportAsJSON(
                           generatedReport,
@@ -549,18 +497,18 @@ export function Reports() {
                         )
                       }
                     >
-                      <Download className="h-3.5 w-3.5 mr-2 opacity-60" />
+                      <Download className="h-3 w-3 mr-1.5 opacity-60" />
                       RAW JSON
                     </Button>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="rounded-2xl border border-[hsl(220_16%_14%)] overflow-hidden bg-[hsl(220_16%_9%)]">
-                  <div className="max-h-[600px] overflow-auto custom-scrollbar">
+                <div className="rounded-xl border border-border/40 overflow-hidden bg-muted/10">
+                  <div className="max-h-[500px] overflow-auto custom-scrollbar">
                     <Table>
-                      <TableHeader className="bg-[hsl(220_18%_7%)] sticky top-0 z-10 shadow-sm shadow-black/20">
-                        <TableRow className="border-b border-[hsl(220_16%_14%)] hover:bg-transparent">
+                      <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
+                        <TableRow className="border-b border-border/40 hover:bg-transparent">
                           {(() => {
                             const processedData = generatedReport.data.reduce((acc: any[], item: any) => {
                               if (item.metric_name === 'raw_csv_row' && item.metadata?.row_data) {
@@ -569,10 +517,10 @@ export function Reports() {
                               return acc;
                             }, []);
                             const displayData = processedData.length > 0 ? processedData : generatedReport.data;
-                            if (displayData.length === 0) return <TableHead className="text-[11px] font-bold uppercase py-4">No Output Segments Found</TableHead>;
+                            if (displayData.length === 0) return <TableHead className="text-[10px] font-bold uppercase py-3">No Output Segments Found</TableHead>;
                             
                             return Object.keys(displayData[0]).slice(0, 10).map(key => (
-                              <TableHead key={key} className="text-[11px] font-bold uppercase py-4 text-muted-foreground whitespace-nowrap min-w-[120px]">
+                              <TableHead key={key} className="text-[10px] font-bold uppercase py-3 text-muted-foreground whitespace-nowrap min-w-[120px]">
                                 {key.replace(/_/g, ' ')}
                               </TableHead>
                             ));
@@ -590,13 +538,13 @@ export function Reports() {
                           const displayData = processedData.length > 0 ? processedData : generatedReport.data;
 
                           return displayData.map((row: any, idx: number) => (
-                            <TableRow key={idx} className="border-b border-[hsl(220_16%_14%)] hover:bg-white/[0.01] transition-colors group">
+                            <TableRow key={idx} className="border-b border-border/40 hover:bg-primary/[0.02] transition-colors group">
                               {Object.values(row)
                                 .slice(0, 10)
                                 .map((value: any, vidx: number) => (
-                                  <TableCell key={vidx} className="py-3 text-[13px] font-mono text-muted-foreground/80 group-hover:text-foreground transition-colors">
+                                  <TableCell key={vidx} className="py-2.5 text-[12px] font-mono text-muted-foreground/80 group-hover:text-foreground transition-colors">
                                     {typeof value === 'object' ? 
-                                      <span className="text-[11px] opacity-40 italic">{'{Object}'}</span> : 
+                                      <span className="text-[10px] opacity-40 italic">{'{Object}'}</span> : 
                                       String(value).length > 60 ? String(value).substring(0, 60) + '...' : String(value)
                                     }
                                   </TableCell>

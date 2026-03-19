@@ -41,9 +41,9 @@ import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
     return (
-        <div className="min-h-screen bg-[hsl(220_20%_5%)] overflow-x-hidden">
+        <div className="min-h-screen bg-background overflow-x-hidden">
             {/* ─── Nav ─── */}
-            <nav className="fixed top-0 w-full z-50 bg-[hsl(220_20%_5%/0.85)] backdrop-blur-xl border-b border-[hsl(220_16%_12%)]">
+            <nav className="fixed top-0 w-full z-50 bg-background/85 backdrop-blur-xl border-b border-border">
                 <div className="container mx-auto px-4">
                     <div className="flex items-center justify-between h-14">
                         <Link to="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
@@ -86,7 +86,7 @@ export default function LandingPage() {
                                             <Menu className="h-5 w-5" />
                                         </Button>
                                     </SheetTrigger>
-                                    <SheetContent side="right" className="w-[280px] bg-[hsl(220_20%_5%)] border-primary/10 p-0">
+                                    <SheetContent side="right" className="w-[280px] bg-background border-primary/10 p-0">
                                         <div className="flex flex-col h-full">
                                             <div className="p-6 border-b border-primary/5">
                                                 <div className="flex items-center gap-2.5">

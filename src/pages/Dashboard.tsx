@@ -40,10 +40,10 @@ import { Upload, Filter, SlidersHorizontal } from "lucide-react";
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="flex items-center gap-4 mb-4">
+    <div className="flex items-center gap-4 mb-3">
       <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/20 to-primary/40" />
-      <div className="px-4 py-1.5 rounded-full border border-primary/10 bg-primary/5 backdrop-blur-sm shadow-[0_0_15px_rgba(59,130,246,0.05)]">
-        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/70">
+      <div className="px-3 py-1 rounded-full border border-primary/10 bg-primary/5 backdrop-blur-sm shadow-[0_0_15px_rgba(59,130,246,0.05)]">
+        <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/70">
           {title}
         </h3>
       </div>
@@ -92,9 +92,9 @@ export default function Dashboard() {
   const firstName = user?.user_metadata?.display_name?.split(' ')[0] || "there";
 
   return (
-    <PageLayout maxWidth="7xl">
+    <PageLayout maxWidth="7xl" className="py-4 space-y-6">
         {/* ─── Header Section ─── */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-6 lg:p-10 bg-[hsl(220_18%_7%)]/50 backdrop-blur-xl border border-[hsl(220_16%_12%)] rounded-3xl shadow-2xl relative overflow-hidden group">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 lg:p-6 bg-card/40 backdrop-blur-xl border border-border/40 rounded-2xl shadow-xl relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
           
           <div className="flex-1 min-w-0">
@@ -135,7 +135,7 @@ export default function Dashboard() {
                   <span className="xs:hidden">DATA</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent className="w-full sm:max-w-lg overflow-y-auto bg-[hsl(220_18%_7%)] border-[hsl(220_16%_12%)]">
+              <SheetContent className="w-full sm:max-w-lg overflow-y-auto bg-card border-border">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2 text-foreground font-bold uppercase tracking-widest">
                     <Upload className="h-5 w-5 text-primary" />
@@ -180,7 +180,7 @@ export default function Dashboard() {
 
         {/* ─── Filters (collapsible) ─── */}
         {showFilters && (
-          <div className="rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)] p-5 space-y-4 animate-fade-in-up">
+          <div className="rounded-xl border border-border bg-card p-5 space-y-4 animate-fade-in-up">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Filter className="w-4 h-4 text-primary" />
               Chart Filters

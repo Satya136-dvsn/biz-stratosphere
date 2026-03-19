@@ -200,8 +200,8 @@ export function Sidebar() {
         <div
             className={cn(
                 "hidden lg:flex relative flex-col h-screen border-r transition-all duration-300 ease-in-out z-30",
-                "bg-[hsl(220_20%_5%)]/90 backdrop-blur-xl border-primary/10 shadow-2xl",
-                collapsed ? "w-[64px]" : "w-[260px]"
+                "bg-sidebar backdrop-blur-xl border-sidebar-border/40 shadow-xl",
+                collapsed ? "w-[60px]" : "w-[240px]"
             )}
         >
             {/* ─── Logo ─── */}
@@ -371,7 +371,7 @@ export function Sidebar() {
                                 </AvatarFallback>
                             </Avatar>
                             {/* Online indicator */}
-                            <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-[hsl(220_20%_5.5%)]" />
+                            <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
                         </div>
 
                         {!collapsed && (
