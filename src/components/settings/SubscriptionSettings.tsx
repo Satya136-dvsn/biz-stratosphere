@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Check, CreditCard, Zap } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SubscriptionSettings() {
     const { session } = useAuth();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [currentPlan, setCurrentPlan] = useState<string>("starter");
     const [usage, setUsage] = useState({
@@ -124,7 +125,7 @@ export function SubscriptionSettings() {
                 </CardContent>
                 <CardFooter className="border-t pt-6">
                     <Button variant="outline" className="mr-2">Manage Billing</Button>
-                    <Button>Upgrade Plan</Button>
+                    <Button onClick={() => navigate("/checkout?plan=pro")}>Upgrade Plan</Button>
                 </CardFooter>
             </Card>
 
@@ -173,7 +174,12 @@ export function SubscriptionSettings() {
                         </ul>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full" variant={currentPlan === 'pro' ? "outline" : "default"} disabled={currentPlan === 'pro'}>
+                        <Button 
+                            className="w-full h-10 shadow-glow-primary hover:shadow-glow-primary-hover transition-all" 
+                            variant={currentPlan === 'pro' ? "outline" : "default"} 
+                            disabled={currentPlan === 'pro'}
+                            onClick={() => navigate("/checkout?plan=pro")}
+                        >
                             {currentPlan === 'pro' ? 'Current Plan' : 'Upgrade to Pro'}
                         </Button>
                     </CardFooter>

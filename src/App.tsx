@@ -49,6 +49,7 @@ const StreamingETL = lazy(() => import("./pages/StreamingETL"));
 const AgentPlayground = lazy(() => import("./pages/AgentPlayground"));
 const DecisionHistory = lazy(() => import("./pages/DecisionHistory"));
 const ContactSales = lazy(() => import("./pages/ContactSales"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 import { AdminRoute } from "./components/AdminRoute";
 
 // Loading fallback component
@@ -279,6 +280,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <ContactSales />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/checkout"
+                  element={
+                    <ProtectedRoute>
+                      <Checkout />
                     </ProtectedRoute>
                   }
                 />
