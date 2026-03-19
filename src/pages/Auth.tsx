@@ -143,55 +143,48 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-[hsl(220_20%_5%)]">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-secondary to-accent p-12 relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse delay-1000" />
-        </div>
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden border-r border-[hsl(220_16%_12%)]">
+        {/* Background */}
+        <div className="absolute inset-0 bg-[hsl(220_20%_4%)]" />
+        <div className="absolute top-1/4 left-1/3 w-[400px] h-[400px] bg-primary/6 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center text-white">
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <img
-                src="/logo-orbit.png"
-                alt="Biz Stratosphere"
-                className="h-12 w-12 rounded-full bg-transparent object-contain"
-              />
+        <div className="relative z-10 flex flex-col justify-center p-12 max-w-lg">
+          <div className="mb-10">
+            <div className="flex items-center gap-2.5 mb-1">
+              <img src="/logo-orbit.png" alt="Biz Stratosphere" className="h-9 w-9 rounded-lg object-contain" />
               <div>
-                <h2 className="text-2xl font-bold text-white">Biz Stratosphere</h2>
-                <p className="text-xs text-white/80">Analytics</p>
+                <h2 className="text-lg font-bold text-foreground tracking-tight">Biz Stratosphere</h2>
+                <p className="text-[10px] text-muted-foreground/50 font-medium uppercase tracking-wide">Analytics</p>
               </div>
             </div>
-            <p className="text-white/90 text-sm">Business Intelligence Platform</p>
           </div>
 
-          <div className="space-y-6 max-w-md">
-            <div className="space-y-2">
-              <h2 className="text-4xl font-bold leading-tight">
-                Transform Your Data Into Insights
-              </h2>
-              <p className="text-white/80 text-lg">
-                Enterprise-grade analytics and AI-powered predictions for modern businesses.
-              </p>
-            </div>
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold tracking-tight leading-tight text-foreground">
+              Transform Your Data Into{' '}
+              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Insights</span>
+            </h2>
+            <p className="text-muted-foreground/60 leading-relaxed">
+              Enterprise-grade analytics and AI-powered predictions for modern businesses.
+            </p>
 
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
-                <Sparkles className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />
+            <div className="space-y-3 pt-2">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)]">
+                <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold mb-1">AI-Powered Analytics</h3>
-                  <p className="text-sm text-white/80">Get instant insights with machine learning predictions</p>
+                  <h3 className="text-[13px] font-semibold text-foreground">AI-Powered Analytics</h3>
+                  <p className="text-[12px] text-muted-foreground/50">Get instant insights with machine learning predictions</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
-                <TrendingUp className="h-5 w-5 text-white mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 p-3.5 rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)]">
+                <TrendingUp className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold mb-1">Real-Time Dashboards</h3>
-                  <p className="text-sm text-white/80">Monitor your KPIs with beautiful, live visualizations</p>
+                  <h3 className="text-[13px] font-semibold text-foreground">Real-Time Dashboards</h3>
+                  <p className="text-[12px] text-muted-foreground/50">Monitor your KPIs with beautiful, live visualizations</p>
                 </div>
               </div>
             </div>
@@ -200,147 +193,110 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Auth Forms */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-background">
-        <Card className="w-full max-w-md glass border-2">
-          <CardHeader className="space-y-1">
-            <div className="lg:hidden flex justify-center items-center gap-3 mb-6">
-              <img
-                src="/logo-orbit.png"
-                alt="Biz Stratosphere"
-                className="h-10 w-10 rounded-full bg-transparent object-contain"
-              />
-              <div className="text-left">
-                <h2 className="text-xl font-bold text-foreground">Biz Stratosphere</h2>
-                <p className="text-xs text-muted-foreground">Analytics</p>
-              </div>
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-2.5 mb-8">
+            <img src="/logo-orbit.png" alt="Biz Stratosphere" className="h-8 w-8 rounded-lg object-contain" />
+            <span className="text-sm font-bold text-foreground tracking-tight">Biz Stratosphere</span>
+          </div>
+
+          <div className="rounded-xl border border-[hsl(220_16%_14%)] bg-[hsl(220_18%_7%)] p-6">
+            <div className="mb-5">
+              <h3 className="text-xl font-bold text-foreground">Welcome</h3>
+              <p className="text-[13px] text-muted-foreground/50 mt-0.5">Sign in to your account or create a new one</p>
             </div>
-            <CardTitle className="text-2xl">Welcome</CardTitle>
-            <CardDescription>
-              Sign in to your account or create a new one
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-5 bg-[hsl(220_16%_9%)] border border-[hsl(220_16%_14%)]">
+                <TabsTrigger value="signin" className="text-[13px] data-[state=active]:bg-primary/15 data-[state=active]:text-primary">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="text-[13px] data-[state=active]:bg-primary/15 data-[state=active]:text-primary">Sign Up</TabsTrigger>
               </TabsList>
 
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email" className="text-[12px] text-muted-foreground/70 font-medium">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
                       <Input
-                        id="email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-9"
-                        required
-                        autoComplete="email"
+                        id="email" type="email" placeholder="you@example.com"
+                        value={email} onChange={(e) => setEmail(e.target.value)}
+                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        required autoComplete="email"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="password" className="text-[12px] text-muted-foreground/70 font-medium">Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
                       <Input
-                        id="password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-9"
-                        required
-                        autoComplete="current-password"
+                        id="password" type="password" placeholder="••••••••"
+                        value={password} onChange={(e) => setPassword(e.target.value)}
+                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        required autoComplete="current-password"
                       />
                     </div>
                   </div>
                   <div className="flex justify-end">
-                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                    <Link to="/forgot-password" className="text-[12px] text-primary/70 hover:text-primary transition-colors">
                       Forgot password?
                     </Link>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-primary hover:opacity-90"
-                    disabled={loading}
-                  >
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white h-10 text-[13px]" disabled={loading}>
                     {loading ? "Signing in..." : "Sign In"}
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-2 h-3.5 w-3.5" />
                   </Button>
 
                   <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
+                      <span className="w-full border-t border-[hsl(220_16%_14%)]" />
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">Or</span>
+                    <div className="relative flex justify-center text-[11px] uppercase">
+                      <span className="bg-[hsl(220_18%_7%)] px-2 text-muted-foreground/40">Or</span>
                     </div>
                   </div>
 
                   <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full border-primary/20 hover:bg-primary/5"
+                    type="button" variant="outline"
+                    className="w-full border-[hsl(220_16%_16%)] hover:bg-primary/5 hover:border-primary/20 text-muted-foreground hover:text-foreground h-10 text-[13px]"
                     disabled={loading}
                     onClick={async () => {
                       const demoEmail = 'demo@bizstratosphere.com';
                       const demoPass = 'demo123456';
-
                       setEmail(demoEmail);
                       setPassword(demoPass);
                       setLoading(true);
-
                       try {
-                        // 1. Try to login
                         const { error: signInError } = await signIn(demoEmail, demoPass);
-
                         if (!signInError) {
                           toast({ title: "Welcome back!", description: "Signed in to demo account" });
                           navigate("/dashboard");
                           return;
                         }
-
-                        // 2. If login fails (likely user missing), try to register
                         if (signInError.message.includes("Invalid login credentials")) {
                           toast({ title: "Setting up demo...", description: "Creating demo account for you..." });
-
                           const { error: signUpError } = await signUp(demoEmail, demoPass, "Demo User");
-
-                          if (signUpError) {
-                            throw signUpError;
-                          }
-
-                          // 3. Try login again after signup (sometimes needed to refresh session)
+                          if (signUpError) throw signUpError;
                           const { error: reSignInError } = await signIn(demoEmail, demoPass);
                           if (!reSignInError) {
                             toast({ title: "Demo Ready", description: "Account created and signed in!" });
                             navigate("/dashboard");
                           } else {
-                            // If auto-login fails, maybe email confirmation is ON.
                             toast({ title: "Account Created", description: "Please check if email confirmation is required, or try signing in again." });
                             setLoading(false);
                           }
                         } else {
-                          // Real error (e.g. rate limit)
                           throw signInError;
                         }
                       } catch (err: any) {
-                        toast({
-                          title: "Demo Login Failed",
-                          description: err.message,
-                          variant: "destructive"
-                        });
+                        toast({ title: "Demo Login Failed", description: err.message, variant: "destructive" });
                         setLoading(false);
                       }
                     }}
                   >
-                    <Sparkles className="mr-2 h-4 w-4 text-primary" />
+                    <Sparkles className="mr-2 h-3.5 w-3.5 text-primary" />
                     {loading && email === 'demo@bizstratosphere.com' ? "Setting up Demo..." : "Try Public Demo (One-Click)"}
                   </Button>
                 </form>
@@ -348,67 +304,52 @@ export default function Auth() {
 
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Display Name</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-name" className="text-[12px] text-muted-foreground/70 font-medium">Display Name</Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
                       <Input
-                        id="signup-name"
-                        type="text"
-                        placeholder="John Doe"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        className="pl-9"
+                        id="signup-name" type="text" placeholder="John Doe"
+                        value={displayName} onChange={(e) => setDisplayName(e.target.value)}
+                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
                         autoComplete="name"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-email" className="text-[12px] text-muted-foreground/70 font-medium">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
                       <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-9"
-                        required
-                        autoComplete="email"
+                        id="signup-email" type="email" placeholder="you@example.com"
+                        value={email} onChange={(e) => setEmail(e.target.value)}
+                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        required autoComplete="email"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-password" className="text-[12px] text-muted-foreground/70 font-medium">Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40" />
                       <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-9"
-                        required
-                        autoComplete="new-password"
+                        id="signup-password" type="password" placeholder="••••••••"
+                        value={password} onChange={(e) => setPassword(e.target.value)}
+                        className="pl-9 bg-[hsl(220_16%_9%)] border-[hsl(220_16%_14%)] text-foreground placeholder:text-muted-foreground/30 focus-visible:ring-primary/30 h-10"
+                        required autoComplete="new-password"
                       />
                     </div>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-primary hover:opacity-90"
-                    disabled={loading}
-                  >
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white h-10 text-[13px]" disabled={loading}>
                     {loading ? "Creating account..." : "Create Account"}
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-2 h-3.5 w-3.5" />
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
-    </div >
+    </div>
   );
 }
