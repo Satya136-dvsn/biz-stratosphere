@@ -84,7 +84,7 @@ export function Settings() {
     fetchPreferences();
   }, []);
 
-  const handleChangePassword = async () => {
+  const handleSaveProfile = async () => {
     // Feature: Profile update (Backend pending)
     toast({ title: "Coming Soon", description: "Profile updates will be available in the next release." });
     console.log('Saving profile...');
