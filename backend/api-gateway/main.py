@@ -50,14 +50,22 @@ LLM_URL = os.getenv("LLM_ORCHESTRATOR_URL", "http://localhost:8002")
 RAG_URL = os.getenv("RAG_SERVICE_URL", "http://localhost:8003")
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+# SUPABASE_JWT_SECRET is the HS256 signing secret from Supabase project settings.
+# It must be set in production; the anon key is not a valid signing secret.
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "")
+# Whether to run in local-demo mode (auth disabled). Must be explicitly opted in.
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+
+_extra_origins_raw = os.getenv("ALLOWED_ORIGINS", "")
+_extra_origins = [o.strip() for o in _extra_origins_raw.split(",") if o.strip()]
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:8080",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
-    "http://127.0.0.1:8080"
-]
+    "http://127.0.0.1:8080",
+] + _extra_origins
 
 # ──────────────────────────────────────────────
 # Circuit Breakers (per downstream service)
@@ -115,22 +123,33 @@ from jose import jwt, JWTError
 # Auth Middleware (Phase 5)
 # ──────────────────────────────────────────────
 async def get_current_user(request: Request):
-    """Simple JWT validation against Supabase if configured."""
-    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
-        # In demo/local mode without Supabase config, allow all
+    """Validate Supabase JWT. Requires SUPABASE_JWT_SECRET in production."""
+    if DEMO_MODE:
+        # Demo/local mode: auth is explicitly disabled via DEMO_MODE=true
+        logger.warning("DEMO_MODE is active – authentication is disabled")
         return {"id": "demo-user", "role": "authenticated"}
+
+    if not SUPABASE_JWT_SECRET:
+        # Fail-safe: refuse requests rather than granting open access
+        logger.error(
+            "SUPABASE_JWT_SECRET is not configured – rejecting request. "
+            "Set DEMO_MODE=true to run without auth in local development."
+        )
+        raise HTTPException(status_code=503, detail="Authentication service not configured")
 
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        # Log the missing header for debugging (Phase 5)
         logger.warning(f"Missing or malformed Authorization header for {request.url.path}")
         raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
     
     token = auth_header.split(" ")[1]
     try:
-        # Note: In a real prod env, we'd use the Supabase secret or public key
-        # For this blueprint, we're demonstrating the integration point
-        payload = jwt.decode(token, SUPABASE_ANON_KEY, algorithms=["HS256"], audience="authenticated")
+        payload = jwt.decode(
+            token,
+            SUPABASE_JWT_SECRET,
+            algorithms=["HS256"],
+            audience="authenticated",
+        )
         return payload
     except JWTError as e:
         logger.warning(f"JWT Validation failed: {e}")

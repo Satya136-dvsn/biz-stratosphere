@@ -26,12 +26,15 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { createLogger } from '@/lib/logger';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
+const log = createLogger('AgentPlayground');
 
 interface ToolUsage {
     name: string;
-    args: any;
+    args: Record<string, unknown>;
 }
 
 interface AgentResponse {
@@ -136,11 +139,12 @@ export default function AgentPlayground() {
                 title: "PROCESS_COMPLETE",
                 description: `Execution successful. Confidence: ${(data.confidence_score * 100).toFixed(0)}%`,
             });
-        } catch (error: any) {
-            console.error(error);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            log.error('Agent query failed', error instanceof Error ? error : new Error(message));
             toast({
                 title: "EXECUTION_ERROR",
-                description: error.message,
+                description: message,
                 variant: "destructive"
             });
         } finally {
