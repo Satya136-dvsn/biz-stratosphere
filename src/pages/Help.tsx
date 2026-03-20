@@ -119,7 +119,7 @@ export default function Help() {
                             <p>Biz Stratosphere is a full-stack business analytics and AI platform. It combines real-time dashboards, machine learning predictions, RAG-powered AI chat, advanced charting, and team collaboration — all inside a premium corporate interface.</p>
                             <SectionBlock title="Quick Start (5 Minutes)">
                                 <StepList steps={[
-                                    "Sign up or log in at the Authentication page. Google and GitHub OAuth are also supported.",
+                                    "Sign up or log in at the Authentication page. Any valid email address is supported for registration.",
                                     "You'll land on the Dashboard with live KPI cards (Revenue, Customers, Growth, Satisfaction).",
                                     "Upload your first dataset via the Data Upload widget — CSV and JSON files are accepted, with automatic PII detection.",
                                     "Explore your data in Advanced Charts — choose from 9 chart types with full customization.",

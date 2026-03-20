@@ -59,9 +59,32 @@ export function Settings() {
     push: false,
     reports: true,
     alerts: true,
+    loginConfirmation: true,
   });
 
-  const handleSaveProfile = () => {
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('login_notifications_enabled')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profile) {
+        setNotifications(prev => ({
+          ...prev,
+          loginConfirmation: profile.login_notifications_enabled ?? true
+        }));
+      }
+    };
+
+    fetchPreferences();
+  }, []);
+
+  const handleChangePassword = async () => {
     // Feature: Profile update (Backend pending)
     toast({ title: "Coming Soon", description: "Profile updates will be available in the next release." });
     console.log('Saving profile...');
@@ -129,10 +152,34 @@ export function Settings() {
     }
   };
 
-  const handleSaveNotifications = () => {
-    // Feature: Notification preferences
-    toast({ title: "Saved", description: "Notification preferences saved locally." });
-    console.log('Saving notifications...', notifications);
+  const handleSaveNotifications = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No authenticated user");
+
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
+          login_notifications_enabled: notifications.loginConfirmation,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+
+      toast({ 
+        title: "Preferences Saved", 
+        description: "Security notification protocols updated successfully." 
+      });
+      console.log('Saved notifications to profile:', notifications);
+    } catch (err: any) {
+      console.error('Failed to save notification preferences:', err);
+      toast({ 
+        title: "Save Failed", 
+        description: err.message || "Could not synchronize security protocols.", 
+        variant: "destructive" 
+      });
+    }
   };
 
   const handleExportData = async () => {
@@ -372,6 +419,18 @@ export function Settings() {
                     checked={notifications.reports}
                     onCheckedChange={(checked) =>
                       setNotifications({ ...notifications, reports: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 group">
+                  <div className="space-y-1">
+                    <Label className="text-sm font-bold tracking-tight group-hover:text-primary transition-colors">LOGIN_CONFIRMATION</Label>
+                    <p className="text-xs text-muted-foreground/60 uppercase">SECURE_LOGIN_EVENT_NOTIFICATIONS</p>
+                  </div>
+                  <Switch
+                    checked={notifications.loginConfirmation}
+                    onCheckedChange={(checked) =>
+                      setNotifications({ ...notifications, loginConfirmation: checked })
                     }
                   />
                 </div>

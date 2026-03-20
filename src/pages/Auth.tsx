@@ -14,6 +14,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, Mail, Lock, User, ArrowRight, Sparkles } from "lucide-react";
+import { sendLoginConfirmation } from "@/lib/emailService";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -32,7 +34,7 @@ export default function Auth() {
       // Validate input
       loginSchema.parse({ email, password });
 
-      const { error } = await signIn(email, password);
+      const { error, data } = await signIn(email, password);
 
       if (error) {
         toast({
@@ -46,6 +48,61 @@ export default function Auth() {
           title: "Welcome back!",
           description: "Signed in successfully",
         });
+
+        // Trigger Login Notification Asynchronously
+        if (data?.user) {
+          const user = data.user;
+          const normalizedEmail = email.trim().toLowerCase();
+          
+          // Fire and forget - don't await to avoid blocking UI
+          (async () => {
+            try {
+              // 1. Check if notifications are enabled for this user
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('login_notifications_enabled')
+                .eq('user_id', user.id)
+                .maybeSingle();
+
+              // Default to true if not set
+              if (profile?.login_notifications_enabled !== false) {
+                // 2. Gather device info
+                const ua = navigator.userAgent;
+                const browser = /chrome|safari|firefox|msie|trident/i.test(ua) 
+                  ? ua.match(/(chrome|safari|firefox|msie|trident)/i)?.[0] || 'Unknown Browser'
+                  : 'Unknown Browser';
+                const device = /mobile|android|iphone|ipad|tablet/i.test(ua) ? 'Mobile Device' : 'Desktop/Workstation';
+                
+                // 3. Get IP Address (asynchronously)
+                let ip = 'Unknown';
+                try {
+                  const ipResponse = await fetch('https://api.ipify.org?format=json');
+                  const ipData = await ipResponse.json();
+                  ip = ipData.ip;
+                } catch (e) {
+                  console.warn('Could not fetch IP address for notification');
+                }
+
+                // 4. Send the notification
+                await sendLoginConfirmation({
+                  userId: user.id,
+                  email: user.email!,
+                  name: user.user_metadata?.display_name || user.email!.split('@')[0],
+                  ipAddress: ip,
+                  device: device,
+                  browser: browser,
+                  resetUrl: `${window.location.origin}/forgot-password`
+                });
+                
+                console.log('Login security notification dispatched successfully');
+              }
+            } catch (err) {
+              // Log failure but don't disrupt user
+              console.error('Failed to dispatch login security notification:', err);
+            }
+          })();
+        }
+
         const normalizedEmail = email.trim().toLowerCase();
         navigate(normalizedEmail === "admin@bizstratosphere.com" ? "/admin" : "/dashboard");
       }
