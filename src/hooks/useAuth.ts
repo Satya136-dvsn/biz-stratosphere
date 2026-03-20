@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from '@supabase/supabase-js';
 import { setUserContext } from '@/lib/errorTracking';
+import { createLogger } from '@/lib/logger';
 import {
   canAttemptLogin,
   getRemainingLoginAttempts,
@@ -13,6 +14,8 @@ import {
   isSessionIdle,
   clearIdleTimer,
 } from '@/lib/security';
+
+const log = createLogger('useAuth');
 
 export type UserRole = 'admin' | 'user' | 'super_admin';
 
@@ -89,6 +92,10 @@ export function useAuth() {
       } else {
         setRoleLoading(false);
       }
+    }).catch((err: unknown) => {
+      log.error('Failed to retrieve session', err instanceof Error ? err : new Error(String(err)));
+      setLoading(false);
+      setRoleLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -105,15 +112,15 @@ export function useAuth() {
 
       const userEmail = email?.toLowerCase() || user?.email?.toLowerCase();
       
-      console.log(`[Auth] Identifying role for ${userEmail} (ID: ${userId})`);
+      log.info(`Identifying role for ${userEmail}`, { userId });
 
       if (error) {
-        console.warn('[Auth] profiles.role lookup error:', error);
+        log.warn('profiles.role lookup error', { error });
       }
 
       if (data && (data as any).role) {
         const roleText = String((data as any).role);
-        console.log(`[Auth] Found role in database: ${roleText}`);
+        log.info(`Found role in database: ${roleText}`);
         // Normalize legacy roles into our app roles
         if (roleText === 'company_admin') setUserRole('admin');
         else if (roleText === 'super_admin') setUserRole('super_admin');
@@ -121,14 +128,14 @@ export function useAuth() {
         else setUserRole('user');
       } else if (userEmail === 'admin@bizstratosphere.com') {
         // Local bypass for primary admin account while RLS/Profiles sync
-        console.log(`[Auth] Admin bypass triggered for ${userEmail}`);
+        log.info(`Admin bypass triggered for ${userEmail}`);
         setUserRole('super_admin');
       } else {
-        console.log(`[Auth] No specific role found, defaulting to 'user'`);
+        log.info(`No specific role found, defaulting to 'user'`);
         setUserRole('user');
       }
     } catch (err) {
-      console.error('[Auth] Error in fetchUserRole:', err);
+      log.error('Error in fetchUserRole', err instanceof Error ? err : new Error(String(err)));
       // Fail safe for primary admin
       if (email?.toLowerCase() === 'admin@bizstratosphere.com') {
         setUserRole('super_admin');
@@ -210,7 +217,7 @@ export function useAuth() {
     clearIdleTimer();
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Error signing out:', error);
+      log.error('Error signing out', error);
       return { error };
     }
     return { error: null };

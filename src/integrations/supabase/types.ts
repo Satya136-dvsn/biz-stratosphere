@@ -135,35 +135,61 @@ export interface Database {
                 Row: {
                     id: string;
                     user_id: string;
+                    name: string;
                     file_name: string;
+                    file_type: string;
+                    file_size: number;
+                    status: string;
+                    metadata: Record<string, Json | undefined> | null;
                     created_at: string;
                 };
                 Insert: {
                     id?: string;
                     user_id: string;
+                    name: string;
                     file_name: string;
+                    file_type?: string;
+                    file_size?: number;
+                    status?: string;
+                    metadata?: Record<string, Json | undefined> | null;
                     created_at?: string;
                 };
                 Update: {
+                    name?: string;
                     file_name?: string;
+                    file_type?: string;
+                    file_size?: number;
+                    status?: string;
+                    metadata?: Record<string, Json | undefined> | null;
                 };
             };
             data_points: {
                 Row: {
                     id: string;
+                    user_id: string;
                     dataset_id: string;
                     metric_name: string;
                     metric_value: number;
                     date_recorded: string;
+                    metadata: Record<string, Json | undefined> | null;
                     created_at: string;
                 };
                 Insert: {
+                    user_id: string;
                     dataset_id: string;
                     metric_name: string;
                     metric_value: number;
                     date_recorded: string;
+                    metadata?: Record<string, Json | undefined> | null;
                 };
-                Update: Record<string, any>;
+                Update: {
+                    user_id?: string;
+                    dataset_id?: string;
+                    metric_name?: string;
+                    metric_value?: number;
+                    date_recorded?: string;
+                    metadata?: Record<string, Json | undefined> | null;
+                };
             };
             embeddings: {
                 Row: {

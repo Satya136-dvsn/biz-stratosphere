@@ -12,9 +12,13 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, CheckCircle2, AlertCircle, TrendingUp, Shield, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import Papa from 'papaparse';
 import { scanDataForPII, type PIIScanResult } from '@/lib/piiDetection';
 import { PIIDetection } from './PIIDetection';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('EnhancedDataUpload');
 
 interface DataQuality {
   totalRows: number;
@@ -31,7 +35,7 @@ interface DataQuality {
 interface ValidationError {
   row: number;
   column: string;
-  value: any;
+  value: unknown;
   issue: string;
 }
 
@@ -39,17 +43,22 @@ interface ValidationError {
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
+/** Safely serialise an arbitrary value to a JSON-compatible type. */
+function toJson(value: unknown): Json {
+  return JSON.parse(JSON.stringify(value ?? null)) as Json;
+}
+
 export function EnhancedDataUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<DataQuality | null>(null);
   const [piiScan, setPiiScan] = useState<PIIScanResult | null>(null);
-  const [parsedData, setParsedData] = useState<any[]>([]);
+  const [parsedData, setParsedData] = useState<Record<string, unknown>[]>([]);
   const [piiConsent, setPiiConsent] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const { toast } = useToast();
 
-  const analyzeCSV = (data: any[], fields: string[]) => {
+  const analyzeCSV = (data: Record<string, unknown>[], fields: string[]) => {
     const numericColumns: string[] = [];
     const categoricalColumns: string[] = [];
     const dateColumns: string[] = [];
@@ -59,10 +68,11 @@ export function EnhancedDataUpload() {
     // Analyze columns
     fields.forEach(field => {
       const sample = data.find(row => row[field] != null)?.[field];
+      const sampleStr = String(sample ?? '');
 
-      if (!isNaN(Number(sample))) {
+      if (sampleStr !== '' && sample != null && !isNaN(Number(sample))) {
         numericColumns.push(field);
-      } else if (!isNaN(Date.parse(sample))) {
+      } else if (sampleStr !== '' && !isNaN(Date.parse(sampleStr))) {
         dateColumns.push(field);
       } else {
         categoricalColumns.push(field);
@@ -180,7 +190,7 @@ export function EnhancedDataUpload() {
     Papa.parse(file, {
       header: true,
       complete: (results) => {
-        const data = results.data as any[];
+        const data = results.data as Record<string, unknown>[];
         const fields = results.meta.fields || [];
 
         // Analyze quality
@@ -211,7 +221,7 @@ export function EnhancedDataUpload() {
         }
       },
       error: (error) => {
-        console.error('Parse error:', error);
+        log.error('Parse error', error instanceof Error ? error : new Error(String(error)));
         toast({
           title: "Error",
           description: "Failed to parse CSV file",
@@ -223,7 +233,7 @@ export function EnhancedDataUpload() {
   };
 
   const handleUpload = async () => {
-    console.log('Starting upload. Parsed data length:', parsedData.length);
+    log.info('Starting upload', { rowCount: parsedData.length });
 
     if (!file || !analysis) return;
 
@@ -254,38 +264,46 @@ export function EnhancedDataUpload() {
       if (!user) throw new Error('Not authenticated');
 
       // 1. Create dataset record
-      const { data: dataset, error: datasetError } = await (supabase
-        .from('datasets') as any)
+      const { data: dataset, error: datasetError } = await supabase
+        .from('datasets')
         .insert([{
           user_id: user.id,
           name: file.name,
           file_name: file.name,
           file_type: 'csv',
           file_size: file.size,
-          status: 'processing' as const, // Set to processing initially
+          status: 'processing',
           metadata: {
-            quality: analysis,
-            pii_scan: piiScan,
+            quality: toJson(analysis) as Record<string, Json | undefined>,
+            pii_scan: toJson(piiScan) as Record<string, Json | undefined>,
             pii_consent_given: piiConsent,
             uploaded_at: new Date().toISOString()
           }
-        }] as any)
+        }])
         .select()
         .single();
 
       if (datasetError || !dataset) throw datasetError;
 
       // 2. Prepare Data Points (Batch Processing)
+      interface DataPointInsert {
+        user_id: string;
+        dataset_id: string;
+        metric_name: string;
+        metric_value: number;
+        date_recorded: string;
+        metadata?: Record<string, Json | undefined> | null;
+      }
       const BATCH_SIZE = 100; // conservative batch size
-      const pointsToInsert: any[] = [];
+      const pointsToInsert: DataPointInsert[] = [];
       const timestamp = new Date().toISOString();
 
       // Helper to try parsing date
-      const parseDate = (row: any) => {
+      const parseDate = (row: Record<string, unknown>) => {
         // Try common date fields
         const dateField = Object.keys(row).find(k => k.toLowerCase().includes('date') || k.toLowerCase().includes('time'));
         if (dateField && row[dateField]) {
-          const d = new Date(row[dateField]);
+          const d = new Date(String(row[dateField]));
           if (!isNaN(d.getTime())) return d.toISOString();
         }
         return timestamp; // Fallback to upload time
@@ -301,7 +319,7 @@ export function EnhancedDataUpload() {
           metric_name: 'raw_csv_row',
           metric_value: 0, // Placeholder
           date_recorded: rowDate,
-          metadata: { row_data: row }
+          metadata: { row_data: toJson(row) as Record<string, Json | undefined> }
         });
 
         // B. Insert Individual Numeric Metrics (for Aggregation Reports)
@@ -310,7 +328,7 @@ export function EnhancedDataUpload() {
           // Skip IDs, dates, and non-numeric
           if (key.toLowerCase().includes('date') || key.toLowerCase().includes('id')) return;
 
-          const numVal = parseFloat(val as string);
+          const numVal = parseFloat(String(val));
           if (!isNaN(numVal)) {
             pointsToInsert.push({
               user_id: user.id,
@@ -325,16 +343,16 @@ export function EnhancedDataUpload() {
       });
 
       // 3. Perform Batched Inserts
-      console.log(`Uploading ${pointsToInsert.length} data points...`);
+      log.info(`Uploading ${pointsToInsert.length} data points`);
 
       for (let i = 0; i < pointsToInsert.length; i += BATCH_SIZE) {
         const batch = pointsToInsert.slice(i, i + BATCH_SIZE);
-        const { error: batchError } = await (supabase
-          .from('data_points') as any)
+        const { error: batchError } = await supabase
+          .from('data_points')
           .insert(batch);
 
         if (batchError) {
-          console.error('Batch upload error:', batchError);
+          log.error('Batch upload error', new Error(batchError.message), { batchIndex: i });
           // We continue trying best effort, but log critical failure
           toast({
             title: "Batch Upload Issue",
@@ -349,9 +367,9 @@ export function EnhancedDataUpload() {
       }
 
       // 4. Update Dataset Status to Completed
-      await (supabase
-        .from('datasets') as any)
-        .update({ status: 'completed' } as any)
+      await supabase
+        .from('datasets')
+        .update({ status: 'completed' })
         .eq('id', dataset.id);
 
       toast({
@@ -366,7 +384,7 @@ export function EnhancedDataUpload() {
       setParsedData([]);
 
     } catch (error) {
-      console.error('Upload error:', error);
+      log.error('Upload error', error instanceof Error ? error : new Error(String(error)));
       toast({
         title: "Upload Failed",
         description: error instanceof Error ? error.message : 'Unknown error',
