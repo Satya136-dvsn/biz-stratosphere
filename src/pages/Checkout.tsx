@@ -31,7 +31,6 @@ import {
     QrCode,
     Globe,
     Banknote,
-    Loader2,
     ArrowRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -75,9 +74,6 @@ export default function Checkout() {
     
     const selectedPlan = searchParams.get("plan") || "pro";
     const [activeMethod, setActiveMethod] = useState<PaymentMethod>("card");
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [processingStep, setProcessingStep] = useState("");
-    const [isSuccess, setIsSuccess] = useState(false);
 
     // ── Plan Pricing ──
     const plans: Record<string, { name: string; price: number; predictions: string }> = {
@@ -100,76 +96,13 @@ export default function Checkout() {
     const [selectedBank, setSelectedBank] = useState("");
     const [selectedWallet, setSelectedWallet] = useState("");
 
-    // ── Simulate multi-step processing ──
-    const handlePayment = async (e: React.FormEvent) => {
+    // ── Contact Sales redirect ──
+    const handlePayment = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsProcessing(true);
-
-        const steps = [
-            "Encrypting payment data...",
-            "Connecting to payment gateway...",
-            "Verifying with bank...",
-            "Confirming transaction..."
-        ];
-
-        for (const step of steps) {
-            setProcessingStep(step);
-            await new Promise(r => setTimeout(r, 700));
-        }
-        
-        setIsProcessing(false);
-        setIsSuccess(true);
-        
-        toast({
-            title: isVIP ? "VIP Access Granted" : "Payment Successful",
-            description: `Your ${planInfo.name} plan is now active.`,
-        });
+        navigate(`/contact-sales?plan=${selectedPlan}&method=${activeMethod}`);
     };
 
-    // ── Success State ──
-    if (isSuccess) {
-        return (
-            <PageLayout maxWidth="3xl" className="flex items-center justify-center min-h-[70vh]">
-                <Card className="w-full max-w-lg text-center p-12 glass-strong border-primary/30 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
-                    <div className="flex justify-center mb-8">
-                        <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center animate-in zoom-in duration-700">
-                            <CheckCircle2 className="h-12 w-12 text-primary" />
-                        </div>
-                    </div>
-                    <CardTitle className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                        Payment Successful!
-                    </CardTitle>
-                    <p className="text-muted-foreground text-lg mb-2">
-                        Your <span className="text-primary font-bold">{planInfo.name}</span> subscription is now active.
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-10">
-                        Payment method: <span className="capitalize font-medium text-foreground">{activeMethod === "card" ? "Credit/Debit Card" : activeMethod === "upi" ? "UPI" : activeMethod === "netbanking" ? "Net Banking" : selectedWallet}</span>
-                    </p>
-                    <Button 
-                        onClick={() => navigate("/dashboard")} 
-                        className="w-full h-12 text-lg shadow-glow-primary hover:shadow-glow-primary-hover transition-all duration-300"
-                    >
-                        Go to Dashboard
-                        <ChevronRight className="ml-2 h-5 w-5" />
-                    </Button>
-                </Card>
-            </PageLayout>
-        );
-    }
-
-    // ── Processing Overlay ──
-    const ProcessingOverlay = () => (
-        isProcessing ? (
-            <div className="absolute inset-0 z-20 bg-background/80 backdrop-blur-md rounded-xl flex flex-col items-center justify-center gap-6">
-                <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                <p className="text-lg font-bold text-foreground animate-pulse">{processingStep}</p>
-                <div className="w-48 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full animate-[progress_2.8s_ease-in-out_infinite]" style={{ width: "100%" }} />
-                </div>
-            </div>
-        ) : null
-    );
+    // ── Success State (kept for future use) ──
 
     return (
         <PageLayout maxWidth="5xl">

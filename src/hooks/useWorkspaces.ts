@@ -191,6 +191,7 @@ export function useWorkspaceMembers(workspaceId: string) {
     });
 
     // Invite member
+    const { user } = useAuth();
     const inviteMember = useMutation({
         mutationFn: async (data: { email: string; role: 'admin' | 'member' | 'viewer' }) => {
             const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -204,6 +205,7 @@ export function useWorkspaceMembers(workspaceId: string) {
                     email: data.email,
                     role: data.role,
                     token,
+                    invited_by: user!.id,   // Fix: required NOT NULL field
                     expires_at: expiresAt.toISOString(),
                 });
 
