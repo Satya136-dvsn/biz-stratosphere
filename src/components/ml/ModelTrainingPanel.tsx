@@ -13,6 +13,9 @@ import { generateChurnTrainingData, generateRevenueTrainingData, splitTrainTest 
 import { trainBothModels, evaluateModel, TrainingProgress } from '@/lib/modelTrainer';
 import { useToast } from '@/hooks/use-toast';
 import { useAdvancedML } from '@/hooks/useAdvancedML';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('ModelTrainingPanel');
 
 export function ModelTrainingPanel() {
     const { toast } = useToast();
@@ -40,7 +43,7 @@ export function ModelTrainingPanel() {
             });
 
             // Generate training data (1000 samples each)
-            console.log('📊 Generating training data...');
+            log.info('Generating training data');
             const churnData = generateChurnTrainingData(1000);
             const revenueData = generateRevenueTrainingData(1000);
 
@@ -48,7 +51,7 @@ export function ModelTrainingPanel() {
             const churnSplit = splitTrainTest(churnData, 0.8);
             const revenueSplit = splitTrainTest(revenueData, 0.8);
 
-            console.log(`✅ Data generated: ${churnData.length} churn samples, ${revenueData.length} revenue samples`);
+            log.info(`Data generated: ${churnData.length} churn samples, ${revenueData.length} revenue samples`);
 
             // Determine next version
             const nextVersion = await getNextVersion('churn_model');
@@ -68,7 +71,7 @@ export function ModelTrainingPanel() {
             const totalTime = Date.now() - startTime;
 
             // Evaluate models on test data
-            console.log('📈 Evaluating model accuracy...');
+            log.info('Evaluating model accuracy');
             const churnEval = await evaluateModel(
                 'indexeddb://churn_model_trained',
                 churnSplit.test,
@@ -111,8 +114,8 @@ export function ModelTrainingPanel() {
                 description: `Models trained successfully in ${(totalTime / 1000).toFixed(1)}s. Churn accuracy: ${(churnEval.accuracy! * 100).toFixed(1)}%`,
             });
 
-        } catch (error: any) {
-            console.error('Training error:', error);
+        } catch (error: unknown) {
+            log.error('Training error', error instanceof Error ? error : new Error(String(error)));
             toast({
                 title: 'Training Failed',
                 description: error.message || 'Failed to train models',

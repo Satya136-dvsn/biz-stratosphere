@@ -5,6 +5,9 @@
 import { AIConfig, AIRequest, AIResponse, AIMessage, AIProvider } from './types';
 import { supabase } from '../supabaseClient';
 import { AI_PROMPTS } from './prompts';
+import { createLogger } from '../logger';
+
+const log = createLogger('AIOrchestrator');
 
 const DEFAULT_CONFIG: AIConfig = {
     localUrl: (import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434') + '/api/chat',
@@ -40,7 +43,7 @@ export class AIOrchestrator {
         // Check Cache
         const cached = this.cache.get(cacheKey);
         if (cached && (Date.now() - cached.timestamp < this.CACHE_TTL)) {
-            console.log('[AIOrchestrator] Cache Hit');
+            log.debug('Cache hit');
             return {
                 content: cached.content,
                 provider: (request.provider || this.config.preferredProvider) as AIProvider,
@@ -52,7 +55,7 @@ export class AIOrchestrator {
         const provider = request.provider || this.config.preferredProvider;
 
         try {
-            console.log(`[AIOrchestrator] Routing to: ${provider}`);
+            log.debug('Routing request', { provider });
 
             let response: AIResponse;
 
@@ -84,11 +87,11 @@ export class AIOrchestrator {
             return response;
 
         } catch (error: any) {
-            console.error(`[AIOrchestrator] Error with ${provider}:`, error);
+            log.error(`Error with provider ${provider}`, error instanceof Error ? error : new Error(String(error)));
 
             // Fallback Logic
             if (this.config.fallbackEnabled && provider !== 'openai') {
-                console.log('[AIOrchestrator] Attempting fallback to OpenAI...');
+                log.info('Attempting fallback to OpenAI');
                 const fallbackRequest = { ...request, provider: 'openai' as AIProvider };
                 return await this.callEdgeFunction(fallbackRequest, 'openai');
             }
@@ -111,7 +114,7 @@ export class AIOrchestrator {
 
         // MOCK FALLBACK for Demo/Invalid Key
         if (!apiKey || apiKey === 'your_gemini_api_key_here' || apiKey.length < 10) {
-            console.warn('[AIOrchestrator] No valid Gemini API Key found. Using Mock Response.');
+            log.warn('No valid Gemini API Key found, using mock response');
             await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate latency
             return {
                 content: "I'm currently in Demo Mode because a valid API Key wasn't detected. \n\nNormally, I would analyze your data using Gemini Flash, but for now, I can tell you that your Revenue is trending up! 🚀\n\n(To enable real AI, please set VITE_GEMINI_API_KEY in your .env file)",
@@ -174,7 +177,7 @@ export class AIOrchestrator {
                         throw new Error(`Gemini Rate Limit Exceeded after ${maxRetries} retries.`);
                     }
                     const delay = baseDelay * Math.pow(2, attempt) + (Math.random() * 1000); // Backoff + Jitter
-                    console.warn(`[AIOrchestrator] Rate limit hit (429). Retrying in ${Math.round(delay)}ms...`);
+                    log.warn('Rate limit hit (429), retrying', { delayMs: Math.round(delay) });
                     await new Promise(resolve => setTimeout(resolve, delay));
                     continue; // Retry loop
                 }
@@ -353,7 +356,7 @@ export class AIOrchestrator {
             jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(jsonStr);
         } catch (e) {
-            console.error('Failed to parse AI suggestions:', e);
+            log.error('Failed to parse AI suggestions', e instanceof Error ? e : new Error(String(e)));
             return [];
         }
     }

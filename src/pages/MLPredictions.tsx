@@ -22,6 +22,9 @@ import { ModelComparison } from '@/components/ml/ModelComparison';
 import { BatchPredictionPanel } from '@/components/ml/BatchPredictionPanel';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
 import { Sparkles } from 'lucide-react';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('MLPredictions');
 
 const MODEL_FEATURES = {
     churn_model: {
@@ -68,7 +71,7 @@ export function MLPredictions() {
                 // This will create 'churn_model_advanced' and 'revenue_model_advanced'
                 await createDemoModels();
                 setModelsCreated(true);
-                console.log('✅ Advanced demo models ready for predictions');
+                log.info('Advanced demo models ready for predictions');
             }
         };
         initModels();
@@ -102,7 +105,7 @@ export function MLPredictions() {
 
             setExplanation(response.content);
         } catch (error) {
-            console.error('Explanation failed:', error);
+            log.error('Explanation failed', error instanceof Error ? error : new Error(String(error)));
             setExplanation("Sorry, I couldn't generate an explanation right now.");
         } finally {
             setIsExplaining(false);
@@ -138,17 +141,17 @@ export function MLPredictions() {
             try {
                 // 1. Try fully trained user model (highest priority)
                 model = await tf.loadLayersModel(trainedModelPath);
-                console.log('✅ Using custom trained model');
+                log.debug('Using custom trained model');
             } catch (e1) {
                 try {
                     // 2. Try advanced pre-built model (high accuracy default)
                     model = await tf.loadLayersModel(advancedModelPath);
-                    console.log('✅ Using advanced deep neural network model');
+                    log.debug('Using advanced deep neural network model');
                 } catch (e2) {
                     try {
                         // 3. Fallback to basic model if exists
                         model = await tf.loadLayersModel(basicModelPath);
-                        console.log('⚠️ Using basic model (fallback)');
+                        log.debug('Using basic model (fallback)');
                     } catch (e3) {
                         throw new Error('No valid model found. Please wait for models to initialize.');
                     }
@@ -199,17 +202,17 @@ export function MLPredictions() {
                         });
 
                     if (dbError) {
-                        console.error('Error saving prediction:', dbError);
+                        log.error('Error saving prediction', new Error(dbError.message));
                     } else {
-                        console.log('✅ Prediction saved to history');
+                        log.debug('Prediction saved to history');
                     }
                 }
-            } catch (dbError) {
-                console.error('Database save error:', dbError);
+            } catch (dbError: unknown) {
+                log.error('Database save error', dbError instanceof Error ? dbError : new Error(String(dbError)));
             }
 
-        } catch (error: any) {
-            console.error('Prediction error:', error);
+        } catch (error: unknown) {
+            log.error('Prediction error', error instanceof Error ? error : new Error(String(error)));
             setPrediction({
                 error: true,
                 message: 'Failed to make prediction. Please try again.',

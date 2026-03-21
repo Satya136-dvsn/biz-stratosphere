@@ -41,7 +41,9 @@ export const initializeErrorTracking = (dsn?: string) => {
             replaysSessionSampleRate: 0.1,
             replaysOnErrorSampleRate: 1.0,
         });
-        console.log('Sentry initialized successfully');
+        if (import.meta.env.DEV) {
+            console.log('Sentry initialized successfully');
+        }
     } catch (e) {
         console.error('Failed to initialize Sentry:', e);
     }

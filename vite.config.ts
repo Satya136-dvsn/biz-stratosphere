@@ -19,7 +19,7 @@ export default defineConfig({
     },
   },
   build: {
-    minify: false,
-    sourcemap: true,
+    minify: true,
+    sourcemap: process.env.NODE_ENV !== 'production',
   },
 });

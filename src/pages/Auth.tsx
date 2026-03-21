@@ -16,6 +16,9 @@ import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, Mail, Lock, User, ArrowRight, Sparkles } from "lucide-react";
 import { sendLoginConfirmation } from "@/lib/emailService";
 import { supabase } from "@/integrations/supabase/client";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger('Auth');
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -80,7 +83,7 @@ export default function Auth() {
                   const ipData = await ipResponse.json();
                   ip = ipData.ip;
                 } catch (e) {
-                  console.warn('Could not fetch IP address for notification');
+                  log.warn('Could not fetch IP address for notification');
                 }
 
                 // 4. Send the notification
@@ -94,11 +97,11 @@ export default function Auth() {
                   resetUrl: `${window.location.origin}/forgot-password`
                 });
                 
-                console.log('Login security notification dispatched successfully');
+                log.info('Login security notification dispatched successfully');
               }
             } catch (err) {
               // Log failure but don't disrupt user
-              console.error('Failed to dispatch login security notification:', err);
+              log.error('Failed to dispatch login security notification', err instanceof Error ? err : new Error(String(err)));
             }
           })();
         }

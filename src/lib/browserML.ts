@@ -4,6 +4,9 @@
 
 import * as tf from '@tensorflow/tfjs';
 import { supabase } from './supabaseClient';
+import { createLogger } from './logger';
+
+const log = createLogger('browserML');
 
 // Model metadata interface
 export interface MLModel {
@@ -29,11 +32,11 @@ export async function loadModel(modelPath: string): Promise<tf.LayersModel | nul
     try {
         // Check cache first
         if (modelCache.has(modelPath)) {
-            console.log(`✅ Model loaded from cache: ${modelPath}`);
+            log.debug('Model loaded from cache', { modelPath });
             return modelCache.get(modelPath)!;
         }
 
-        console.log(`📥 Loading model from storage: ${modelPath}`);
+        log.debug('Loading model from storage', { modelPath });
 
         // Get model URL from Supabase Storage (public bucket)
         const { data } = supabase.storage
@@ -50,10 +53,10 @@ export async function loadModel(modelPath: string): Promise<tf.LayersModel | nul
         // Cache for future use
         modelCache.set(modelPath, model);
 
-        console.log(`✅ Model loaded successfully: ${modelPath}`);
+        log.debug('Model loaded successfully', { modelPath });
         return model;
     } catch (error) {
-        console.error('❌ Error loading model:', error);
+        log.error('Error loading model', error instanceof Error ? error : new Error(String(error)));
         return null;
     }
 }
@@ -116,7 +119,7 @@ export async function predict(
             confidence: Number(Math.min(1.0, confidence).toFixed(4)), // Cap at 1.0 (100%)
         };
     } catch (error) {
-        console.error('❌ Prediction error:', error);
+        log.error('Prediction error', error instanceof Error ? error : new Error(String(error)));
         throw error;
     }
 }
@@ -155,7 +158,7 @@ export async function batchPredict(
 
         return results;
     } catch (error) {
-        console.error('❌ Batch prediction error:', error);
+        log.error('Batch prediction error', error instanceof Error ? error : new Error(String(error)));
         throw error;
     }
 }
@@ -194,7 +197,7 @@ export async function getFeatureImportance(
 
         return importance;
     } catch (error) {
-        console.error('❌ Feature importance error:', error);
+        log.error('Feature importance error', error instanceof Error ? error : new Error(String(error)));
         return {};
     }
 }
@@ -354,9 +357,9 @@ export function createRevenueModel(): tf.Sequential {
 export async function saveModelLocally(model: tf.LayersModel, modelName: string): Promise<void> {
     try {
         await model.save(`indexeddb://${modelName}`);
-        console.log(`✅ Model saved locally: ${modelName}`);
+        log.debug('Model saved locally', { modelName });
     } catch (error) {
-        console.error('❌ Error saving model:', error);
+        log.error('Error saving model', error instanceof Error ? error : new Error(String(error)));
     }
 }
 
@@ -366,10 +369,10 @@ export async function saveModelLocally(model: tf.LayersModel, modelName: string)
 export async function loadModelLocally(modelName: string): Promise<tf.LayersModel | null> {
     try {
         const model = await tf.loadLayersModel(`indexeddb://${modelName}`);
-        console.log(`✅ Model loaded from local storage: ${modelName}`);
+        log.debug('Model loaded from local storage', { modelName });
         return model;
     } catch (error) {
-        console.error('❌ Error loading local model:', error);
+        log.error('Error loading local model', error instanceof Error ? error : new Error(String(error)));
         return null;
     }
 }
@@ -379,7 +382,7 @@ export async function loadModelLocally(modelName: string): Promise<tf.LayersMode
  */
 export function clearModelCache(): void {
     modelCache.clear();
-    console.log('🗑️ Model cache cleared');
+    log.info('Model cache cleared');
 }
 
 /**

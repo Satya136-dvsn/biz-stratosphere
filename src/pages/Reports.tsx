@@ -267,9 +267,8 @@ export function Reports() {
                   <div className="space-y-1.5">
                     <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Contextual Dataset</Label>
                     <Select
-                      onValueChange={(value) => {
+                      onValueChange={(_value) => {
                         // In a real app, this would filter metrics by dataset
-                        console.log('Selected dataset:', value);
                       }}
                     >
                       <SelectTrigger className="bg-muted/30 border-border/40 text-xs h-9">

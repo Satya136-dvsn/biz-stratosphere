@@ -12,6 +12,9 @@ import { aiOrchestrator } from '@/lib/ai/orchestrator';
 import { useEmbeddings } from '@/hooks/useEmbeddings';
 import { calculateConfidenceFromResults, type ConfidenceScore } from '@/lib/ai/confidenceScoring';
 import { validateGrounding, type GroundingResult } from '@/lib/ai/groundingValidator';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('useRAGChat');
 
 
 
@@ -192,12 +195,12 @@ export function useRAGChat(conversationId?: string) {
                                 metadata: r.metadata,
                                 similarity: r.similarity
                             }));
-                            console.log(`[RAG] Found ${results.length} context chunks.`);
+                            log.debug('Found context chunks', { count: results.length });
                         } else {
-                            console.log('[RAG] No relevant context found above threshold.');
+                            log.debug('No relevant context found above threshold');
                         }
                     } catch (searchErr) {
-                        console.error('Vector search failed:', searchErr);
+                        log.error('Vector search failed', searchErr instanceof Error ? searchErr : new Error(String(searchErr)));
                         // Continue without context rather than failing completely
                     }
                 }
@@ -304,7 +307,7 @@ Cite sources using [Source ID] format if referenced.`;
                         prompt_version: 'v2.1-rag-optimized',
                     }]);
                 } catch (auditError) {
-                    console.warn('[RAG] Audit logging failed:', auditError);
+                    log.warn('Audit logging failed', { error: String(auditError) });
                     // Don't fail the request if audit fails
                 }
 

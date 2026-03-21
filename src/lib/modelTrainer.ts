@@ -5,6 +5,9 @@
 import * as tf from '@tensorflow/tfjs';
 import { createChurnModel, createRevenueModel } from './browserML';
 import { MLMonitor } from './ml/monitor';
+import { createLogger } from './logger';
+
+const log = createLogger('modelTrainer');
 
 export interface TrainingProgress {
     epoch: number;
@@ -80,7 +83,7 @@ export async function trainChurnModel(
         //    but here we rely on val_acc for speed in browser)
 
         if (finalValAccuracy < 0.80) {
-            console.error(`❌ Training Rejected: Model Accuracy (${(finalValAccuracy * 100).toFixed(1)}%) below threshold (80%)`);
+            log.error(`Training rejected: accuracy ${(finalValAccuracy * 100).toFixed(1)}% below 80% threshold`, new Error('AccuracyBelowThreshold'));
             throw new Error(`Model validation failed! Accuracy ${(finalValAccuracy * 100).toFixed(1)}% is too low (target > 80%). Training rolled back.`);
         }
 
@@ -100,7 +103,7 @@ export async function trainChurnModel(
         await model.save(`indexeddb://churn_model_v${version.replace(/\./g, '_')}`);
         // Also save as the generic 'trained' for backward compatibility or active use
         await model.save('indexeddb://churn_model_trained');
-        console.log(`✅ Churn model trained, validated (Acc: ${(finalValAccuracy * 100).toFixed(1)}%), and saved as v${version}`);
+        log.info('Churn model trained and saved', { accuracy: (finalValAccuracy * 100).toFixed(1), version });
 
     } finally {
         // Cleanup tensors
@@ -170,7 +173,7 @@ export async function trainRevenueModel(
         // Let's enforce that val_loss is not exploding.
 
         if (Number.isNaN(finalValLoss) || finalValLoss > 1.0) {
-            console.error(`❌ Training Rejected: Model Loss (${finalValLoss.toFixed(4)}) is too high or NaN.`);
+            log.error(`Training rejected: loss ${finalValLoss.toFixed(4)} is too high or NaN`, new Error('LossTooHigh'));
             throw new Error(`Model validation failed! Loss is too high. Training rolled back.`);
         }
 
@@ -187,7 +190,7 @@ export async function trainRevenueModel(
         await model.save(`indexeddb://revenue_model_v${version.replace(/\./g, '_')}`);
         // Also save as the generic 'trained' for backward compatibility or active use
         await model.save('indexeddb://revenue_model_trained');
-        console.log(`✅ Revenue model trained, validated (Loss: ${finalValLoss.toFixed(4)}), and saved as v${version}`);
+        log.info('Revenue model trained and saved', { loss: finalValLoss.toFixed(4), version });
 
     } finally {
         // Cleanup tensors
@@ -265,7 +268,7 @@ export async function trainBothModels(
     version: string = '1.0.0',
     onProgress?: (modelName: string, progress: TrainingProgress) => void
 ): Promise<{ churn: TrainingResult; revenue: TrainingResult }> {
-    console.log(`🚀 Starting model training for version ${version}...`);
+    log.info('Starting model training', { version });
 
     // Train churn model
     const churnResult = await trainChurnModel(churnData, version, (progress) => {
@@ -277,7 +280,7 @@ export async function trainBothModels(
         if (onProgress) onProgress('Revenue Model', progress);
     });
 
-    console.log('✅ Both models trained successfully!');
+    log.info('Both models trained successfully');
 
     return {
         churn: churnResult,

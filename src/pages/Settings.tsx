@@ -41,6 +41,9 @@ import { useToast } from "@/hooks/use-toast";
 import { passwordSchema } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger('Settings');
 
 export function Settings() {
   const { user } = useAuth();
@@ -87,7 +90,6 @@ export function Settings() {
   const handleSaveProfile = async () => {
     // Feature: Profile update (Backend pending)
     toast({ title: "Coming Soon", description: "Profile updates will be available in the next release." });
-    console.log('Saving profile...');
   };
 
   const handleChangePassword = async () => {
@@ -171,12 +173,11 @@ export function Settings() {
         title: "Preferences Saved", 
         description: "Security notification protocols updated successfully." 
       });
-      console.log('Saved notifications to profile:', notifications);
-    } catch (err: any) {
-      console.error('Failed to save notification preferences:', err);
+    } catch (err: unknown) {
+      log.error('Failed to save notification preferences', err instanceof Error ? err : new Error(String(err)));
       toast({ 
         title: "Save Failed", 
-        description: err.message || "Could not synchronize security protocols.", 
+        description: err instanceof Error ? err.message : "Could not synchronize security protocols.", 
         variant: "destructive" 
       });
     }
@@ -205,7 +206,7 @@ export function Settings() {
         description: "Your personal data has been securely exported.",
       });
     } catch (error) {
-      console.error('Export failed:', error);
+      log.error('Export failed', error instanceof Error ? error : new Error(String(error)));
       toast({
         title: "Export Failed",
         description: "Could not generate functionality export. Please try again later.",

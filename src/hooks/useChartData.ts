@@ -6,6 +6,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format, subMonths, subYears } from 'date-fns';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('useChartData');
 
 interface ChartDataPoint {
   month: string;
@@ -56,7 +59,7 @@ export function useChartData(filters: ChartFilters) {
       return;
     }
 
-    console.log('[useChartData] Fetching data...', {
+    log.debug('Fetching data', {
       isFilterChange,
       startDate: filters.startDate?.toISOString(),
       endDate: filters.endDate?.toISOString(),
@@ -90,7 +93,7 @@ export function useChartData(filters: ChartFilters) {
 
       if (!rawDataPoints || rawDataPoints.length === 0) {
         // Return empty chart points if no data to be ACCURATE
-        console.log('[useChartData] No data found in DB, showing empty state');
+        log.debug('No data found in DB, showing empty state');
         setChartData([]);
         return;
       }
@@ -208,12 +211,12 @@ export function useChartData(filters: ChartFilters) {
       chartPoints.sort((a, b) => a.date.getTime() - b.date.getTime());
 
       setChartData(chartPoints);
-      console.log('[useChartData] Chart data filtered and set:', chartPoints.length, 'points');
+      log.debug('Chart data filtered and set', { count: chartPoints.length });
 
     } catch (error) {
-      console.error('Error fetching chart data:', error);
+      log.error('Error fetching chart data', error instanceof Error ? error : new Error(String(error)));
       // Fallback to Demo Data on Error (e.g. Backend down)
-      console.log('[useChartData] Error (likely backend down), using Demo Data');
+      log.debug('Error (likely backend down), using Demo Data');
       const currentYear = new Date().getFullYear();
       const demoPoints = DEMO_CHART_DATA.map((d, i) => {
         return {
@@ -232,7 +235,7 @@ export function useChartData(filters: ChartFilters) {
   // Initial fetch (runs once or when user changes)
   useEffect(() => {
     // Always fetch. If user is null, fetchChartData handles it by showing Demo Data.
-    console.log('[useChartData] Initial load');
+    log.debug('Initial load');
     fetchChartData(false);
   }, [user?.id, fetchChartData]);
 
@@ -244,7 +247,7 @@ export function useChartData(filters: ChartFilters) {
   useEffect(() => {
     // Only fetch on filter changes after initial load
     if (hasInitiallyLoaded.current) {
-      console.log('[useChartData] Filter changed, refetching...');
+      log.debug('Filter changed, refetching');
       fetchChartData(true);
     }
   }, [startTimestamp, endTimestamp, filters.period, JSON.stringify(filters.categories), fetchChartData]);

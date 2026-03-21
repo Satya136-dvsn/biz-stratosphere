@@ -30,6 +30,9 @@ import { Save, Download, FileDown, Loader2, Info, ChevronLeft, ChevronRight, Che
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('AdvancedCharts');
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F'];
 const PAGE_SIZE = 500;
@@ -96,7 +99,7 @@ export default function AdvancedCharts() {
             const { data, error } = await query;
 
             if (error) {
-                console.error('❌ Query error:', error);
+                log.error('Query error', error instanceof Error ? error : new Error(String(error)));
                 throw error;
             }
 
@@ -108,9 +111,8 @@ export default function AdvancedCharts() {
                 _date_recorded: point.date_recorded
             }));
 
-            console.log('📊 Extracted Data:', {
+            log.debug('Extracted data', {
                 extracted_count: extractedData.length,
-                sample_row: extractedData[0],
                 columns: extractedData[0] ? Object.keys(extractedData[0]) : []
             });
 

@@ -18,10 +18,8 @@ export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
         // If we have a user but are still roleLoading, we wait.
         if (!loading) {
             if (!user) {
-                console.log('[AdminRoute] No user found, redirecting to auth');
                 navigate('/auth');
             } else if (!roleLoading && !isAdmin()) {
-                console.log('[AdminRoute] User is not an admin, redirecting to dashboard');
                 navigate('/dashboard');
             }
         }

@@ -120,6 +120,24 @@ app.include_router(make_health_router("api-gateway", version="1.0.0"))
 from jose import jwt, JWTError
 
 # ──────────────────────────────────────────────
+# Startup validation
+# ──────────────────────────────────────────────
+@app.on_event("startup")
+async def _startup_checks() -> None:
+    """Warn loudly about dangerous runtime configurations."""
+    if DEMO_MODE:
+        logger.warning(
+            "DEMO_MODE=true: authentication is DISABLED. "
+            "This must never be set in a production deployment."
+        )
+    if not SUPABASE_JWT_SECRET and not DEMO_MODE:
+        logger.error(
+            "SUPABASE_JWT_SECRET is not set and DEMO_MODE is false. "
+            "All authenticated endpoints will return 503 until the secret is configured. "
+            "See .env.production.example for required variables."
+        )
+
+# ──────────────────────────────────────────────
 # Auth Middleware (Phase 5)
 # ──────────────────────────────────────────────
 async def get_current_user(request: Request):
@@ -135,7 +153,13 @@ async def get_current_user(request: Request):
             "SUPABASE_JWT_SECRET is not configured – rejecting request. "
             "Set DEMO_MODE=true to run without auth in local development."
         )
-        raise HTTPException(status_code=503, detail="Authentication service not configured")
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Authentication service not configured: SUPABASE_JWT_SECRET is missing. "
+                "See .env.production.example for required environment variables."
+            ),
+        )
 
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):

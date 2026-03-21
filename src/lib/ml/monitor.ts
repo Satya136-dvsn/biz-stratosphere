@@ -3,6 +3,9 @@
 // Unauthorized copying or distribution prohibited.
 
 import { supabase } from '../supabaseClient';
+import { createLogger } from '../logger';
+
+const log = createLogger('MLMonitor');
 
 export interface ModelMetrics {
     accuracy?: number;
@@ -40,7 +43,7 @@ export class MLMonitor {
                 .single();
 
             if (!model) {
-                console.warn(`[MLMonitor] Model not found: ${modelName}`);
+                log.warn('Model not found', { modelName });
                 return;
             }
 
@@ -62,9 +65,9 @@ export class MLMonitor {
             });
 
             if (error) throw error;
-            console.log(`[MLMonitor] Logged metrics for ${modelName} v${version}`);
+            log.info('Metrics logged', { modelName, version });
         } catch (err) {
-            console.error('[MLMonitor] Failed to log metrics:', err);
+            log.error('Failed to log metrics', err instanceof Error ? err : new Error(String(err)));
         }
     }
 

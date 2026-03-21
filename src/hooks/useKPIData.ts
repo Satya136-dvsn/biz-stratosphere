@@ -5,6 +5,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('useKPIData');
 
 export interface KPIData {
   totalRevenue: number;
@@ -42,7 +45,7 @@ export function useKPIData() {
           .eq('user_id', user.id)
           .ilike('metric_name', 'revenue');
 
-        if (revError) console.error('useKPIData: Revenue fetch error:', revError);
+        if (revError) log.error('Revenue fetch error', revError instanceof Error ? revError : new Error(String(revError)));
         const totalRevenue = revenueData?.reduce((sum, row) => sum + (Number(row.metric_value) || 0), 0) || 0;
 
         // 2. Get Active Customers
@@ -58,7 +61,7 @@ export function useKPIData() {
 
         // Return 0 values if no data to be ACCURATE, rather than showing confusing demo data
         if (totalRevenue === 0 && activeCustomers === 0) {
-          console.log('useKPIData: No data found for user, showing empty state');
+          log.debug('No data found for user, showing empty state');
           return {
             totalRevenue: 0,
             revenueChange: 0,
@@ -90,7 +93,7 @@ export function useKPIData() {
           growthChange: 0,
         };
       } catch (error) {
-        console.error('Error calculating KPIs:', error);
+        log.error('Error calculating KPIs', error instanceof Error ? error : new Error(String(error)));
         return DEMO_KPI_DATA; // Fallback on error too
       }
     },

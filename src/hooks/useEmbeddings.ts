@@ -9,6 +9,9 @@ import { useToast } from './use-toast';
 import { hashContent } from '@/lib/conversationUtils';
 import { useUserUploads } from './useUserUploads';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('useEmbeddings');
 
 const AI_PROVIDER = import.meta.env.VITE_AI_PROVIDER || 'local';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
@@ -64,7 +67,7 @@ export function useEmbeddings() {
             }
         }
 
-        console.log(`[Embeddings] Generating embedding for text length: ${text.length} (provider: ${AI_PROVIDER})`);
+        log.debug('Generating embedding', { textLength: text.length, provider: AI_PROVIDER });
 
         // Use local Ollama embeddings when provider is 'local'
         if (AI_PROVIDER === 'local') {
@@ -82,7 +85,7 @@ export function useEmbeddings() {
                             workspace_id: workspaceId
                         });
                     } catch (err) {
-                        console.warn('Cache insert failed:', err);
+                        log.warn('Cache insert failed', { error: err });
                     }
                 })();
             }
@@ -102,7 +105,7 @@ export function useEmbeddings() {
 
         if (!response.ok) {
             const errBody = await response.text();
-            console.error(`[Embeddings] API Error: ${response.status} - ${errBody}`);
+            log.error('API Error', new Error(errBody), { status: response.status });
             throw new Error(`Gemini API error: ${response.statusText} ${errBody}`);
         }
 
@@ -122,7 +125,7 @@ export function useEmbeddings() {
                         workspace_id: workspaceId
                     });
                 } catch (err) {
-                    console.warn('Cache insert failed:', err);
+                    log.warn('Cache insert failed', { error: err });
                 }
             })();
         }
@@ -135,7 +138,7 @@ export function useEmbeddings() {
         mutationFn: async ({ datasetId, chunkSize = 1, chunkOverlap = 0 }: { datasetId: string, chunkSize?: number, chunkOverlap?: number }) => {
             if (!user) throw new Error('Not authenticated');
 
-            console.log(`[Embeddings] Starting generation for dataset ${datasetId}`);
+            log.info('Starting embedding generation', { datasetId });
 
             // Fetch data points
             const { data: dataPoints, error: fetchError } = await supabase
@@ -150,7 +153,7 @@ export function useEmbeddings() {
                 throw new Error('No data found in dataset');
             }
 
-            console.log(`[Embeddings] Found ${dataPoints.length} data points.`);
+            log.debug('Found data points', { count: dataPoints.length });
 
             // Delete existing embeddings for this dataset
             // Use filter on metadata since dataset_id column is missing
@@ -187,7 +190,7 @@ export function useEmbeddings() {
                 });
             }
 
-            console.log(`[Embeddings] Created ${chunks.length} chunks to embed.`);
+            log.debug('Created chunks', { count: chunks.length });
 
             const batchSize = 5;
             let successCount = 0;
@@ -208,7 +211,7 @@ export function useEmbeddings() {
                             embedding: embeddingVector,
                         };
                     } catch (err) {
-                        console.error(`[Embeddings] Chunk failed:`, err);
+                        log.error('Chunk embedding failed', err instanceof Error ? err : new Error(String(err)));
                         return null;
                     }
                 });
@@ -223,7 +226,7 @@ export function useEmbeddings() {
                         .insert(successfulEmbeddings);
 
                     if (insertError) {
-                        console.error('[Embeddings] Batch insert failed:', insertError);
+                        log.error('Batch insert failed', new Error(insertError.message));
                         failedCount += successfulEmbeddings.length;
                     } else {
                         successCount += successfulEmbeddings.length;
@@ -232,7 +235,7 @@ export function useEmbeddings() {
 
                 failedCount += (results.length - successfulEmbeddings.length);
 
-                console.log(`[Embeddings] Batch ${i / batchSize + 1} complete. Saved: ${successfulEmbeddings.length}`);
+                log.debug('Batch complete', { batch: i / batchSize + 1, saved: successfulEmbeddings.length });
 
                 await new Promise(resolve => setTimeout(resolve, 200));
             }
@@ -241,7 +244,7 @@ export function useEmbeddings() {
                 throw new Error('All embedding generation attempts failed.');
             }
 
-            console.log(`[Embeddings] Finished. Success: ${successCount}, Failed: ${failedCount}`);
+            log.info('Embedding generation finished', { successCount, failedCount });
 
             return { count: successCount, failed: failedCount };
         },
@@ -282,11 +285,11 @@ export function useEmbeddings() {
                     });
                 }
             } catch (error) {
-                console.warn('Failed to log upload:', error);
+                log.warn('Failed to log upload', { error });
             }
         },
         onError: (error) => {
-            console.error('[Embeddings] Fatal Error:', error);
+            log.error('Fatal error', error instanceof Error ? error : new Error(String(error)));
             toast({
                 title: 'Error',
                 description: `Failed to generate embeddings: ${error.message}`,
@@ -304,7 +307,7 @@ export function useEmbeddings() {
     ): Promise<SearchResult[]> => {
         if (!user) throw new Error('Not authenticated');
 
-        console.log(`[RAG Debug] Searching similar for: "${query}"`, { limit, datasetId, threshold });
+        log.debug('Searching similar vectors', { queryLength: query.length, limit, datasetId, threshold });
 
         const queryEmbedding = await generateEmbedding(query);
 
@@ -314,27 +317,21 @@ export function useEmbeddings() {
             match_count: limit,
             filter_dataset_id: datasetId || null,
         };
-        console.log('[RAG Debug] Invoking RPC match_embeddings with:', rpcParams);
+        log.debug('Invoking RPC match_embeddings', rpcParams);
 
         const { data, error } = await supabase.rpc('match_embeddings', rpcParams);
 
         if (data) {
-            console.log(`[RAG Debug] RPC returned ${data.length} matches.`);
+            log.debug('RPC matches returned', { count: data.length });
             if (data.length > 0) {
-                console.log('[RAG Debug] First match score:', data[0].similarity);
+                log.debug('First match score', { similarity: data[0].similarity });
             }
         }
 
         if (error || !data) {
             if (error) {
-                console.error('[RAG Debug] RPC Error Details:', {
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint,
-                    code: error.code,
-                    fullError: error
-                });
-                console.warn('RPC search failed, using fallback:', error);
+                log.error('RPC search error', error instanceof Error ? error : new Error(String(error)));
+                log.warn('RPC search failed, using fallback', { error });
             }
 
             let queryBuilder = supabase

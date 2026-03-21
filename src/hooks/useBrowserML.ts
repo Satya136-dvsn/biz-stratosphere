@@ -14,6 +14,9 @@ import {
     getMemoryInfo,
 } from '@/lib/browserML';
 import { supabase } from '@/lib/supabaseClient';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('useBrowserML');
 
 export interface BrowserMLModel {
     id: string;
@@ -209,7 +212,7 @@ export function useBrowserML() {
 
             return null;
         } catch (err) {
-            console.error('Cache check error:', err);
+            log.error('Cache check error', err instanceof Error ? err : new Error(String(err)));
             return null;
         }
     };
@@ -251,7 +254,7 @@ export function useBrowserML() {
                 cache_hit: result.cache_hit,
             });
         } catch (err) {
-            console.error('Save prediction error:', err);
+            log.error('Save prediction error', err instanceof Error ? err : new Error(String(err)));
         }
     };
 
@@ -288,7 +291,7 @@ export function useBrowserML() {
     // Create demo models (for first-time setup)
     const createDemoModels = async () => {
         try {
-            console.log('🔄 Creating and training demo models...');
+            log.info('Creating and training demo models');
 
             // ===== CHURN MODEL TRAINING =====
             const churnModel = createChurnModel();
@@ -339,7 +342,7 @@ export function useBrowserML() {
             });
 
             await churnModel.save('indexeddb://churn_model_advanced');
-            console.log('✅ Churn model trained and saved');
+            log.info('Churn model trained and saved');
 
             // Cleanup
             xTrainChurn.dispose();
@@ -391,15 +394,15 @@ export function useBrowserML() {
             });
 
             await revenueModel.save('indexeddb://revenue_model_advanced');
-            console.log('✅ Revenue model trained and saved');
+            log.info('Revenue model trained and saved');
 
             // Cleanup
             xTrainRevenue.dispose();
             yTrainRevenue.dispose();
 
-            console.log('✅ All demo models created, trained, and saved locally');
-        } catch (err: any) {
-            console.error('❌ Error creating demo models:', err);
+            log.info('All demo models created, trained, and saved locally');
+        } catch (err: unknown) {
+            log.error('Error creating demo models', err instanceof Error ? err : new Error(String(err)));
         }
     };
 

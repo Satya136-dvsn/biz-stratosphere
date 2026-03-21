@@ -30,6 +30,9 @@ import { MessageSquare, Send, Plus, Loader2, Sparkles, Database, Trash2, Zap, Ch
 import { ConversationSettings } from '@/components/ai/ConversationSettings';
 import { ExportConversation } from '@/components/ai/ExportConversation';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('AIChat');
 
 export function AIChat() {
     const { user } = useAuth();
@@ -76,14 +79,13 @@ export function AIChat() {
         queryKey: ['datasets', user?.id],
         queryFn: async () => {
             if (!user) return [];
-            console.log('[AIChat] Fetching datasets for user:', user.id);
             const { data, error } = await supabase
                 .from('datasets')
                 .select('id, file_name')
                 .eq('user_id', user.id);
 
             if (error) {
-                console.error('[AIChat] Error fetching datasets:', error);
+                log.error('Error fetching datasets', error);
                 toast({
                     title: "Error loading datasets",
                     description: error.message,
@@ -91,8 +93,6 @@ export function AIChat() {
                 });
                 throw error;
             }
-            console.log('[AIChat] Fetched datasets:', data);
-            console.log('[AIChat] Number of datasets:', data?.length || 0);
             return data || [];
         },
         enabled: !!user,
@@ -100,36 +100,12 @@ export function AIChat() {
         refetchOnWindowFocus: false, // Prevent disappearing on tab switch
     });
 
-    // Log datasets state changes
-    useEffect(() => {
-        console.log('[AIChat] Datasets state updated:', {
-            count: datasets?.length || 0,
-            datasets,
-            error: datasetsError,
-            loading: datasetsLoading
-        });
-
-        // Log each dataset individually to see the file_name field
-        if (datasets && datasets.length > 0) {
-            console.log('[AIChat] Individual datasets:');
-            datasets.forEach((ds, idx) => {
-                console.log(`  Dataset ${idx}:`, {
-                    id: ds.id,
-                    file_name: ds.file_name,
-                    nameType: typeof ds.file_name,
-                    nameLength: ds.file_name?.length,
-                    fullObject: ds
-                });
-            });
-        }
-    }, [datasets, datasetsError, datasetsLoading]);
-
     // Recover orphaned datasets (Fix for visibility issues)
     const recoverOrphanedDatasets = async () => {
         if (!user || isRecovering) return;
         setIsRecovering(true);
         try {
-            console.log('[Recovery] Scanning embeddings for orphaned datasets...');
+            log.info('Scanning embeddings for orphaned datasets');
             // Fetch sample embeddings metadata
             const { data: embeddings, error: embError } = await supabase
                 .from('embeddings')
@@ -154,8 +130,7 @@ export function AIChat() {
                 }
             });
 
-            console.log('[Recovery] Found distinct IDs:', Array.from(datasetInfo.keys()));
-            console.log('[Recovery] Dataset names from metadata:', Object.fromEntries(datasetInfo));
+            log.debug('Recovery: found distinct IDs', { ids: Array.from(datasetInfo.keys()) });
 
             if (datasetInfo.size === 0) {
                 toast({ title: 'No Data Found', description: 'No embeddings found to recover.' });
@@ -184,7 +159,7 @@ export function AIChat() {
                 return;
             }
 
-            console.log('[Recovery] Upserting datasets:', toUpsert);
+            log.info('Recovery: upserting datasets', { count: toUpsert.length });
 
             // Restore/Update them
             const { error: insertError } = await supabase
@@ -200,11 +175,11 @@ export function AIChat() {
                 description: `Fixed ${toUpsert.length} dataset(s) with proper names from metadata.`
             });
 
-        } catch (error: any) {
-            console.error('[Recovery] Failed:', error);
+        } catch (error: unknown) {
+            log.error('Recovery failed', error instanceof Error ? error : new Error(String(error)));
             toast({
                 title: 'Recovery Failed',
-                description: error.message,
+                description: error instanceof Error ? error.message : 'An unexpected error occurred.',
                 variant: 'destructive'
             });
         } finally {

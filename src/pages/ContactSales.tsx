@@ -15,6 +15,9 @@ import { Mail, MessageSquare, Building2, Send, CheckCircle2, ArrowLeft } from "l
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger('ContactSales');
 
 export default function ContactSales() {
     const { user } = useAuth();
@@ -60,8 +63,8 @@ export default function ContactSales() {
 
                 if (error) throw error;
             } else {
-                // Fallback for anonymous users: log to console or handled by Edge Function in prod
-                console.log("Anonymous inquiry:", formData);
+                // Fallback for anonymous users: handled by Edge Function in prod
+                log.info('Anonymous inquiry submitted', { company: formData.company });
             }
 
             // Simulate slight delay for professional feel
@@ -72,8 +75,8 @@ export default function ContactSales() {
                 title: "Inquiry Sent",
                 description: "An Enterprise Account Manager will reach out to you within 24 hours.",
             });
-        } catch (error: any) {
-            console.error("Submission error:", error);
+        } catch (error: unknown) {
+            log.error('Submission error', error instanceof Error ? error : new Error(String(error)));
             toast({
                 title: "Submission Failed",
                 description: "There was an error sending your inquiry. Please try again or email us directly.",
