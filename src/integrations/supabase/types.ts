@@ -183,8 +183,6 @@ export interface Database {
                     metadata?: Record<string, Json | undefined> | null;
                 };
                 Update: {
-                    user_id?: string;
-                    dataset_id?: string;
                     metric_name?: string;
                     metric_value?: number;
                     date_recorded?: string;

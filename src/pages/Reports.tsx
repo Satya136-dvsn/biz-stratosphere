@@ -268,7 +268,7 @@ export function Reports() {
                     <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Contextual Dataset</Label>
                     <Select
                       onValueChange={(_value) => {
-                        // In a real app, this would filter metrics by dataset
+                        // TODO: implement dataset filtering for metrics
                       }}
                     >
                       <SelectTrigger className="bg-muted/30 border-border/40 text-xs h-9">

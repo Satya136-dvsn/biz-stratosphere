@@ -45,6 +45,60 @@ The backend utilizes an isolated microservice mesh orchestrated by Kubernetes. W
 | **Deployment & Orchestration** | Docker, Docker Compose, Kubernetes, Kustomize |
 | **Observability** | Prometheus (Metrics), Grafana (Dashboards), Jaeger (Distributed Tracing) |
 
+## ⚙️ Backend Configuration
+
+### API Gateway – Authentication Setup
+
+The API Gateway validates every request using a **Supabase JWT** signed with your project's JWT Secret (HS256). The secret must be configured before running the backend in production. This is a deliberately strict **fail-safe**: without the secret the gateway returns `503` rather than silently granting open access.
+
+#### Getting your `SUPABASE_JWT_SECRET`
+
+1. Open your project in the [Supabase Dashboard](https://app.supabase.com).
+2. Go to **Project Settings → API**.
+3. Scroll to the **JWT Settings** section and copy the **JWT Secret** value.
+4. Set it as an environment variable for the API Gateway service:
+
+```bash
+# .env.production  (see .env.production.example for the full template)
+SUPABASE_JWT_SECRET=your-jwt-secret-from-supabase-dashboard
+```
+
+> **⚠️ Important:** The `SUPABASE_JWT_SECRET` is **not** the same as the `SUPABASE_ANON_KEY`. The anon key is for client-side SDK use; the JWT secret is used by the gateway to cryptographically verify signed tokens.
+
+#### Local / Demo Development (No JWT Required)
+
+For local development and demos you can bypass JWT validation entirely by setting `DEMO_MODE=true`. The gateway then returns a fixed demo identity for all requests without validating tokens.
+
+```bash
+# .env.local
+DEMO_MODE=true   # auth disabled — for local development only
+```
+
+> **🔴 Never set `DEMO_MODE=true` in a production environment.** The gateway logs a startup warning when demo mode is active so it cannot go unnoticed.
+
+#### Startup Validation
+
+The gateway validates its configuration at startup and emits clear log messages:
+
+| Condition | Startup behaviour |
+|---|---|
+| `SUPABASE_JWT_SECRET` set, `DEMO_MODE=false` | ✅ Normal — JWT validation enforced |
+| `DEMO_MODE=true` | ⚠️ Warning logged — auth disabled (local dev only) |
+| `SUPABASE_JWT_SECRET` missing, `DEMO_MODE=false` | 🔴 Error logged — gateway starts but every protected route returns `503` until secret is set |
+
+### Frontend Build Configuration
+
+`vite.config.ts` contains two categories of changes that are both intentional and preserved:
+
+| Setting | Value | Reason |
+|---|---|---|
+| `import { defineConfig } from "vite"` | _preserved_ | Custom local fix: avoids the `vitest/config` import that caused Vite transformation errors under Node v24 |
+| `VitePWA({})` | _commented out_ | Custom local fix: disabled to resolve core build issues; can be re-enabled when PWA support is needed |
+| `build.minify` | `true` | Production improvement: enables Terser/esbuild minification for smaller bundle sizes |
+| `build.sourcemap` | `process.env.NODE_ENV !== 'production'` | Production improvement: sourcemaps generated in dev/staging but omitted from production builds |
+
+---
+
 ## 🚀 Quick Links
 
 Explore the detailed portfolio documentation to understand the engineering decisions behind the platform:

@@ -8,6 +8,9 @@
  */
 
 import * as Sentry from '@sentry/react';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('errorTracking');
 
 export interface ErrorContext {
     user?: {
@@ -26,7 +29,7 @@ export const initializeErrorTracking = (dsn?: string) => {
     const SENTRY_DSN = dsn || import.meta.env.VITE_SENTRY_DSN;
 
     if (!SENTRY_DSN) {
-        console.warn('Error tracking DSN not configured - Sentry disabled');
+        log.warn('Error tracking DSN not configured – Sentry disabled');
         return;
     }
 
@@ -41,11 +44,9 @@ export const initializeErrorTracking = (dsn?: string) => {
             replaysSessionSampleRate: 0.1,
             replaysOnErrorSampleRate: 1.0,
         });
-        if (import.meta.env.DEV) {
-            console.log('Sentry initialized successfully');
-        }
+        log.info('Sentry initialized successfully');
     } catch (e) {
-        console.error('Failed to initialize Sentry:', e);
+        log.error('Failed to initialize Sentry', e instanceof Error ? e : new Error(String(e)));
     }
 };
 

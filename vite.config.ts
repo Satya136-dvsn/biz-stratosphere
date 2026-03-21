@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vite"; // Custom fix: use "vite" (not "vitest/config") to avoid Node v24 transformation errors
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { VitePWA } from 'vite-plugin-pwa';
@@ -11,7 +11,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    // VitePWA({}) // Disabled for now to debug core build
+    // VitePWA({}) // Custom fix: disabled to resolve core build issue; re-enable when PWA support is needed
   ],
   resolve: {
     alias: {
@@ -19,6 +19,7 @@ export default defineConfig({
     },
   },
   build: {
+    // Production improvements: minify bundles and only emit sourcemaps outside production
     minify: true,
     sourcemap: process.env.NODE_ENV !== 'production',
   },

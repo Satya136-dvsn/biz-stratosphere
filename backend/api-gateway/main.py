@@ -57,7 +57,23 @@ SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "")
 DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
 
 _extra_origins_raw = os.getenv("ALLOWED_ORIGINS", "")
-_extra_origins = [o.strip() for o in _extra_origins_raw.split(",") if o.strip()]
+
+def _is_valid_origin(origin: str) -> bool:
+    """Accept only well-formed http/https origins (scheme + host, no paths or wildcards)."""
+    import re
+    return bool(re.fullmatch(r"https?://[a-zA-Z0-9._-]+(:\d+)?", origin.rstrip("/")))
+
+_extra_origins = [
+    o.strip()
+    for o in _extra_origins_raw.split(",")
+    if o.strip() and _is_valid_origin(o.strip())
+]
+if _extra_origins_raw and len(_extra_origins) < len([o for o in _extra_origins_raw.split(",") if o.strip()]):
+    logger.warning(
+        "Some values in ALLOWED_ORIGINS were rejected because they did not match "
+        "the expected 'scheme://host[:port]' format. Accepted: %s",
+        _extra_origins,
+    )
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
