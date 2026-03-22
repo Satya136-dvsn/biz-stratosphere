@@ -20,6 +20,10 @@ import { createLogger } from '@/lib/logger';
 
 const log = createLogger('EnhancedDataUpload');
 
+// Matches ISO 8601 dates (YYYY-MM-DD or YYYY-MM-DDThh:mm:ss…) and US format MM/DD/YYYY.
+// Used for reliable date-column detection; avoids false positives from bare words like "May" or "2023".
+const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}(T[\d:.Z+-]+)?$|^\d{2}\/\d{2}\/\d{4}$/;
+
 interface DataQuality {
   totalRows: number;
   totalColumns: number;
@@ -72,7 +76,7 @@ export function EnhancedDataUpload() {
 
       if (sampleStr !== '' && sample != null && !isNaN(Number(sample))) {
         numericColumns.push(field);
-      } else if (sampleStr !== '' && !isNaN(Date.parse(sampleStr))) {
+      } else if (sampleStr !== '' && DATE_FORMAT_REGEX.test(sampleStr) && !isNaN(Date.parse(sampleStr))) {
         dateColumns.push(field);
       } else {
         categoricalColumns.push(field);

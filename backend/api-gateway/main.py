@@ -11,6 +11,7 @@ Responsibilities:
 from __future__ import annotations
 
 import os
+import re
 import time
 import uuid
 import logging
@@ -60,7 +61,6 @@ _extra_origins_raw = os.getenv("ALLOWED_ORIGINS", "")
 
 def _is_valid_origin(origin: str) -> bool:
     """Accept only well-formed http/https origins (scheme + host, no paths or wildcards)."""
-    import re
     return bool(re.fullmatch(r"https?://[a-zA-Z0-9._-]+(:\d+)?", origin.rstrip("/")))
 
 _extra_origins = [
