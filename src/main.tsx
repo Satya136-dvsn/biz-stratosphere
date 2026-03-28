@@ -2,23 +2,27 @@
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
 
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
 import { StrictMode } from "react";
+import { createRoot } from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
+import { ThemeProvider } from "./components/ThemeProvider";
+import App from './App.tsx';
+
+// ✅ Performance: CSS is a blocking resource — import before JS side-effects
+import './index.css';
+
+// ✅ Initialize monitoring AFTER core imports to avoid blocking render
 import { initializeAnalytics, trackWebVitals } from "./lib/analytics";
 import { initializeErrorTracking } from "./lib/errorTracking";
 
-// ⬇️ import the test function
-// Initialize analytics and monitoring
-initializeAnalytics();
 initializeErrorTracking();
+initializeAnalytics();
 trackWebVitals();
 
-import { HelmetProvider } from 'react-helmet-async';
-import { ThemeProvider } from "./components/ThemeProvider";
+const rootEl = document.getElementById("root");
+if (!rootEl) throw new Error('[CRITICAL] Root element #root not found in DOM.');
 
-createRoot(document.getElementById("root")!).render(
+createRoot(rootEl).render(
     <StrictMode>
         <HelmetProvider>
             <ThemeProvider defaultTheme="dark" storageKey="biz-stratosphere-theme" attribute="class">

@@ -4,6 +4,9 @@
 
 import { supabase } from '@/integrations/supabase/client'
 import { addDays, isAfter } from 'date-fns'
+import { createLogger } from './logger'
+
+const log = createLogger('rateLimit')
 
 export type LimitType = 'upload' | 'ai_query'
 
@@ -106,13 +109,13 @@ export async function checkRateLimit(
             resetAt: new Date(existingLimit.window_end),
         }
     } catch (error) {
-        console.error('Rate limit check error:', error)
-        // On error, allow the request but log it
+        log.error('Rate limit check error — failing CLOSED for safety', error)
+        // ✅ Security: fail closed on error — deny the request, don't silently allow
         return {
-            allowed: true,
+            allowed: false,
             limit: config.limit,
-            current: 0,
-            remaining: config.limit,
+            current: config.limit,
+            remaining: 0,
             resetAt: addDays(now, 1),
         }
     }
@@ -160,7 +163,7 @@ export async function getRateLimitStatus(
             resetAt: new Date(existingLimit.window_end),
         }
     } catch (error) {
-        console.error('Get rate limit status error:', error)
+        log.error('Get rate limit status error', error)
         return {
             allowed: true,
             limit: config.limit,

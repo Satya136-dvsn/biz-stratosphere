@@ -26,7 +26,10 @@ export const initializeErrorTracking = (dsn?: string) => {
     const SENTRY_DSN = dsn || import.meta.env.VITE_SENTRY_DSN;
 
     if (!SENTRY_DSN) {
-        console.warn('Error tracking DSN not configured - Sentry disabled');
+        // ✅ Downgraded to debug — this is expected in local dev
+        if (import.meta.env.DEV) {
+            console.debug('[Sentry] DSN not configured — disabled in dev mode.');
+        }
         return;
     }
 
@@ -37,13 +40,23 @@ export const initializeErrorTracking = (dsn?: string) => {
                 Sentry.browserTracingIntegration(),
                 Sentry.replayIntegration(),
             ],
-            tracesSampleRate: 1.0,
-            replaysSessionSampleRate: 0.1,
+            // ✅ Performance: 1% of traces in production (was 100% — very expensive)
+            tracesSampleRate: import.meta.env.PROD ? 0.01 : 1.0,
+            // ✅ Performance: No session replay by default; capture 100% on errors only
+            replaysSessionSampleRate: 0,
             replaysOnErrorSampleRate: 1.0,
+            // ✅ Security: strip PII from events before sending
+            beforeSend(event) {
+                // Remove any request body that might contain user data
+                if (event.request) {
+                    delete event.request.data;
+                    delete event.request.cookies;
+                }
+                return event;
+            },
         });
-        console.log('Sentry initialized successfully');
     } catch (e) {
-        console.error('Failed to initialize Sentry:', e);
+        // Silent fail — error tracking should never break the app
     }
 };
 

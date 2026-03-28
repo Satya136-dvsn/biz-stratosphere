@@ -2,10 +2,11 @@
 // Biz Stratosphere - Proprietary Software
 // Unauthorized copying or distribution prohibited.
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from '@supabase/supabase-js';
 import { setUserContext } from '@/lib/errorTracking';
+import { createLogger } from '@/lib/logger';
 import {
   canAttemptLogin,
   getRemainingLoginAttempts,
@@ -13,6 +14,8 @@ import {
   isSessionIdle,
   clearIdleTimer,
 } from '@/lib/security';
+
+const log = createLogger('useAuth');
 
 export type UserRole = 'admin' | 'user' | 'super_admin';
 
@@ -51,7 +54,7 @@ export function useAuth() {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -69,7 +72,7 @@ export function useAuth() {
 
         if (session?.user) {
           setRoleLoading(true);
-          setTimeout(() => fetchUserRole(session.user.id, session.user.email), 0);
+          setTimeout(() => fetchUserRole(session.user.id), 0);
         } else {
           setUserRole(null);
           setRoleLoading(false);
@@ -85,7 +88,7 @@ export function useAuth() {
 
       if (session?.user) {
         setRoleLoading(true);
-        fetchUserRole(session.user.id, session.user.email);
+        fetchUserRole(session.user.id);
       } else {
         setRoleLoading(false);
       }
@@ -94,47 +97,33 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserRole = async (userId: string, email?: string | null) => {
+  const fetchUserRole = async (userId: string) => {
     try {
-      // Phase 1: Fetch role from profiles (Single Source of Truth)
       const { data, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('user_id', userId)
         .maybeSingle();
 
-      const userEmail = email?.toLowerCase() || user?.email?.toLowerCase();
-      
-      console.log(`[Auth] Identifying role for ${userEmail} (ID: ${userId})`);
-
       if (error) {
-        console.warn('[Auth] profiles.role lookup error:', error);
+        // ✅ Security: do NOT log user identifiers in production
+        log.warn('profiles.role lookup error', { action: 'fetchUserRole' });
       }
 
-      if (data && (data as any).role) {
-        const roleText = String((data as any).role);
-        console.log(`[Auth] Found role in database: ${roleText}`);
+      if (data && (data as Record<string, unknown>).role) {
+        const roleText = String((data as Record<string, unknown>).role);
         // Normalize legacy roles into our app roles
-        if (roleText === 'company_admin') setUserRole('admin');
+        if (roleText === 'company_admin' || roleText === 'admin') setUserRole('admin');
         else if (roleText === 'super_admin') setUserRole('super_admin');
-        else if (roleText === 'admin') setUserRole('admin');
         else setUserRole('user');
-      } else if (userEmail === 'admin@bizstratosphere.com') {
-        // Local bypass for primary admin account while RLS/Profiles sync
-        console.log(`[Auth] Admin bypass triggered for ${userEmail}`);
-        setUserRole('super_admin');
       } else {
-        console.log(`[Auth] No specific role found, defaulting to 'user'`);
+        // ✅ Security: no hardcoded bypasses — roles MUST come from DB
         setUserRole('user');
       }
     } catch (err) {
-      console.error('[Auth] Error in fetchUserRole:', err);
-      // Fail safe for primary admin
-      if (email?.toLowerCase() === 'admin@bizstratosphere.com') {
-        setUserRole('super_admin');
-      } else {
-        setUserRole('user');
-      }
+      log.error('Error in fetchUserRole', err, { action: 'fetchUserRole' });
+      // ✅ Security: fail closed — default to least privilege on error
+      setUserRole('user');
     } finally {
       setRoleLoading(false);
     }
@@ -182,7 +171,7 @@ export function useAuth() {
       if (error) return { error };
       updateLastActivity();
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return { error };
     }
   };
@@ -201,16 +190,17 @@ export function useAuth() {
 
       if (error) return { error };
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return { error };
     }
   };
 
   const signOut = async () => {
     clearIdleTimer();
+    clearMFASession();
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Error signing out:', error);
+      log.error('Error signing out', error);
       return { error };
     }
     return { error: null };

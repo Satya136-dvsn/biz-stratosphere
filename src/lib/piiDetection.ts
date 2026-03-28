@@ -79,7 +79,7 @@ export interface PIIScanResult {
 /**
  * Scan data for PII
  */
-export function scanDataForPII(data: any[], columns: string[]): PIIScanResult {
+export function scanDataForPII(data: Record<string, unknown>[], columns: string[]): PIIScanResult {
     const piiColumns: PIIDetectionResult[] = [];
 
     columns.forEach((column) => {
