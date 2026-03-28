@@ -25,7 +25,7 @@ export interface ModelMetadata {
 
 export interface ExportedModel {
     metadata: ModelMetadata;
-    modelJSON: any; // Model topology
+    modelJSON: Record<string, unknown>; // Model topology
     weightsData: ArrayBuffer; // Model weights
 }
 

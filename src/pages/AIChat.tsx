@@ -3,6 +3,9 @@
 // Unauthorized copying or distribution prohibited.
 
 import { useState, useRef, useEffect } from 'react';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('AIChat');
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,18 +75,17 @@ export function AIChat() {
     const { generateDatasetEmbeddings, isGenerating, embeddingsCount } = useEmbeddings();
 
     // Fetch datasets
-    const { data: datasets = [], error: datasetsError, isLoading: datasetsLoading } = useQuery({
+    const { data: datasets = [], isLoading: datasetsLoading } = useQuery({
         queryKey: ['datasets', user?.id],
         queryFn: async () => {
             if (!user) return [];
-            console.log('[AIChat] Fetching datasets for user:', user.id);
             const { data, error } = await supabase
                 .from('datasets')
                 .select('id, file_name')
                 .eq('user_id', user.id);
 
             if (error) {
-                console.error('[AIChat] Error fetching datasets:', error);
+                log.error('Error fetching datasets', error);
                 toast({
                     title: "Error loading datasets",
                     description: error.message,
@@ -91,45 +93,25 @@ export function AIChat() {
                 });
                 throw error;
             }
-            console.log('[AIChat] Fetched datasets:', data);
-            console.log('[AIChat] Number of datasets:', data?.length || 0);
+            log.debug('Fetched datasets', { count: data?.length || 0 });
             return data || [];
         },
         enabled: !!user,
         staleTime: 1000 * 60 * 5, // 5 minutes cache
-        refetchOnWindowFocus: false, // Prevent disappearing on tab switch
+        refetchOnWindowFocus: false,
     });
 
-    // Log datasets state changes
+    // Subtle debug logging only in dev (no PII, no raw object dumps)
     useEffect(() => {
-        console.log('[AIChat] Datasets state updated:', {
-            count: datasets?.length || 0,
-            datasets,
-            error: datasetsError,
-            loading: datasetsLoading
-        });
-
-        // Log each dataset individually to see the file_name field
-        if (datasets && datasets.length > 0) {
-            console.log('[AIChat] Individual datasets:');
-            datasets.forEach((ds, idx) => {
-                console.log(`  Dataset ${idx}:`, {
-                    id: ds.id,
-                    file_name: ds.file_name,
-                    nameType: typeof ds.file_name,
-                    nameLength: ds.file_name?.length,
-                    fullObject: ds
-                });
-            });
-        }
-    }, [datasets, datasetsError, datasetsLoading]);
+        log.debug('Datasets loaded', { count: datasets?.length || 0, loading: datasetsLoading });
+    }, [datasets?.length, datasetsLoading]);
 
     // Recover orphaned datasets (Fix for visibility issues)
     const recoverOrphanedDatasets = async () => {
         if (!user || isRecovering) return;
         setIsRecovering(true);
         try {
-            console.log('[Recovery] Scanning embeddings for orphaned datasets...');
+            log.info('Scanning embeddings for orphaned datasets');
             // Fetch sample embeddings metadata
             const { data: embeddings, error: embError } = await supabase
                 .from('embeddings')
@@ -154,8 +136,7 @@ export function AIChat() {
                 }
             });
 
-            console.log('[Recovery] Found distinct IDs:', Array.from(datasetInfo.keys()));
-            console.log('[Recovery] Dataset names from metadata:', Object.fromEntries(datasetInfo));
+            log.debug('Recovery scan complete', { found: datasetInfo.size });
 
             if (datasetInfo.size === 0) {
                 toast({ title: 'No Data Found', description: 'No embeddings found to recover.' });
@@ -184,7 +165,7 @@ export function AIChat() {
                 return;
             }
 
-            console.log('[Recovery] Upserting datasets:', toUpsert);
+            log.info('Upserting orphaned datasets', { count: toUpsert.length });
 
             // Restore/Update them
             const { error: insertError } = await supabase
@@ -200,11 +181,11 @@ export function AIChat() {
                 description: `Fixed ${toUpsert.length} dataset(s) with proper names from metadata.`
             });
 
-        } catch (error: any) {
-            console.error('[Recovery] Failed:', error);
+        } catch (error: unknown) {
+            log.error('Dataset recovery failed', error);
             toast({
                 title: 'Recovery Failed',
-                description: error.message,
+                description: error instanceof Error ? error.message : 'Unknown error',
                 variant: 'destructive'
             });
         } finally {

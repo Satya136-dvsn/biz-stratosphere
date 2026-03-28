@@ -35,6 +35,18 @@ export const PII_PATTERNS = {
 
     // Passport Numbers (generic)
     passport: /\b[A-Z0-9]{6,9}\b/g,
+
+    // IBAN (International Bank Account Number)
+    iban: /\b[A-Z]{2}[0-9]{2}(?:[ ]?[A-Z0-9]){12,30}\b/g,
+
+    // SWIFT / BIC
+    swift_bic: /\b[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b/g,
+
+    // Generic API Keys (high entropy strings)
+    api_key: /\b(?:sk|pk|key|token|auth|secret)[-_]?[A-Za-z0-9]{20,60}\b/gi,
+
+    // Crypto Addresses (BTC example)
+    crypto_address: /\b(?:[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[ac-hj-np-z02-9]{11,71})\b/g,
 } as const;
 
 // Common PII column name keywords
@@ -138,16 +150,26 @@ export function scanDataForPII(data: Record<string, unknown>[], columns: string[
  * Mask PII value
  */
 export function maskPIIValue(value: string, type: string): string {
+    if (!value) return '';
+
     switch (type) {
         case 'email':
-            const [local, domain] = value.split('@');
-            return `${local[0]}${'*'.repeat(local.length - 1)}@${domain}`;
+            const parts = value.split('@');
+            if (parts.length < 2) return '****';
+            const [local, domain] = parts;
+            const maskedLocal = local.length > 2 
+                ? `${local[0]}***${local[local.length - 1]}`
+                : `${local[0]}*`;
+            return `${maskedLocal}@${domain}`;
         case 'phone':
-            return `***-***-${value.slice(-4)}`;
+            return value.length > 4 ? `***-***-${value.slice(-4)}` : '***-****';
         case 'ssn':
             return `***-**-${value.slice(-4)}`;
         case 'credit_card':
             return `****-****-****-${value.slice(-4)}`;
+        case 'api_key':
+        case 'secret':
+            return `${value.substring(0, 4)}...${value.slice(-4)}`;
         default:
             return '*'.repeat(Math.min(value.length, 10));
     }

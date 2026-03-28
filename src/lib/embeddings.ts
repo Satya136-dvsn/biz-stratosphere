@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
+import type { Json } from '@/integrations/supabase/types';
 
 const AI_PROVIDER = import.meta.env.VITE_AI_PROVIDER || 'local';
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
@@ -9,7 +10,15 @@ export interface EmbeddingResult {
     content: string;
     content_type: string;
     similarity: number;
-    metadata: any;
+    metadata: Json;
+}
+
+export interface DatasetContent {
+    name?: string;
+    summary?: any;
+    columns?: Record<string, any>;
+    sampleRows?: any[];
+    [key: string]: any;
 }
 
 /**
@@ -59,7 +68,7 @@ export async function storeEmbedding({
     content: string;
     contentType: string;
     embedding: number[];
-    metadata?: any;
+    metadata?: Json;
 }) {
     const { data, error } = await supabase
         .from('data_embeddings')
@@ -112,9 +121,9 @@ export async function searchSimilarContent(
 export async function embedDataset(
     userId: string,
     datasetId: string,
-    datasetContent: any
+    datasetContent: DatasetContent
 ): Promise<void> {
-    const tasks: Promise<any>[] = [];
+    const tasks: Promise<unknown>[] = [];
 
     // 1. Dataset summary
     if (datasetContent.summary) {

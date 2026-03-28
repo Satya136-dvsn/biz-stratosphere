@@ -17,15 +17,35 @@ import { useState } from 'react';
 import { ScheduleBuilder } from '@/components/automation/ScheduleBuilder';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useDashboardData } from '@/hooks/useDashboardData'; // Make sure this hook exists or simulated
+import { useDashboardData } from '@/hooks/useDashboardData'; 
+import { createLogger } from '@/lib/logger';
 
+const log = createLogger('AutomationRules');
+
+interface RuleSuggestion {
+    name: string;
+    reasoning: string;
+    condition: string;
+    action: string;
+}
+
+interface RuleFormData {
+    name: string;
+    description: string;
+    trigger_type: string;
+    condition: { metric: string; operator: string; threshold: number };
+    action_type: string;
+    action_config: { title: string; message: string };
+    schedule_type: 'manual' | 'cron' | 'interval';
+    schedule_config: Record<string, unknown>;
+}
 export function AutomationRules() {
     const { rules, isLoading, createRule, toggleRule, deleteRule, runRule, isRunning } = useAutomationRules();
     const [showWizard, setShowWizard] = useState(false);
 
     // AI Suggestion State
     const [isGenerating, setIsGenerating] = useState(false);
-    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [suggestions, setSuggestions] = useState<RuleSuggestion[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     // Mock dashboard data for AI context (in real app, fetch from hook)
@@ -43,16 +63,16 @@ export function AutomationRules() {
             const results = await aiOrchestrator.suggestAutomationRules(analyticsContext);
             setSuggestions(results);
             setShowSuggestions(true);
-        } catch (err) {
-            console.error("Failed to generate rules", err);
+        } catch (err: unknown) {
+            log.error('Failed to generate suggestions', err);
         } finally {
             setIsGenerating(false);
         }
     };
 
     // Helper to open wizard with suggestion
-    const [wizardInitData, setWizardInitData] = useState<any>(null);
-    const acceptSuggestion = (suggestion: any) => {
+    const [wizardInitData, setWizardInitData] = useState<Partial<RuleFormData> | null>(null);
+    const acceptSuggestion = (suggestion: RuleSuggestion) => {
         setWizardInitData({
             name: suggestion.name,
             description: suggestion.reasoning,
@@ -229,16 +249,16 @@ export function AutomationRules() {
 }
 
 // Rule Creation Wizard Component
-function RuleWizard({ onClose, onCreate, initialData }: { onClose: () => void; onCreate: (rule: any) => void; initialData?: any }) {
+function RuleWizard({ onClose, onCreate, initialData }: { onClose: () => void; onCreate: (rule: Partial<RuleFormData>) => void; initialData?: Partial<RuleFormData> | null }) {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState(initialData || {
+    const [formData, setFormData] = useState<RuleFormData>(initialData as RuleFormData || {
         name: '',
         description: '',
         trigger_type: 'threshold',
         condition: { metric: 'revenue', operator: '>', threshold: 10000 },
         action_type: 'notification',
         action_config: { title: '', message: '' },
-        schedule_type: 'manual' as 'manual' | 'cron' | 'interval',
+        schedule_type: 'manual',
         schedule_config: {},
     });
 

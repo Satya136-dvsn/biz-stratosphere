@@ -18,7 +18,7 @@ export interface Database {
                     id: string;
                     user_id: string;
                     title: string;
-                    messages: any;
+                    messages: Json;
                     created_at: string;
                     updated_at: string;
                 };
@@ -26,7 +26,7 @@ export interface Database {
                     id?: string;
                     user_id: string;
                     title: string;
-                    messages?: any;
+                    messages?: Json;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -34,7 +34,7 @@ export interface Database {
                     id?: string;
                     user_id?: string;
                     title?: string;
-                    messages?: any;
+                    messages?: Json;
                     updated_at?: string;
                 };
             };
@@ -76,9 +76,9 @@ export interface Database {
                     conversation_id: string;
                     role: string;
                     content: string;
-                    sources: any;
-                    confidence: any;
-                    grounding: any;
+                    sources: Json;
+                    confidence: Json;
+                    grounding: Json;
                     created_at: string;
                 };
                 Insert: {
@@ -86,12 +86,12 @@ export interface Database {
                     conversation_id: string;
                     role: string;
                     content: string;
-                    sources?: any;
+                    sources?: Json;
                     created_at?: string;
                 };
                 Update: {
                     content?: string;
-                    sources?: any;
+                    sources?: Json;
                 };
             };
             ai_response_audits: {
@@ -206,45 +206,76 @@ export interface Database {
                 Row: {
                     id: string;
                     user_id: string;
-                    dataset_id: string;
+                    dataset_id: string | null;
                     content: string;
                     content_type: string;
                     embedding: string;
-                    metadata: any;
+                    metadata: Json;
                     created_at: string;
                 };
                 Insert: {
+                    id?: string;
                     user_id: string;
-                    dataset_id?: string;
+                    dataset_id?: string | null;
                     content: string;
                     content_type: string;
                     embedding: string;
-                    metadata?: any;
+                    metadata?: Json;
                 };
-                Update: Record<string, any>;
+                Update: {
+                    user_id?: string;
+                    dataset_id?: string | null;
+                    content?: string;
+                    content_type?: string;
+                    embedding?: string;
+                    metadata?: Json;
+                };
             };
             predictions_log: {
                 Row: {
                     id: string;
                     user_id: string;
                     model_type: string;
-                    prediction_result: any;
-                    input_features: any;
+                    prediction_result: Json;
+                    input_features: Json;
                     created_at: string;
                 };
                 Insert: {
                     user_id: string;
                     model_type: string;
-                    prediction_result?: any;
-                    input_features?: any;
+                    prediction_result?: Json;
+                    input_features?: Json;
                 };
-                Update: Record<string, any>;
+                Update: {
+                    model_type?: string;
+                    prediction_result?: Json;
+                    input_features?: Json;
+                };
             };
-            // Catch-all for other tables not explicitly typed
-            [key: string]: {
-                Row: Record<string, any>;
-                Insert: Record<string, any>;
-                Update: Record<string, any>;
+            p7_rate_limits: {
+                Row: {
+                    id: string;
+                    user_id: string;
+                    endpoint: string;
+                    requests_count: number;
+                    window_start: string;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    user_id: string;
+                    endpoint: string;
+                    requests_count?: number;
+                    window_start?: string;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    requests_count?: number;
+                    window_start?: string;
+                    updated_at?: string;
+                };
             };
         };
         Views: {

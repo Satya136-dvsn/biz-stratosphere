@@ -17,7 +17,7 @@ interface LogContext {
     requestId?: string;
     component?: string;
     action?: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 interface LogEntry {
@@ -62,24 +62,31 @@ class Logger {
         if (isDev) {
             const style = this.getStyle(level);
             const prefix = this.formatPrefix(level, mergedContext);
-            console.log(`%c${prefix} ${message}`, style, mergedContext || '');
+            const consoleMethod = level === 'debug' ? 'debug' : level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'log';
+            console[consoleMethod](`%c${prefix} ${message}`, style, mergedContext || '');
         } else {
-            console.log(JSON.stringify(entry));
+            // Production: structured logging for collectors
+            if (level === 'error') console.error(JSON.stringify(entry));
+            else if (level === 'warn') console.warn(JSON.stringify(entry));
+            else console.log(JSON.stringify(entry));
         }
 
         // Send to Sentry if error or warning
         if (level === 'error') {
-            const error = mergedContext?.error instanceof Error ? mergedContext.error : new Error(message);
+            const error = mergedContext?.error instanceof Error 
+                ? mergedContext.error 
+                : new Error(typeof mergedContext?.error === 'string' ? mergedContext.error : message);
+            
             captureException(error, {
                 level: 'error',
                 extra: mergedContext,
-                user: mergedContext?.userId ? { id: mergedContext.userId } : undefined
+                user: mergedContext?.userId ? { id: String(mergedContext.userId) } : undefined
             });
         } else if (level === 'warn') {
             captureMessage(message, {
                 level: 'warning',
                 extra: mergedContext,
-                user: mergedContext?.userId ? { id: mergedContext.userId } : undefined
+                user: mergedContext?.userId ? { id: String(mergedContext.userId) } : undefined
             });
         }
     }
@@ -109,8 +116,13 @@ class Logger {
         this.log('warn', message, context);
     }
 
-    public error(message: string, error?: any, context?: LogContext) {
-        this.log('error', message, { ...context, error: error?.message || error, stack: error?.stack });
+    public error(message: string, error?: unknown, context?: LogContext) {
+        const errorObj = error instanceof Error ? error : new Error(String(error));
+        this.log('error', message, { 
+            ...context, 
+            error: errorObj.message, 
+            stack: errorObj.stack 
+        });
     }
 
     public debug(message: string, context?: LogContext) {
