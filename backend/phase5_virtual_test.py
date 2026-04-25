@@ -30,7 +30,7 @@ if sys.stdout.encoding != "utf-8":
 
 # ─── Add backend/shared to path ──────────────────────────────────────────────
 ROOT = Path(__file__).parent
-sys.path.insert(0, str(ROOT / "backend"))  # so "shared" is importable
+sys.path.insert(0, str(ROOT))  # so "shared" is importable
 
 from shared.errors import (  # noqa: E402
     ErrorCodes, ErrorResponse, build_error_response,

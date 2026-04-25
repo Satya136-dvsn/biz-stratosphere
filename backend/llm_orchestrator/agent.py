@@ -5,8 +5,10 @@ import httpx
 import logging
 from typing import Dict, Any, List, Optional
 import sys
+from pathlib import Path
 
-sys.path.insert(0, "/app")
+# Dynamic path to root for 'shared' imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared.tracing import init_tracer  # noqa: E402
 from shared.metrics import get_or_create_metrics, Counter, Histogram  # noqa: E402
 

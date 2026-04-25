@@ -23,7 +23,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
-sys.path.insert(0, "/app")
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared import (  # noqa: E402
     make_health_router,
     make_exception_handlers,
@@ -34,7 +34,7 @@ from shared.tracing import init_tracer, make_traces_router  # noqa: E402
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("ml-inference")
 
-MODELS_DIR = Path(os.getenv("MODELS_DIR", "/app/models"))
+MODELS_DIR = Path(os.getenv("MODELS_DIR", str(Path(__file__).parent.parent.parent / "models")))
 
 # ──────────────────────────────────────────────
 # Model Registry

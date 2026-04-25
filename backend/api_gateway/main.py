@@ -22,7 +22,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 # Make shared library importable when run inside container
-sys.path.insert(0, "/app")
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from shared import (  # noqa: E402
     make_health_router,
     make_exception_handlers,

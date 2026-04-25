@@ -20,7 +20,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-sys.path.insert(0, "/app")
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared import (  # noqa: E402
     make_health_router,
     make_exception_handlers,
