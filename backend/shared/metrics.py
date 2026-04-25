@@ -13,8 +13,6 @@ from __future__ import annotations
 
 import time
 import logging
-from typing import Optional
-from functools import wraps
 
 from fastapi import APIRouter, Request, Response
 
@@ -33,7 +31,7 @@ class Counter:
         self._values: dict[tuple, float] = {}
 
     def inc(self, amount: float = 1.0, **labels) -> None:
-        key = tuple(labels.get(l, "") for l in self._labels)
+        key = tuple(labels.get(label, "") for label in self._labels)
         self._values[key] = self._values.get(key, 0) + amount
 
     def collect(self) -> list[dict]:
@@ -56,7 +54,7 @@ class Histogram:
         self._observations: dict[tuple, list[float]] = {}
 
     def observe(self, value: float, **labels) -> None:
-        key = tuple(labels.get(l, "") for l in self._labels)
+        key = tuple(labels.get(label, "") for label in self._labels)
         self._observations.setdefault(key, []).append(value)
 
     def collect(self) -> list[dict]:

@@ -1,6 +1,6 @@
 import time
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from collections import deque
 from shared.metrics import Counter, Histogram
 

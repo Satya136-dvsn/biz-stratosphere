@@ -23,7 +23,7 @@ from fastapi.responses import JSONResponse
 
 # Make shared library importable when run inside container
 sys.path.insert(0, "/app")
-from shared import (
+from shared import (  # noqa: E402
     make_health_router,
     make_exception_handlers,
     make_breaker,
@@ -33,8 +33,11 @@ from shared import (
     ErrorCodes,
     Timeouts,
 )
-from shared.metrics import get_or_create_metrics, make_metrics_router
-from shared.tracing import init_tracer, make_traces_router, build_traceparent
+from shared.metrics import get_or_create_metrics, make_metrics_router  # noqa: E402
+from shared.tracing import init_tracer, make_traces_router  # noqa: E402
+
+from jose import jwt, JWTError  # noqa: E402
+from routers.chat import router as chat_router  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,
@@ -109,7 +112,6 @@ async def health_check():
 app.include_router(make_health_router("api-gateway", version="1.0.0"))
 
 
-from jose import jwt, JWTError
 
 # ──────────────────────────────────────────────
 # Auth Middleware (Phase 5)
@@ -268,7 +270,6 @@ async def _proxy(
         )
 
 
-from routers.chat import router as chat_router
 app.include_router(chat_router, prefix="/api/v1/chat", tags=["chat"])
 
 # ──────────────────────────────────────────────

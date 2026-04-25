@@ -14,14 +14,13 @@ Usage:
 """
 from __future__ import annotations
 
-import os
 import time
 import uuid
 import logging
 from typing import Any, Optional
 from contextlib import contextmanager
 
-from fastapi import Request
+from fastapi import APIRouter, Request
 
 logger = logging.getLogger(__name__)
 
@@ -238,8 +237,7 @@ def get_collector() -> SpanCollector:
 # ──────────────────────────────────────────────
 # FastAPI Router for trace inspection
 # ──────────────────────────────────────────────
-def make_traces_router() -> "APIRouter":
-    from fastapi import APIRouter
+def make_traces_router() -> APIRouter:
     router = APIRouter(tags=["Observability"])
 
     @router.get("/traces/recent", summary="Recent trace spans")

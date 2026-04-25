@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 sys.path.insert(0, "/app")
-from shared import (
+from shared import (  # noqa: E402
     make_health_router,
     make_exception_handlers,
     make_breaker,
@@ -29,11 +29,10 @@ from shared import (
     make_ollama_client,
     CircuitBreakerError,
     retry_with_backoff,
-    ErrorCodes,
-    Timeouts,
 )
-from shared.metrics import get_or_create_metrics, make_metrics_router
-from shared.tracing import init_tracer, make_traces_router
+from shared.metrics import get_or_create_metrics, make_metrics_router  # noqa: E402
+from shared.tracing import init_tracer, make_traces_router  # noqa: E402
+from agent import run_agent  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("llm-orchestrator")
@@ -213,8 +212,6 @@ async def generate(req: GenerateRequest):
             latency_ms=latency_ms,
             fallback_used=(req.include_rag and rag_context is None) or (req.include_ml and ml_context is None),
         )
-
-from agent import run_agent
 
 @app.post("/api/v1/agent/query")
 async def agent_query(req: AgentQueryRequest):

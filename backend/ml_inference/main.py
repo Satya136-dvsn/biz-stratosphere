@@ -24,14 +24,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
 sys.path.insert(0, "/app")
-from shared import (
+from shared import (  # noqa: E402
     make_health_router,
     make_exception_handlers,
-    ErrorCodes,
-    build_error_json,
 )
-from shared.metrics import get_or_create_metrics, make_metrics_router
-from shared.tracing import init_tracer, make_traces_router
+from shared.metrics import get_or_create_metrics, make_metrics_router  # noqa: E402
+from shared.tracing import init_tracer, make_traces_router  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("ml-inference")

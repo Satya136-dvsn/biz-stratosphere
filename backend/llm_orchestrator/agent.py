@@ -7,19 +7,15 @@ from typing import Dict, Any, List, Optional
 import sys
 
 sys.path.insert(0, "/app")
-from shared.tracing import init_tracer
-from shared.metrics import get_or_create_metrics
+from shared.tracing import init_tracer  # noqa: E402
+from shared.metrics import get_or_create_metrics, Counter, Histogram  # noqa: E402
+
 metrics_service = get_or_create_metrics("llm-orchestrator-agent")
-Counter = metrics_service.Counter if hasattr(metrics_service, 'Counter') else None
-# Since shared.metrics.py uses Counter and Histogram classes directly in ServiceMetrics
-# but doesn't export a global 'metrics' object, let's fix the imports.
 
-from shared.metrics import Counter, Histogram
+import asyncpg  # noqa: E402
 
-import asyncpg
-
-from tools import TOOLS_SCHEMA, execute_tool
-from memory import memory_manager
+from tools import TOOLS_SCHEMA, execute_tool  # noqa: E402
+from memory import memory_manager  # noqa: E402
 
 logger = logging.getLogger("llm-orchestrator.agent")
 tracer = init_tracer("llm-orchestrator.agent")
@@ -243,9 +239,11 @@ async def run_agent(query: str, session_id: Optional[str] = None) -> Dict[str, A
         reason_span.set_attribute("reasoning", agent_reasoning)
 
     # Confidence Scoring (Rule-based combining signals)
-    confidence_score = 0.8 # Base
-    if ml_results: confidence_score += 0.1
-    if rag_context: confidence_score += 0.05
+    confidence_score = 0.8  # Base
+    if ml_results:
+        confidence_score += 0.1
+    if rag_context:
+        confidence_score += 0.05
     confidence_score = min(confidence_score, 0.99)
     
     # Check if 'action_trigger' was called to pause for human-in-the-loop

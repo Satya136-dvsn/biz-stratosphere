@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+from unittest.mock import MagicMock
 from pathlib import Path
 
 # Mock environment variables for import-time safety
@@ -13,6 +14,9 @@ os.environ["EMBED_MODEL"] = "all-minilm"
 # Add backend to path so services can find "shared"
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
+
+# Mock asyncpg to prevent hanging on Windows during import tests
+sys.modules["asyncpg"] = MagicMock()
 
 class TestServiceImports(unittest.TestCase):
     """Verifies all backend services are importable."""

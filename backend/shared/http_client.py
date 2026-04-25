@@ -5,7 +5,6 @@ Biz Stratosphere Phase 5 – All inter-service calls MUST use these clients.
 from __future__ import annotations
 
 import httpx
-from typing import Optional
 
 
 # ──────────────────────────────────────────────

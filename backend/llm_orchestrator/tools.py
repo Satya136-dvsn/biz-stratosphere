@@ -1,8 +1,7 @@
 import os
-import json
 import httpx
 import logging
-from typing import Optional, Dict, Any, Callable, Awaitable, List
+from typing import Dict, Any, Callable, Awaitable, List
 
 logger = logging.getLogger("llm-orchestrator.tools")
 

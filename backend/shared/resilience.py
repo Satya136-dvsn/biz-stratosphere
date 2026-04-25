@@ -19,7 +19,6 @@ import asyncio
 import time
 import logging
 from enum import Enum
-from functools import wraps
 from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
@@ -131,7 +130,7 @@ class CircuitBreaker:
             result = await func(*args, **kwargs)
             await self._on_success()
             return result
-        except Exception as exc:
+        except Exception:
             await self._on_failure()
             if fallback:
                 logger.warning(f"[CircuitBreaker:{self.name}] Call failed - Executing fallback")

@@ -32,14 +32,14 @@ if sys.stdout.encoding != "utf-8":
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT / "backend"))  # so "shared" is importable
 
-from shared.errors import (
-    ErrorCodes, ErrorResponse, build_error_response, build_error_json,
+from shared.errors import (  # noqa: E402
+    ErrorCodes, ErrorResponse, build_error_response,
 )
-from shared.resilience import (
+from shared.resilience import (  # noqa: E402
     CircuitBreaker, CircuitBreakerError, CircuitState,
     retry_with_backoff, make_breaker, get_all_breaker_status,
 )
-from shared.http_client import Timeouts
+from shared.http_client import Timeouts  # noqa: E402
 
 # ─── Test helpers ─────────────────────────────────────────────────────────────
 PASS = "✅"
@@ -218,7 +218,6 @@ async def test_retry_exhaustion():
 # ─── TEST 8: Timeout budget constants ─────────────────────────────────────────
 def test_timeout_constants():
     print("\n── Test 8: Timeout Budget Constants ──")
-    import httpx
 
     record("GATEWAY_DEFAULT read=15s", Timeouts.GATEWAY_DEFAULT.read == 15.0)
     record("ORCHESTRATOR_TO_RAG read=3s", Timeouts.ORCHESTRATOR_TO_RAG.read == 3.0)
@@ -256,8 +255,8 @@ async def test_concurrent_safety():
 # ─── TEST 10: Circuit breaker registry ───────────────────────────────────────
 async def test_registry():
     print("\n── Test 10: Circuit Breaker Registry ──")
-    b1 = make_breaker("reg-svc-a", failure_threshold=3)
-    b2 = make_breaker("reg-svc-b", failure_threshold=3)
+    _ = make_breaker("reg-svc-a", failure_threshold=3)
+    _ = make_breaker("reg-svc-b", failure_threshold=3)
 
     statuses = get_all_breaker_status()
     names = [s["service"] for s in statuses]
