@@ -8,19 +8,16 @@ on:
 
 jobs:
   backend-quality:
-    name: Backend Quality & Tests
+    name: Backend Quality & Tests (Unified)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./ml-service
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install system dependencies
@@ -31,63 +28,20 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install --prefer-binary -r requirements-ci.txt
-
-      - name: Debug File Structure
-        run: |
-          pwd
-          ls -R
-          echo "PYTHONPATH: $PYTHONPATH"
+          pip install --prefer-binary -r backend/requirements-ci.txt
 
       - name: Lint with Ruff
         run: |
-          ruff check . --select E9,F63,F7,F82 --target-version py311
-          ruff check . --exit-zero --statistics
+          # Lint the entire backend directory
+          ruff check backend/ --select E9,F63,F7,F82 --target-version py311
+          ruff check backend/ --exit-zero --statistics
 
-      - name: Test Import (Debug)
-        env:
-          PYTHONPATH: .
+      - name: Run Resilience Tests (Virtual)
         run: |
-          python -c "
-          import sys
-          print('Python:', sys.version)
-          try:
-              import httpx
-              print('httpx imported:', httpx.__version__)
-              from fastapi.testclient import TestClient
-              print('TestClient imported')
-              from main import app
-              print('App import verification: SUCCESS')
-          except Exception as e:
-              print(f'Import verification failed: {e}')
-              sys.exit(1)
-          "
+          # Run the virtual test suite for circuit breakers and retries
+          python backend/phase5_virtual_test.py
 
-      - name: Debug Pytest Collection
-        env:
-          PYTHONPATH: .
+      - name: Verify Service Imports
         run: |
-          # Use python -m pytest to be safe
-          python -m pytest tests/test_health.py --collect-only -v
-
-      - name: Test with pytest
-        env:
-          PYTHONPATH: .
-        run: |
-          # Use proper bash error handling
-          set +e
-          # Run pytest and capture output
-          output=$(python -m pytest tests/test_health.py -v --tb=long 2>&1)
-          exit_code=$?
-
-          echo "Pytest exit code: $exit_code"
-          echo "Pytest output:"
-          echo "$output"
-
-          if [ $exit_code -ne 0 ]; then
-            # Clean up output for annotation
-            formatted_output="${output//$'\n'/'%0A'}"
-            formatted_output="${formatted_output//$'\r'/'%0D'}"
-            echo "::error::Pytest Failed (Exit $exit_code):%0A$formatted_output"
-            exit $exit_code
-          fi
+          # Verify each microservice is importable and ready
+          python -m pytest backend/tests/test_imports.py -v

@@ -23,7 +23,7 @@ services:
   api-gateway:
     build:
       context: ./backend
-      dockerfile: api-gateway/Dockerfile
+      dockerfile: api_gateway/Dockerfile
     container_name: biz-gateway
     ports:
       - "8000:8000"
@@ -54,7 +54,7 @@ services:
   ml-inference:
     build:
       context: ./backend
-      dockerfile: ml-inference/Dockerfile
+      dockerfile: ml_inference/Dockerfile
     container_name: biz-ml
     ports:
       - "8001:8001"
@@ -80,7 +80,7 @@ services:
   llm-orchestrator:
     build:
       context: ./backend
-      dockerfile: llm-orchestrator/Dockerfile
+      dockerfile: llm_orchestrator/Dockerfile
     container_name: biz-llm
     ports:
       - "8002:8002"
@@ -110,7 +110,7 @@ services:
   rag-service:
     build:
       context: ./backend
-      dockerfile: rag-service/Dockerfile
+      dockerfile: rag_service/Dockerfile
     container_name: biz-rag
     ports:
       - "8003:8003"
@@ -137,7 +137,7 @@ services:
   embedding-worker:
     build:
       context: ./backend
-      dockerfile: embedding-worker/Dockerfile
+      dockerfile: embedding_worker/Dockerfile
     container_name: biz-embedder
     ports:
       - "8004:8004"
