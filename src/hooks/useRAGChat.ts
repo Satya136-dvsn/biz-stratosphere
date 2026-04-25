@@ -13,8 +13,6 @@ import { useEmbeddings } from '@/hooks/useEmbeddings';
 import { calculateConfidenceFromResults, type ConfidenceScore } from '@/lib/ai/confidenceScoring';
 import { validateGrounding, type GroundingResult } from '@/lib/ai/groundingValidator';
 
-
-
 export interface ChatMessage {
     id: string;
     conversation_id: string;
@@ -38,6 +36,24 @@ export interface Conversation {
     updated_at: string;
 }
 
+const GATEWAY_URL = 'http://localhost:8000/api/v1/chat';
+
+async function authFetch(url: string, options: RequestInit = {}) {
+    const { data: { session } } = await supabase.auth.getSession();
+    const headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${session?.access_token}`
+    };
+    const res = await fetch(url, { ...options, headers });
+    if (!res.ok) {
+        let err = res.statusText;
+        try { err = await res.text(); } catch (e) {}
+        throw new Error(`API Error: ${err}`);
+    }
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+}
+
 export function useRAGChat(conversationId?: string) {
     const { user } = useAuth();
     const { toast } = useToast();
@@ -52,15 +68,7 @@ export function useRAGChat(conversationId?: string) {
         queryKey: ['chat-conversations', user?.id],
         queryFn: async () => {
             if (!user) return [];
-
-            const { data, error } = await supabase
-                .from('chat_conversations')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('updated_at', { ascending: false });
-
-            if (error) throw error;
-            return data as Conversation[];
+            return await authFetch(`${GATEWAY_URL}/conversations?select=*&user_id=eq.${user.id}&order=updated_at.desc`) as Conversation[];
         },
         enabled: !!user,
     });
@@ -70,15 +78,7 @@ export function useRAGChat(conversationId?: string) {
         queryKey: ['chat-messages', conversationId],
         queryFn: async () => {
             if (!conversationId) return [];
-
-            const { data, error } = await supabase
-                .from('chat_messages')
-                .select('*')
-                .eq('conversation_id', conversationId)
-                .order('created_at', { ascending: true });
-
-            if (error) throw error;
-            return data as ChatMessage[];
+            return await authFetch(`${GATEWAY_URL}/messages?select=*&conversation_id=eq.${conversationId}&order=created_at.asc`) as ChatMessage[];
         },
         enabled: !!conversationId,
     });
@@ -98,20 +98,21 @@ export function useRAGChat(conversationId?: string) {
         }) => {
             if (!user) throw new Error('Not authenticated');
 
-            const { data, error } = await supabase
-                .from('chat_conversations')
-                .insert([{
+             const data = await authFetch(`${GATEWAY_URL}/conversations`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
                     user_id: user.id,
                     title,
                     context_window,
                     temperature,
                     max_tokens
-                }])
-                .select()
-                .single();
-
-            if (error) throw error;
-            return data as Conversation;
+                })
+            });
+            return (Array.isArray(data) ? data[0] : data) as Conversation;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['chat-conversations'] });
@@ -121,12 +122,7 @@ export function useRAGChat(conversationId?: string) {
     // Delete conversation
     const deleteConversation = useMutation({
         mutationFn: async (id: string) => {
-            const { error } = await supabase
-                .from('chat_conversations')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
+            await authFetch(`${GATEWAY_URL}/conversations/${id}`, { method: 'DELETE' });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['chat-conversations'] });
@@ -165,17 +161,16 @@ export function useRAGChat(conversationId?: string) {
 
             try {
                 // 1. Save user message
-                const { data: userMessage, error: userMsgError } = await supabase
-                    .from('chat_messages')
-                    .insert([{
+                const userMsgData = await authFetch(`${GATEWAY_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+                    body: JSON.stringify({
                         conversation_id: convId,
                         role: 'user',
                         content: message,
-                    }])
-                    .select()
-                    .single();
-
-                if (userMsgError) throw userMsgError;
+                    })
+                });
+                const userMessage = Array.isArray(userMsgData) ? userMsgData[0] : userMsgData;
 
                 // 2. Prepare Context & History
                 let contextText = '';
@@ -192,39 +187,25 @@ export function useRAGChat(conversationId?: string) {
                                 metadata: r.metadata,
                                 similarity: r.similarity
                             }));
-                            console.log(`[RAG] Found ${results.length} context chunks.`);
-                        } else {
-                            console.log('[RAG] No relevant context found above threshold.');
                         }
                     } catch (searchErr) {
                         console.error('Vector search failed:', searchErr);
-                        // Continue without context rather than failing completely
                     }
                 }
 
                 // Get conversation settings
-                const { data: conversationData } = await supabase
-                    .from('chat_conversations')
-                    .select('context_window, temperature, max_tokens')
-                    .eq('id', convId)
-                    .single();
-
+                const convDataRes = await authFetch(`${GATEWAY_URL}/conversations?select=context_window,temperature,max_tokens&id=eq.${convId}`);
+                const conversationData = Array.isArray(convDataRes) ? convDataRes[0] : convDataRes;
                 const contextWindow = conversationData?.context_window || 10;
 
                 // Get recent history
-                const { data: historyData } = await supabase
-                    .from('chat_messages')
-                    .select('*')
-                    .eq('conversation_id', convId)
-                    .order('created_at', { ascending: true }) // Oldest first for context
-                    .limit(contextWindow);
-
-                const history = (historyData || []).map(msg => ({
+                const historyData = await authFetch(`${GATEWAY_URL}/messages?select=*&conversation_id=eq.${convId}&order=created_at.asc&limit=${contextWindow}`);
+                const history = (historyData || []).map((msg: any) => ({
                     role: (msg.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
                     content: msg.content
                 }));
 
-                // 3. Call AI Orchestrator (env-configured provider)
+                // 3. Call AI Orchestrator
                 const systemPrompt = `You are a helpful AI assistant analyzing business data. 
 Answer questions based on the provided context if available.
 If the answer isn't in the context, say so clearly but try to be helpful with general knowledge.
@@ -234,9 +215,9 @@ Cite sources using [Source ID] format if referenced.`;
                     messages: [
                         { role: 'system', content: systemPrompt },
                         ...history,
-                        { role: 'user', content: message } // Current message
+                        { role: 'user', content: message } 
                     ],
-                    context: contextText || undefined, // Pass retrieved text directly
+                    context: contextText || undefined,
                     temperature: conversationData?.temperature || 0.7,
                     maxTokens: conversationData?.max_tokens || 1000
                 });
@@ -246,8 +227,6 @@ Cite sources using [Source ID] format if referenced.`;
                 }
 
                 const assistantMessageContent = response.content;
-                const sources = response.metadata?.sources || [];
-
                 setIsSearching(false); // Done
 
                 // 4. Calculate Confidence Score
@@ -263,10 +242,11 @@ Cite sources using [Source ID] format if referenced.`;
                     sources: searchSources,
                 });
 
-                // 6. Save assistant message with confidence metadata
-                const { data: aiMessage, error: aiMsgError } = await supabase
-                    .from('chat_messages')
-                    .insert([{
+                // 6. Save assistant message
+                const aiMsgData = await authFetch(`${GATEWAY_URL}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+                    body: JSON.stringify({
                         conversation_id: convId,
                         role: 'assistant',
                         content: assistantMessageContent,
@@ -274,44 +254,42 @@ Cite sources using [Source ID] format if referenced.`;
                             content: r.content,
                             metadata: r.metadata,
                             similarity: r.similarity || 0,
-                        })),
-                    }])
-                    .select()
-                    .single();
+                        }))
+                    })
+                });
+                const aiMessage = Array.isArray(aiMsgData) ? aiMsgData[0] : aiMsgData;
 
-                if (aiMsgError) throw aiMsgError;
-
-                // 7. Log to AI Response Audit table (non-blocking)
+                // 7. Log to AI Response Audit table
                 try {
-                    await supabase.from('ai_response_audits').insert([{
-                        user_id: user.id,
-                        conversation_id: convId,
-                        query: message,
-                        response_preview: assistantMessageContent.substring(0, 500),
-                        confidence_score: confidence.score,
-                        confidence_level: confidence.level,
-                        confidence_reasons: confidence.reasons,
-                        grounding_score: grounding.groundingScore,
-                        is_grounded: grounding.isGrounded,
-                        source_count: searchSources.length,
-                        dataset_id: datasetId && datasetId !== 'none' ? datasetId : null,
-                        average_similarity: searchSources.length > 0
-                            ? searchSources.reduce((a, b) => a + b.similarity, 0) / searchSources.length
-                            : null,
-
-                        // Versioning Metadata
-                        model_version: aiOrchestrator.getChatModelName(),
-                        prompt_version: 'v2.1-rag-optimized',
-                    }]);
+                    await authFetch(`${GATEWAY_URL}/audits`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: user.id,
+                            conversation_id: convId,
+                            query: message,
+                            response_preview: assistantMessageContent.substring(0, 500),
+                            confidence_score: confidence.score,
+                            confidence_level: confidence.level,
+                            confidence_reasons: confidence.reasons,
+                            grounding_score: grounding.groundingScore,
+                            is_grounded: grounding.isGrounded,
+                            source_count: searchSources.length,
+                            dataset_id: datasetId && datasetId !== 'none' ? datasetId : null,
+                            average_similarity: searchSources.length > 0
+                                ? searchSources.reduce((a, b) => a + b.similarity, 0) / searchSources.length
+                                : null,
+                            model_version: aiOrchestrator.getChatModelName(),
+                            prompt_version: 'v2.1-rag-optimized',
+                        })
+                    });
                 } catch (auditError) {
                     console.warn('[RAG] Audit logging failed:', auditError);
-                    // Don't fail the request if audit fails
                 }
 
                 // 8. Increment usage counter
                 await incrementUsage();
 
-                // Return message with confidence metadata attached
                 return {
                     userMessage,
                     aiMessage: {

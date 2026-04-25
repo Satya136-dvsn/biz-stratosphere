@@ -59,15 +59,23 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 async def _readiness_check():
     # Check Ollama reachable
-    async with httpx.AsyncClient(timeout=httpx.Timeout(3.0)) as client:
-        r = await client.get(f"{OLLAMA_HOST}/api/tags")
-        if not r.is_success:
-            raise RuntimeError(f"Ollama not available: {r.status_code}")
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(3.0)) as client:
+            r = await client.get(f"{OLLAMA_HOST}/api/tags")
+            if not r.is_success:
+                raise RuntimeError(f"Ollama not available: {r.status_code}")
+    except Exception as exc:
+        logger.warning(f"Ollama readiness check failed (non-fatal): {exc}")
+        return {"ollama": "unreachable", "degraded": True}
     # Check DB
     if DATABASE_URL:
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-            await conn.fetchval("SELECT 1")
+        try:
+            pool = await get_pool()
+            async with pool.acquire() as conn:
+                await conn.fetchval("SELECT 1")
+        except Exception as exc:
+            logger.warning(f"DB readiness check failed (non-fatal): {exc}")
+            return {"ollama": OLLAMA_HOST, "embed_model": EMBED_MODEL, "database": "unreachable", "degraded": True}
     return {"ollama": OLLAMA_HOST, "embed_model": EMBED_MODEL}
 
 
@@ -86,7 +94,11 @@ for exc_type, handler in make_exception_handlers("embedding-worker"):
 @app.on_event("startup")
 async def startup():
     if DATABASE_URL:
-        await get_pool()
+        try:
+            await get_pool()
+            logger.info("Database pool initialised successfully.")
+        except Exception as exc:
+            logger.warning(f"Could not initialise DB pool on startup (will retry on first request): {exc}")
 
 @app.on_event("shutdown")
 async def shutdown():

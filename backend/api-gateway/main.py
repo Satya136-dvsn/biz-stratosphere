@@ -268,6 +268,9 @@ async def _proxy(
         )
 
 
+from routers.chat import router as chat_router
+app.include_router(chat_router, prefix="/api/v1/chat", tags=["chat"])
+
 # ──────────────────────────────────────────────
 # Proxy Routes
 # ──────────────────────────────────────────────

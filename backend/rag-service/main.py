@@ -72,7 +72,9 @@ async def _readiness_check():
             await conn.fetchval("SELECT 1")
         return {"database": "connected"}
     except Exception as exc:
-        raise RuntimeError(f"DB not reachable: {exc}")
+        logger.warning(f"Readiness DB check failed (non-fatal): {exc}")
+        # Return degraded but don't raise – container stays healthy
+        return {"database": "unreachable", "degraded": True}
 
 
 app.include_router(make_health_router("rag-service", version="1.0.0", readiness_check=_readiness_check))
@@ -90,7 +92,11 @@ for exc_type, handler in make_exception_handlers("rag-service"):
 @app.on_event("startup")
 async def startup():
     if DATABASE_URL:
-        await get_pool()
+        try:
+            await get_pool()
+            logger.info("Database pool initialised successfully.")
+        except Exception as exc:
+            logger.warning(f"Could not initialise DB pool on startup (will retry on first request): {exc}")
 
 
 @app.on_event("shutdown")

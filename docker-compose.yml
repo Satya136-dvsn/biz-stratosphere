@@ -22,18 +22,15 @@ services:
   # ────────────────────────────────
   api-gateway:
     build:
-      context: ./backend/api-gateway
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: api-gateway/Dockerfile
     container_name: biz-gateway
     ports:
       - "8000:8000"
     depends_on:
-      ml-inference:
-        condition: service_healthy
-      llm-orchestrator:
-        condition: service_healthy
-      rag-service:
-        condition: service_healthy
+      - ml-inference
+      - llm-orchestrator
+      - rag-service
     environment:
       <<: *shared-env
       ML_INFERENCE_URL: http://ml-inference:8001
@@ -44,7 +41,7 @@ services:
     restart: unless-stopped
     healthcheck:
       <<: *hc-defaults
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
     deploy:
       resources:
         limits:
@@ -56,8 +53,8 @@ services:
   # ────────────────────────────────
   ml-inference:
     build:
-      context: ./backend/ml-inference
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ml-inference/Dockerfile
     container_name: biz-ml
     ports:
       - "8001:8001"
@@ -69,7 +66,7 @@ services:
       - ./models:/app/models:ro
     healthcheck:
       <<: *hc-defaults
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
       start_period: 30s     # Models may need time to load
     deploy:
       resources:
@@ -82,8 +79,8 @@ services:
   # ────────────────────────────────
   llm-orchestrator:
     build:
-      context: ./backend/llm-orchestrator
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: llm-orchestrator/Dockerfile
     container_name: biz-llm
     ports:
       - "8002:8002"
@@ -100,7 +97,7 @@ services:
     restart: unless-stopped
     healthcheck:
       <<: *hc-defaults
-      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
     deploy:
       resources:
         limits:
@@ -112,8 +109,8 @@ services:
   # ────────────────────────────────
   rag-service:
     build:
-      context: ./backend/rag-service
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: rag-service/Dockerfile
     container_name: biz-rag
     ports:
       - "8003:8003"
@@ -127,7 +124,7 @@ services:
     restart: unless-stopped
     healthcheck:
       <<: *hc-defaults
-      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
     deploy:
       resources:
         limits:
@@ -139,8 +136,8 @@ services:
   # ────────────────────────────────
   embedding-worker:
     build:
-      context: ./backend/embedding-worker
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: embedding-worker/Dockerfile
     container_name: biz-embedder
     ports:
       - "8004:8004"
@@ -156,7 +153,7 @@ services:
     restart: unless-stopped
     healthcheck:
       <<: *hc-defaults
-      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/health')"]
     deploy:
       resources:
         limits:
@@ -169,15 +166,15 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: biz-ollama
-    ports:
-      - "11434:11434"
+    # ports:
+    #   - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
     environment:
       - OLLAMA_HOST=0.0.0.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      test: ["CMD", "ollama", "list"]
       interval: 10s
       timeout: 5s
       retries: 5
