@@ -47,7 +47,7 @@ export const DEMO_KPI_DATA: DemoKPIData = {
     totalRevenue: 2_847_500,
     activeCustomers: 1_284,
     churnRate: 3.2,
-    averageDealSize: 4_850,
+    averageDealSize: 2_218,
     conversionRate: 24.7,
     growthRate: 18.3,
     revenueChange: 12.4,
