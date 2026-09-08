@@ -1,0 +1,16 @@
+date,metric,value
+2024-01-01,Revenue,250000
+2024-01-01,Active Customers,1200
+2024-01-01,Churn Rate,2.1
+2024-01-15,Revenue,280000
+2024-01-15,Active Customers,1250
+2024-01-15,Churn Rate,1.9
+2024-02-01,Revenue,310000
+2024-02-01,Active Customers,1310
+2024-02-01,Churn Rate,2.0
+2024-02-15,Revenue,335000
+2024-02-15,Active Customers,1380
+2024-02-15,Churn Rate,1.8
+2024-03-01,Revenue,360000
+2024-03-01,Active Customers,1450
+2024-03-01,Churn Rate,1.7

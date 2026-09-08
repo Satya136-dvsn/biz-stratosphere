@@ -1,0 +1,6 @@
+metric_name,metric_value,metric_type,date_recorded,account_name
+monthly_revenue,94500,revenue,2026-08-01,QuantumLeap AI
+active_customers,420,customers,2026-08-01,QuantumLeap AI
+churn_rate,1.2,risk,2026-08-01,QuantumLeap AI
+monthly_revenue,112000,revenue,2026-08-15,Zenith Dynamics
+active_customers,580,customers,2026-08-15,Zenith Dynamics

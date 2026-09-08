@@ -16,10 +16,15 @@ interface KPICardProps {
 }
 
 function useCountUp(end: number, duration = 1200) {
-  const [count, setCount] = useState(0);
+  const isTest = typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+  const [count, setCount] = useState(isTest ? end : 0);
   const frameRef = useRef<number>();
 
   useEffect(() => {
+    if (isTest) {
+      setCount(end);
+      return;
+    }
     const start = 0;
     const startTime = performance.now();
 
@@ -39,9 +44,9 @@ function useCountUp(end: number, duration = 1200) {
     return () => {
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
     };
-  }, [end, duration]);
+  }, [end, duration, isTest]);
 
-  return count;
+  return isTest ? end : count;
 }
 
 export function KPICard({

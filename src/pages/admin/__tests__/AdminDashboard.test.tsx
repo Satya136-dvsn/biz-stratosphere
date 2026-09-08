@@ -6,8 +6,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AdminRoute } from '@/components/AdminRoute';
 import { AdminDashboard } from '../AdminDashboard';
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: { retry: false }
+    }
+});
 
 // Mock useAuth
 const mockUseAuth = vi.fn();
@@ -41,6 +48,7 @@ vi.mock('lucide-react', () => ({
     AlertCircle: () => <div data-testid="icon-alert" />,
     Braille: () => <div data-testid="icon-braille" />,
     Building: () => <div data-testid="icon-building" />,
+    ExternalLink: () => <div data-testid="icon-external-link" />,
 }));
 
 
@@ -71,11 +79,13 @@ describe('Admin Security', () => {
         });
 
         render(
-            <MemoryRouter>
-                <AdminRoute>
-                    <AdminDashboard />
-                </AdminRoute>
-            </MemoryRouter>
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <AdminRoute>
+                        <AdminDashboard />
+                    </AdminRoute>
+                </MemoryRouter>
+            </QueryClientProvider>
         );
 
         expect(screen.getByText('Admin Control Plane')).toBeInTheDocument();
@@ -93,11 +103,13 @@ describe('Admin Security', () => {
         // We can't easily test navigation with MemoryRouter without a complex setup, 
         // but checking that children are NOT rendered is a good proxy.
         const { queryByText } = render(
-            <MemoryRouter>
-                <AdminRoute>
-                    <AdminDashboard />
-                </AdminRoute>
-            </MemoryRouter>
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <AdminRoute>
+                        <AdminDashboard />
+                    </AdminRoute>
+                </MemoryRouter>
+            </QueryClientProvider>
         );
 
         expect(queryByText('Admin Control Plane')).not.toBeInTheDocument();

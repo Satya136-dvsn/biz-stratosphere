@@ -266,8 +266,10 @@ export function useDataUpload() {
           description: `Processed ${dataPoints.length} data points from ${file.name}`,
         });
 
-        // Invalidate datasets query to refresh the list automatically
+        // Invalidate datasets and metrics queries to refresh the list and dashboard automatically
         queryClient.invalidateQueries({ queryKey: ['datasets'] });
+        queryClient.invalidateQueries({ queryKey: ['kpi-data'] });
+        queryClient.invalidateQueries({ queryKey: ['chart-data'] });
       }
     } catch (error) {
       console.error('Upload error:', error);

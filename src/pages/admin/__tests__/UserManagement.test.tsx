@@ -21,22 +21,43 @@ vi.mock('@/hooks/useAdminUsers', () => ({
 
 // Mock Lucide Icons
 vi.mock('lucide-react', () => ({
-    MoreHorizontal: () => <div>More</div>,
+    MoreHorizontal: () => <div>MoreHorizontal</div>,
     Search: () => <div>Search</div>,
     ShieldAlert: () => <div>ShieldAlert</div>,
     ShieldCheck: () => <div>ShieldCheck</div>,
     Ban: () => <div>Ban</div>,
     CheckCircle: () => <div>CheckCircle</div>,
     Users: () => <div>Users</div>,
-    Loader2: () => <div>Loading</div>
+    FileText: () => <div>FileText</div>,
+    Clock: () => <div>Clock</div>,
+    Info: () => <div>Info</div>,
+    Eye: () => <div>Eye</div>,
+    Activity: () => <div>Activity</div>,
+    Loader2: () => <div>Loader2</div>,
 }));
 
 // Mock UI components that might cause issues
 vi.mock('@/components/ui/dropdown-menu', () => ({
     DropdownMenu: ({ children }: any) => <div>{children}</div>,
-    DropdownMenuTrigger: ({ children }: any) => <div role="button">{children}</div>,
+    DropdownMenuTrigger: ({ children }: any) => <div>{children}</div>,
     DropdownMenuContent: ({ children }: any) => <div>{children}</div>,
     DropdownMenuItem: ({ children, onClick }: any) => <div role="menuitem" onClick={onClick}>{children}</div>,
+}));
+
+vi.mock('@/components/ui/dialog', () => ({
+    Dialog: ({ children }: any) => <div>{children}</div>,
+    DialogContent: ({ children }: any) => <div>{children}</div>,
+    DialogHeader: ({ children }: any) => <div>{children}</div>,
+    DialogTitle: ({ children }: any) => <div>{children}</div>,
+    DialogDescription: ({ children }: any) => <div>{children}</div>,
+    DialogTrigger: ({ children }: any) => <div>{children}</div>,
+}));
+
+vi.mock('@/components/ui/tooltip', () => ({
+    Tooltip: ({ children }: any) => <div>{children}</div>,
+    TooltipContent: ({ children }: any) => <div>{children}</div>,
+    TooltipProvider: ({ children }: any) => <div>{children}</div>,
+    TooltipTrigger: ({ children }: any) => <div>{children}</div>,
 }));
 
 describe('User Management', () => {

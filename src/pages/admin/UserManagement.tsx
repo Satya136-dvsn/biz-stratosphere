@@ -89,9 +89,16 @@ export const UserManagement = () => {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant={user.role === 'admin' || user.role === 'super_admin' ? 'default' : 'secondary'}>
-                                                    {user.role}
-                                                </Badge>
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant={user.role === 'admin' || user.role === 'super_admin' ? 'default' : 'secondary'}>
+                                                        {user.role}
+                                                    </Badge>
+                                                    {user.suspended ? (
+                                                        <Badge variant="destructive">Suspended</Badge>
+                                                    ) : (
+                                                        <Badge variant="outline" className="text-green-600 border-green-200">Active</Badge>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">

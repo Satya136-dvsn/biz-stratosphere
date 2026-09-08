@@ -70,7 +70,7 @@ describe('Dashboard Integration', () => {
         render(<Dashboard />, { wrapper: Wrapper });
 
         // Check for Main Title
-        expect(screen.getByText(/Business Intelligence Dashboard/i)).toBeInTheDocument();
+        expect(screen.getByText(/Strategic Intelligence Node/i)).toBeInTheDocument();
 
         // Check for mocked KPI value (Total Revenue)
         // KPICard formats currency, so 50000 -> $50,000 or similar

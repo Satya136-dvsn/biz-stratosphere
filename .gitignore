@@ -36,6 +36,7 @@ test-results/
 playwright-report/
 blob-report/
 force_dashboard.png
+scratch_screenshots/
 
 # Python
 __pycache__/

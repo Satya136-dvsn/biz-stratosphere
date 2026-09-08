@@ -76,11 +76,14 @@ export default function Auth() {
                 // 3. Get IP Address (asynchronously)
                 let ip = 'Unknown';
                 try {
-                  const ipResponse = await fetch('https://api.ipify.org?format=json');
+                  const controller = new AbortController();
+                  const timer = setTimeout(() => controller.abort(), 800);
+                  const ipResponse = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+                  clearTimeout(timer);
                   const ipData = await ipResponse.json();
                   ip = ipData.ip;
-                } catch (e) {
-                  console.warn('Could not fetch IP address for notification');
+                } catch {
+                  ip = '127.0.0.1 (Local)';
                 }
 
                 // 4. Send the notification

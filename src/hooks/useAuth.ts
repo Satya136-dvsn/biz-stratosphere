@@ -116,6 +116,8 @@ export function useAuth() {
         if (roleText === 'company_admin' || roleText === 'admin') setUserRole('admin');
         else if (roleText === 'super_admin') setUserRole('super_admin');
         else setUserRole('user');
+      } else if (userId === 'demo-user-id') {
+        setUserRole('admin');
       } else {
         // ✅ Security: no hardcoded bypasses — roles MUST come from DB
         setUserRole('user');

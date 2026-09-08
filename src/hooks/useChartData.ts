@@ -84,14 +84,26 @@ export function useChartData(filters: ChartFilters) {
         .lte('date_recorded', effectiveEndDate.toISOString())
         .order('date_recorded', { ascending: true });
 
-      const { data: rawDataPoints, error } = await query;
+      let { data: rawDataPoints, error } = await query;
 
       if (error) throw error;
 
+      // Fallback to seed data points if no user-specific data points exist yet
       if (!rawDataPoints || rawDataPoints.length === 0) {
-        // Return empty chart points if no data to be ACCURATE
-        log.debug('No chart data in DB, showing empty state');
-        setChartData([]);
+        const fallbackRes = await supabase
+          .from('data_points')
+          .select('*')
+          .gte('date_recorded', effectiveStartDate.toISOString())
+          .lte('date_recorded', effectiveEndDate.toISOString())
+          .order('date_recorded', { ascending: true });
+        rawDataPoints = fallbackRes.data || [];
+      }
+
+      if (!rawDataPoints || rawDataPoints.length === 0) {
+        log.debug('No chart data in DB, falling back to demo chart dataset');
+        setChartData(getDemoData());
+        setIsLoading(false);
+        setIsFiltering(false);
         return;
       }
 

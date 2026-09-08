@@ -7,7 +7,7 @@ import { createLogger } from './logger';
 
 const log = createLogger('EmailService');
 
-const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
+const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY || 're_dummy_key');
 
 export interface EmailConfig {
     to: string | string[];

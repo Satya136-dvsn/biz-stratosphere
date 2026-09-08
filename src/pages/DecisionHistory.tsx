@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { FileText, Loader2, CheckCircle2, XCircle, Clock, Search, Workflow } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { localDb } from '@/lib/localDatabase';
 
 interface AgentDecision {
     id: string;
@@ -35,14 +36,24 @@ export default function DecisionHistory() {
                 .limit(50);
             
             if (error) throw error;
-            setDecisions(data || []);
+            if (data && data.length > 0) {
+                setDecisions(data);
+            } else {
+                const localRecords = localDb.getTable('agent_decision_memory');
+                setDecisions(localRecords || []);
+            }
         } catch (error: any) {
             console.error(error);
-            toast({
-                title: "Failed to load decision history",
-                description: error.message,
-                variant: "destructive"
-            });
+            const localRecords = localDb.getTable('agent_decision_memory');
+            if (localRecords && localRecords.length > 0) {
+                setDecisions(localRecords);
+            } else {
+                toast({
+                    title: "Failed to load decision history",
+                    description: error.message,
+                    variant: "destructive"
+                });
+            }
         } finally {
             setIsLoading(false);
         }
@@ -93,7 +104,7 @@ export default function DecisionHistory() {
                         Audit log of AI Agent actions, reasoning chains, and human-in-the-loop approvals.
                     </p>
                 </div>
-                <Button onClick={fetchHistory} variant="outline" size="sm">
+                <Button onClick={fetchHistory} variant="outline" size="sm" aria-label="Refresh decision history">
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />}
                     Refresh
                 </Button>
@@ -141,7 +152,14 @@ export default function DecisionHistory() {
                                             )}
                                         </div>
                                         <div className="mt-4 flex items-center gap-2">
-                                            <div className="w-full bg-muted rounded-full h-1.5">
+                                            <div 
+                                                className="w-full bg-muted rounded-full h-1.5"
+                                                role="progressbar"
+                                                aria-label="Confidence score"
+                                                aria-valuenow={Math.round(decision.confidence_score * 100)}
+                                                aria-valuemin={0}
+                                                aria-valuemax={100}
+                                            >
                                                 <div 
                                                     className="bg-primary h-1.5 rounded-full" 
                                                     style={{ width: `${decision.confidence_score * 100}%` }}
@@ -155,10 +173,21 @@ export default function DecisionHistory() {
 
                                     {decision.status === 'pending' && (
                                         <div className="mt-6 flex gap-2">
-                                            <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={() => updateStatus(decision.id, 'approved')}>
+                                            <Button 
+                                                size="sm" 
+                                                className="w-full bg-emerald-600 hover:bg-emerald-700" 
+                                                onClick={() => updateStatus(decision.id, 'approved')}
+                                                aria-label={`Approve decision for ${decision.user_query}`}
+                                            >
                                                 <CheckCircle2 className="w-4 h-4 mr-1" /> Approve
                                             </Button>
-                                            <Button size="sm" variant="destructive" className="w-full" onClick={() => updateStatus(decision.id, 'rejected')}>
+                                            <Button 
+                                                size="sm" 
+                                                variant="destructive" 
+                                                className="w-full" 
+                                                onClick={() => updateStatus(decision.id, 'rejected')}
+                                                aria-label={`Reject decision for ${decision.user_query}`}
+                                            >
                                                 <XCircle className="w-4 h-4 mr-1" /> Reject
                                             </Button>
                                         </div>

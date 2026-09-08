@@ -7,6 +7,24 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "0.0.0.0",
     port: 8080,
+    proxy: {
+      '/auth/v1': {
+        target: 'https://kfkllxfwyvocmnkowbyw.supabase.co',
+        changeOrigin: true,
+      },
+      '/rest/v1': {
+        target: 'https://kfkllxfwyvocmnkowbyw.supabase.co',
+        changeOrigin: true,
+      },
+      '/functions/v1': {
+        target: 'https://kfkllxfwyvocmnkowbyw.supabase.co',
+        changeOrigin: true,
+      },
+      '/storage/v1': {
+        target: 'https://kfkllxfwyvocmnkowbyw.supabase.co',
+        changeOrigin: true,
+      },
+    }
   },
   plugins: [
     react(),

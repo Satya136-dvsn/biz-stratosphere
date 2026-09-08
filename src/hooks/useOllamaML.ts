@@ -23,7 +23,7 @@ export function useOllamaML() {
     const { data: modelsData, isLoading: modelsLoading } = useQuery({
         queryKey: ['ollama-models'],
         queryFn: async () => {
-            const res = await fetch(`${ML_API_URL}/models`);
+            const res = await fetch(`${ML_API_URL}/api/v1/ml/models`);
             if (!res.ok) throw new Error('Failed to fetch models');
             return res.json();
         },
@@ -34,7 +34,7 @@ export function useOllamaML() {
     const { data: healthData } = useQuery({
         queryKey: ['ml-health'],
         queryFn: async () => {
-            const res = await fetch(`${ML_API_URL}/health`);
+            const res = await fetch(`${ML_API_URL}/api/v1/ml/health`);
             return res.json();
         },
         refetchInterval: 10000, // Check every 10s
@@ -43,7 +43,7 @@ export function useOllamaML() {
     // Generate prediction
     const generatePrediction = useMutation({
         mutationFn: async (request: PredictionRequest) => {
-            const res = await fetch(`${ML_API_URL}/predict`, {
+            const res = await fetch(`${ML_API_URL}/api/v1/ml/predict`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -66,7 +66,7 @@ export function useOllamaML() {
     // Get explanation
     const getExplanation = useMutation({
         mutationFn: async (request: ExplainRequest) => {
-            const res = await fetch(`${ML_API_URL}/explain`, {
+            const res = await fetch(`${ML_API_URL}/api/v1/ml/explain`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(request),

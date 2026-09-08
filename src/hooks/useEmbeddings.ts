@@ -90,24 +90,30 @@ export function useEmbeddings() {
             return embeddingVector;
         }
 
-        // Fallback: Gemini embedding API
-        const response = await fetch(`${GEMINI_EMBEDDING_URL}?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'models/text-embedding-004',
-                content: { parts: [{ text }] }
-            })
-        });
+        // Fallback: Gemini embedding API or Zero-API local embedding
+        try {
+            if (GEMINI_API_KEY && GEMINI_API_KEY !== 'your_gemini_api_key_here' && GEMINI_API_KEY.length > 10) {
+                const response = await fetch(`${GEMINI_EMBEDDING_URL}?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'models/text-embedding-004',
+                        content: { parts: [{ text }] }
+                    })
+                });
 
-        if (!response.ok) {
-            const errBody = await response.text();
-            console.error(`[Embeddings] API Error: ${response.status} - ${errBody}`);
-            throw new Error(`Gemini API error: ${response.statusText} ${errBody}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data?.embedding?.values) {
+                        return data.embedding.values;
+                    }
+                }
+            }
+        } catch {
+            // Fall through to local embedding
         }
 
-        const data = await response.json();
-        const embeddingVector = data.embedding.values;
+        const embeddingVector = await aiOrchestrator.generateLocalEmbedding(text);
 
         if (workspaceId) {
             const contentHash = await hashContent(text);

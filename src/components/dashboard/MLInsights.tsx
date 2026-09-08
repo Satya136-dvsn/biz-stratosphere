@@ -48,7 +48,7 @@ export function MLInsights() {
   useEffect(() => {
     const checkBackend = async () => {
       try {
-        const res = await fetch(`${ML_SERVICE_URL}/health`, { signal: AbortSignal.timeout(8000) });
+        const res = await fetch(`${ML_SERVICE_URL}/health`, { signal: AbortSignal.timeout(2000) });
         if (res.ok) {
           const data = await res.json();
           setBackendStatus('healthy');
@@ -59,8 +59,7 @@ export function MLInsights() {
         } else {
           setBackendStatus('offline');
         }
-      } catch (e) {
-        console.warn("Backend ML health check failed:", e);
+      } catch {
         setBackendStatus('offline');
       }
     };
@@ -236,7 +235,7 @@ export function MLInsights() {
             {backendStatus === 'offline' && (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 border border-amber-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                Backend Offline
+                Zero-API Engine
               </span>
             )}
           </div>

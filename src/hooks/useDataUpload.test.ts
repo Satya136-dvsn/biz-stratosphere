@@ -18,6 +18,8 @@ const mocks = vi.hoisted(() => {
             insert: vi.fn(() => builder),
             upsert: vi.fn(() => builder),
             eq: vi.fn(() => builder),
+            single: vi.fn(() => Promise.resolve({ data: {}, error: null })),
+            maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
             then: vi.fn((cb: any) => Promise.resolve(cb?.({ data: [], error: null }))),
         };
         return builder;
