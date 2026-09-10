@@ -32,7 +32,7 @@ const mocks = vi.hoisted(() => {
             gte: vi.fn(() => builder),
             lte: vi.fn(() => builder),
             order: vi.fn(() => builder),
-            then: vi.fn((cb: any) => Promise.resolve(cb?.({ data: [], error: null }))),
+            then: vi.fn((resolve: any, reject?: any) => Promise.resolve({ data: [], error: null }).then(resolve, reject)),
         };
         return builder;
     };
@@ -102,12 +102,13 @@ describe('useChartData', () => {
     });
 
     it('should return chartData as an array', async () => {
+        const testFilters = {
+            startDate: subMonths(new Date(), 6),
+            endDate: new Date(),
+            period: 'monthly' as const,
+        };
         const { result } = renderHook(
-            () => useChartData({
-                startDate: subMonths(new Date(), 6),
-                endDate: new Date(),
-                period: 'monthly' as const,
-            }),
+            () => useChartData(testFilters),
             { wrapper: createWrapper() }
         );
 
@@ -119,12 +120,13 @@ describe('useChartData', () => {
     });
 
     it('should provide refreshData function', () => {
+        const testFilters = {
+            startDate: subMonths(new Date(), 6),
+            endDate: new Date(),
+            period: 'monthly' as const,
+        };
         const { result } = renderHook(
-            () => useChartData({
-                startDate: subMonths(new Date(), 6),
-                endDate: new Date(),
-                period: 'monthly' as const,
-            }),
+            () => useChartData(testFilters),
             { wrapper: createWrapper() }
         );
 

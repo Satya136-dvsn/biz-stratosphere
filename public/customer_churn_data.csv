@@ -1,0 +1,9 @@
+customer_id,account_name,contact_email,contact_phone,mrr,contract_length_months,support_tickets_open,usage_frequency_score,days_to_renewal,satisfaction_score,churn_risk_score,industry,tier
+CUST-1001,Northstar Logistics,david.miller@northstarlogistics.com,+1-555-234-8841,48200,12,9,42,18,3.2,0.84,Supply Chain,Enterprise
+CUST-1002,Cascade Global,sarah.connor@cascadeglobal.com,+1-555-891-4432,62500,24,12,35,45,2.8,0.88,Cloud Infrastructure,Enterprise
+CUST-1003,Orbit Systems,marcus.vance@orbitsystems.io,+1-555-672-9100,22100,12,7,49,90,3.6,0.73,FinTech,Enterprise
+CUST-1004,Apex Retail,elena.rostova@apexretail.com,+1-555-341-2099,76400,36,2,91,210,4.8,0.18,E-Commerce,Enterprise
+CUST-1005,Meridian Health,dr.patel@meridianhealth.org,+1-555-443-7721,56300,24,3,78,180,4.2,0.36,Healthcare,Enterprise
+CUST-1006,Vanguard Dynamics,alex.chen@vanguarddynamics.co,+1-555-908-1122,34900,12,8,38,24,3.1,0.81,Manufacturing,Enterprise
+CUST-1007,Helios Energy,rachel.adams@heliosenergy.com,+1-555-812-3344,41000,12,4,65,150,4.0,0.42,Renewables,Enterprise
+CUST-1008,Synthetix Media,james.wilson@synthetixmedia.com,+1-555-709-6655,18500,6,6,52,60,3.4,0.68,Digital Media,Enterprise
