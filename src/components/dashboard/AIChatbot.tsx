@@ -204,6 +204,7 @@ export function AIChatbot() {
               onClick={handleSend}
               disabled={!input.trim() || isSending}
               size="icon"
+              aria-label="Send message"
               className="bg-gradient-primary hover:opacity-90"
             >
               {isSending ? (
