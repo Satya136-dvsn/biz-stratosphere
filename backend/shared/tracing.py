@@ -191,6 +191,9 @@ class Tracer:
             self._current_trace_id = prev_trace
             self._current_span_id = prev_span
 
+    # OpenTelemetry compatibility alias
+    start_as_current_span = span
+
     def inject_headers(self, headers: Optional[dict] = None) -> dict:
         """Inject trace context into outgoing HTTP headers."""
         h = headers or {}

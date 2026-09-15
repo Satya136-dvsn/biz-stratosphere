@@ -12,6 +12,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCompany } from '@/hooks/useCompany';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { useQueryClient } from '@tanstack/react-query';
+import { maskRowPII, maskRowsPII } from '@/lib/data/piiMasking';
+import { computeChurnKPIs, type ChurnKPIs } from '@/lib/data/kpiEngine';
 
 type DataPoint = {
   metric_name: string;
@@ -23,6 +25,7 @@ type DataPoint = {
 
 export function useDataUpload() {
   const [isUploading, setIsUploading] = useState(false);
+  const [lastKPIs, setLastKPIs] = useState<ChurnKPIs | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const { company } = useCompany();
@@ -68,9 +71,16 @@ export function useDataUpload() {
   };
 
   const validateAndTransformData = (rawData: unknown[]): DataPoint[] => {
+    // 1. Scrub PII from all incoming rows using clean regex masking
+    const maskedRawData = maskRowsPII(rawData as Record<string, any>[]);
+
+    // 2. Compute dynamic KPIs for churn/MRR data
+    const kpis = computeChurnKPIs(maskedRawData);
+    setLastKPIs(kpis);
+
     const dataPoints: DataPoint[] = [];
 
-    rawData.forEach((row: any, index: number) => {
+    maskedRawData.forEach((row: any, index: number) => {
       try {
         // Custom mapping for user data format
         // Map churn column as metric_name and estimated_ as metric_value
@@ -85,7 +95,11 @@ export function useDataUpload() {
               metric_value: metricValue,
               metric_type: 'number',
               date_recorded: dateRecorded,
-              metadata: { original_row: row as unknown as import("@/integrations/supabase/types").Json, row_index: index }
+              metadata: {
+                original_row: row as unknown as import("@/integrations/supabase/types").Json,
+                row_index: index,
+                pii_masked: true,
+              }
             });
           }
           return;
@@ -93,7 +107,7 @@ export function useDataUpload() {
 
         // Try to find metric name, value, and date columns
         const possibleNameFields = ['name', 'metric', 'metric_name', 'category', 'type'];
-        const possibleValueFields = ['value', 'amount', 'metric_value', 'revenue', 'sales', 'count'];
+        const possibleValueFields = ['value', 'amount', 'metric_value', 'revenue', 'sales', 'count', 'mrr', 'MRR'];
         const possibleDateFields = ['date', 'created_at', 'timestamp', 'recorded_date', 'date_recorded'];
 
         let metricName = '';
@@ -130,9 +144,9 @@ export function useDataUpload() {
           }
         }
 
-        // If we couldn't find a name, use row index or a generic name
+        // If we couldn't find a name, use row index or account name
         if (!metricName) {
-          metricName = `Metric_${index + 1}`;
+          metricName = row.account_name ? String(row.account_name) : `Metric_${index + 1}`;
         }
 
         // Skip rows with invalid values
@@ -145,18 +159,20 @@ export function useDataUpload() {
           metric_value: metricValue,
           metric_type: 'number',
           date_recorded: dateRecorded,
-          metadata: { original_row: row as import("@/integrations/supabase/types").Json, row_index: index }
+          metadata: {
+            original_row: row as import("@/integrations/supabase/types").Json,
+            row_index: index,
+            pii_masked: true,
+          }
         });
       } catch (error) {
         console.warn(`Skipping row ${index + 1} due to validation error:`, error);
       }
     });
 
-    // ALSO: Create raw CSV row entries for Advanced Charts
-    // Each raw entry preserves the complete row structure
-    rawData.forEach((row: any, index: number) => {
+    // ALSO: Create raw CSV row entries for Advanced Charts with PII-masked rows
+    maskedRawData.forEach((row: any, index: number) => {
       try {
-        // Try to extract date from the row for proper filtering
         const possibleDateFields = ['date', 'created_at', 'timestamp', 'recorded_date', 'date_recorded'];
         let dateRecorded = new Date().toISOString();
 
@@ -170,15 +186,15 @@ export function useDataUpload() {
           }
         }
 
-        // Create raw row entry
         dataPoints.push({
-          metric_name: 'raw_csv_row',  // Special marker for Advanced Charts
-          metric_value: 0,              // Not used for raw rows
+          metric_name: 'raw_csv_row',
+          metric_value: 0,
           metric_type: 'raw',
           date_recorded: dateRecorded,
           metadata: {
             row_data: row as import("@/integrations/supabase/types").Json,
             is_raw: true,
+            pii_masked: true,
             columns: Object.keys(row),
             row_index: index
           }
@@ -196,7 +212,6 @@ export function useDataUpload() {
   };
 
   const uploadData = async (files: FileList) => {
-
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -206,7 +221,6 @@ export function useDataUpload() {
       return;
     }
 
-    // Check rate limit before uploading
     try {
       const rateLimitResult = await checkRateLimit(user.id, 'upload');
 
@@ -222,17 +236,14 @@ export function useDataUpload() {
       }
     } catch (error) {
       console.error('Rate limit check error:', error);
-      // Continue with upload if rate limit check fails (fail open)
     }
 
     setIsUploading(true);
 
     try {
       for (const file of Array.from(files)) {
-        // Process file
         const dataPoints = await processFile(file);
 
-        // Prepare payload for backend function
         const datasetsPayload = [{
           name: file.name.split('.')[0],
           file_name: file.name,
@@ -249,8 +260,7 @@ export function useDataUpload() {
           ...(company ? { company_id: company.id } : {}),
         }));
 
-        // Call Supabase Edge Function
-        const { data, error } = await supabase.functions.invoke('data-upload', {
+        const { error } = await supabase.functions.invoke('data-upload', {
           body: {
             datasets: datasetsPayload,
             data_points: dataPointsPayload
@@ -263,10 +273,9 @@ export function useDataUpload() {
 
         toast({
           title: "Upload Successful",
-          description: `Processed ${dataPoints.length} data points from ${file.name}`,
+          description: `Processed ${dataPoints.length} data points from ${file.name} with PII auto-masking`,
         });
 
-        // Invalidate datasets and metrics queries to refresh the list and dashboard automatically
         queryClient.invalidateQueries({ queryKey: ['datasets'] });
         queryClient.invalidateQueries({ queryKey: ['kpi-data'] });
         queryClient.invalidateQueries({ queryKey: ['chart-data'] });
@@ -283,10 +292,102 @@ export function useDataUpload() {
     }
   };
 
+  /**
+   * Load sample enterprise customer churn data (8 accounts) with PII auto-masking and KPI computation
+   */
+  const loadSampleChurnData = async () => {
+    setIsUploading(true);
+    try {
+      let csvText = '';
+      try {
+        const response = await fetch('/customer_churn_data.csv');
+        if (response.ok) {
+          csvText = await response.text();
+        }
+      } catch {
+        // Fallback to embedded CSV text below
+      }
+
+      if (!csvText) {
+        csvText = `customer_id,account_name,contact_email,contact_phone,mrr,contract_length_months,support_tickets_open,usage_frequency_score,days_to_renewal,satisfaction_score,churn_risk_score,industry,tier
+CUST-1001,Northstar Logistics,david.miller@northstarlogistics.com,+1-555-234-8841,48200,12,9,42,18,3.2,0.84,Supply Chain,Enterprise
+CUST-1002,Cascade Global,sarah.connor@cascadeglobal.com,+1-555-891-4432,62500,24,12,35,45,2.8,0.88,Cloud Infrastructure,Enterprise
+CUST-1003,Orbit Systems,marcus.vance@orbitsystems.io,+1-555-672-9100,22100,12,7,49,90,3.6,0.73,FinTech,Enterprise
+CUST-1004,Apex Retail,elena.rostova@apexretail.com,+1-555-341-2099,76400,36,2,91,210,4.8,0.18,E-Commerce,Enterprise
+CUST-1005,Meridian Health,dr.patel@meridianhealth.org,+1-555-443-7721,56300,24,3,78,180,4.2,0.36,Healthcare,Enterprise
+CUST-1006,Vanguard Dynamics,alex.chen@vanguarddynamics.co,+1-555-908-1122,34900,12,8,38,24,3.1,0.81,Manufacturing,Enterprise
+CUST-1007,Helios Energy,rachel.adams@heliosenergy.com,+1-555-812-3344,41000,12,4,65,150,4.0,0.42,Renewables,Enterprise
+CUST-1008,Synthetix Media,james.wilson@synthetixmedia.com,+1-555-709-6655,18500,6,6,52,60,3.4,0.68,Digital Media,Enterprise`;
+      }
+
+      const parsed = Papa.parse<Record<string, any>>(csvText, { header: true, skipEmptyLines: true });
+      const maskedRows = maskRowsPII(parsed.data);
+      const kpis = computeChurnKPIs(maskedRows);
+      setLastKPIs(kpis);
+
+      const dataPoints = validateAndTransformData(maskedRows);
+
+      if (user) {
+        try {
+          const datasetsPayload = [{
+            name: 'customer_churn_data',
+            file_name: 'customer_churn_data.csv',
+            file_type: 'text/csv',
+            file_size: csvText.length,
+            status: 'completed',
+            user_id: user.id,
+            ...(company ? { company_id: company.id } : {}),
+          }];
+
+          const dataPointsPayload = dataPoints.map(dp => ({
+            ...dp,
+            user_id: user.id,
+            ...(company ? { company_id: company.id } : {}),
+          }));
+
+          const { error } = await supabase.functions.invoke('data-upload', {
+            body: {
+              datasets: datasetsPayload,
+              data_points: dataPointsPayload
+            }
+          });
+
+          if (error) {
+            console.warn('Edge function upload failed, continuing locally:', error);
+          }
+        } catch (err) {
+          console.warn('Backend sync failed, continuing locally:', err);
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['datasets'] });
+      queryClient.invalidateQueries({ queryKey: ['kpi-data'] });
+      queryClient.invalidateQueries({ queryKey: ['chart-data'] });
+      window.dispatchEvent(new CustomEvent('dataUploaded', { detail: { kpis, count: maskedRows.length } }));
+
+      toast({
+        title: "Sample Churn Data Loaded",
+        description: `Loaded ${maskedRows.length} enterprise accounts ($${kpis.totalMRR.toLocaleString()} MRR, at-risk ARR: $${kpis.atRiskARR.toLocaleString()}). PII auto-masking applied.`,
+      });
+
+      return { kpis, rows: maskedRows };
+    } catch (error) {
+      console.error('Failed to load sample churn data:', error);
+      toast({
+        title: "Load Failed",
+        description: error instanceof Error ? error.message : "Failed to load sample churn data.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return {
     uploadData,
-    isUploading
+    isUploading,
+    loadSampleChurnData,
+    lastKPIs,
+    isMaskingActive: true,
   };
 }
-
-

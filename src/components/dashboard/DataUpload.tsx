@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileText, CheckCircle, AlertCircle, X } from "lucide-react";
+import { Upload, FileText, CheckCircle, AlertCircle, X, ShieldCheck, Database } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useDataUpload } from "@/hooks/useDataUpload";
@@ -27,7 +27,7 @@ export function DataUpload() {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadData, isUploading } = useDataUpload();
+  const { uploadData, isUploading, loadSampleChurnData } = useDataUpload();
   const { user } = useAuth();
 
   const handleDrag = (e: React.DragEvent) => {
@@ -62,6 +62,11 @@ export function DataUpload() {
     if (e.target.files && e.target.files.length > 0) {
       handleFileUpload(e.target.files);
     }
+  };
+
+  const handleQuickLoad = async () => {
+    await loadSampleChurnData();
+    await fetchDatasets();
   };
 
   const fetchDatasets = async () => {
@@ -150,7 +155,6 @@ export function DataUpload() {
   };
 
   useEffect(() => {
-    // Inline fetchDatasets to avoid extra dependency in the array
     const fetchDatasetsAsync = async () => {
       if (!user) return;
 
@@ -192,11 +196,15 @@ export function DataUpload() {
 
   return (
     <Card className="border-2 border-info/20 bg-gradient-to-br from-info/10 to-transparent">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="flex items-center gap-2 text-xl font-semibold">
           <Upload className="h-6 w-6 text-info" />
           Data Management
         </CardTitle>
+        <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full shadow-sm">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+          <span>PII Auto-Masking Active</span>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Upload Area */}
@@ -217,13 +225,24 @@ export function DataUpload() {
           <p className="text-muted-foreground mb-4">
             Drag and drop your CSV, Excel, or JSON files here
           </p>
-          <Button
-            className="bg-gradient-primary"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-          >
-            {isUploading ? 'Uploading...' : 'Choose Files'}
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button
+              className="bg-gradient-primary"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+            >
+              {isUploading ? 'Uploading...' : 'Choose Files'}
+            </Button>
+            <Button
+              variant="outline"
+              className="border-dashed border-info/40 hover:border-info hover:bg-info/5 text-foreground text-sm flex items-center gap-2"
+              onClick={handleQuickLoad}
+              disabled={isUploading}
+            >
+              <Database className="h-4 w-4 text-info" />
+              Quick Load Sample Churn Data
+            </Button>
+          </div>
           <input
             type="file"
             ref={fileInputRef}

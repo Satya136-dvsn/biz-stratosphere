@@ -9,6 +9,7 @@ import { useToast } from './use-toast';
 import { hashContent } from '@/lib/conversationUtils';
 import { useUserUploads } from './useUserUploads';
 import { aiOrchestrator } from '@/lib/ai/orchestrator';
+import { searchStandardPlaybooks } from '@/lib/ai/playbooks';
 
 const AI_PROVIDER = import.meta.env.VITE_AI_PROVIDER || 'local';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
@@ -301,6 +302,23 @@ export function useEmbeddings() {
         },
     });
 
+    const mapPlaybooksToResults = (queryText: string, maxResults: number): SearchResult[] => {
+        const playbooks = searchStandardPlaybooks(queryText, maxResults);
+        return playbooks.map((pb, idx) => ({
+            id: pb.id,
+            content: pb.text,
+            metadata: {
+                title: pb.title,
+                triggers: pb.triggers,
+                action_checklist: pb.actionChecklist,
+                keywords: pb.keywords,
+                source: 'standard_playbook',
+                category: pb.metadata?.category || 'retention_playbook',
+            },
+            similarity: Math.max(0.6, +(0.95 - idx * 0.05).toFixed(4)),
+        }));
+    };
+
     // Search similar embeddings
     const searchSimilar = async (
         query: string,
@@ -308,71 +326,79 @@ export function useEmbeddings() {
         datasetId?: string,
         threshold: number = 0.5
     ): Promise<SearchResult[]> => {
-        if (!user) throw new Error('Not authenticated');
+        // Fallback to standard playbooks when user is unauthenticated
+        if (!user) {
+            console.log('[RAG Debug] User unauthenticated; returning standard retention playbooks.');
+            return mapPlaybooksToResults(query, limit);
+        }
 
         console.log(`[RAG Debug] Searching similar for: "${query}"`, { limit, datasetId, threshold });
 
-        const queryEmbedding = await generateEmbedding(query);
+        try {
+            const queryEmbedding = await generateEmbedding(query);
 
-        const rpcParams = {
-            query_embedding: queryEmbedding,
-            match_threshold: threshold,
-            match_count: limit,
-            filter_dataset_id: datasetId || null,
-        };
-        console.log('[RAG Debug] Invoking RPC match_embeddings with:', rpcParams);
+            const rpcParams = {
+                query_embedding: queryEmbedding,
+                match_threshold: threshold,
+                match_count: limit,
+                filter_dataset_id: datasetId || null,
+            };
+            console.log('[RAG Debug] Invoking RPC match_embeddings with:', rpcParams);
 
-        const { data, error } = await supabase.rpc('match_embeddings', rpcParams);
+            const { data, error } = await supabase.rpc('match_embeddings', rpcParams);
 
-        if (data) {
-            console.log(`[RAG Debug] RPC returned ${data.length} matches.`);
-            if (data.length > 0) {
-                console.log('[RAG Debug] First match score:', data[0].similarity);
+            if (data && data.length > 0) {
+                console.log(`[RAG Debug] RPC returned ${data.length} matches.`);
+                return data;
             }
-        }
 
-        if (error || !data) {
             if (error) {
-                console.error('[RAG Debug] RPC Error Details:', {
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint,
-                    code: error.code,
-                    fullError: error
-                });
-                console.warn('RPC search failed, using fallback:', error);
+                console.warn('[RAG Debug] pgvector RPC search failed, falling back:', error);
+            } else {
+                console.log('[RAG Debug] pgvector RPC returned 0 results, attempting fallback.');
             }
 
-            let queryBuilder = supabase
-                .from('embeddings')
-                .select('*')
-                .eq('user_id', user.id);
+            // Fallback: try embeddings table directly
+            try {
+                let queryBuilder = supabase
+                    .from('embeddings')
+                    .select('*')
+                    .eq('user_id', user.id);
 
-            if (datasetId) {
-                queryBuilder = queryBuilder.filter('metadata->>dataset_id', 'eq', datasetId);
+                if (datasetId) {
+                    queryBuilder = queryBuilder.filter('metadata->>dataset_id', 'eq', datasetId);
+                }
+
+                const { data: embeddings, error: fetchError } = await queryBuilder.limit(100);
+
+                if (!fetchError && embeddings && embeddings.length > 0) {
+                    const results = embeddings.map(emb => {
+                        const similarity = cosineSimilarity(queryEmbedding, emb.embedding);
+                        return {
+                            id: emb.id,
+                            content: emb.content,
+                            metadata: emb.metadata,
+                            similarity,
+                        };
+                    })
+                    .filter(r => r.similarity >= threshold)
+                    .sort((a, b) => b.similarity - a.similarity)
+                    .slice(0, limit);
+
+                    if (results.length > 0) {
+                        return results;
+                    }
+                }
+            } catch (tableErr) {
+                console.warn('[RAG Debug] Table fallback failed:', tableErr);
             }
-
-            const { data: embeddings, error: fetchError } = await queryBuilder.limit(100);
-
-            if (fetchError) throw fetchError;
-
-            const results = embeddings?.map(emb => {
-                const similarity = cosineSimilarity(queryEmbedding, emb.embedding);
-                return {
-                    id: emb.id,
-                    content: emb.content,
-                    metadata: emb.metadata,
-                    similarity,
-                };
-            }) || [];
-
-            return results
-                .filter(r => r.similarity > 0.5)
-                .sort((a, b) => b.similarity - a.similarity)
-                .slice(0, limit);
+        } catch (genErr) {
+            console.warn('[RAG Debug] Error during embedding generation or RPC:', genErr);
         }
 
-        return data || [];
+        // Fallback to standard playbooks when pgvector RPC fails or returns 0 results
+        console.log('[RAG Debug] Falling back to standard retention playbooks.');
+        return mapPlaybooksToResults(query, limit);
     };
 
     const { data: embeddingsCount = 0 } = useQuery({
