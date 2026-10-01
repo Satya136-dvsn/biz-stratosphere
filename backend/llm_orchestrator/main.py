@@ -30,6 +30,8 @@ from shared import (  # noqa: E402
     make_ollama_client,
     CircuitBreakerError,
     retry_with_backoff,
+    is_in_docker,
+    resolve_service_url,
 )
 from shared.metrics import get_or_create_metrics, make_metrics_router  # noqa: E402
 from shared.tracing import init_tracer, make_traces_router  # noqa: E402
@@ -38,29 +40,11 @@ from agent import run_agent  # noqa: E402
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s - %(message)s")
 logger = logging.getLogger("llm-orchestrator")
 
-def _is_in_docker() -> bool:
-    if os.path.exists("/.dockerenv"):
-        return True
-    try:
-        with open("/proc/1/cgroup", "rt") as f:
-            return "docker" in f.read()
-    except Exception:
-        pass
-    return os.getenv("IS_DOCKER", "").lower() in ("true", "1", "yes")
+_IN_DOCKER = is_in_docker()
 
-_IN_DOCKER = _is_in_docker()
-
-def _resolve_url(env_var: str, docker_url: str, local_url: str) -> str:
-    val = os.getenv(env_var)
-    if val:
-        if not _IN_DOCKER and any(h in val for h in ["rag-service", "ml-inference", "ollama", "analytics-service"]):
-            return local_url
-        return val
-    return docker_url if _IN_DOCKER else local_url
-
-OLLAMA_HOST = _resolve_url("OLLAMA_HOST", "http://ollama:11434", "http://localhost:11434")
-RAG_URL = _resolve_url("RAG_SERVICE_URL", "http://rag-service:8003", "http://localhost:8003")
-ML_URL = _resolve_url("ML_INFERENCE_URL", "http://ml-inference:8001", "http://localhost:8001")
+OLLAMA_HOST = resolve_service_url("OLLAMA_HOST", "http://ollama:11434", "http://localhost:11434")
+RAG_URL = resolve_service_url("RAG_SERVICE_URL", "http://rag-service:8003", "http://localhost:8003")
+ML_URL = resolve_service_url("ML_INFERENCE_URL", "http://ml-inference:8001", "http://localhost:8001")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 
 # Circuit breakers for lateral service calls

@@ -21,6 +21,7 @@ import hashlib
 from typing import Optional
 
 import asyncpg
+import asyncio
 import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,23 +42,10 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(na
 logger = logging.getLogger("rag-service")
 
 
-def _is_in_docker() -> bool:
-    """Detect if running inside a Docker container."""
-    if os.path.exists("/.dockerenv"):
-        return True
-    try:
-        with open("/proc/1/cgroup", "rt") as f:
-            content = f.read()
-            return "docker" in content or "kubepods" in content
-    except Exception:
-        pass
-    return False
-
+from shared.env import is_in_docker, resolve_service_url  # noqa: E402
 
 DATABASE_URL = os.getenv("DATABASE_URL", "")
-# Set default OLLAMA_HOST to 'http://localhost:11434' if not in docker
-_DEFAULT_OLLAMA_HOST = "http://ollama:11434" if _is_in_docker() else "http://localhost:11434"
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", _DEFAULT_OLLAMA_HOST)
+OLLAMA_HOST = resolve_service_url("OLLAMA_HOST", "http://ollama:11434", "http://localhost:11434")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "nomic-embed-text")
 
 # ──────────────────────────────────────────────
@@ -246,17 +234,24 @@ STANDARD_PLAYBOOKS: list[dict] = [
 # ──────────────────────────────────────────────
 # Deterministic Synthetic Embeddings & Vector Math
 # ──────────────────────────────────────────────
+_SYNTHETIC_EMBED_CACHE: dict[str, list[float]] = {}
+_MAX_EMBED_CACHE_SIZE = 2048
+
 def _synthetic_embed(text: str, dimensions: int = 768) -> list[float]:
     """
     Deterministic zero-dependency 768-dimensional synthetic embedding generator.
     Produces semantically aligned unit-normalized vectors using token hashing,
-    n-gram projection, domain boosting, and L2 normalization.
+    n-gram projection, domain boosting, and L2 normalization with LRU caching.
     """
     if not text or not text.strip():
         return [0.0] * dimensions
 
-    vec = [0.0] * dimensions
     cleaned = text.lower().strip()
+    cache_key = f"{dimensions}:{cleaned}"
+    if cache_key in _SYNTHETIC_EMBED_CACHE:
+        return list(_SYNTHETIC_EMBED_CACHE[cache_key])
+
+    vec = [0.0] * dimensions
 
     tokens = re.findall(r"\b[a-zA-Z0-9_\-\./]+\b", cleaned)
     if not tokens:
@@ -319,9 +314,27 @@ def _synthetic_embed(text: str, dimensions: int = 768) -> list[float]:
 
     # L2 Unit Normalization
     norm = math.sqrt(sum(v * v for v in vec))
-    if norm > 0:
-        return [v / norm for v in vec]
-    return vec
+    res = [v / norm for v in vec] if norm > 0 else vec
+
+    # Cache management
+    if len(_SYNTHETIC_EMBED_CACHE) >= _MAX_EMBED_CACHE_SIZE:
+        keys_to_remove = list(_SYNTHETIC_EMBED_CACHE.keys())[: _MAX_EMBED_CACHE_SIZE // 4]
+        for k in keys_to_remove:
+            _SYNTHETIC_EMBED_CACHE.pop(k, None)
+    _SYNTHETIC_EMBED_CACHE[cache_key] = list(res)
+
+    return res
+
+
+def _precompute_playbook_embeddings():
+    """Precomputes standard playbook embeddings to eliminate runtime retrieval latency."""
+    for pb in STANDARD_PLAYBOOKS:
+        if not pb.get("_synthetic_embedding"):
+            searchable_text = f"{pb['id']} {pb['title']}. {pb['text']} {' '.join(pb['keywords'])} {' '.join(pb['triggers'])}"
+            pb["_synthetic_embedding"] = _synthetic_embed(searchable_text, dimensions=768)
+            pb["_embedding"] = pb["_synthetic_embedding"]
+
+_precompute_playbook_embeddings()
 
 
 def _cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
@@ -388,18 +401,25 @@ for exc_type, handler in make_exception_handlers("rag-service"):
     app.add_exception_handler(exc_type, handler)
 
 
-@app.on_event("startup")
-async def startup():
-    # Pre-seed synthetic embeddings for in-memory playbooks
+async def _async_preseed_ollama_embeddings():
+    """Asynchronously fetch Ollama embeddings in the background without blocking server startup."""
     for pb in STANDARD_PLAYBOOKS:
         searchable_text = f"{pb['id']} {pb['title']}. {pb['text']} {' '.join(pb['keywords'])} {' '.join(pb['triggers'])}"
-        pb["_synthetic_embedding"] = _synthetic_embed(searchable_text, dimensions=768)
-        pb["_embedding"] = pb["_synthetic_embedding"]
         try:
-            pb["_ollama_embedding"] = await _embed(searchable_text)
+            async with make_ollama_client(OLLAMA_HOST) as client:
+                r = await client.post("/api/embeddings", json={"model": EMBED_MODEL, "prompt": searchable_text}, timeout=1.5)
+                if r.status_code == 200:
+                    pb["_ollama_embedding"] = r.json()["embedding"]
         except Exception:
             pb["_ollama_embedding"] = None
-    logger.info("Pre-seeded STANDARD_PLAYBOOKS with 768-dim synthetic and Ollama embeddings.")
+    logger.debug("Background Ollama embedding pre-seed pass completed.")
+
+
+@app.on_event("startup")
+async def startup():
+    # Synthetic embeddings are already precomputed at import time; spawn non-blocking task for Ollama
+    asyncio.create_task(_async_preseed_ollama_embeddings())
+    logger.info("RAG Service ready: in-memory playbooks primed with 768-dim synthetic embeddings.")
 
     if DATABASE_URL:
         try:

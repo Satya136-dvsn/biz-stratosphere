@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import sys
 import time
+import math
 import logging
 import hashlib
 from pathlib import Path
@@ -71,6 +72,7 @@ class ModelRegistry:
         "churn_prediction": "churn_model",
         "churn": "churn_model",
         "churn_risk": "churn_model",
+        "churn_risk_v1": "churn_model",
         "customer_churn": "churn_model",
         "bank_churn": "churn_model",
         # Revenue model aliases
@@ -100,6 +102,14 @@ class ModelRegistry:
                 logger.error(f"Failed to load {f}: {exc}")
 
     def get(self, name: str) -> Any:
+        if not name or not isinstance(name, str):
+            return None
+
+        # Prevent path traversal attacks
+        if ".." in name or "/" in name or "\\" in name:
+            logger.warning(f"Rejected potentially malicious model lookup: {name}")
+            return None
+
         if not self._models:
             self.load_all()
 
@@ -178,13 +188,23 @@ class PredictRequest(BaseModel):
     model_name: str
     features: list[float]
     feature_names: Optional[list[str]] = None
+    strict_features: bool = False
 
-    @field_validator("features")
+    @field_validator("features", mode="before")
     @classmethod
-    def features_not_empty(cls, v):
-        if not v:
-            raise ValueError("features must be non-empty")
-        return v
+    def validate_features_numeric(cls, v):
+        if not v or not isinstance(v, list):
+            raise ValueError("features must be a non-empty list of numeric values")
+        cleaned = []
+        for i, val in enumerate(v):
+            try:
+                num = float(val)
+                if math.isnan(num) or math.isinf(num):
+                    raise ValueError(f"Feature at index {i} must be a finite number (received {val})")
+                cleaned.append(num)
+            except (ValueError, TypeError) as exc:
+                raise ValueError(f"Feature at index {i} is not a valid number: {val}") from exc
+        return cleaned
 
 
 class PredictResponse(BaseModel):
@@ -193,6 +213,7 @@ class PredictResponse(BaseModel):
     prediction: Any
     probability: Optional[list[float]] = None
     latency_ms: float
+    warnings: Optional[list[str]] = None
 
 
 # ──────────────────────────────────────────────
@@ -206,6 +227,16 @@ async def list_models():
 @app.post("/api/v1/predict", response_model=PredictResponse)
 async def predict(req: PredictRequest):
     start = time.monotonic()
+    warnings: list[str] = []
+
+    # Reject path traversal attacks immediately
+    if any(char in req.model_name for char in ("..", "/", "\\")):
+        logger.warning(f"Rejected path traversal model lookup: {req.model_name}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid model name '{req.model_name}': path traversal characters are forbidden",
+        )
+
     model = registry.get(req.model_name)
 
     # Sub-50ms deterministic fallback if unmapped
@@ -215,12 +246,14 @@ async def predict(req: PredictRequest):
         latency_ms = round(latency_s * 1000, 2)
         metrics.ml_inference_latency.observe(latency_s, model=req.model_name)
         logger.info(f"Unmapped model '{req.model_name}' served via deterministic fallback in {latency_ms}ms")
+        warnings.append(f"Model '{req.model_name}' unmapped; prediction generated via deterministic zero-API fallback.")
         return PredictResponse(
             success=True,
             model_name=req.model_name,
             prediction=pred,
             probability=proba,
             latency_ms=latency_ms,
+            warnings=warnings,
         )
 
     with tracer.span("ml.predict", attributes={"model": req.model_name}) as span:
@@ -230,9 +263,25 @@ async def predict(req: PredictRequest):
             # Feature array padding/alignment to match model.n_features_in_
             expected_n = getattr(model, "n_features_in_", None)
             if expected_n is not None:
+                # Enforce strict count if requested by caller or global policy
+                if req.strict_features or os.getenv("ML_STRICT_FEATURES", "").lower() == "true":
+                    if len(features) != expected_n:
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Strict validation failure: model '{req.model_name}' expects exactly {expected_n} features, but received {len(features)}. Set strict_features=False to allow zero-padding/truncation.",
+                        )
+
                 if len(features) < expected_n:
-                    features = features + [0.0] * (expected_n - len(features))
+                    diff = expected_n - len(features)
+                    warn_msg = f"Feature count mismatch: received {len(req.features)} features, expected {expected_n}. Padded features with {diff} zero(s)."
+                    logger.warning(warn_msg)
+                    warnings.append(warn_msg)
+                    features = features + [0.0] * diff
                 elif len(features) > expected_n:
+                    diff = len(features) - expected_n
+                    warn_msg = f"Feature count mismatch: received {len(req.features)} features, expected {expected_n}. Truncated features: dropped {diff} feature(s)."
+                    logger.warning(warn_msg)
+                    warnings.append(warn_msg)
                     features = features[:expected_n]
 
             # Pandas DataFrame feature name wrapping
@@ -274,7 +323,10 @@ async def predict(req: PredictRequest):
                 prediction=pred.tolist()[0] if hasattr(pred, "tolist") else pred,
                 probability=proba,
                 latency_ms=latency_ms,
+                warnings=warnings if warnings else None,
             )
+        except HTTPException:
+            raise
         except Exception as exc:
             span.set_error(exc)
             logger.exception(f"Prediction error for '{req.model_name}': {exc}")

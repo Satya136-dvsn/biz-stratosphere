@@ -38,8 +38,14 @@ from .tracing import (
     get_collector,
     make_traces_router,
 )
+from .env import (
+    is_in_docker,
+    resolve_service_url,
+)
 
 __all__ = [
+    # Environment & URLs
+    "is_in_docker", "resolve_service_url",
     # Errors
     "ErrorResponse", "SuccessResponse", "ErrorDetail", "ErrorCodes",
     "build_error_response", "build_error_json", "make_exception_handlers",
